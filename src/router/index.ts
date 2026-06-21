@@ -260,4 +260,13 @@ const router = createRouter({
   ]
 })
 
+// Mise en ligne: le dashboard/CMS n'est pas encore pret. On masque /dashboard et
+// /connexion tant que VITE_ENABLE_DASHBOARD !== 'true'. Reactiver via le .env du build.
+const DASHBOARD_ENABLED = import.meta.env.VITE_ENABLE_DASHBOARD === 'true'
+router.beforeEach((to) => {
+  if (!DASHBOARD_ENABLED && (to.path.startsWith('/dashboard') || to.path === '/connexion')) {
+    return { path: '/' }
+  }
+})
+
 export default router

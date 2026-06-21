@@ -146,6 +146,7 @@
 
             <!-- Bouton de connexion -->
             <router-link
+              v-if="dashboardEnabled"
               to="/connexion"
               class="bg-[#fcd116] text-[#006633] px-5 py-2 rounded-full font-semibold hover:bg-[#006633] hover:text-white transition-all ml-4 flex items-center gap-2"
             >
@@ -178,7 +179,7 @@
             </div>
 
             <router-link to="/videos" class="block px-3 py-2 rounded hover:bg-[#fcd116] hover:text-[#006633] text-[#006633]">Vidéos</router-link>
-            <router-link to="/connexion" class="block px-3 py-2 rounded bg-[#fcd116] text-[#006633] font-semibold text-center">Connexion</router-link>
+            <router-link v-if="dashboardEnabled" to="/connexion" class="block px-3 py-2 rounded bg-[#fcd116] text-[#006633] font-semibold text-center">Connexion</router-link>
           </div>
         </div>
       </div>
@@ -388,6 +389,10 @@ import logo1 from '@/assets/images/logo.png'
 import logoSimandou from '@/assets/images/masque.png'
 
 const isMobileMenuOpen = ref(false)
+
+// Masque la connexion/dashboard tant que le CMS n'est pas pret (mise en ligne).
+// Reactiver en buildant avec VITE_ENABLE_DASHBOARD=true.
+const dashboardEnabled = import.meta.env.VITE_ENABLE_DASHBOARD === 'true'
 
 // État des dropdowns
 const openDropdowns = reactive({
