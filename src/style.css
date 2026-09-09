@@ -1,5 +1,36 @@
 @import 'tailwindcss';
 
+/*
+ * Tokens de theme du template multi-ambassades.
+ * Les trois couleurs de base sont remplacees au runtime par applyTheme()
+ * a partir de la config du tenant (GET /api/bootstrap). Les valeurs ci-dessous
+ * sont les couleurs de l'ambassade de Guinee, utilisees comme repli si le
+ * bootstrap echoue ou renvoie une config incomplete.
+ * Les nuances sont derivees par color-mix() : elles suivent donc
+ * automatiquement la couleur de base injectee, sans calcul en JavaScript.
+ */
+@theme {
+  --color-primary: #006633;
+  --color-primary-dark: color-mix(in oklab, var(--color-primary) 78%, black);
+  --color-primary-light: color-mix(in oklab, var(--color-primary) 82%, white);
+
+  --color-secondary: #fcd116;
+  --color-secondary-dark: color-mix(in oklab, var(--color-secondary) 88%, black);
+
+  --color-accent: #ce1126;
+  --color-accent-dark: color-mix(in oklab, var(--color-accent) 86%, black);
+  --color-accent-deep: color-mix(in oklab, var(--color-accent) 66%, black);
+
+  /* Gris bleutes du dashboard : non pilotes par le tenant. */
+  --color-ink: #346778;
+  --color-ink-dark: #2a5563;
+  --color-ink-light: #42637a;
+
+  /* Bleus d'information repris des ecrans SecureCheck. */
+  --color-info: #0297b8;
+  --color-info-dark: #02739a;
+}
+
 /* Famille de marque : Futura LT Pro, six graisses reellement fournies. */
 
 @font-face {
