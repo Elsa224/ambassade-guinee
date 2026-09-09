@@ -54,7 +54,8 @@ Repos analysés : `Danielle074/ambassade-guinee`, `Danielle074/ambassade-gabon`
 | Langue | **FR** en Phase 1 ; schéma **prêt au multilingue** (champ `locale` prévu) |
 | Ambassade Secure | **1 brand SecureCheck « Ambassade Secure »** ; **chaque ambassade = un tenant (Company)** dedans |
 | Portée RDV au démarrage | **Flux existant suffit** (demande → validation → QR → check-in) ; moteur de créneaux consulaires = plus tard si besoin |
-| Base de données CMS | **Nouveau schéma sur une RDS existante** (pas de nouvelle instance) |
+| Base de données CMS | **Nouvelles bases dédiées** (dev + prod) sur une RDS existante du parc (pas de nouvelle instance) |
+| Environnements | **shared-dev** (tests/démo/validation) + **shared-prod** (prod) |
 | Clé d'ingestion scraping | **Une `X-API-Key` par ambassade** |
 | Couture auth CMS ↔ SecureCheck | **BFF** (Laravel garde le JWT SecureCheck côté serveur) |
 
@@ -209,12 +210,17 @@ Modération : un humain valide dans le back-office avant passage en `publie`.
   Enjeu à câbler : provisionner/mapper un utilisateur SecureCheck par admin
   d'ambassade et le rattacher au bon `companyId`.
 
-## 5. Déploiement (cible shared-prod)
+## 5. Déploiement
 
-- **CMS Laravel** : 1 app PHP-FPM + 1 vhost Apache, **1 base = nouveau schéma
-  sur une RDS existante** (MariaDB/MySQL du parc ; instance précise à confirmer
-  au déploiement, candidat `express-prod-db`). Pas de nouvelle instance RDS.
-  Médias sur S3.
+**Environnements :**
+- **shared-dev** : tests internes, démo, validation.
+- **shared-prod** : production.
+
+- **CMS Laravel** : 1 app PHP-FPM + 1 vhost Apache par environnement. **Base =
+  nouvelle base dédiée par environnement** (dev + prod), sur une RDS existante
+  MariaDB/MySQL du parc (pas de nouvelle instance). Ce sont de **nouvelles
+  bases**, donc aucune interférence avec l'existant. Instance précise à
+  confirmer au déploiement. Médias sur S3.
 - **Front** : 1 build Vue statique servi pour tous les domaines (docroot partagé
   ou proxy), 1 **vhost Apache + certbot par domaine** d'ambassade (comme les
   autres sites du parc). TLS Let's Encrypt.
@@ -237,8 +243,8 @@ Modération : un humain valide dans le back-office avant passage en `publie`.
 Décisions figées (2026-09-09) : base CMS = **nouveau schéma sur RDS existante** ;
 ingestion = **une `X-API-Key` par ambassade** ; couture auth = **BFF**.
 
-- **Instance RDS précise** pour le schéma CMS — à confirmer au déploiement
-  (candidat `express-prod-db`, MariaDB).
+- **Instance RDS précise** pour les bases CMS (dev/prod) — à confirmer au
+  déploiement (une RDS MariaDB/MySQL du parc).
 - **Refactor couleurs** : le passage des `bg-[#hex]` en variables CSS touche
   beaucoup de fichiers (effort réel, mais prérequis du template).
 - **Repos** : le back Laravel n'existe pas encore (repo à créer) ; le front
