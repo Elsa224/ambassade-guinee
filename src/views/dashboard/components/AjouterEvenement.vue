@@ -16,30 +16,30 @@
       <div>
         <label class="block mb-2 text-gray-700">Entreprise <span class="text-red-500">*</span></label>
         <input v-model="newEvent.entreprise" type="text" required
-               class="w-full border rounded-lg p-2 bg-gray-100 focus:ring-2 focus:ring-[#006633]" />
+               class="w-full border rounded-lg p-2 bg-gray-100 focus:ring-2 focus:ring-primary" />
       </div>
 
       <div>
         <label class="block mb-2 text-gray-700">Nom de l'Événement <span class="text-red-500">*</span></label>
         <input v-model="newEvent.nom" type="text" required
-               class="w-full border rounded-lg p-2 bg-gray-100 focus:ring-2 focus:ring-[#006633]" />
+               class="w-full border rounded-lg p-2 bg-gray-100 focus:ring-2 focus:ring-primary" />
       </div>
 
       <div>
         <label class="block mb-2 text-gray-700">Lieu de l'Événement <span class="text-red-500">*</span></label>
         <input v-model="newEvent.lieu" type="text" required
-               class="w-full border rounded-lg p-2 bg-gray-100 focus:ring-2 focus:ring-[#006633]" />
+               class="w-full border rounded-lg p-2 bg-gray-100 focus:ring-2 focus:ring-primary" />
       </div>
 
       <div>
         <label class="block mb-2 text-gray-700">Adresse</label>
         <input v-model="newEvent.adresse" type="text"
-               class="w-full border rounded-lg p-2 bg-gray-100 focus:ring-2 focus:ring-[#006633]" />
+               class="w-full border rounded-lg p-2 bg-gray-100 focus:ring-2 focus:ring-primary" />
       </div>
 
       <div>
         <label class="block mb-2 text-gray-700">Ville</label>
-        <select v-model="newEvent.ville" class="w-full border rounded-lg p-2 bg-gray-100 focus:ring-2 focus:ring-[#006633]">
+        <select v-model="newEvent.ville" class="w-full border rounded-lg p-2 bg-gray-100 focus:ring-2 focus:ring-primary">
           <option value="">Sélectionner une ville</option>
           <option>Abidjan</option>
           <option>Paris</option>
@@ -51,7 +51,7 @@
 
       <div>
         <label class="block mb-2 text-gray-700">Pays</label>
-        <select v-model="newEvent.pays" class="w-full border rounded-lg p-2 bg-gray-100 focus:ring-2 focus:ring-[#006633]">
+        <select v-model="newEvent.pays" class="w-full border rounded-lg p-2 bg-gray-100 focus:ring-2 focus:ring-primary">
           <option value="">Sélectionner un pays</option>
           <option>Côte d'Ivoire</option>
           <option>France</option>
@@ -64,37 +64,37 @@
       <div>
         <label class="block mb-2 text-gray-700">Région / État</label>
         <input v-model="newEvent.region" type="text"
-               class="w-full border rounded-lg p-2 bg-gray-100 focus:ring-2 focus:ring-[#006633]" />
+               class="w-full border rounded-lg p-2 bg-gray-100 focus:ring-2 focus:ring-primary" />
       </div>
 
       <div>
         <label class="block mb-2 text-gray-700">Code Postal</label>
         <input v-model="newEvent.codePostal" type="text"
-               class="w-full border rounded-lg p-2 bg-gray-100 focus:ring-2 focus:ring-[#006633]" />
+               class="w-full border rounded-lg p-2 bg-gray-100 focus:ring-2 focus:ring-primary" />
       </div>
 
       <div>
         <label class="block mb-2 text-gray-700">Date de l'Événement <span class="text-red-500">*</span></label>
         <input v-model="newEvent.date" type="date" required
-               class="w-full border rounded-lg p-2 bg-gray-100 focus:ring-2 focus:ring-[#006633]" />
+               class="w-full border rounded-lg p-2 bg-gray-100 focus:ring-2 focus:ring-primary" />
       </div>
 
       <div>
         <label class="block mb-2 text-gray-700">Heure de l'Événement <span class="text-red-500">*</span></label>
         <input v-model="newEvent.heure" type="time" required
-               class="w-full border rounded-lg p-2 bg-gray-100 focus:ring-2 focus:ring-[#006633]" />
+               class="w-full border rounded-lg p-2 bg-gray-100 focus:ring-2 focus:ring-primary" />
       </div>
 
       <div>
         <label class="block mb-2 text-gray-700">Lien <span class="text-red-500">*</span></label>
         <input v-model="newEvent.lien" type="text" required
-               class="w-full border rounded-lg p-2 bg-gray-100 focus:ring-2 focus:ring-[#006633]" />
+               class="w-full border rounded-lg p-2 bg-gray-100 focus:ring-2 focus:ring-primary" />
       </div>
 
       <!-- Bouton d'envoi -->
       <div class="col-span-2 flex justify-center mt-6">
         <button type="submit"
-                class="bg-[#006633] text-white px-8 py-2 rounded-lg font-semibold hover:bg-[#004d26] transition">
+                class="bg-primary text-white px-8 py-2 rounded-lg font-semibold hover:bg-primary-dark transition">
           Soumettre
         </button>
       </div>
@@ -105,14 +105,14 @@
          class="fixed inset-0 flex flex-col items-center justify-center bg-white z-50 overflow-y-auto p-4">
       <div class="self-start ml-6 mb-4">
         <button @click="fermerBadge"
-                class="flex items-center text-[#006633] font-semibold hover:text-[#004d26] transition-colors">
+                class="flex items-center text-primary font-semibold hover:text-primary-dark transition-colors">
           <i class="bx bx-arrow-back text-xl mr-2"></i> Retour
         </button>
       </div>
 
-      <div class="relative bg-[#006633] text-white w-full max-w-sm rounded-3xl shadow-lg overflow-hidden p-6">
+      <div class="relative bg-primary text-white w-full max-w-sm rounded-3xl shadow-lg overflow-hidden p-6">
         <div class="flex justify-center -mt-14 mb-4">
-          <div class="w-28 h-28 bg-white rounded-full flex items-center justify-center shadow-md border-4 border-[#006633]">
+          <div class="w-28 h-28 bg-white rounded-full flex items-center justify-center shadow-md border-4 border-primary">
             <img :src="logo" alt="Logo" class="w-20 h-20 object-contain" />
           </div>
         </div>
@@ -165,10 +165,10 @@
         </div>
 
         <div class="flex justify-center gap-4 mt-6">
-          <button class="bg-[#006633] text-white px-6 py-3 rounded-lg flex items-center gap-2 shadow hover:bg-[#004d26] transition-colors">
+          <button class="bg-primary text-white px-6 py-3 rounded-lg flex items-center gap-2 shadow hover:bg-primary-dark transition-colors">
             <i class="bx bx-share-alt"></i> Partager
           </button>
-          <button class="bg-[#006633] text-white px-6 py-3 rounded-lg flex items-center gap-2 shadow hover:bg-[#004d26] transition-colors">
+          <button class="bg-primary text-white px-6 py-3 rounded-lg flex items-center gap-2 shadow hover:bg-primary-dark transition-colors">
             <i class="bx bx-download"></i> Capturer
           </button>
         </div>

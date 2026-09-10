@@ -1,14 +1,14 @@
 <template>
   <aside
     :class="[
-      'fixed left-0 top-0 h-full bg-gradient-to-b from-[#006633] to-[#004d26] text-white shadow-xl flex flex-col transition-all duration-300 z-[1000]',
+      'fixed left-0 top-0 h-full bg-gradient-to-b from-primary to-primary-dark text-white shadow-xl flex flex-col transition-all duration-300 z-[1000]',
       isCollapsed ? 'w-20' : 'w-72'
     ]"
   >
     <!-- Bouton toggle -->
     <button
       @click="toggleSidebar"
-      class="absolute -right-3 top-20 bg-[#fcd116] text-[#006633] rounded-full p-1 cursor-pointer shadow-lg transition-all duration-300 hover:scale-110 z-10"
+      class="absolute -right-3 top-20 bg-secondary text-primary rounded-full p-1 cursor-pointer shadow-lg transition-all duration-300 hover:scale-110 z-10"
     >
       <i :class="isCollapsed ? 'bx bx-menu' : 'bx bx-menu-alt-left'" class="text-xl"></i>
     </button>
@@ -34,7 +34,7 @@
       <div>
         <div
           @click="toggleAdmin"
-          class="flex items-center justify-between px-4 py-3 rounded-xl cursor-pointer transition-all duration-300 text-white hover:bg-yellow-500/20 hover:text-[#fcd116]"
+          class="flex items-center justify-between px-4 py-3 rounded-xl cursor-pointer transition-all duration-300 text-white hover:bg-yellow-500/20 hover:text-secondary"
         >
           <div class="flex items-center gap-3">
             <i class='bx bx-user-circle text-xl flex-shrink-0'></i>
@@ -50,8 +50,8 @@
         <div v-show="isAdminOpen" class="ml-2 flex flex-col gap-1">
           <router-link
             to="/dashboard"
-            class="flex items-center gap-3 px-4 py-2 rounded-xl text-white no-underline transition-all duration-300 text-sm font-medium hover:bg-yellow-500/20 hover:text-[#fcd116] hover:translate-x-1"
-            active-class="!bg-[#fcd116] !text-[#006633]"
+            class="flex items-center gap-3 px-4 py-2 rounded-xl text-white no-underline transition-all duration-300 text-sm font-medium hover:bg-yellow-500/20 hover:text-secondary hover:translate-x-1"
+            active-class="!bg-secondary !text-primary"
           >
             <i class='bx bxs-dashboard text-xl flex-shrink-0'></i>
             <span v-if="!isCollapsed">Tableau de bord</span>
@@ -59,8 +59,8 @@
 
           <router-link
             to="/dashboard/articles"
-            class="flex items-center gap-3 px-4 py-2 rounded-xl text-white no-underline transition-all duration-300 text-sm font-medium hover:bg-yellow-500/20 hover:text-[#fcd116] hover:translate-x-1"
-            active-class="!bg-[#fcd116] !text-[#006633]"
+            class="flex items-center gap-3 px-4 py-2 rounded-xl text-white no-underline transition-all duration-300 text-sm font-medium hover:bg-yellow-500/20 hover:text-secondary hover:translate-x-1"
+            active-class="!bg-secondary !text-primary"
           >
             <i class='bx bxs-news text-xl flex-shrink-0'></i>
             <span v-if="!isCollapsed">Articles</span>
@@ -68,8 +68,8 @@
 
           <router-link
             to="/dashboard/actualites"
-            class="flex items-center gap-3 px-4 py-2 rounded-xl text-white no-underline transition-all duration-300 text-sm font-medium hover:bg-yellow-500/20 hover:text-[#fcd116] hover:translate-x-1"
-            active-class="!bg-[#fcd116] !text-[#006633]"
+            class="flex items-center gap-3 px-4 py-2 rounded-xl text-white no-underline transition-all duration-300 text-sm font-medium hover:bg-yellow-500/20 hover:text-secondary hover:translate-x-1"
+            active-class="!bg-secondary !text-primary"
           >
             <i class='bx bxs-megaphone text-xl flex-shrink-0'></i>
             <span v-if="!isCollapsed">Actualités</span>
@@ -77,8 +77,8 @@
 
           <router-link
             to="/dashboard/galerie"
-            class="flex items-center gap-3 px-4 py-2 rounded-xl text-white no-underline transition-all duration-300 text-sm font-medium hover:bg-yellow-500/20 hover:text-[#fcd116] hover:translate-x-1"
-            active-class="!bg-[#fcd116] !text-[#006633]"
+            class="flex items-center gap-3 px-4 py-2 rounded-xl text-white no-underline transition-all duration-300 text-sm font-medium hover:bg-yellow-500/20 hover:text-secondary hover:translate-x-1"
+            active-class="!bg-secondary !text-primary"
           >
             <i class='bx bxs-image text-xl flex-shrink-0'></i>
             <span v-if="!isCollapsed">Galerie photos</span>
@@ -86,8 +86,8 @@
 
           <router-link
             to="/dashboard/nouvelles"
-            class="flex items-center gap-3 px-4 py-2 rounded-xl text-white no-underline transition-all duration-300 text-sm font-medium hover:bg-yellow-500/20 hover:text-[#fcd116] hover:translate-x-1"
-            active-class="!bg-[#fcd116] !text-[#006633]"
+            class="flex items-center gap-3 px-4 py-2 rounded-xl text-white no-underline transition-all duration-300 text-sm font-medium hover:bg-yellow-500/20 hover:text-secondary hover:translate-x-1"
+            active-class="!bg-secondary !text-primary"
           >
             <i class='bx bxs-bell text-xl flex-shrink-0'></i>
             <span v-if="!isCollapsed">Nouvelles</span>
@@ -96,8 +96,8 @@
           <!-- Lien Site Internet (pour retourner au site public) -->
           <router-link
             to="/"
-            class="flex items-center gap-3 px-4 py-2 rounded-xl text-white no-underline transition-all duration-300 text-sm font-medium hover:bg-yellow-500/20 hover:text-[#fcd116] hover:translate-x-1"
-            active-class="!bg-[#fcd116] !text-[#006633]"
+            class="flex items-center gap-3 px-4 py-2 rounded-xl text-white no-underline transition-all duration-300 text-sm font-medium hover:bg-yellow-500/20 hover:text-secondary hover:translate-x-1"
+            active-class="!bg-secondary !text-primary"
           >
             <i class='bx bx-globe text-xl flex-shrink-0'></i>
             <span v-if="!isCollapsed">Site Internet</span>
@@ -109,7 +109,7 @@
       <div>
         <div
           @click="toggleAmbassade"
-          class="flex items-center justify-between px-4 py-3 rounded-xl cursor-pointer transition-all duration-300 text-white hover:bg-yellow-500/20 hover:text-[#fcd116]"
+          class="flex items-center justify-between px-4 py-3 rounded-xl cursor-pointer transition-all duration-300 text-white hover:bg-yellow-500/20 hover:text-secondary"
         >
           <div class="flex items-center gap-3">
             <i class='bx bx-shield text-xl flex-shrink-0'></i>
@@ -126,8 +126,8 @@
 
           <router-link
             to="/dashboard/utilisateurs"
-            class="flex items-center gap-3 px-4 py-2 rounded-xl text-white no-underline transition-all duration-300 text-sm font-medium hover:bg-yellow-500/20 hover:text-[#fcd116] hover:translate-x-1"
-            active-class="!bg-[#fcd116] !text-[#006633]"
+            class="flex items-center gap-3 px-4 py-2 rounded-xl text-white no-underline transition-all duration-300 text-sm font-medium hover:bg-yellow-500/20 hover:text-secondary hover:translate-x-1"
+            active-class="!bg-secondary !text-primary"
           >
             <i class='bx bx-user text-xl flex-shrink-0'></i>
             <span v-if="!isCollapsed">Utilisateurs</span>
@@ -135,8 +135,8 @@
 
           <router-link
             to="/dashboard/scanner"
-            class="flex items-center gap-3 px-4 py-2 rounded-xl text-white no-underline transition-all duration-300 text-sm font-medium hover:bg-yellow-500/20 hover:text-[#fcd116] hover:translate-x-1"
-            active-class="!bg-[#fcd116] !text-[#006633]"
+            class="flex items-center gap-3 px-4 py-2 rounded-xl text-white no-underline transition-all duration-300 text-sm font-medium hover:bg-yellow-500/20 hover:text-secondary hover:translate-x-1"
+            active-class="!bg-secondary !text-primary"
           >
             <i class='bx bx-qr-scan text-xl flex-shrink-0'></i>
             <span v-if="!isCollapsed">Scanner QR Code</span>
@@ -144,8 +144,8 @@
 
           <router-link
             to="/dashboard/evenement"
-            class="flex items-center gap-3 px-4 py-2 rounded-xl text-white no-underline transition-all duration-300 text-sm font-medium hover:bg-yellow-500/20 hover:text-[#fcd116] hover:translate-x-1"
-            active-class="!bg-[#fcd116] !text-[#006633]"
+            class="flex items-center gap-3 px-4 py-2 rounded-xl text-white no-underline transition-all duration-300 text-sm font-medium hover:bg-yellow-500/20 hover:text-secondary hover:translate-x-1"
+            active-class="!bg-secondary !text-primary"
           >
             <i class='bx bx-calendar-event text-xl flex-shrink-0'></i>
             <span v-if="!isCollapsed">Evènements</span>
@@ -153,8 +153,8 @@
 
           <router-link
             to="/dashboard/visiteur"
-            class="flex items-center gap-3 px-4 py-2 rounded-xl text-white no-underline transition-all duration-300 text-sm font-medium hover:bg-yellow-500/20 hover:text-[#fcd116] hover:translate-x-1"
-            active-class="!bg-[#fcd116] !text-[#006633]"
+            class="flex items-center gap-3 px-4 py-2 rounded-xl text-white no-underline transition-all duration-300 text-sm font-medium hover:bg-yellow-500/20 hover:text-secondary hover:translate-x-1"
+            active-class="!bg-secondary !text-primary"
           >
             <i class='bx bx-list-ul text-xl flex-shrink-0'></i>
             <span v-if="!isCollapsed">Liste des visiteurs</span>
@@ -162,8 +162,8 @@
 
           <router-link
             to="/dashboard/demande"
-            class="flex items-center gap-3 px-4 py-2 rounded-xl text-white no-underline transition-all duration-300 text-sm font-medium hover:bg-yellow-500/20 hover:text-[#fcd116] hover:translate-x-1"
-            active-class="!bg-[#fcd116] !text-[#006633]"
+            class="flex items-center gap-3 px-4 py-2 rounded-xl text-white no-underline transition-all duration-300 text-sm font-medium hover:bg-yellow-500/20 hover:text-secondary hover:translate-x-1"
+            active-class="!bg-secondary !text-primary"
           >
             <i class='bx bx-envelope text-xl flex-shrink-0'></i>
             <span v-if="!isCollapsed">Demande</span>
@@ -171,8 +171,8 @@
 
           <router-link
             to="/dashboard/presence"
-            class="flex items-center gap-3 px-4 py-2 rounded-xl text-white no-underline transition-all duration-300 text-sm font-medium hover:bg-yellow-500/20 hover:text-[#fcd116] hover:translate-x-1"
-            active-class="!bg-[#fcd116] !text-[#006633]"
+            class="flex items-center gap-3 px-4 py-2 rounded-xl text-white no-underline transition-all duration-300 text-sm font-medium hover:bg-yellow-500/20 hover:text-secondary hover:translate-x-1"
+            active-class="!bg-secondary !text-primary"
           >
             <i class='bx bx-check-square text-xl flex-shrink-0'></i>
             <span v-if="!isCollapsed">Liste de présence</span>
@@ -180,8 +180,8 @@
 
           <router-link
             to="/dashboard/cartes/liste"
-            class="flex items-center gap-3 px-4 py-2 rounded-xl text-white no-underline transition-all duration-300 text-sm font-medium hover:bg-yellow-500/20 hover:text-[#fcd116] hover:translate-x-1"
-            active-class="!bg-[#fcd116] !text-[#006633]"
+            class="flex items-center gap-3 px-4 py-2 rounded-xl text-white no-underline transition-all duration-300 text-sm font-medium hover:bg-yellow-500/20 hover:text-secondary hover:translate-x-1"
+            active-class="!bg-secondary !text-primary"
           >
             <i class='bx bx-id-card text-xl flex-shrink-0'></i>
             <span v-if="!isCollapsed">Carte de membre</span>
@@ -189,8 +189,8 @@
 
           <router-link
             to="/dashboard/courriers/liste"
-            class="flex items-center gap-3 px-4 py-2 rounded-xl text-white no-underline transition-all duration-300 text-sm font-medium hover:bg-yellow-500/20 hover:text-[#fcd116] hover:translate-x-1"
-            active-class="!bg-[#fcd116] !text-[#006633]"
+            class="flex items-center gap-3 px-4 py-2 rounded-xl text-white no-underline transition-all duration-300 text-sm font-medium hover:bg-yellow-500/20 hover:text-secondary hover:translate-x-1"
+            active-class="!bg-secondary !text-primary"
           >
             <i class='bx bx-mail-send text-xl flex-shrink-0'></i>
             <span v-if="!isCollapsed">Liste de courriers</span>
@@ -198,8 +198,8 @@
 
           <router-link
             to="/dashboard/taches"
-            class="flex items-center gap-3 px-4 py-2 rounded-xl text-white no-underline transition-all duration-300 text-sm font-medium hover:bg-yellow-500/20 hover:text-[#fcd116] hover:translate-x-1"
-            active-class="!bg-[#fcd116] !text-[#006633]"
+            class="flex items-center gap-3 px-4 py-2 rounded-xl text-white no-underline transition-all duration-300 text-sm font-medium hover:bg-yellow-500/20 hover:text-secondary hover:translate-x-1"
+            active-class="!bg-secondary !text-primary"
           >
             <i class='bx bx-task text-xl flex-shrink-0'></i>
             <span v-if="!isCollapsed">Tâches</span>
@@ -207,8 +207,8 @@
 
           <router-link
             to="/dashboard/projets/liste"
-            class="flex items-center gap-3 px-4 py-2 rounded-xl text-white no-underline transition-all duration-300 text-sm font-medium hover:bg-yellow-500/20 hover:text-[#fcd116] hover:translate-x-1"
-            active-class="!bg-[#fcd116] !text-[#006633]"
+            class="flex items-center gap-3 px-4 py-2 rounded-xl text-white no-underline transition-all duration-300 text-sm font-medium hover:bg-yellow-500/20 hover:text-secondary hover:translate-x-1"
+            active-class="!bg-secondary !text-primary"
           >
             <i class='bx bx-folder text-xl flex-shrink-0'></i>
             <span v-if="!isCollapsed">Projets</span>
@@ -216,8 +216,8 @@
 
           <router-link
             to="/dashboard/documents"
-            class="flex items-center gap-3 px-4 py-2 rounded-xl text-white no-underline transition-all duration-300 text-sm font-medium hover:bg-yellow-500/20 hover:text-[#fcd116] hover:translate-x-1"
-            active-class="!bg-[#fcd116] !text-[#006633]"
+            class="flex items-center gap-3 px-4 py-2 rounded-xl text-white no-underline transition-all duration-300 text-sm font-medium hover:bg-yellow-500/20 hover:text-secondary hover:translate-x-1"
+            active-class="!bg-secondary !text-primary"
           >
             <i class='bx bx-file text-xl flex-shrink-0'></i>
             <span v-if="!isCollapsed">Documents</span>
@@ -281,12 +281,12 @@ const deconnexion = () => {
 }
 
 .overflow-y-auto::-webkit-scrollbar-track {
-  background: #004d26;
+  background: var(--color-primary-dark);
   border-radius: 4px;
 }
 
 .overflow-y-auto::-webkit-scrollbar-thumb {
-  background: #fcd116;
+  background: var(--color-secondary);
   border-radius: 4px;
 }
 

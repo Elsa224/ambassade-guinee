@@ -17,7 +17,7 @@
           </button>
           <button
             @click="updateProject"
-            class="px-4 py-2 bg-[#006633] text-white rounded-lg hover:bg-[#004c2a] transition-colors"
+            class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
           >
             Sauvegarder
           </button>
@@ -45,7 +45,7 @@
               </label>
               <input
                 type="text"
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0297B8] focus:border-transparent"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-info focus:border-transparent"
                 v-model="company"
               >
             </div>
@@ -69,7 +69,7 @@
               </label>
               <input
                 type="text"
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#006633] focus:border-transparent"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                 v-model="startDate"
               >
             </div>
@@ -80,7 +80,7 @@
                 Statut <span class="text-red-500">*</span>
               </label>
               <select
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0297B8] focus:border-transparent"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-info focus:border-transparent"
                 v-model="status"
               >
                 <option value="Planifié">Planifié</option>
@@ -121,7 +121,7 @@
               </label>
               <input
                 type="text"
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0297B8] focus:border-transparent bg-gray-50"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-info focus:border-transparent bg-gray-50"
                 value="TANARES"
                 readonly
               >
@@ -134,7 +134,7 @@
               </label>
               <input
                 type="text"
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0297B8] focus:border-transparent"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-info focus:border-transparent"
                 v-model="endDate"
               >
             </div>
@@ -165,7 +165,7 @@
           </label>
           <textarea
             rows="4"
-            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#006633] focus:border-transparent"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
             v-model="description"
           ></textarea>
         </div>
@@ -183,7 +183,7 @@
           </button>
           <button
             @click="updateProject"
-            class="px-6 py-2 bg-[#006633] text-white rounded-lg hover:bg-[#004c2a] transition-colors"
+            class="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
           >
             Mettre à jour
           </button>

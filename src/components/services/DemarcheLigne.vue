@@ -1,7 +1,7 @@
 <template>
   <div class="min-h-screen bg-gray-50">
     <!-- Hero section -->
-    <div class="relative bg-gradient-to-r from-[#ce1126] to-[#009460] text-white">
+    <div class="relative bg-gradient-to-r from-accent to-primary-light text-white">
       <div class="absolute inset-0 bg-black/20"></div>
       <div class="relative max-w-7xl mx-auto px-4 py-16 md:py-20">
         <div class="text-center">
@@ -13,9 +13,9 @@
             Obtenez votre carte consulaire en ligne en quelques étapes
           </p>
           <div class="flex justify-center gap-4 mt-8">
-            <div class="w-16 h-1 bg-[#ce1126]"></div>
-            <div class="w-16 h-1 bg-[#fcd116]"></div>
-            <div class="w-16 h-1 bg-[#009460]"></div>
+            <div class="w-16 h-1 bg-accent"></div>
+            <div class="w-16 h-1 bg-secondary"></div>
+            <div class="w-16 h-1 bg-primary-light"></div>
           </div>
         </div>
       </div>
@@ -38,19 +38,19 @@
             <div class="relative z-10">
               <div :class="[
                 'w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all duration-300',
-                currentStep >= index + 1 ? 'bg-[#ce1126] text-white' : 'bg-gray-200 text-gray-500',
-                currentStep > index + 1 ? 'ring-4 ring-[#ce1126]/30' : ''
+                currentStep >= index + 1 ? 'bg-accent text-white' : 'bg-gray-200 text-gray-500',
+                currentStep > index + 1 ? 'ring-4 ring-accent/30' : ''
               ]">
                 {{ index + 1 }}
               </div>
             </div>
-            <div class="text-xs mt-2 font-medium" :class="currentStep >= index + 1 ? 'text-[#ce1126]' : 'text-gray-400'">
+            <div class="text-xs mt-2 font-medium" :class="currentStep >= index + 1 ? 'text-accent' : 'text-gray-400'">
               {{ step.title }}
             </div>
             <!-- Trait de connexion (derrière les cercles) -->
             <div v-if="index < steps.length - 1"
                  class="absolute top-5 left-[calc(50%+20px)] right-[-calc(50%-20px)] h-0.5 -translate-y-1/2"
-                 :class="currentStep > index + 1 ? 'bg-[#ce1126]' : 'bg-gray-200'"
+                 :class="currentStep > index + 1 ? 'bg-accent' : 'bg-gray-200'"
                  style="z-index: 1;">
             </div>
           </div>
@@ -64,7 +64,7 @@
           <div v-show="currentStep === 1" class="space-y-6">
             <div class="border-b border-gray-200 pb-4">
               <h2 class="text-2xl font-bold text-gray-800 flex items-center gap-2">
-                <svg class="w-6 h-6 text-[#ce1126]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-6 h-6 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                 </svg>
                 1. Formulaire de demande (à remplir en ligne)
@@ -75,32 +75,32 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Nom complet *</label>
-                <input type="text" v-model="form.fullname" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-[#ce1126] focus:border-transparent transition" placeholder="Ex: Mamadou Diallo">
+                <input type="text" v-model="form.fullname" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-accent focus:border-transparent transition" placeholder="Ex: Mamadou Diallo">
               </div>
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Prénom(s) *</label>
-                <input type="text" v-model="form.firstname" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-[#ce1126] focus:border-transparent transition" placeholder="Prénom usuel">
+                <input type="text" v-model="form.firstname" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-accent focus:border-transparent transition" placeholder="Prénom usuel">
               </div>
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Date de naissance *</label>
-                <input type="date" v-model="form.dob" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-[#ce1126] focus:border-transparent transition">
+                <input type="date" v-model="form.dob" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-accent focus:border-transparent transition">
               </div>
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Lieu de naissance *</label>
-                <input type="text" v-model="form.birthplace" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-[#ce1126] focus:border-transparent transition" placeholder="Ville, Pays">
+                <input type="text" v-model="form.birthplace" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-accent focus:border-transparent transition" placeholder="Ville, Pays">
               </div>
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Email *</label>
-                <input type="email" v-model="form.email" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-[#ce1126] focus:border-transparent transition" placeholder="exemple@domaine.com">
+                <input type="email" v-model="form.email" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-accent focus:border-transparent transition" placeholder="exemple@domaine.com">
               </div>
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Téléphone (USA) *</label>
-                <input type="tel" v-model="form.phone" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-[#ce1126] focus:border-transparent transition" placeholder="+1 234 567 8900">
+                <input type="tel" v-model="form.phone" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-accent focus:border-transparent transition" placeholder="+1 234 567 8900">
               </div>
             </div>
 
             <div class="flex justify-end pt-4">
-              <button @click="nextStep" :disabled="!isFormValid" class="bg-[#ce1126] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#b30f20] transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
+              <button @click="nextStep" :disabled="!isFormValid" class="bg-accent text-white px-6 py-3 rounded-lg font-semibold hover:bg-accent-dark transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
                 Suivant
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
@@ -113,7 +113,7 @@
           <div v-show="currentStep === 2" class="space-y-6">
             <div class="border-b border-gray-200 pb-4">
               <h2 class="text-2xl font-bold text-gray-800 flex items-center gap-2">
-                <svg class="w-6 h-6 text-[#ce1126]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-6 h-6 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
                 </svg>
                 2. Téléchargement des justificatifs
@@ -123,9 +123,9 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
               <!-- Preuve de nationalité -->
-              <div class="border-2 border-dashed border-gray-300 rounded-xl p-6 hover:border-[#ce1126] transition">
+              <div class="border-2 border-dashed border-gray-300 rounded-xl p-6 hover:border-accent transition">
                 <div class="text-center">
-                  <svg class="w-12 h-12 text-[#ce1126] mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg class="w-12 h-12 text-accent mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 9h3.75M15 12h3.75M15 15h3.75M4.5 19.5h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z"></path>
                   </svg>
                   <h3 class="font-semibold text-gray-800 mb-2">Preuve de nationalité *</h3>
@@ -139,9 +139,9 @@
               </div>
 
               <!-- Preuve de résidence USA -->
-              <div class="border-2 border-dashed border-gray-300 rounded-xl p-6 hover:border-[#ce1126] transition">
+              <div class="border-2 border-dashed border-gray-300 rounded-xl p-6 hover:border-accent transition">
                 <div class="text-center">
-                  <svg class="w-12 h-12 text-[#ce1126] mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg class="w-12 h-12 text-accent mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
                   </svg>
                   <h3 class="font-semibold text-gray-800 mb-2">Preuve de résidence aux USA *</h3>
@@ -155,9 +155,9 @@
               </div>
 
               <!-- Photo d'identité fond blanc -->
-              <div class="border-2 border-dashed border-gray-300 rounded-xl p-6 hover:border-[#ce1126] transition">
+              <div class="border-2 border-dashed border-gray-300 rounded-xl p-6 hover:border-accent transition">
                 <div class="text-center">
-                  <svg class="w-12 h-12 text-[#ce1126] mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg class="w-12 h-12 text-accent mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                   </svg>
                   <h3 class="font-semibold text-gray-800 mb-2">Photo d'identité fond blanc *</h3>
@@ -171,19 +171,19 @@
               </div>
 
               <!-- Frais d'établissement -->
-              <div class="bg-gradient-to-r from-[#ce1126]/10 to-[#009460]/10 rounded-xl p-6 text-center">
-                <svg class="w-12 h-12 text-[#ce1126] mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div class="bg-gradient-to-r from-accent/10 to-primary-light/10 rounded-xl p-6 text-center">
+                <svg class="w-12 h-12 text-accent mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
                 <h3 class="font-semibold text-gray-800 mb-2">Frais d'établissement</h3>
-                <p class="text-3xl font-bold text-[#ce1126] mb-2">50 USD</p>
+                <p class="text-3xl font-bold text-accent mb-2">50 USD</p>
                 <p class="text-sm text-gray-600">Payable directement en ligne</p>
               </div>
             </div>
 
-            <div class="bg-yellow-50 border-l-4 border-[#fcd116] p-4 rounded-r-xl">
+            <div class="bg-yellow-50 border-l-4 border-secondary p-4 rounded-r-xl">
               <div class="flex items-start gap-3">
-                <svg class="w-5 h-5 text-[#fcd116] flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-5 h-5 text-secondary flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
                 <div>
@@ -200,7 +200,7 @@
                 </svg>
                 Précédent
               </button>
-              <button @click="nextStep" :disabled="!allFilesValid" class="bg-[#ce1126] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#b30f20] transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
+              <button @click="nextStep" :disabled="!allFilesValid" class="bg-accent text-white px-6 py-3 rounded-lg font-semibold hover:bg-accent-dark transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
                 Suivant
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
@@ -213,7 +213,7 @@
           <div v-show="currentStep === 3" class="space-y-6">
             <div class="border-b border-gray-200 pb-4">
               <h2 class="text-2xl font-bold text-gray-800 flex items-center gap-2">
-                <svg class="w-6 h-6 text-[#ce1126]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-6 h-6 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
                 </svg>
                 3. Paiement sécurisé & Soumission
@@ -224,17 +224,17 @@
             <div class="bg-gray-50 rounded-xl p-6">
               <div class="flex items-center justify-between mb-4">
                 <span class="text-lg font-semibold text-gray-800">Frais consulaires</span>
-                <span class="text-2xl font-bold text-[#ce1126]">50 USD</span>
+                <span class="text-2xl font-bold text-accent">50 USD</span>
               </div>
 
               <div class="border-t border-gray-200 pt-4 mb-4">
                 <label class="flex items-center gap-3 cursor-pointer">
-                  <input type="checkbox" v-model="paymentConfirmed" class="w-5 h-5 text-[#ce1126] rounded focus:ring-[#ce1126]">
+                  <input type="checkbox" v-model="paymentConfirmed" class="w-5 h-5 text-accent rounded focus:ring-accent">
                   <span class="text-gray-700">Je confirme avoir lu les conditions et je m'engage à payer les 50 USD par carte bancaire</span>
                 </label>
               </div>
 
-              <button @click="simulatePayment" :disabled="!paymentConfirmed || paymentDone" class="w-full bg-[#009460] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#007a4d] transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+              <button @click="simulatePayment" :disabled="!paymentConfirmed || paymentDone" class="w-full bg-primary-light text-white px-6 py-3 rounded-lg font-semibold hover:bg-primary-dark transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
                 </svg>
@@ -249,14 +249,14 @@
               </div>
             </div>
 
-            <div class="bg-red-50 border-l-4 border-[#ce1126] p-4 rounded-r-xl">
+            <div class="bg-red-50 border-l-4 border-accent p-4 rounded-r-xl">
               <div class="flex items-start gap-3">
-                <svg class="w-5 h-5 text-[#ce1126] flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-5 h-5 text-accent flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
                 </svg>
                 <div>
                   <p class="font-bold text-gray-800">IMPORTANT :</p>
-                  <p class="text-gray-700">Les documents susmentionnés devront être ensuite téléchargés sur la plate-forme <span class="font-mono font-bold text-[#ce1126]">express54.org</span> après validation de votre demande.</p>
+                  <p class="text-gray-700">Les documents susmentionnés devront être ensuite téléchargés sur la plate-forme <span class="font-mono font-bold text-accent">express54.org</span> après validation de votre demande.</p>
                 </div>
               </div>
             </div>
@@ -268,7 +268,7 @@
                 </svg>
                 Précédent
               </button>
-              <button @click="submitDossier" :disabled="!paymentDone" class="bg-[#ce1126] text-white px-8 py-3 rounded-lg font-semibold hover:bg-[#b30f20] transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
+              <button @click="submitDossier" :disabled="!paymentDone" class="bg-accent text-white px-8 py-3 rounded-lg font-semibold hover:bg-accent-dark transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                 </svg>

@@ -1,7 +1,7 @@
 <template>
   <div class="min-h-screen bg-gray-50">
     <!-- Hero section -->
-    <div class="relative bg-gradient-to-r from-[#ce1126] to-[#009460] text-white">
+    <div class="relative bg-gradient-to-r from-accent to-primary-light text-white">
       <div class="absolute inset-0 bg-black/20"></div>
       <div class="relative max-w-7xl mx-auto px-4 py-16 md:py-20">
         <div class="text-center">
@@ -13,9 +13,9 @@
             Prenez rendez-vous avec les services consulaires de l'Ambassade
           </p>
           <div class="flex justify-center gap-4 mt-8">
-            <div class="w-16 h-1 bg-[#ce1126] "></div>
-            <div class="w-16 h-1 bg-[#fcd116]"></div>
-            <div class="w-16 h-1 bg-[#009460]"></div>
+            <div class="w-16 h-1 bg-accent "></div>
+            <div class="w-16 h-1 bg-secondary"></div>
+            <div class="w-16 h-1 bg-primary-light"></div>
           </div>
         </div>
       </div>
@@ -35,7 +35,7 @@
         <div class="lg:col-span-2">
           <div class="bg-white rounded-2xl shadow-xl p-8">
             <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
-              <span class="bg-[#ce1126] w-1 h-6 mr-3"></span>
+              <span class="bg-accent w-1 h-6 mr-3"></span>
               Formulaire de rendez-vous
             </h2>
 
@@ -47,7 +47,7 @@
                 </label>
                 <select
                   v-model="formData.service"
-                  class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#ce1126] focus:border-transparent"
+                  class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
                   required
                 >
                   <option value="">Sélectionnez un service</option>
@@ -71,7 +71,7 @@
                   <input
                     type="text"
                     v-model="formData.nom"
-                    class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#ce1126] focus:border-transparent"
+                    class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
                     required
                   >
                 </div>
@@ -82,7 +82,7 @@
                   <input
                     type="text"
                     v-model="formData.prenom"
-                    class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#ce1126] focus:border-transparent"
+                    class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
                     required
                   >
                 </div>
@@ -96,7 +96,7 @@
                   <input
                     type="email"
                     v-model="formData.email"
-                    class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#ce1126] focus:border-transparent"
+                    class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
                     required
                   >
                 </div>
@@ -107,7 +107,7 @@
                   <input
                     type="tel"
                     v-model="formData.telephone"
-                    class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#ce1126] focus:border-transparent"
+                    class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
                     required
                   >
                 </div>
@@ -123,7 +123,7 @@
                     type="date"
                     v-model="formData.date"
                     :min="dateMin"
-                    class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#ce1126] focus:border-transparent"
+                    class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
                     required
                   >
                 </div>
@@ -133,7 +133,7 @@
                   </label>
                   <select
                     v-model="formData.heure"
-                    class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#ce1126] focus:border-transparent"
+                    class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
                     required
                   >
                     <option value="">Sélectionnez une heure</option>
@@ -160,7 +160,7 @@
                 <textarea
                   v-model="formData.documents"
                   rows="3"
-                  class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#ce1126] focus:border-transparent"
+                  class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
                   placeholder="Listez les documents que vous apporterez (passeport, formulaire, etc.)"
                   required
                 ></textarea>
@@ -174,7 +174,7 @@
                 <textarea
                   v-model="formData.message"
                   rows="3"
-                  class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#ce1126] focus:border-transparent"
+                  class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
                   placeholder="Informations complémentaires..."
                 ></textarea>
               </div>
@@ -184,7 +184,7 @@
                 <button
                   type="submit"
                   :disabled="isSubmitting"
-                  class="bg-[#ce1126] text-white px-10 py-4 rounded-lg font-semibold hover:bg-[#b30f20] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-3 text-lg shadow-lg hover:shadow-xl"
+                  class="bg-accent text-white px-10 py-4 rounded-lg font-semibold hover:bg-accent-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-3 text-lg shadow-lg hover:shadow-xl"
                 >
                   <svg v-if="isSubmitting" class="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -202,7 +202,7 @@
           <!-- Horaires d'ouverture -->
           <div class="bg-white rounded-2xl shadow-xl p-6">
             <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
-              <svg class="w-6 h-6 text-[#ce1126] mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-6 h-6 text-accent mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
               </svg>
               Horaires d'ouverture
@@ -218,7 +218,7 @@
               </div>
               <div class="flex justify-between py-2">
                 <span class="text-gray-600">Samedi - Dimanche</span>
-                <span class="font-semibold text-[#ce1126]">Fermé</span>
+                <span class="font-semibold text-accent">Fermé</span>
               </div>
             </div>
           </div>
@@ -226,7 +226,7 @@
           <!-- Coordonnées -->
           <div class="bg-white rounded-2xl shadow-xl p-6">
             <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
-              <svg class="w-6 h-6 text-[#ce1126] mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-6 h-6 text-accent mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
               </svg>
@@ -234,7 +234,7 @@
             </h3>
             <div class="space-y-3">
               <div class="flex items-start gap-3">
-                <svg class="w-5 h-5 text-[#ce1126] mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-5 h-5 text-accent mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
                 </svg>
                 <div>
@@ -243,7 +243,7 @@
                 </div>
               </div>
               <div class="flex items-start gap-3">
-                <svg class="w-5 h-5 text-[#ce1126] mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-5 h-5 text-accent mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
                 </svg>
                 <div>
@@ -252,7 +252,7 @@
                 </div>
               </div>
               <div class="flex items-start gap-3">
-                <svg class="w-5 h-5 text-[#ce1126] mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-5 h-5 text-accent mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
                 </svg>
@@ -265,7 +265,7 @@
           </div>
 
           <!-- Documents requis -->
-          <div class="bg-gradient-to-r from-[#ce1126] to-[#009460] text-white rounded-2xl p-6">
+          <div class="bg-gradient-to-r from-accent to-primary-light text-white rounded-2xl p-6">
             <h3 class="text-xl font-bold mb-4 flex items-center">
               <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
@@ -274,19 +274,19 @@
             </h3>
             <ul class="space-y-2 text-sm">
               <li class="flex items-start gap-2">
-                <span class="text-[#fcd116]">✓</span>
+                <span class="text-secondary">✓</span>
                 <span>Pièce d'identité valide (passeport, carte consulaire)</span>
               </li>
               <li class="flex items-start gap-2">
-                <span class="text-[#fcd116]">✓</span>
+                <span class="text-secondary">✓</span>
                 <span>Formulaire de rendez-vous rempli</span>
               </li>
               <li class="flex items-start gap-2">
-                <span class="text-[#fcd116]">✓</span>
+                <span class="text-secondary">✓</span>
                 <span>Documents spécifiques selon le service demandé</span>
               </li>
               <li class="flex items-start gap-2">
-                <span class="text-[#fcd116]">✓</span>
+                <span class="text-secondary">✓</span>
                 <span>Preuve de résidence aux États-Unis</span>
               </li>
             </ul>
@@ -309,7 +309,7 @@
           </p>
           <button
             @click="closeModal"
-            class="bg-[#ce1126] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#b30f20] transition-colors"
+            class="bg-accent text-white px-6 py-3 rounded-lg font-semibold hover:bg-accent-dark transition-colors"
           >
             Fermer
           </button>

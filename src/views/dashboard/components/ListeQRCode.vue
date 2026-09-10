@@ -1,7 +1,7 @@
 <template>
   <div class="overflow-x-auto bg-white rounded-lg shadow-md">
     <table class="min-w-full divide-y divide-gray-200">
-      <thead class="bg-[#006633] text-white">
+      <thead class="bg-primary text-white">
         <tr>
           <th class="px-6 py-3 text-left text-sm font-semibold">Nom</th>
           <th class="px-6 py-3 text-left text-sm font-semibold">Prénom</th>
@@ -30,7 +30,7 @@
           </td>
           <td class="px-6 py-3 text-center relative">
             <button @click="item.showActions = !item.showActions" class="flex items-center justify-center w-full">
-              <i class="bx bx-dots-vertical text-xl text-gray-600 hover:text-[#006633]"></i>
+              <i class="bx bx-dots-vertical text-xl text-gray-600 hover:text-primary"></i>
             </button>
 
             <div
@@ -81,7 +81,7 @@
           @click="goToPage(page)"
           :class="[
             'px-3 py-1 rounded-md border border-gray-300 hover:bg-gray-50',
-            currentPage === page ? 'bg-[#006633] text-white border-[#006633]' : ''
+            currentPage === page ? 'bg-primary text-white border-primary' : ''
           ]"
         >
           {{ page }}

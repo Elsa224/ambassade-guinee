@@ -19,8 +19,8 @@
               <span class="text-green-600 text-xs">+12%</span>
             </div>
           </div>
-          <div class="w-12 h-12 bg-[#006633]/10 rounded-full flex items-center justify-center">
-            <i class='bx bxs-news text-2xl text-[#006633]'></i>
+          <div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
+            <i class='bx bxs-news text-2xl text-primary'></i>
           </div>
         </div>
       </div>
@@ -36,8 +36,8 @@
               <span class="text-green-600 text-xs">+5</span>
             </div>
           </div>
-          <div class="w-12 h-12 bg-[#fcd116]/10 rounded-full flex items-center justify-center">
-            <i class='bx bxs-megaphone text-2xl text-[#fcd116]'></i>
+          <div class="w-12 h-12 bg-secondary/10 rounded-full flex items-center justify-center">
+            <i class='bx bxs-megaphone text-2xl text-secondary'></i>
           </div>
         </div>
       </div>
@@ -53,8 +53,8 @@
               <span class="text-green-600 text-xs">+8</span>
             </div>
           </div>
-          <div class="w-12 h-12 bg-[#ce1126]/10 rounded-full flex items-center justify-center">
-            <i class='bx bxs-image text-2xl text-[#ce1126]'></i>
+          <div class="w-12 h-12 bg-accent/10 rounded-full flex items-center justify-center">
+            <i class='bx bxs-image text-2xl text-accent'></i>
           </div>
         </div>
       </div>
@@ -107,7 +107,7 @@
               <span class="text-gray-800 font-medium">24 (38%)</span>
             </div>
             <div class="w-full bg-gray-200 rounded-full h-2">
-              <div class="bg-[#006633] h-2 rounded-full" style="width: 38%"></div>
+              <div class="bg-primary h-2 rounded-full" style="width: 38%"></div>
             </div>
           </div>
           <div>
@@ -116,7 +116,7 @@
               <span class="text-gray-800 font-medium">18 (29%)</span>
             </div>
             <div class="w-full bg-gray-200 rounded-full h-2">
-              <div class="bg-[#fcd116] h-2 rounded-full" style="width: 29%"></div>
+              <div class="bg-secondary h-2 rounded-full" style="width: 29%"></div>
             </div>
           </div>
           <div>
@@ -125,7 +125,7 @@
               <span class="text-gray-800 font-medium">156 (33%)</span>
             </div>
             <div class="w-full bg-gray-200 rounded-full h-2">
-              <div class="bg-[#ce1126] h-2 rounded-full" style="width: 33%"></div>
+              <div class="bg-accent h-2 rounded-full" style="width: 33%"></div>
             </div>
           </div>
         </div>
@@ -137,7 +137,7 @@
       <div class="bg-white rounded-xl shadow-md p-6">
         <div class="flex justify-between items-center mb-4">
           <h3 class="font-semibold text-gray-800">Derniers articles</h3>
-          <router-link to="/admin/articles" class="text-sm text-[#006633] hover:underline">Voir tous →</router-link>
+          <router-link to="/admin/articles" class="text-sm text-primary hover:underline">Voir tous →</router-link>
         </div>
         <div class="space-y-3">
           <div v-for="article in derniersArticles" :key="article.id" class="flex gap-3 p-2 hover:bg-gray-50 rounded-lg cursor-pointer">
@@ -158,7 +158,7 @@
       <div class="bg-white rounded-xl shadow-md p-6">
         <div class="flex justify-between items-center mb-4">
           <h3 class="font-semibold text-gray-800">Messages récents</h3>
-          <router-link to="/admin/commentaires" class="text-sm text-[#006633] hover:underline">Voir tous →</router-link>
+          <router-link to="/admin/commentaires" class="text-sm text-primary hover:underline">Voir tous →</router-link>
         </div>
         <div class="space-y-3">
           <div v-for="msg in messagesRecents" :key="msg.id" class="flex gap-3 p-2 hover:bg-gray-50 rounded-lg">
@@ -180,22 +180,22 @@
       <h3 class="font-semibold text-gray-800 mb-4">Actions rapides</h3>
       <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
         <button @click="$router.push('/admin/articles')" class="p-4 text-center hover:bg-gray-50 rounded-lg transition-colors">
-          <div class="bg-[#006633]/10 p-3 rounded-full inline-block mb-2">
-            <i class='bx bxs-news text-xl text-[#006633]'></i>
+          <div class="bg-primary/10 p-3 rounded-full inline-block mb-2">
+            <i class='bx bxs-news text-xl text-primary'></i>
           </div>
           <p class="text-xs font-medium">Nouvel article</p>
         </button>
 
         <button @click="$router.push('/admin/actualites')" class="p-4 text-center hover:bg-gray-50 rounded-lg transition-colors">
-          <div class="bg-[#fcd116]/10 p-3 rounded-full inline-block mb-2">
-            <i class='bx bxs-megaphone text-xl text-[#fcd116]'></i>
+          <div class="bg-secondary/10 p-3 rounded-full inline-block mb-2">
+            <i class='bx bxs-megaphone text-xl text-secondary'></i>
           </div>
           <p class="text-xs font-medium">Nouvelle actu</p>
         </button>
 
         <button @click="$router.push('/admin/photos')" class="p-4 text-center hover:bg-gray-50 rounded-lg transition-colors">
-          <div class="bg-[#ce1126]/10 p-3 rounded-full inline-block mb-2">
-            <i class='bx bxs-image text-xl text-[#ce1126]'></i>
+          <div class="bg-accent/10 p-3 rounded-full inline-block mb-2">
+            <i class='bx bxs-image text-xl text-accent'></i>
           </div>
           <p class="text-xs font-medium">Ajouter photo</p>
         </button>
@@ -229,13 +229,13 @@
 import { ref } from 'vue'
 
 const statsHebdo = ref([
-  { jour: 'Lundi', visites: 120, couleur: 'bg-[#006633]' },
-  { jour: 'Mardi', visites: 190, couleur: 'bg-[#006633]' },
-  { jour: 'Mercredi', visites: 170, couleur: 'bg-[#006633]' },
-  { jour: 'Jeudi', visites: 210, couleur: 'bg-[#006633]' },
-  { jour: 'Vendredi', visites: 250, couleur: 'bg-[#006633]' },
-  { jour: 'Samedi', visites: 300, couleur: 'bg-[#fcd116]' },
-  { jour: 'Dimanche', visites: 280, couleur: 'bg-[#ce1126]' }
+  { jour: 'Lundi', visites: 120, couleur: 'bg-primary' },
+  { jour: 'Mardi', visites: 190, couleur: 'bg-primary' },
+  { jour: 'Mercredi', visites: 170, couleur: 'bg-primary' },
+  { jour: 'Jeudi', visites: 210, couleur: 'bg-primary' },
+  { jour: 'Vendredi', visites: 250, couleur: 'bg-primary' },
+  { jour: 'Samedi', visites: 300, couleur: 'bg-secondary' },
+  { jour: 'Dimanche', visites: 280, couleur: 'bg-accent' }
 ])
 
 const derniersArticles = ref([

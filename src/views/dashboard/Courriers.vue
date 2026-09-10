@@ -1,12 +1,12 @@
 <template>
-  <div class="relative min-h-screen bg-[#f5f9fa] px-6 pt-2 pb-6">
-    <h2 class="text-2xl font-bold text-[#006633]">{{ pageTitle }}</h2>
+  <div class="relative min-h-screen bg-slate-50 px-6 pt-2 pb-6">
+    <h2 class="text-2xl font-bold text-primary">{{ pageTitle }}</h2>
 
     <!-- Bouton Ajouter seulement sur la liste -->
     <div v-if="!isCreating" class="flex justify-end mb-6">
       <router-link
         to="/dashboard/courriers/ajouter"
-        class="px-4 py-2 rounded-lg font-medium bg-[#006633] text-white hover:bg-[#004c2a] transition"
+        class="px-4 py-2 rounded-lg font-medium bg-primary text-white hover:bg-primary-dark transition"
       >
         Ajouter un courrier
       </router-link>

@@ -1,7 +1,7 @@
 <template>
   <div class="min-h-screen bg-gray-50">
     <!-- Hero section de la page actualités -->
-    <section class="relative bg-gradient-to-r from-[#006633] to-[#004d26] py-16 lg:py-24">
+    <section class="relative bg-gradient-to-r from-primary to-primary-dark py-16 lg:py-24">
       <div class="absolute inset-0 overflow-hidden">
         <div class="absolute inset-0 bg-black/20"></div>
         <svg class="absolute  left-0 right-0 top-40" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320">
@@ -11,7 +11,7 @@
 
       <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <h1 class="text-4xl lg:text-5xl font-bold text-white mb-4">Actualités</h1>
-        <div class="w-24 h-1 bg-[#fcd116] mx-auto mb-6"></div>
+        <div class="w-24 h-1 bg-secondary mx-auto mb-6"></div>
         <p class="text-xl text-white/90 max-w-3xl mx-auto">
           Restez informé des dernières nouvelles de l'Ambassade et de la Guinée
         </p>
@@ -27,7 +27,7 @@
             <button
               @click="selectedCategorie = 'tous'"
               class="px-4 py-2 rounded-full text-sm font-semibold transition-all"
-              :class="selectedCategorie === 'tous' ? 'bg-[#006633] text-white' : 'bg-gray-100 text-gray-700 hover:bg-[#fcd116] hover:text-[#006633]'"
+              :class="selectedCategorie === 'tous' ? 'bg-primary text-white' : 'bg-gray-100 text-gray-700 hover:bg-secondary hover:text-primary'"
             >
               Toutes
             </button>
@@ -36,7 +36,7 @@
               :key="categorie.id"
               @click="selectedCategorie = categorie.id"
               class="px-4 py-2 rounded-full text-sm font-semibold transition-all"
-              :class="selectedCategorie === categorie.id ? categorie.color + ' text-white' : 'bg-gray-100 text-gray-700 hover:bg-[#fcd116] hover:text-[#006633]'"
+              :class="selectedCategorie === categorie.id ? categorie.color + ' text-white' : 'bg-gray-100 text-gray-700 hover:bg-secondary hover:text-primary'"
             >
               {{ categorie.nom }}
             </button>
@@ -48,7 +48,7 @@
               type="text"
               v-model="searchQuery"
               placeholder="Rechercher une actualité..."
-              class="w-full px-4 py-2 pl-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#006633] focus:border-transparent"
+              class="w-full px-4 py-2 pl-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
             >
             <i class='bx bx-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400'></i>
           </div>
@@ -76,12 +76,12 @@
                     {{ formatDate(actualiteUne.date) }}
                   </span>
                 </div>
-                <h2 class="text-3xl lg:text-4xl font-bold text-[#006633] mb-4">{{ actualiteUne.titre }}</h2>
+                <h2 class="text-3xl lg:text-4xl font-bold text-primary mb-4">{{ actualiteUne.titre }}</h2>
                 <p class="text-gray-600 text-lg mb-6">{{ actualiteUne.description }}</p>
                 <div class="flex items-center justify-between">
                   <router-link
                     :to="`/actualites/${actualiteUne.id}`"
-                    class="inline-flex items-center gap-2 bg-[#fcd116] text-[#006633] px-6 py-3 rounded-lg font-semibold hover:bg-[#006633] hover:text-white transition-all group"
+                    class="inline-flex items-center gap-2 bg-secondary text-primary px-6 py-3 rounded-lg font-semibold hover:bg-primary hover:text-white transition-all group"
                   >
                     Lire l'article complet
                     <i class='bx bx-right-arrow-alt text-xl group-hover:translate-x-2 transition-transform'></i>
@@ -126,7 +126,7 @@
                 <span>{{ actualite.tempsLecture }} min</span>
               </div>
 
-              <h3 class="font-bold text-xl mb-3 text-[#006633] hover:text-[#ce1126] transition-colors">
+              <h3 class="font-bold text-xl mb-3 text-primary hover:text-accent transition-colors">
                 <router-link :to="`/actualites/${actualite.id}`">{{ actualite.titre }}</router-link>
               </h3>
 
@@ -135,7 +135,7 @@
               <div class="flex items-center justify-between">
                 <router-link
                   :to="`/actualites/${actualite.id}`"
-                  class="text-[#ce1126] font-semibold inline-flex items-center gap-1 hover:gap-2 transition-all group"
+                  class="text-accent font-semibold inline-flex items-center gap-1 hover:gap-2 transition-all group"
                 >
                   Lire la suite
                   <i class='bx bx-right-arrow-alt group-hover:translate-x-1 transition-transform'></i>
@@ -146,7 +146,7 @@
                     <i class='bx bx-heart' :class="{ 'bxs-heart text-red-500': actualite.liked }"></i>
                     <span>{{ actualite.likes }}</span>
                   </button>
-                  <button class="flex items-center gap-1 hover:text-[#006633] transition-colors">
+                  <button class="flex items-center gap-1 hover:text-primary transition-colors">
                     <i class='bx bx-share-alt'></i>
                   </button>
                 </div>
@@ -168,7 +168,7 @@
             <button
               @click="pageCourante--"
               :disabled="pageCourante === 1"
-              class="w-10 h-10 rounded-lg border border-gray-300 flex items-center justify-center hover:bg-[#fcd116] hover:text-[#006633] transition-colors disabled:opacity-50 disabled:hover:bg-transparent"
+              class="w-10 h-10 rounded-lg border border-gray-300 flex items-center justify-center hover:bg-secondary hover:text-primary transition-colors disabled:opacity-50 disabled:hover:bg-transparent"
             >
               <i class='bx bx-chevron-left'></i>
             </button>
@@ -178,7 +178,7 @@
               :key="page"
               @click="pageCourante = page"
               class="w-10 h-10 rounded-lg font-semibold transition-all"
-              :class="pageCourante === page ? 'bg-[#006633] text-white' : 'border border-gray-300 hover:bg-[#fcd116] hover:text-[#006633]'"
+              :class="pageCourante === page ? 'bg-primary text-white' : 'border border-gray-300 hover:bg-secondary hover:text-primary'"
             >
               {{ page }}
             </button>
@@ -186,7 +186,7 @@
             <button
               @click="pageCourante++"
               :disabled="pageCourante === pagesTotales"
-              class="w-10 h-10 rounded-lg border border-gray-300 flex items-center justify-center hover:bg-[#fcd116] hover:text-[#006633] transition-colors disabled:opacity-50 disabled:hover:bg-transparent"
+              class="w-10 h-10 rounded-lg border border-gray-300 flex items-center justify-center hover:bg-secondary hover:text-primary transition-colors disabled:opacity-50 disabled:hover:bg-transparent"
             >
               <i class='bx bx-chevron-right'></i>
             </button>
@@ -196,7 +196,7 @@
     </section>
 
     <!-- Section newsletter -->
-    <section class="py-20 bg-gradient-to-r from-[#006633] to-[#004d26]">
+    <section class="py-20 bg-gradient-to-r from-primary to-primary-dark">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <h2 class="text-3xl lg:text-4xl font-bold text-white mb-4">Restez informé</h2>
         <p class="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
@@ -208,12 +208,12 @@
             type="email"
             v-model="email"
             placeholder="Votre adresse email"
-            class="flex-1 px-6 py-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#fcd116] text-gray-800"
+            class="flex-1 px-6 py-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary text-gray-800"
             required
           >
           <button
             type="submit"
-            class="bg-[#fcd116] text-[#006633] px-8 py-4 rounded-lg font-semibold hover:bg-white transition-all whitespace-nowrap flex items-center justify-center gap-2"
+            class="bg-secondary text-primary px-8 py-4 rounded-lg font-semibold hover:bg-white transition-all whitespace-nowrap flex items-center justify-center gap-2"
           >
             S'abonner
             <i class='bx bx-send'></i>
@@ -240,9 +240,9 @@ const email = ref('')
 
 // Catégories disponibles
 const categories = [
-  { id: 'ambassade', nom: 'Ambassade', color: 'bg-[#006633]' },
-  { id: 'diplomatie', nom: 'Diplomatie', color: 'bg-[#ce1126]' },
-  { id: 'economie', nom: 'Économie', color: 'bg-[#fcd116] text-[#006633]' },
+  { id: 'ambassade', nom: 'Ambassade', color: 'bg-primary' },
+  { id: 'diplomatie', nom: 'Diplomatie', color: 'bg-accent' },
+  { id: 'economie', nom: 'Économie', color: 'bg-secondary text-primary' },
   { id: 'culture', nom: 'Culture', color: 'bg-purple-600' },
   { id: 'communique', nom: 'Communiqué', color: 'bg-gray-700' },
   { id: 'evenement', nom: 'Événement', color: 'bg-blue-600' }

@@ -9,14 +9,14 @@
       <div class="flex gap-3">
         <button
           @click="exportData"
-          class="bg-white border border-[#006633] text-[#006633] px-4 py-2.5 rounded-lg hover:bg-[#006633] hover:text-white transition-colors flex items-center gap-2"
+          class="bg-white border border-primary text-primary px-4 py-2.5 rounded-lg hover:bg-primary hover:text-white transition-colors flex items-center gap-2"
         >
           <i class='bx bx-export text-xl'></i>
           Exporter
         </button>
         <button
           @click="openModal('add')"
-          class="bg-[#006633] text-white px-5 py-2.5 rounded-lg hover:bg-[#004d26] transition-colors flex items-center gap-2 shadow-md"
+          class="bg-primary text-white px-5 py-2.5 rounded-lg hover:bg-primary-dark transition-colors flex items-center gap-2 shadow-md"
         >
           <i class='bx bx-plus-circle text-xl'></i>
           Nouvelle demande
@@ -27,7 +27,7 @@
     <!-- Statistiques -->
     <div class="grid grid-cols-2 sm:grid-cols-5 gap-4 mb-6">
       <div class="bg-white rounded-xl shadow-md p-4 text-center">
-        <p class="text-2xl font-bold text-[#006633]">{{ totalDemandes }}</p>
+        <p class="text-2xl font-bold text-primary">{{ totalDemandes }}</p>
         <p class="text-sm text-gray-600">Total demandes</p>
       </div>
       <div class="bg-white rounded-xl shadow-md p-4 text-center">
@@ -57,13 +57,13 @@
             v-model="searchQuery"
             type="text"
             placeholder="Rechercher par nom, email ou titre..."
-            class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#fcd116]"
+            class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary"
           >
         </div>
 
         <select
           v-model="filtreType"
-          class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#fcd116]"
+          class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary"
         >
           <option value="">Tous les types</option>
           <option value="visa">Demande de visa</option>
@@ -75,7 +75,7 @@
 
         <select
           v-model="filtreStatut"
-          class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#fcd116]"
+          class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary"
         >
           <option value="">Tous les statuts</option>
           <option value="en_attente">En attente</option>
@@ -86,7 +86,7 @@
 
         <select
           v-model="tri"
-          class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#fcd116]"
+          class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary"
         >
           <option value="recent">Plus récentes</option>
           <option value="ancien">Plus anciennes</option>
@@ -184,7 +184,7 @@
                   <button @click="viewDemande(demande)" class="text-blue-600 hover:text-blue-800">
                     <i class='bx bx-show text-xl'></i>
                   </button>
-                  <button @click="editDemande(demande)" class="text-[#fcd116] hover:text-[#e6b800]">
+                  <button @click="editDemande(demande)" class="text-secondary hover:text-secondary-dark">
                     <i class='bx bx-edit-alt text-xl'></i>
                   </button>
                   <button @click="deleteDemande(demande.id)" class="text-red-600 hover:text-red-800">
@@ -210,7 +210,7 @@
           >
             <i class='bx bx-chevron-left'></i>
           </button>
-          <span class="px-3 py-1 bg-[#006633] text-white rounded-lg">{{ pageCourante }}</span>
+          <span class="px-3 py-1 bg-primary text-white rounded-lg">{{ pageCourante }}</span>
           <button
             @click="pageCourante++"
             :disabled="pageCourante === totalPages"
@@ -292,7 +292,7 @@
               <div class="upload-area" @dragover.prevent @drop.prevent="handleDrop">
                 <input type="file" @change="handleFilesUpload" multiple accept=".pdf,.doc,.docx,.jpg,.png" class="hidden" ref="fileInput">
                 <div class="upload-content" @click="$refs.fileInput.click()">
-                  <i class='bx bx-cloud-upload text-3xl text-[#006633]'></i>
+                  <i class='bx bx-cloud-upload text-3xl text-primary'></i>
                   <p class="text-sm text-gray-600">Cliquez ou glissez-déposez des fichiers</p>
                   <p class="text-xs text-gray-400">PDF, DOC, JPG, PNG (Max 5MB)</p>
                 </div>
@@ -957,12 +957,12 @@ onMounted(() => {
 }
 
 .form-input:focus {
-  border-color: #fcd116;
+  border-color: var(--color-secondary);
   ring: 2px solid rgba(252, 209, 22, 0.2);
 }
 
 .btn-submit {
-  background-color: #006633;
+  background-color: var(--color-primary);
   color: white;
   padding: 0.5rem 1.5rem;
   border-radius: 0.5rem;
@@ -971,7 +971,7 @@ onMounted(() => {
 }
 
 .btn-submit:hover {
-  background-color: #004d26;
+  background-color: var(--color-primary-dark);
 }
 
 .btn-cancel {
@@ -998,7 +998,7 @@ onMounted(() => {
 }
 
 .upload-area:hover {
-  border-color: #006633;
+  border-color: var(--color-primary);
   background-color: #f9fafb;
 }
 
@@ -1025,7 +1025,7 @@ onMounted(() => {
 .section-title {
   font-size: 1rem;
   font-weight: 600;
-  color: #006633;
+  color: var(--color-primary);
   margin-bottom: 0.75rem;
   display: flex;
   align-items: center;
@@ -1072,7 +1072,7 @@ onMounted(() => {
   width: 0.75rem;
   height: 0.75rem;
   border-radius: 50%;
-  background-color: #006633;
+  background-color: var(--color-primary);
 }
 
 .timeline-item::before {

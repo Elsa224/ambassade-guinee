@@ -10,7 +10,7 @@
       <div v-if="!isCreatePage" class="space-x-4">
         <router-link
           to="/dashboard/evenement/creer"
-          class="px-4 py-2 rounded-lg font-semibold bg-[#006633] text-white hover:bg-[#004d26]"
+          class="px-4 py-2 rounded-lg font-semibold bg-primary text-white hover:bg-primary-dark"
         >
           Créer un Événement
         </router-link>

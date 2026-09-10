@@ -43,7 +43,7 @@
         <input type="file" class="w-full border rounded-lg p-2 bg-gray-100" @change="handleFileChange" />
       </div>
       <div class="col-span-2 flex justify-center mt-6">
-        <button type="submit" class="bg-[#006633] text-white px-6 py-2 rounded-lg hover:bg-[#004d26]">
+        <button type="submit" class="bg-primary text-white px-6 py-2 rounded-lg hover:bg-primary-dark">
           Créer
         </button>
       </div>

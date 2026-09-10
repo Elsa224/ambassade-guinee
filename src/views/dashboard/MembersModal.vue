@@ -10,12 +10,12 @@
         &times;
       </button>
 
-      <h2 class="text-xl font-bold text-[#346778] mb-4">
+      <h2 class="text-xl font-bold text-ink mb-4">
         Membres de {{ company?.nom || 'Entreprise' }}
       </h2>
 
       <table class="min-w-full border border-gray-200 rounded-lg">
-        <thead class="bg-[#346778] text-white">
+        <thead class="bg-ink text-white">
           <tr>
             <th class="p-3">ID</th>
             <th class="p-3">Photo</th>

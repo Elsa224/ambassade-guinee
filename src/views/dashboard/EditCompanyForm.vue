@@ -5,7 +5,7 @@
   >
     <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden">
       <!-- En-tête du modal -->
-      <div class="bg-gradient-to-r from-[#346778] to-[#42637a] p-4">
+      <div class="bg-gradient-to-r from-ink to-ink-light p-4">
         <div class="flex justify-between items-center">
           <h2 class="text-xl font-bold text-white">
             Éditer {{ editedCompany.nom || company.nom }}
@@ -34,7 +34,7 @@
                 <input
                   type="file"
                   @change="onFileChange"
-                  class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#346778] file:text-white hover:file:bg-[#2a5563]"
+                  class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-ink file:text-white hover:file:bg-ink-dark"
                   accept="image/*"
                 />
               </div>
@@ -50,7 +50,7 @@
                 <input
                   v-model="editedCompany.nom"
                   type="text"
-                  class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#346778] focus:border-transparent"
+                  class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-ink focus:border-transparent"
                   placeholder="Entrez le nom"
                 />
               </div>
@@ -60,7 +60,7 @@
                 <input
                   v-model="editedCompany.idNumber"
                   type="text"
-                  class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#346778] focus:border-transparent"
+                  class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-ink focus:border-transparent"
                   placeholder="ID de l'entreprise"
                 />
               </div>
@@ -70,7 +70,7 @@
                 <input
                   v-model="editedCompany.industry"
                   type="text"
-                  class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#346778] focus:border-transparent"
+                  class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-ink focus:border-transparent"
                   placeholder="Industrie"
                 />
               </div>
@@ -79,7 +79,7 @@
                 <label class="block mb-2 text-sm font-medium text-gray-700">Nombre d'employés</label>
                 <select
                   v-model="editedCompany.numEmployees"
-                  class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#346778] focus:border-transparent"
+                  class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-ink focus:border-transparent"
                 >
                   <option value="" disabled>Sélectionnez</option>
                   <option v-for="n in 100" :key="n" :value="n">{{ n }} employé{{ n > 1 ? 's' : '' }}</option>
@@ -97,7 +97,7 @@
                 <input
                   v-model="editedCompany.address"
                   type="text"
-                  class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#346778] focus:border-transparent"
+                  class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-ink focus:border-transparent"
                   placeholder="Adresse"
                 />
               </div>
@@ -108,7 +108,7 @@
                   <input
                     v-model="editedCompany.city"
                     type="text"
-                    class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#346778] focus:border-transparent"
+                    class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-ink focus:border-transparent"
                     placeholder="Ville"
                   />
                 </div>
@@ -118,7 +118,7 @@
                   <input
                     v-model="editedCompany.region"
                     type="text"
-                    class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#346778] focus:border-transparent"
+                    class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-ink focus:border-transparent"
                     placeholder="Région"
                   />
                 </div>
@@ -127,7 +127,7 @@
                   <label class="block mb-2 text-sm font-medium text-gray-700">Pays</label>
                   <select
                     v-model="editedCompany.country"
-                    class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#346778] focus:border-transparent"
+                    class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-ink focus:border-transparent"
                   >
                     <option>USA</option>
                     <option>France</option>
@@ -140,7 +140,7 @@
                   <input
                     v-model="editedCompany.zip"
                     type="text"
-                    class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#346778] focus:border-transparent"
+                    class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-ink focus:border-transparent"
                     placeholder="Code postal"
                   />
                 </div>
@@ -157,7 +157,7 @@
                 <input
                   v-model="editedCompany.contact"
                   type="text"
-                  class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#346778] focus:border-transparent"
+                  class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-ink focus:border-transparent"
                   placeholder="Personne à contacter"
                 />
               </div>
@@ -167,7 +167,7 @@
                 <input
                   v-model="editedCompany.title"
                   type="text"
-                  class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#346778] focus:border-transparent"
+                  class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-ink focus:border-transparent"
                   placeholder="Titre/fonction"
                 />
               </div>
@@ -177,7 +177,7 @@
                 <input
                   v-model="editedCompany.email"
                   type="email"
-                  class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#346778] focus:border-transparent"
+                  class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-ink focus:border-transparent"
                   placeholder="email@exemple.com"
                 />
               </div>
@@ -187,7 +187,7 @@
                 <input
                   v-model="editedCompany.phone"
                   type="text"
-                  class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#346778] focus:border-transparent"
+                  class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-ink focus:border-transparent"
                   placeholder="Numéro de téléphone"
                 />
               </div>
@@ -205,7 +205,7 @@
             </button>
             <button
               type="submit"
-              class="px-6 py-2.5 bg-[#346778] text-white rounded-lg text-sm font-medium hover:bg-[#2a5563] transition-colors flex items-center gap-2"
+              class="px-6 py-2.5 bg-ink text-white rounded-lg text-sm font-medium hover:bg-ink-dark transition-colors flex items-center gap-2"
             >
               <i class='bx bx-check'></i>
               Soumettre

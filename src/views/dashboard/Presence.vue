@@ -1,6 +1,6 @@
 <template>
   <div class="p-6 bg-gray-100 min-h-screen">
-    <h2 class="text-2xl font-bold text-[#006633] mb-4">Liste de Présence</h2>
+    <h2 class="text-2xl font-bold text-primary mb-4">Liste de Présence</h2>
 
     <!-- Barre de recherche -->
     <div class="mb-4">
@@ -8,14 +8,14 @@
         v-model="search"
         type="text"
         placeholder="Rechercher un utilisateur..."
-        class="p-2 border rounded-lg focus:ring-2 focus:ring-[#006633]"
+        class="p-2 border rounded-lg focus:ring-2 focus:ring-primary"
       />
     </div>
 
     <!-- Tableau utilisateur -->
     <div class="overflow-x-auto bg-white shadow-lg rounded-xl">
       <table class="min-w-full border border-gray-200">
-        <thead class="bg-[#006633] text-white">
+        <thead class="bg-primary text-white">
           <tr>
             <th class="p-3 text-left">Nom</th>
             <th class="p-3 text-left">Email</th>

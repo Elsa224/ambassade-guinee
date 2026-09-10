@@ -1,11 +1,11 @@
 <template>
   <div class="min-h-screen bg-gray-50">
     <!-- Hero section avec titre -->
-    <div class="bg-[#ce1126] text-white py-16 px-4">
+    <div class="bg-accent text-white py-16 px-4">
       <div class="max-w-7xl mx-auto text-center">
         <h1 class="text-4xl md:text-5xl font-bold mb-4">Nos Actualités</h1>
         <p class="text-xl md:text-2xl opacity-90">Actualités Gouvernementales</p>
-        <div class="w-24 h-1 bg-[#fcd116] mx-auto mt-6"></div>
+        <div class="w-24 h-1 bg-secondary mx-auto mt-6"></div>
       </div>
     </div>
 
@@ -20,7 +20,7 @@
             :class="[
               'px-4 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap',
               categorieActive === categorie
-                ? 'bg-[#ce1126] text-white'
+                ? 'bg-accent text-white'
                 : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'
             ]"
           >
@@ -33,7 +33,7 @@
             type="text"
             v-model="recherche"
             placeholder="Rechercher une actualité..."
-            class="w-full px-4 py-2 pl-10 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#ce1126] focus:border-transparent"
+            class="w-full px-4 py-2 pl-10 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
           >
         </div>
       </div>
@@ -41,7 +41,7 @@
       <!-- Actualités en vedette -->
       <div v-if="actualitesVedette.length > 0" class="mb-12">
         <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
-          <span class="bg-[#fcd116] w-1 h-8 mr-3"></span>
+          <span class="bg-secondary w-1 h-8 mr-3"></span>
           À la une
         </h2>
 

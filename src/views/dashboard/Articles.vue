@@ -8,7 +8,7 @@
       </div>
       <button
         @click="openModal('add')"
-        class="bg-[#006633] text-white px-5 py-2.5 rounded-lg hover:bg-[#004d26] transition-colors flex items-center gap-2 shadow-md"
+        class="bg-primary text-white px-5 py-2.5 rounded-lg hover:bg-primary-dark transition-colors flex items-center gap-2 shadow-md"
       >
         <i class='bx bx-plus-circle text-xl'></i>
         Nouvel article
@@ -24,13 +24,13 @@
             v-model="searchQuery"
             type="text"
             placeholder="Rechercher un article..."
-            class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#fcd116] focus:border-[#fcd116]"
+            class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary focus:border-secondary"
           >
         </div>
 
         <select
           v-model="filtreCategorie"
-          class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#fcd116]"
+          class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary"
         >
           <option value="">Toutes les catégories</option>
           <option value="actualites-ambassade">Actualités Ambassade</option>
@@ -40,7 +40,7 @@
 
         <select
           v-model="filtreStatut"
-          class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#fcd116]"
+          class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary"
         >
           <option value="">Tous les statuts</option>
           <option value="Publié">Publié</option>
@@ -50,7 +50,7 @@
 
         <select
           v-model="tri"
-          class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#fcd116]"
+          class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary"
         >
           <option value="recent">Plus récent</option>
           <option value="ancien">Plus ancien</option>
@@ -63,7 +63,7 @@
     <!-- Statistiques -->
     <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
       <div class="bg-white rounded-xl shadow-md p-4 text-center">
-        <p class="text-2xl font-bold text-[#006633]">{{ articlesFiltres.length }}</p>
+        <p class="text-2xl font-bold text-primary">{{ articlesFiltres.length }}</p>
         <p class="text-sm text-gray-600">Total articles</p>
       </div>
       <div class="bg-white rounded-xl shadow-md p-4 text-center">
@@ -127,7 +127,7 @@
                   <button @click="viewArticle(article)" class="text-blue-600 hover:text-blue-800">
                     <i class='bx bx-show text-xl'></i>
                   </button>
-                  <button @click="editArticle(article)" class="text-[#fcd116] hover:text-[#e6b800]">
+                  <button @click="editArticle(article)" class="text-secondary hover:text-secondary-dark">
                     <i class='bx bx-edit-alt text-xl'></i>
                   </button>
                   <button @click="deleteArticle(article.id)" class="text-red-600 hover:text-red-800">
@@ -153,7 +153,7 @@
           >
             <i class='bx bx-chevron-left'></i>
           </button>
-          <span class="px-3 py-1 bg-[#006633] text-white rounded-lg">{{ pageCourante }}</span>
+          <span class="px-3 py-1 bg-primary text-white rounded-lg">{{ pageCourante }}</span>
           <button
             @click="pageCourante++"
             :disabled="pageCourante === totalPages"
@@ -184,7 +184,7 @@
                 v-model="formArticle.titre"
                 type="text"
                 required
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#fcd116]"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary"
                 placeholder="Entrez le titre de l'article"
               >
             </div>
@@ -195,7 +195,7 @@
               <select
                 v-model="formArticle.categorie"
                 required
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#fcd116]"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary"
               >
                 <option value="actualites-ambassade">Actualités de l'Ambassade</option>
                 <option value="actualites-diplomatique">Actualités diplomatiques</option>
@@ -209,7 +209,7 @@
               <textarea
                 v-model="formArticle.resume"
                 rows="2"
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#fcd116]"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary"
                 placeholder="Petite description de l'article..."
               ></textarea>
             </div>
@@ -221,7 +221,7 @@
                 v-model="formArticle.contenu"
                 rows="6"
                 required
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#fcd116]"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary"
                 placeholder="Contenu détaillé de l'article..."
               ></textarea>
             </div>
@@ -248,7 +248,7 @@
                 <label class="block text-sm font-medium text-gray-700 mb-1">Statut</label>
                 <select
                   v-model="formArticle.statut"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#fcd116]"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary"
                 >
                   <option value="Brouillon">Brouillon</option>
                   <option value="Publié">Publié</option>
@@ -260,7 +260,7 @@
                 <input
                   v-model="formArticle.date"
                   type="date"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#fcd116]"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary"
                 >
               </div>
             </div>
@@ -270,7 +270,7 @@
               <button type="button" @click="closeModal" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300">
                 Annuler
               </button>
-              <button type="submit" class="px-4 py-2 bg-[#006633] text-white rounded-lg hover:bg-[#004d26]">
+              <button type="submit" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark">
                 {{ modalButtonText }}
               </button>
             </div>

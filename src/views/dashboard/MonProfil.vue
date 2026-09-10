@@ -1,7 +1,7 @@
 <template>
   <div class="p-6 min-h-screen bg-gray-100">
     <!-- Header -->
-    <h1 class="text-3xl font-bold text-[#346778] mb-6">Mon Profil</h1>
+    <h1 class="text-3xl font-bold text-ink mb-6">Mon Profil</h1>
 
     <div class="max-w-3xl mx-auto p-6">
       <!-- Avatar et nom -->
@@ -9,7 +9,7 @@
         <img
           src="https://i.pravatar.cc/100"
           alt="Avatar"
-          class="w-24 h-24 rounded-full border-2 border-[#346778]"
+          class="w-24 h-24 rounded-full border-2 border-ink"
         />
         <div>
           <h2 class="text-2xl font-semibold text-gray-700">John Doe</h2>
@@ -24,7 +24,7 @@
           <input
             type="text"
             v-model="user.nom"
-            class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#346778]"
+            class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-ink"
           />
         </div>
 
@@ -33,7 +33,7 @@
           <input
             type="text"
             v-model="user.prenom"
-            class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#346778]"
+            class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-ink"
           />
         </div>
 
@@ -42,7 +42,7 @@
           <input
             type="email"
             v-model="user.email"
-            class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#346778]"
+            class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-ink"
           />
         </div>
 
@@ -51,7 +51,7 @@
           <input
             type="text"
             v-model="user.telephone"
-            class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#346778]"
+            class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-ink"
           />
         </div>
       </div>
@@ -65,7 +65,7 @@
           Annuler
         </button>
         <button
-          class="px-4 py-2 rounded bg-[#346778] text-white hover:bg-[#42637a]"
+          class="px-4 py-2 rounded bg-ink text-white hover:bg-ink-light"
           @click="saveProfile"
         >
           Enregistrer

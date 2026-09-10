@@ -8,7 +8,7 @@
       </div>
       <button
         @click="openModal('add')"
-        class="bg-[#006633] text-white px-5 py-2.5 rounded-lg hover:bg-[#004d26] transition-colors flex items-center gap-2 shadow-md"
+        class="bg-primary text-white px-5 py-2.5 rounded-lg hover:bg-primary-dark transition-colors flex items-center gap-2 shadow-md"
       >
         <i class='bx bx-plus-circle text-xl'></i>
         Nouvelle actualité
@@ -25,14 +25,14 @@
             v-model="searchQuery"
             type="text"
             placeholder="Rechercher une actualité..."
-            class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#fcd116] focus:border-[#fcd116]"
+            class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary focus:border-secondary"
           >
         </div>
 
         <!-- Filtre type -->
         <select
           v-model="filtreType"
-          class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#fcd116]"
+          class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary"
         >
           <option value="">Tous les types</option>
           <option value="actualites-ambassade">Actualités Ambassade</option>
@@ -43,7 +43,7 @@
         <!-- Filtre statut -->
         <select
           v-model="filtreStatut"
-          class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#fcd116]"
+          class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary"
         >
           <option value="">Tous les statuts</option>
           <option value="Publié">Publié</option>
@@ -54,7 +54,7 @@
         <!-- Trier par -->
         <select
           v-model="tri"
-          class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#fcd116]"
+          class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary"
         >
           <option value="recent">Plus récent</option>
           <option value="ancien">Plus ancien</option>
@@ -67,7 +67,7 @@
     <!-- Statistiques -->
     <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
       <div class="bg-white rounded-xl shadow-md p-4 text-center">
-        <p class="text-2xl font-bold text-[#006633]">{{ actualitesFiltrees.length }}</p>
+        <p class="text-2xl font-bold text-primary">{{ actualitesFiltrees.length }}</p>
         <p class="text-sm text-gray-600">Total actualités</p>
       </div>
       <div class="bg-white rounded-xl shadow-md p-4 text-center">
@@ -137,7 +137,7 @@
                   <button @click="viewActualite(actualite)" class="text-blue-600 hover:text-blue-800">
                     <i class='bx bx-show text-xl'></i>
                   </button>
-                  <button @click="editActualite(actualite)" class="text-[#fcd116] hover:text-[#e6b800]">
+                  <button @click="editActualite(actualite)" class="text-secondary hover:text-secondary-dark">
                     <i class='bx bx-edit-alt text-xl'></i>
                   </button>
                   <button @click="deleteActualite(actualite.id)" class="text-red-600 hover:text-red-800">
@@ -164,7 +164,7 @@
           >
             <i class='bx bx-chevron-left'></i>
           </button>
-          <span class="px-3 py-1 bg-[#006633] text-white rounded-lg">{{ pageCourante }}</span>
+          <span class="px-3 py-1 bg-primary text-white rounded-lg">{{ pageCourante }}</span>
           <button
             @click="pageCourante++"
             :disabled="pageCourante === totalPages"
@@ -195,7 +195,7 @@
                 v-model="formActualite.titre"
                 type="text"
                 required
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#fcd116]"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary"
                 placeholder="Entrez le titre de l'actualité"
               >
             </div>
@@ -206,7 +206,7 @@
               <select
                 v-model="formActualite.type"
                 required
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#fcd116]"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary"
               >
                 <option value="actualites-ambassade">Actualités de l'Ambassade</option>
                 <option value="actualites-diplomatique">Actualités diplomatiques</option>
@@ -220,7 +220,7 @@
               <textarea
                 v-model="formActualite.resume"
                 rows="2"
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#fcd116]"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary"
                 placeholder="Petite description de l'actualité..."
               ></textarea>
             </div>
@@ -232,7 +232,7 @@
                 v-model="formActualite.contenu"
                 rows="6"
                 required
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#fcd116]"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary"
                 placeholder="Contenu détaillé de l'actualité..."
               ></textarea>
             </div>
@@ -259,7 +259,7 @@
                 <label class="block text-sm font-medium text-gray-700 mb-1">Statut</label>
                 <select
                   v-model="formActualite.statut"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#fcd116]"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary"
                 >
                   <option value="Brouillon">Brouillon</option>
                   <option value="Publié">Publié</option>
@@ -271,7 +271,7 @@
                 <input
                   v-model="formActualite.date"
                   type="date"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#fcd116]"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary"
                 >
               </div>
             </div>
@@ -282,7 +282,7 @@
               <input
                 v-model="formActualite.tags"
                 type="text"
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#fcd116]"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary"
                 placeholder="ex: diplomatie, coopération, économie"
               >
               <div v-if="formActualite.tags" class="flex gap-2 mt-2 flex-wrap">
@@ -297,7 +297,7 @@
               <button type="button" @click="closeModal" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300">
                 Annuler
               </button>
-              <button type="submit" class="px-4 py-2 bg-[#006633] text-white rounded-lg hover:bg-[#004d26]">
+              <button type="submit" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark">
                 {{ modalButtonText }}
               </button>
             </div>

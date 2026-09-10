@@ -1,7 +1,7 @@
 <template>
   <div class="min-h-screen bg-gray-50">
     <!-- Hero section -->
-    <div class="relative bg-gradient-to-r from-[#ce1126] to-[#009460] text-white">
+    <div class="relative bg-gradient-to-r from-accent to-primary-light text-white">
       <div class="absolute inset-0 bg-black/20"></div>
       <div class="relative max-w-7xl mx-auto px-4 py-16 md:py-20">
         <div class="text-center">
@@ -13,9 +13,9 @@
             La Guinée dans le monde : coopération internationale et partenariats stratégiques
           </p>
           <div class="flex justify-center gap-4 mt-8">
-            <div class="w-16 h-1 bg-[#ce1126] "></div>
-            <div class="w-16 h-1 bg-[#fcd116]"></div>
-            <div class="w-16 h-1 bg-[#009460]"></div>
+            <div class="w-16 h-1 bg-accent "></div>
+            <div class="w-16 h-1 bg-secondary"></div>
+            <div class="w-16 h-1 bg-primary-light"></div>
           </div>
         </div>
       </div>
@@ -33,7 +33,7 @@
       <!-- Introduction -->
       <div class="bg-white rounded-2xl shadow-xl p-8 mb-12">
         <div class="flex items-center gap-4 mb-6">
-          <div class="bg-[#ce1126] p-3 rounded-full">
+          <div class="bg-accent p-3 rounded-full">
             <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.66 0 3-4 3-9s-1.34-9-3-9m0 18c-1.66 0-3-4-3-9s1.34-9 3-9"></path>
             </svg>
@@ -50,7 +50,7 @@
       <!-- Relations bilatérales - Section -->
       <div class="mb-12">
         <h2 class="text-3xl font-bold text-gray-800 mb-8 flex items-center">
-          <span class="bg-[#ce1126] w-1 h-8 mr-3"></span>
+          <span class="bg-accent w-1 h-8 mr-3"></span>
           🤝 Relations bilatérales
         </h2>
         <p class="text-gray-600 mb-8">
@@ -62,13 +62,13 @@
           <!-- États-Unis -->
           <router-link to="/relations/etats-unis" class="group">
             <div class="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all hover:-translate-y-2">
-              <div class="h-2 bg-gradient-to-r from-[#ce1126] to-[#009460]"></div>
+              <div class="h-2 bg-gradient-to-r from-accent to-primary-light"></div>
               <div class="p-6">
                 <div class="text-5xl mb-4">🇺🇸</div>
-                <h3 class="text-xl font-bold text-gray-800 mb-2 group-hover:text-[#ce1126] transition-colors">États-Unis d'Amérique</h3>
+                <h3 class="text-xl font-bold text-gray-800 mb-2 group-hover:text-accent transition-colors">États-Unis d'Amérique</h3>
                 <p class="text-gray-600 text-sm mb-3">Depuis 1959</p>
                 <p class="text-gray-500 text-xs">Partenariat stratégique, coopération économique et sécuritaire</p>
-                <div class="mt-4 text-[#ce1126] text-sm font-semibold flex items-center gap-1 group-hover:gap-2 transition-all">
+                <div class="mt-4 text-accent text-sm font-semibold flex items-center gap-1 group-hover:gap-2 transition-all">
                   En savoir plus <span>→</span>
                 </div>
               </div>
@@ -78,13 +78,13 @@
           <!-- Costa Rica -->
           <router-link to="/relations/costa-rica" class="group">
             <div class="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all hover:-translate-y-2">
-              <div class="h-2 bg-gradient-to-r from-[#ce1126] to-[#fcd116]"></div>
+              <div class="h-2 bg-gradient-to-r from-accent to-secondary"></div>
               <div class="p-6">
                 <div class="text-5xl mb-4">🇨🇷</div>
-                <h3 class="text-xl font-bold text-gray-800 mb-2 group-hover:text-[#ce1126] transition-colors">Costa Rica</h3>
+                <h3 class="text-xl font-bold text-gray-800 mb-2 group-hover:text-accent transition-colors">Costa Rica</h3>
                 <p class="text-gray-600 text-sm mb-3">Accréditation 2024</p>
                 <p class="text-gray-500 text-xs">Coopération environnementale, touristique et agricole</p>
-                <div class="mt-4 text-[#ce1126] text-sm font-semibold flex items-center gap-1 group-hover:gap-2 transition-all">
+                <div class="mt-4 text-accent text-sm font-semibold flex items-center gap-1 group-hover:gap-2 transition-all">
                   En savoir plus <span>→</span>
                 </div>
               </div>
@@ -94,13 +94,13 @@
           <!-- Haïti -->
           <router-link to="/relations/haiti" class="group">
             <div class="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all hover:-translate-y-2">
-              <div class="h-2 bg-gradient-to-r from-[#009460] to-[#fcd116]"></div>
+              <div class="h-2 bg-gradient-to-r from-primary-light to-secondary"></div>
               <div class="p-6">
                 <div class="text-5xl mb-4">🇭🇹</div>
-                <h3 class="text-xl font-bold text-gray-800 mb-2 group-hover:text-[#ce1126] transition-colors">Haïti</h3>
+                <h3 class="text-xl font-bold text-gray-800 mb-2 group-hover:text-accent transition-colors">Haïti</h3>
                 <p class="text-gray-600 text-sm mb-3">Coopération multilatérale</p>
                 <p class="text-gray-500 text-xs">Engagement guinéen pour la stabilité, coopération à l'OIF et à l'ONU</p>
-                <div class="mt-4 text-[#ce1126] text-sm font-semibold flex items-center gap-1 group-hover:gap-2 transition-all">
+                <div class="mt-4 text-accent text-sm font-semibold flex items-center gap-1 group-hover:gap-2 transition-all">
                   En savoir plus <span>→</span>
                 </div>
               </div>
@@ -110,13 +110,13 @@
           <!-- Bahamas -->
           <router-link to="/relations/bahamas" class="group">
             <div class="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all hover:-translate-y-2">
-              <div class="h-2 bg-gradient-to-r from-[#fcd116] to-[#009460]"></div>
+              <div class="h-2 bg-gradient-to-r from-secondary to-primary-light"></div>
               <div class="p-6">
                 <div class="text-5xl mb-4">🇧🇸</div>
-                <h3 class="text-xl font-bold text-gray-800 mb-2 group-hover:text-[#ce1126] transition-colors">Bahamas</h3>
+                <h3 class="text-xl font-bold text-gray-800 mb-2 group-hover:text-accent transition-colors">Bahamas</h3>
                 <p class="text-gray-600 text-sm mb-3">Commonwealth britannique</p>
                 <p class="text-gray-500 text-xs">Coopération limitée à l'ONU, opportunités de développement</p>
-                <div class="mt-4 text-[#ce1126] text-sm font-semibold flex items-center gap-1 group-hover:gap-2 transition-all">
+                <div class="mt-4 text-accent text-sm font-semibold flex items-center gap-1 group-hover:gap-2 transition-all">
                   En savoir plus <span>→</span>
                 </div>
               </div>
@@ -128,7 +128,7 @@
       <!-- Relations multilatérales - Section -->
       <div class="mb-12">
         <h2 class="text-3xl font-bold text-gray-800 mb-8 flex items-center">
-          <span class="bg-[#009460] w-1 h-8 mr-3"></span>
+          <span class="bg-primary-light w-1 h-8 mr-3"></span>
           🌍 Relations multilatérales
         </h2>
         <p class="text-gray-600 mb-8">
@@ -139,23 +139,23 @@
           <!-- Institutions de Bretton Woods -->
           <router-link to="/relations/bretton-woods" class="group">
             <div class="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all hover:-translate-y-2">
-              <div class="h-2 bg-gradient-to-r from-[#ce1126] to-[#fcd116]"></div>
+              <div class="h-2 bg-gradient-to-r from-accent to-secondary"></div>
               <div class="p-6">
                 <div class="flex items-center gap-4 mb-4">
                   <div class="text-4xl">🏦</div>
-                  <h3 class="text-xl font-bold text-gray-800 group-hover:text-[#ce1126] transition-colors">Institutions de Bretton Woods</h3>
+                  <h3 class="text-xl font-bold text-gray-800 group-hover:text-accent transition-colors">Institutions de Bretton Woods</h3>
                 </div>
                 <div class="grid grid-cols-2 gap-3 mb-4">
                   <div class="bg-gray-50 p-3 rounded-lg text-center">
-                    <p class="font-bold text-[#ce1126]">FMI</p>
+                    <p class="font-bold text-accent">FMI</p>
                     <p class="text-xs">Appui technique et financier</p>
                   </div>
                   <div class="bg-gray-50 p-3 rounded-lg text-center">
-                    <p class="font-bold text-[#009460]">Banque Mondiale</p>
+                    <p class="font-bold text-primary-light">Banque Mondiale</p>
                     <p class="text-xs">907M$ d'engagements</p>
                   </div>
                 </div>
-                <div class="mt-4 text-[#ce1126] text-sm font-semibold flex items-center gap-1 group-hover:gap-2 transition-all">
+                <div class="mt-4 text-accent text-sm font-semibold flex items-center gap-1 group-hover:gap-2 transition-all">
                   Découvrir la coopération <span>→</span>
                 </div>
               </div>
@@ -163,7 +163,7 @@
           </router-link>
 
           <!-- Autres organisations -->
-          <div class="bg-gradient-to-r from-[#ce1126] to-[#009460] text-white rounded-2xl shadow-lg p-6">
+          <div class="bg-gradient-to-r from-accent to-primary-light text-white rounded-2xl shadow-lg p-6">
             <div class="flex items-center gap-4 mb-6">
               <div class="text-4xl">🇺🇳</div>
               <h3 class="text-2xl font-bold">Organisations internationales</h3>
@@ -193,34 +193,34 @@
       <!-- Chiffres clés de la coopération -->
       <div class="bg-white rounded-2xl shadow-xl p-8 mb-12">
         <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
-          <span class="bg-[#fcd116] w-1 h-6 mr-3"></span>
+          <span class="bg-secondary w-1 h-6 mr-3"></span>
           📊 Chiffres clés de la coopération
         </h2>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <div class="text-center p-4 bg-gray-50 rounded-xl">
-            <div class="text-3xl font-bold text-[#ce1126]">1959</div>
+            <div class="text-3xl font-bold text-accent">1959</div>
             <p class="text-sm text-gray-600">Établissement des relations Guinée-USA</p>
           </div>
           <div class="text-center p-4 bg-gray-50 rounded-xl">
-            <div class="text-3xl font-bold text-[#ce1126]">2024</div>
+            <div class="text-3xl font-bold text-accent">2024</div>
             <p class="text-sm text-gray-600">Accréditation au Costa Rica</p>
           </div>
           <div class="text-center p-4 bg-gray-50 rounded-xl">
-            <div class="text-3xl font-bold text-[#ce1126]">907M$</div>
+            <div class="text-3xl font-bold text-accent">907M$</div>
             <p class="text-sm text-gray-600">Engagements Banque Mondiale</p>
           </div>
           <div class="text-center p-4 bg-gray-50 rounded-xl">
-            <div class="text-3xl font-bold text-[#ce1126]">1Md$</div>
+            <div class="text-3xl font-bold text-accent">1Md$</div>
             <p class="text-sm text-gray-600">Aide américaine (2024)</p>
           </div>
         </div>
       </div>
 
       <!-- Perspectives et coopération future -->
-      <div class="bg-gradient-to-r from-[#ce1126] to-[#009460] text-white rounded-2xl p-8">
+      <div class="bg-gradient-to-r from-accent to-primary-light text-white rounded-2xl p-8">
         <h3 class="text-2xl font-bold mb-4 flex items-center">
-          <span class="bg-[#fcd116] w-1 h-6 mr-3"></span>
+          <span class="bg-secondary w-1 h-6 mr-3"></span>
           🚀 Perspectives de coopération
         </h3>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">

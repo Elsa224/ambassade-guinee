@@ -8,7 +8,7 @@
           v-model="search"
           type="text"
           placeholder="Rechercher par objet ou destinateur..."
-          class="w-full p-3 rounded-lg border border-gray-300 focus:border-[#006633] focus:ring-2 focus:ring-[#006633] focus:outline-none transition-all duration-200"
+          class="w-full p-3 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary focus:outline-none transition-all duration-200"
         />
       </div>
     </div>
@@ -21,7 +21,7 @@
       <!-- Table Container -->
       <div class="overflow-auto flex-1">
         <table class="min-w-full text-left table-auto">
-          <thead class="bg-[#006633] text-white sticky top-0">
+          <thead class="bg-primary text-white sticky top-0">
             <tr>
               <th class="px-4 py-3 font-semibold">ID</th>
               <th class="px-4 py-3 font-semibold">Objet</th>
@@ -63,7 +63,7 @@
               <td class="px-4 py-3">
                 <button
                   @click="voirCourrier(courrier)"
-                  class="text-sm font-medium text-[#006633] hover:text-[#004c2a] hover:underline transition-colors duration-200"
+                  class="text-sm font-medium text-primary hover:text-primary-dark hover:underline transition-colors duration-200"
                 >
                   🧷
                 </button>
@@ -86,9 +86,9 @@
                     <!-- ✅ Ajouter -->
                     <button
                       @click="ajouter()"
-                      class="flex items-center w-full px-4 py-2 text-sm text-[#006633] hover:bg-green-50 transition-colors duration-150"
+                      class="flex items-center w-full px-4 py-2 text-sm text-primary hover:bg-green-50 transition-colors duration-150"
                     >
-                      <i class="bx bx-plus-circle mr-2 text-[#006633]"></i>
+                      <i class="bx bx-plus-circle mr-2 text-primary"></i>
                       Ajouter
                     </button>
 
@@ -176,7 +176,7 @@
             :class="[
               'px-3 py-2 rounded-lg border border-gray-300 hover:bg-white transition-colors duration-200 min-w-10',
               currentPage === page
-                ? 'bg-[#006633] text-white border-[#006633] hover:bg-[#004c2a]'
+                ? 'bg-primary text-white border-primary hover:bg-primary-dark'
                 : 'bg-white text-gray-700'
             ]"
           >
@@ -200,7 +200,7 @@
   <div class="mb-4">
     <button
       @click="retourListe"
-      class="flex items-center gap-2 text-[#006633] hover:text-[#004c2a] text-lg font-semibold transition-colors duration-200"
+      class="flex items-center gap-2 text-primary hover:text-primary-dark text-lg font-semibold transition-colors duration-200"
     >
       <i class="bx bx-arrow-back"></i>
       Retour à la liste
@@ -211,7 +211,7 @@
   <div class="flex justify-between mb-6">
     <!-- Destinateur -->
     <div class="space-y-1">
-      <p class="text-xl font-bold text-[#006633]">{{ courrierSelectionne.destinateur }}</p>
+      <p class="text-xl font-bold text-primary">{{ courrierSelectionne.destinateur }}</p>
       <p class="text-gray-600">{{ courrierSelectionne.contact }}</p>
       <p class="text-gray-600">{{ courrierSelectionne.adresse || 'Abidjan, Côte d’Ivoire' }}</p>
     </div>
@@ -226,7 +226,7 @@
   </div>
 
   <!-- Objet -->
-  <h3 class="text-xl font-bold mb-6 text-[#006633] border-b-2 border-[#006633] pb-2">
+  <h3 class="text-xl font-bold mb-6 text-primary border-b-2 border-primary pb-2">
     Objet : {{ courrierSelectionne.objet }}
   </h3>
 
@@ -247,7 +247,7 @@
 
   <!-- Signature -->
   <div class="mb-12">
-    <p class="font-bold text-lg text-[#006633]">Cordialement,</p>
+    <p class="font-bold text-lg text-primary">Cordialement,</p>
     <p class="text-xl font-semibold mt-2">{{ courrierSelectionne.destinateur }}</p>
   </div>
 
@@ -255,7 +255,7 @@
   <div class="flex justify-center gap-3">
     <button
       @click="telecharger(courrierSelectionne)"
-      class="px-4 py-2 bg-[#006633] text-white rounded-lg hover:bg-[#004c2a] transition"
+      class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition"
     >
       Télécharger
     </button>

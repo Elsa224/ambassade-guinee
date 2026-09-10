@@ -3,7 +3,7 @@
     <main class="flex-1 p-8 overflow-hidden">
       <!-- Page header -->
       <div class="flex items-center justify-between mb-6">
-        <h2 class="text-3xl font-bold text-[#006633]">Attendance</h2>
+        <h2 class="text-3xl font-bold text-primary">Attendance</h2>
         <div class="flex items-center gap-4">
           <button class="rounded-full w-10 h-10 bg-white shadow flex items-center justify-center hover:bg-gray-100">
             <i class="bx bx-bell text-2xl text-gray-600"></i>
@@ -90,7 +90,7 @@
                 v-model="searchQuery"
                 type="text"
                 placeholder="Search"
-                class="border border-gray-300 rounded-lg px-10 py-2 focus:outline-none focus:ring-2 focus:ring-[#346778]"
+                class="border border-gray-300 rounded-lg px-10 py-2 focus:outline-none focus:ring-2 focus:ring-ink"
               />
               <i class="bx bx-search absolute left-3 top-2.5 text-gray-400 text-lg"></i>
             </div>
@@ -105,7 +105,7 @@
 
             <router-link
               to="/dashboard/utilisateur/ajouter"
-              class="bg-[#006633] text-white px-4 py-2 rounded-lg shadow-md hover:bg-[#004d26] transition flex items-center gap-2"
+              class="bg-primary text-white px-4 py-2 rounded-lg shadow-md hover:bg-primary-dark transition flex items-center gap-2"
             >
               <i class="bx bx-plus text-lg"></i>
               Add New Employee
@@ -115,7 +115,7 @@
 
         <div class="bg-white rounded-xl shadow-md w-full overflow-hidden">
           <table class="w-full text-left border-collapse min-w-max">
-            <thead class="bg-[#006633] text-white">
+            <thead class="bg-primary text-white">
               <tr>
                 <th class="p-4 border-none whitespace-nowrap">Employee name</th>
                 <th class="p-4 border-none whitespace-nowrap">Clock-in & Out</th>
@@ -230,7 +230,7 @@
               v-for="page in pageNumbers"
               :key="page"
               @click="goToPage(page)"
-              :class="[ 'px-3 py-1 rounded-md border border-gray-300 hover:bg-gray-50', currentPage === page ? 'bg-[#006633] text-white border-[#006633]' : '']"
+              :class="[ 'px-3 py-1 rounded-md border border-gray-300 hover:bg-gray-50', currentPage === page ? 'bg-primary text-white border-primary' : '']"
             >
               {{ page }}
             </button>

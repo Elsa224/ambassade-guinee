@@ -8,7 +8,7 @@
       </div>
       <button
         @click="openModal('add')"
-        class="bg-[#006633] text-white px-5 py-2.5 rounded-lg hover:bg-[#004d26] transition-colors flex items-center gap-2 shadow-md"
+        class="bg-primary text-white px-5 py-2.5 rounded-lg hover:bg-primary-dark transition-colors flex items-center gap-2 shadow-md"
       >
         <i class='bx bx-plus-circle text-xl'></i>
         Ajouter des photos
@@ -18,7 +18,7 @@
     <!-- Statistiques -->
     <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
       <div class="bg-white rounded-xl shadow-md p-4 text-center">
-        <p class="text-2xl font-bold text-[#006633]">{{ totalPhotos }}</p>
+        <p class="text-2xl font-bold text-primary">{{ totalPhotos }}</p>
         <p class="text-sm text-gray-600">Total photos</p>
       </div>
       <div class="bg-white rounded-xl shadow-md p-4 text-center">
@@ -44,13 +44,13 @@
             v-model="searchQuery"
             type="text"
             placeholder="Rechercher une photo..."
-            class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#fcd116]"
+            class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary"
           >
         </div>
 
         <select
           v-model="filtreAlbum"
-          class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#fcd116]"
+          class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary"
         >
           <option value="">Tous les albums</option>
           <option v-for="album in albums" :key="album.id" :value="album.id">
@@ -60,7 +60,7 @@
 
         <select
           v-model="tri"
-          class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#fcd116]"
+          class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary"
         >
           <option value="recent">Plus récentes</option>
           <option value="ancien">Plus anciennes</option>
@@ -74,7 +74,7 @@
     <div v-if="showAlbums" class="mb-8">
       <div class="flex items-center justify-between mb-4">
         <h3 class="text-lg font-semibold text-gray-800">Albums</h3>
-        <button @click="openAlbumModal('add')" class="text-[#006633] text-sm hover:underline flex items-center gap-1">
+        <button @click="openAlbumModal('add')" class="text-primary text-sm hover:underline flex items-center gap-1">
           <i class='bx bx-plus-circle'></i>
           Nouvel album
         </button>
@@ -98,7 +98,7 @@
             <div class="flex justify-between items-center mt-3">
               <span class="text-xs text-gray-400">{{ album.date }}</span>
               <div class="flex gap-2">
-                <button @click.stop="editAlbum(album)" class="text-[#fcd116] hover:text-[#e6b800]">
+                <button @click.stop="editAlbum(album)" class="text-secondary hover:text-secondary-dark">
                   <i class='bx bx-edit-alt'></i>
                 </button>
                 <button @click.stop="deleteAlbum(album.id)" class="text-red-600 hover:text-red-800">
@@ -122,14 +122,14 @@
           <button
             @click="toggleViewMode"
             class="p-2 rounded-lg border hover:bg-gray-50"
-            :class="viewMode === 'grid' ? 'bg-[#006633] text-white' : 'text-gray-600'"
+            :class="viewMode === 'grid' ? 'bg-primary text-white' : 'text-gray-600'"
           >
             <i class='bx bx-grid-alt text-xl'></i>
           </button>
           <button
             @click="toggleViewMode"
             class="p-2 rounded-lg border hover:bg-gray-50"
-            :class="viewMode === 'list' ? 'bg-[#006633] text-white' : 'text-gray-600'"
+            :class="viewMode === 'list' ? 'bg-primary text-white' : 'text-gray-600'"
           >
             <i class='bx bx-list-ul text-xl'></i>
           </button>
@@ -146,10 +146,10 @@
           <div class="relative h-56 overflow-hidden">
             <img :src="photo.url" :alt="photo.titre" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">
             <div class="absolute inset-0 bg-black/50 flex items-center justify-center gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
-              <button @click="viewPhoto(photo)" class="bg-white text-[#006633] p-2 rounded-full hover:scale-110 transition-transform">
+              <button @click="viewPhoto(photo)" class="bg-white text-primary p-2 rounded-full hover:scale-110 transition-transform">
                 <i class='bx bx-show'></i>
               </button>
-              <button @click="editPhoto(photo)" class="bg-white text-[#fcd116] p-2 rounded-full hover:scale-110 transition-transform">
+              <button @click="editPhoto(photo)" class="bg-white text-secondary p-2 rounded-full hover:scale-110 transition-transform">
                 <i class='bx bx-edit-alt'></i>
               </button>
               <button @click="deletePhoto(photo.id)" class="bg-white text-red-600 p-2 rounded-full hover:scale-110 transition-transform">
@@ -199,7 +199,7 @@
                     <button @click="viewPhoto(photo)" class="text-blue-600 hover:text-blue-800">
                       <i class='bx bx-show text-xl'></i>
                     </button>
-                    <button @click="editPhoto(photo)" class="text-[#fcd116] hover:text-[#e6b800]">
+                    <button @click="editPhoto(photo)" class="text-secondary hover:text-secondary-dark">
                       <i class='bx bx-edit-alt text-xl'></i>
                     </button>
                     <button @click="deletePhoto(photo.id)" class="text-red-600 hover:text-red-800">
@@ -226,7 +226,7 @@
           >
             <i class='bx bx-chevron-left'></i>
           </button>
-          <span class="px-3 py-1 bg-[#006633] text-white rounded-lg">{{ pageCourante }}</span>
+          <span class="px-3 py-1 bg-primary text-white rounded-lg">{{ pageCourante }}</span>
           <button
             @click="pageCourante++"
             :disabled="pageCourante === totalPages"
@@ -254,12 +254,12 @@
             <div v-if="modalMode === 'add'" class="mb-4">
               <label class="block text-sm font-medium text-gray-700 mb-1">Sélectionner des photos *</label>
               <div
-                class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-[#006633] hover:bg-gray-50 transition-all"
+                class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-primary hover:bg-gray-50 transition-all"
                 @dragover.prevent
                 @drop.prevent="handleDrop"
                 @click="$refs.fileInput.click()"
               >
-                <i class='bx bx-cloud-upload text-4xl text-[#006633]'></i>
+                <i class='bx bx-cloud-upload text-4xl text-primary'></i>
                 <p class="mt-2 text-gray-600">Cliquez ou glissez-déposez des photos</p>
                 <p class="text-xs text-gray-400">PNG, JPG, JPEG jusqu'à 5MB</p>
                 <input
@@ -295,19 +295,19 @@
             <!-- Titre -->
             <div class="mb-4">
               <label class="block text-sm font-medium text-gray-700 mb-1">Titre *</label>
-              <input v-model="formPhoto.titre" type="text" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#fcd116]" placeholder="Titre de la photo">
+              <input v-model="formPhoto.titre" type="text" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary" placeholder="Titre de la photo">
             </div>
 
             <!-- Description -->
             <div class="mb-4">
               <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
-              <textarea v-model="formPhoto.description" rows="2" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#fcd116]" placeholder="Description de la photo..."></textarea>
+              <textarea v-model="formPhoto.description" rows="2" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary" placeholder="Description de la photo..."></textarea>
             </div>
 
             <!-- Album -->
             <div class="mb-4">
               <label class="block text-sm font-medium text-gray-700 mb-1">Album</label>
-              <select v-model="formPhoto.albumId" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#fcd116]">
+              <select v-model="formPhoto.albumId" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary">
                 <option value="">Sans album</option>
                 <option v-for="album in albums" :key="album.id" :value="album.id">{{ album.nom }}</option>
               </select>
@@ -316,12 +316,12 @@
             <!-- Tags -->
             <div class="mb-4">
               <label class="block text-sm font-medium text-gray-700 mb-1">Tags (séparés par des virgules)</label>
-              <input v-model="formPhoto.tags" type="text" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#fcd116]" placeholder="ex: événement, diplomatie, conférence">
+              <input v-model="formPhoto.tags" type="text" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary" placeholder="ex: événement, diplomatie, conférence">
             </div>
 
             <div class="flex justify-end gap-3 pt-4 border-t">
               <button type="button" @click="closeModal" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300">Annuler</button>
-              <button type="submit" class="px-4 py-2 bg-[#006633] text-white rounded-lg hover:bg-[#004d26]">{{ modalButtonText }}</button>
+              <button type="submit" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark">{{ modalButtonText }}</button>
             </div>
           </form>
         </div>
@@ -341,11 +341,11 @@
           <form @submit.prevent="saveAlbum" class="p-4">
             <div class="mb-4">
               <label class="block text-sm font-medium text-gray-700 mb-1">Nom de l'album *</label>
-              <input v-model="formAlbum.nom" type="text" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#fcd116]" placeholder="Ex: Visite officielle 2024">
+              <input v-model="formAlbum.nom" type="text" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary" placeholder="Ex: Visite officielle 2024">
             </div>
             <div class="mb-4">
               <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
-              <textarea v-model="formAlbum.description" rows="2" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#fcd116]" placeholder="Description de l'album..."></textarea>
+              <textarea v-model="formAlbum.description" rows="2" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary" placeholder="Description de l'album..."></textarea>
             </div>
             <div class="mb-4">
               <label class="block text-sm font-medium text-gray-700 mb-1">Photo de couverture</label>
@@ -356,7 +356,7 @@
             </div>
             <div class="flex justify-end gap-3 pt-4 border-t">
               <button type="button" @click="closeAlbumModal" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300">Annuler</button>
-              <button type="submit" class="px-4 py-2 bg-[#006633] text-white rounded-lg hover:bg-[#004d26]">{{ albumModalButtonText }}</button>
+              <button type="submit" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark">{{ albumModalButtonText }}</button>
             </div>
           </form>
         </div>

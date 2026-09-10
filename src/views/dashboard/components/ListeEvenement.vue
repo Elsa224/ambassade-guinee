@@ -3,13 +3,13 @@
 
     <!-- Barre de recherche (responsive) -->
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
-      <h3 class="text-lg font-semibold text-[#006633]">Liste des Événements</h3>
+      <h3 class="text-lg font-semibold text-primary">Liste des Événements</h3>
       <div class="relative w-full sm:w-64">
         <input
           v-model="searchQuery"
           type="text"
           placeholder="Rechercher un événement..."
-          class="border border-gray-300 rounded-lg px-10 py-2 w-full focus:outline-none focus:ring-2 focus:ring-[#006633]"
+          class="border border-gray-300 rounded-lg px-10 py-2 w-full focus:outline-none focus:ring-2 focus:ring-primary"
         />
         <i class="bx bx-search absolute left-3 top-2.5 text-gray-400 text-lg"></i>
       </div>
@@ -41,7 +41,7 @@
               <p class="text-sm text-gray-600"><span class="font-medium">Date :</span> {{ event.date }} à {{ event.heure }}</p>
               <p class="text-sm text-gray-600"><span class="font-medium">Création :</span> {{ event.createdAt }}</p>
               <p class="text-sm text-gray-600"><span class="font-medium">Participants :</span>
-                <button class="text-[#42637a] font-semibold hover:underline" @click="voirParticipants(event)">
+                <button class="text-ink-light font-semibold hover:underline" @click="voirParticipants(event)">
                   {{ event.participation }}
                 </button>
               </p>
@@ -82,7 +82,7 @@
       <!-- === VUE DESKTOP : TABLEAU === -->
       <div class="hidden md:block overflow-x-auto">
         <table class="min-w-full border border-gray-200 rounded-lg">
-          <thead class="bg-[#006633] text-white">
+          <thead class="bg-primary text-white">
             <tr>
               <th class="p-3 text-left">Nom</th>
               <th class="p-3 text-left">Entreprise</th>
@@ -112,7 +112,7 @@
               <td class="p-3">{{ event.createdAt }}</td>
               <td class="p-3"><a :href="event.lien" class="text-blue-600 hover:underline">Voir</a></td>
               <td class="p-3">
-                <button class="text-[#42637a] font-semibold hover:underline"
+                <button class="text-ink-light font-semibold hover:underline"
                         @click="voirParticipants(event)">
                   {{ event.participation }}
                 </button>
@@ -155,7 +155,7 @@
         <div class="flex gap-1 flex-wrap justify-center">
           <button :disabled="currentPage === 1" @click="currentPage--" class="px-3 py-1 border rounded hover:bg-gray-200 disabled:opacity-50">‹</button>
           <button v-for="page in totalPages" :key="page" @click="currentPage = page"
-                  :class="['px-3 py-1 border rounded hover:bg-gray-200', currentPage === page ? 'bg-[#006633] text-white' : '']">
+                  :class="['px-3 py-1 border rounded hover:bg-gray-200', currentPage === page ? 'bg-primary text-white' : '']">
             {{ page }}
           </button>
           <button :disabled="currentPage === totalPages" @click="currentPage++" class="px-3 py-1 border rounded hover:bg-gray-200 disabled:opacity-50">›</button>
@@ -166,7 +166,7 @@
     <!-- Liste des participants (responsive) -->
     <div v-if="activeTab === 'participants'" class="bg-white shadow-md rounded-lg p-4">
       <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
-        <h3 class="text-lg font-semibold text-[#006633]">
+        <h3 class="text-lg font-semibold text-primary">
           Participants de l'Événement : {{ selectedEvent?.nom || '' }}
         </h3>
         <button @click="activeTab = 'list'" class="bg-gray-200 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-300">
@@ -193,7 +193,7 @@
       <!-- Version desktop : tableau -->
       <div class="hidden md:block overflow-x-auto">
         <table class="min-w-full border border-gray-200 rounded-lg">
-          <thead class="bg-[#006633] text-white">
+          <thead class="bg-primary text-white">
             <tr>
               <th class="p-3 text-left">ID</th>
               <th class="p-3 text-left">Email</th>

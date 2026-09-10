@@ -46,7 +46,7 @@
             v-model="searchQuery"
             type="text"
             placeholder="Search"
-            class="border border-gray-300 rounded-lg px-10 py-2 focus:outline-none focus:ring-2 focus:ring-[#006633]"
+            class="border border-gray-300 rounded-lg px-10 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
           />
           <i class="bx bx-search absolute left-3 top-2.5 text-gray-400 text-lg"></i>
         </div>
@@ -62,7 +62,7 @@
         <!-- Bouton Add New Employee avec les couleurs officielles -->
         <router-link
           to="/dashboard/utilisateurs/ajouter"
-          class="bg-[#006633] text-white px-4 py-2 rounded-lg shadow-md hover:bg-[#004d26] transition flex items-center gap-2"
+          class="bg-primary text-white px-4 py-2 rounded-lg shadow-md hover:bg-primary-dark transition flex items-center gap-2"
         >
           <i class="bx bx-plus text-lg"></i>
           Add New Employee
@@ -74,7 +74,7 @@
     <div class="bg-white rounded-xl shadow-md overflow-hidden w-full">
       <div class="overflow-x-auto w-full" style="max-height: 500px;">
         <table class="w-full text-left border-collapse min-w-max">
-          <thead class="bg-[#006633] text-white">
+          <thead class="bg-primary text-white">
             <tr>
               <th class="p-4 border-none whitespace-nowrap">Employee name</th>
               <th class="p-4 border-none whitespace-nowrap">Clock-in & Out</th>
@@ -109,7 +109,7 @@
                   :class="
                     emp.status === 'On time'
                       ? 'bg-green-100 text-green-600'
-                      : 'bg-red-100 text-[#ce1126]'
+                      : 'bg-red-100 text-accent'
                   "
                   class="px-3 py-1 rounded-full text-sm font-medium whitespace-nowrap"
                 >
@@ -136,7 +136,7 @@
                     </button>
                     <button
                       @click="deleteEmployee(emp)"
-                      class="flex items-center gap-2 px-3 py-2 hover:bg-gray-100 text-[#ce1126] text-sm whitespace-nowrap"
+                      class="flex items-center gap-2 px-3 py-2 hover:bg-gray-100 text-accent text-sm whitespace-nowrap"
                     >
                       <i class="bx bx-trash"></i> Supprimer
                     </button>
@@ -203,7 +203,7 @@
           @click="goToPage(page)"
           :class="[
             'px-3 py-1 rounded-md border border-gray-300 hover:bg-gray-50',
-            currentPage === page ? 'bg-[#006633] text-white border-[#006633]' : '',
+            currentPage === page ? 'bg-primary text-white border-primary' : '',
           ]"
         >
           {{ page }}
