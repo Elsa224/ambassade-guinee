@@ -1,7 +1,13 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import { createPinia, setActivePinia } from 'pinia'
 import { useTenantStore } from '@/stores/tenant'
-import { rubriqueDuChemin, RUBRIQUE_PAR_CHEMIN } from '../rubriques'
+import {
+  rubriqueDuChemin,
+  RUBRIQUE_PAR_CHEMIN,
+  cheminOuvert,
+  moduleDuChemin,
+  type TenantConsulte,
+} from '../rubriques'
 import type { Embassy } from '@/api/bootstrap'
 import guineeFixture from '@/api/fixtures/bootstrap.json'
 import gabonFixture from '@/api/fixtures/bootstrap-gabon.json'
@@ -100,5 +106,54 @@ describe('ouverture des rubriques selon l ambassade', () => {
 
       expect(publiees.filter((chemin) => !ouvert(chemin))).toEqual([])
     })
+  })
+})
+
+describe('chemins dependant d un module a provisionner', () => {
+  it('ferme le module tant que l ambassade ne le declare pas actif', () => {
+    // Defaut inverse de celui des rubriques de contenu : un module absent de
+    // la configuration n'a pas ete provisionne, et ses routes rendent 404
+    // cote back. L'annoncer au menu promettrait une page qui n'existe pas.
+    expect(cheminOuvert('/evenements', null)).toBe(false)
+    expect(cheminOuvert('/evenements', { modules: {} })).toBe(false)
+    expect(cheminOuvert('/evenements', { modules: { secure_events: false } })).toBe(false)
+  })
+
+  it('ouvre le module quand l ambassade le declare actif', () => {
+    expect(cheminOuvert('/evenements', { modules: { secure_events: true } })).toBe(true)
+  })
+
+  it('applique la meme decision aux pages sous le module', () => {
+    // La page d'inscription atteinte par QR code depend du meme module que la
+    // liste : sans lui, le back ne sait rien de l'evenement.
+    expect(
+      cheminOuvert('/evenements/inscription/AbC123', { modules: { secure_events: true } }),
+    ).toBe(true)
+    expect(
+      cheminOuvert('/evenements/inscription/AbC123', { modules: { secure_events: false } }),
+    ).toBe(false)
+  })
+
+  it('ne confond pas un chemin voisin avec le prefixe du module', () => {
+    // `/evenements-passes` n'est pas sous `/evenements` : un `startsWith` sans
+    // separateur le fermerait a tort, alors qu'il n'a rien a voir avec
+    // Ambassade Secure.
+    expect(moduleDuChemin('/evenements-passes')).toBeNull()
+    expect(cheminOuvert('/evenements-passes', { modules: { secure_events: false } })).toBe(true)
+  })
+
+  it('garde aux rubriques de contenu leur defaut ouvert', () => {
+    // La generalisation ne doit pas contaminer l'autre regle.
+    expect(cheminOuvert('/chancellerie', { modules: {} })).toBe(true)
+    expect(cheminOuvert('/chancellerie', { modules: { chancellerie: false } })).toBe(false)
+    expect(cheminOuvert('/', { modules: {} })).toBe(true)
+  })
+
+  it('ferme le module sur les deux ambassades reellement configurees', () => {
+    // Ni la Guinee ni le Gabon n'ont provisionne Ambassade Secure : aucune
+    // entree « Évènements » ne doit apparaitre aujourd'hui en production.
+    const tenants = [guineeFixture, gabonFixture].map((f) => f.embassy as TenantConsulte)
+
+    expect(tenants.filter((t) => cheminOuvert('/evenements', t))).toEqual([])
   })
 })

@@ -29,6 +29,26 @@ export function rubriqueDuChemin(chemin: string): string | null {
 }
 
 /**
+ * Modules a provisionner, fermes tant que l'ambassade ne les declare pas
+ * actifs.
+ *
+ * Le defaut est ici l'inverse de celui des rubriques de contenu : un module
+ * qui n'existe pas encore ne doit pas s'annoncer. La cle est un prefixe de
+ * chemin : tout ce qui est dessous suit le meme sort.
+ */
+export const MODULE_PAR_CHEMIN: Readonly<Record<string, string>> = {
+  '/evenements': 'secure_events',
+}
+
+/** Module dont depend un chemin, ou `null` s'il n'en depend d'aucun. */
+export function moduleDuChemin(chemin: string): string | null {
+  for (const [prefixe, module] of Object.entries(MODULE_PAR_CHEMIN)) {
+    if (chemin === prefixe || chemin.startsWith(`${prefixe}/`)) return module
+  }
+  return null
+}
+
+/**
  * Ambassade dont le gabarit porte encore le contenu en dur.
  *
  * Tant que les pages editoriales ne sont pas servies par l'API, leur texte,
@@ -68,4 +88,16 @@ export function rubriqueOuverte(nom: string | null, tenant: TenantConsulte | nul
   // Sans configuration chargee du tout, on est sur le site d'origine tant
   // qu'aucun autre tenant ne s'est annonce.
   return (tenant?.slug ?? CONTENU_INTEGRE_DE) === CONTENU_INTEGRE_DE
+}
+
+/**
+ * Decide si un chemin du site public est accessible, en appliquant a chaque
+ * cas son defaut : ferme pour un module a provisionner, ouvert pour une
+ * rubrique de contenu de l'ambassade d'origine.
+ */
+export function cheminOuvert(chemin: string, tenant: TenantConsulte | null): boolean {
+  const module = moduleDuChemin(chemin)
+  if (module !== null) return tenant?.modules?.[module] === true
+
+  return rubriqueOuverte(rubriqueDuChemin(chemin), tenant)
 }
