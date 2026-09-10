@@ -13,6 +13,8 @@ export const RUBRIQUE_PAR_CHEMIN: Readonly<Record<string, string>> = {
   '/calendrier': 'calendrier',
   '/consulat': 'consulat',
   '/rendez-vous': 'rendez_vous',
+  '/presentation': 'presentation',
+  '/ambassadeur': 'ambassadeur',
   '/relations-bilaterales': 'bilateral',
   '/usa': 'bilateral',
   '/costa-rica': 'bilateral',

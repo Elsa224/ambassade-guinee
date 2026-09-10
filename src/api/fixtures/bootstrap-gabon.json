@@ -20,16 +20,20 @@
       "hours": "Du lundi au vendredi, 8h - 16h"
     },
     "modules": {
+      "ambassadeur": false,
       "bilateral": false,
-      "chancellerie": false,
-      "services": false,
-      "consuls_honoraires": false,
       "calendrier": false,
+      "chancellerie": false,
       "consulat": false,
-      "rendez_vous": false,
+      "consuls_honoraires": false,
+      "dirigeants": false,
       "galerie": false,
+      "presentation": false,
+      "rendez_vous": false,
+      "secure_events": false,
       "secure_rdv": false,
-      "secure_events": false
+      "services": false,
+      "vitrine": false
     }
   }
 }

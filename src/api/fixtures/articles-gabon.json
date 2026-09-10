@@ -1,0 +1,67 @@
+{
+  "data": [
+    {
+      "id": 101,
+      "slug": "reception-de-la-fete-nationale-gabonaise",
+      "titre": "Réception de la fête nationale à Conakry",
+      "resume": "L'Ambassade a réuni la communauté gabonaise de Guinée pour la fête nationale du 17 août.",
+      "contenu": "<p>La réception annuelle s'est tenue à la résidence de l'Ambassadeur, en présence des autorités guinéennes et des membres de la communauté gabonaise établie en Guinée.</p>",
+      "image": "/fixtures/article-1.jpg",
+      "categorie": {
+        "id": 1,
+        "nom": "Ambassade",
+        "slug": "actualites-ambassade",
+        "couleur": "#009E60"
+      },
+      "date_publication": "2036-08-18",
+      "statut": "publie",
+      "vues": 128,
+      "likes": 14,
+      "locale": "fr",
+      "source": "manuel",
+      "temps_lecture": 2
+    },
+    {
+      "id": 102,
+      "slug": "cooperation-economique-gabon-guinee",
+      "titre": "Renforcement de la coopération économique",
+      "resume": "Un forum a réuni les opérateurs économiques des deux pays à Conakry.",
+      "contenu": "<p>Les échanges ont porté sur les mines, la formation professionnelle et les liaisons aériennes entre Libreville et Conakry.</p>",
+      "image": "/fixtures/article-2.jpg",
+      "categorie": {
+        "id": 2,
+        "nom": "Diplomatie",
+        "slug": "actualites-diplomatique",
+        "couleur": "#3A75C4"
+      },
+      "date_publication": "2036-07-02",
+      "statut": "publie",
+      "vues": 76,
+      "likes": 8,
+      "locale": "fr",
+      "source": "manuel",
+      "temps_lecture": 3
+    },
+    {
+      "id": 103,
+      "slug": "permanence-consulaire-elargie",
+      "titre": "Élargissement des horaires de la permanence consulaire",
+      "resume": "Le service consulaire reçoit désormais également le samedi matin.",
+      "contenu": "<p>Cette extension répond à la demande des ressortissants gabonais résidant hors de Conakry.</p>",
+      "image": "/fixtures/article-3.jpg",
+      "categorie": {
+        "id": 3,
+        "nom": "Gouvernement",
+        "slug": "actualites-gouvernementale",
+        "couleur": "#FCD116"
+      },
+      "date_publication": "2036-05-20",
+      "statut": "publie",
+      "vues": 203,
+      "likes": 21,
+      "locale": "fr",
+      "source": "manuel",
+      "temps_lecture": 2
+    }
+  ]
+}

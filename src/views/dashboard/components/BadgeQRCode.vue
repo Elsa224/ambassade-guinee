@@ -6,7 +6,7 @@
     <!-- 🔙 Bouton Retour -->
     <div class="self-start ml-6 mb-4">
       <router-link
-        to="/app/evenement/liste"
+        to="/dashboard/evenement/liste"
         class="flex items-center text-primary font-semibold hover:text-primary-dark transition-colors"
       >
         <i class="bx bx-arrow-back text-xl mr-2"></i> Retour

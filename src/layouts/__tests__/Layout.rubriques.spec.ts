@@ -23,7 +23,7 @@ function routeur() {
       { path: '/actualite', component: Vide },
       { path: '/chancellerie', component: Chancellerie },
       { path: '/usa', component: Chancellerie },
-      { path: '/presentation', component: Chancellerie },
+      { path: '/demarche-ligne', component: Chancellerie },
     ],
   })
 }
@@ -60,7 +60,7 @@ describe('rubriques fermees dans le gabarit public', () => {
   })
 
   it('rend normalement une page ouverte', async () => {
-    const wrapper = await visiter('/presentation', gabonFixture.embassy)
+    const wrapper = await visiter('/demarche-ligne', gabonFixture.embassy)
 
     expect(wrapper.text()).toContain(TEMOIN)
     expect(wrapper.text()).not.toContain('Rubrique en préparation')
@@ -89,7 +89,7 @@ describe('rubriques fermees dans le gabarit public', () => {
       .findAllComponents({ name: 'RouterLink' })
       .map((l) => String(l.props('to')))
 
-    const ouverts = ['/', '/actualite', '/presentation', '/ambassadeur']
+    const ouverts = ['/', '/actualite', '/demarche-ligne']
 
     expect(ouverts.filter((chemin) => !liens.includes(chemin))).toEqual([])
   })

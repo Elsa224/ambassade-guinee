@@ -75,6 +75,7 @@ describe('ouverture des rubriques selon l ambassade', () => {
 
       expect(fermes.sort()).toEqual(
         [
+          '/ambassadeur',
           '/bahamas',
           '/calendrier',
           '/chancellerie',
@@ -83,6 +84,7 @@ describe('ouverture des rubriques selon l ambassade', () => {
           '/costa-rica',
           '/fond-monetaire',
           '/haiti',
+          '/presentation',
           '/relations-bilaterales',
           '/rendez-vous',
           '/services-ambassadeur',
@@ -94,7 +96,7 @@ describe('ouverture des rubriques selon l ambassade', () => {
     it('garde ouvertes au Gabon les pages que le site publie vraiment', () => {
       useTenantStore().embassy = gabonFixture.embassy as unknown as Embassy
 
-      const publiees = ['/', '/actualite', '/presentation', '/ambassadeur', '/demarche-ligne']
+      const publiees = ['/', '/actualite', '/demarche-ligne', '/actualites-ambassade']
 
       expect(publiees.filter((chemin) => !ouvert(chemin))).toEqual([])
     })

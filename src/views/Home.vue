@@ -6,51 +6,74 @@
         <!-- TEXTE GAUCHE -->
         <div>
           <!-- Logo -->
-          <img :src="logoAmbassade" class="w-20 mb-6" alt="Logo Guinée" />
+          <img v-if="logo" :src="logo" class="w-20 mb-6" :alt="nomDeLAmbassade" />
 
           <!-- Titre -->
           <h1 class="text-4xl lg:text-5xl font-bold text-gray-900 leading-tight mb-6">
-            Ambassade de la République de Guinée près les Etats-Unis d'Amérique Washington DC
+            {{ nomDeLAmbassade }}
           </h1>
 
-          <!-- Texte -->
-          <p class="text-gray-600 mb-8 max-w-xl">
-            Ut velit mauris, egestas sed, gravida nec, ornare ut, mi. Aenean ut orci vel massa
-            suscipit pulvinar. Nulla sollicitudin.
-          </p>
+          <!-- Le paragraphe qui suivait etait du faux texte de maquette
+               (« Ut velit mauris, egestas sed... »), reste en production. Il
+               attend un vrai texte d'accroche, que l'API ne transmet pas
+               encore. -->
 
-          <!-- Boutons -->
+          <!-- Boutons : le premier menait a `/services`, qui n'est pas une
+               route, sous le libelle de maquette « Button 1 ». Les deux
+               destinations retenues sont ouvertes pour toutes les ambassades. -->
           <div class="flex items-center gap-6">
             <router-link
-              to="/services"
-              class="bg-red-600 text-white px-8 py-4 rounded-xl font-semibold shadow-lg hover:bg-red-700 transition"
+              to="/actualite"
+              class="bg-primary hover:bg-primary-dark text-white px-8 py-4 rounded-xl font-semibold shadow-lg transition-colors"
             >
-              Button 1
+              Consulter les actualités
             </router-link>
 
-            <a
-              href="#"
-              class="text-gray-700 font-semibold flex items-center gap-2 hover:text-red-600"
+            <router-link
+              to="/demarche-ligne"
+              class="text-gray-700 font-semibold flex items-center gap-2 hover:text-primary transition-colors"
             >
-              Voir plus →
-            </a>
+              Vos démarches en ligne
+              <i class="bx bx-right-arrow-alt text-xl" aria-hidden="true"></i>
+            </router-link>
           </div>
         </div>
 
         <!-- IMAGES DROITE -->
         <div class="grid grid-cols-2 gap-6">
-          <img :src="heroPhoto1" class="rounded-2xl shadow-lg object-cover h-48 w-full" />
+          <img
+            v-if="drapeau"
+            :src="drapeau"
+            :alt="`Drapeau ${articleDuPays(nomOfficiel)} ${nomOfficiel}`"
+            class="rounded-2xl shadow-lg object-cover h-48 w-full"
+          />
 
-          <img :src="heroPhoto2" class="rounded-2xl shadow-lg object-cover h-64 w-full mt-10" />
+          <img
+            v-if="vitrineOuverte"
+            :src="heroPhoto2"
+            class="rounded-2xl shadow-lg object-cover h-64 w-full mt-10"
+          />
 
-          <img :src="heroPhoto3" class="rounded-2xl shadow-lg object-cover h-64 w-full" />
+          <img
+            v-if="vitrineOuverte"
+            :src="heroPhoto3"
+            class="rounded-2xl shadow-lg object-cover h-64 w-full"
+          />
 
-          <img :src="heroPhoto4" class="rounded-2xl shadow-lg object-cover h-48 w-full" />
+          <img
+            v-if="vitrineOuverte"
+            :src="heroPhoto4"
+            class="rounded-2xl shadow-lg object-cover h-48 w-full"
+          />
         </div>
       </div>
     </section>
     <!-- Message de bienvenue - 3 photos avec visages bien visibles -->
-    <section class="py-20 bg-white">
+    <!-- Portraits des dirigeants et mot de bienvenue : contenu propre a chaque
+         ambassade, que le contrat d'API ne transmet pas encore. Tant qu'il n'a
+         pas de source, la section s'efface plutot que d'afficher les
+         responsables d'un autre pays. -->
+    <section v-if="dirigeantsOuverts" class="py-20 bg-white">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-16">
           <h2 class="text-4xl font-bold text-primary mb-4">MOT DE BIENVENUE</h2>
@@ -180,7 +203,7 @@
               Demande de visa pour les États-Unis et informations sur les procédures.
             </p>
             <router-link
-              to="/services/visa"
+              to="/construction"
               class="text-accent font-semibold inline-flex items-center gap-2 hover:gap-3 transition-all"
             >
               En savoir plus <i class="bx bx-right-arrow-alt"></i>
@@ -199,7 +222,7 @@
               Inscription et renouvellement de votre carte consulaire.
             </p>
             <router-link
-              to="/services/inscription"
+              to="/construction"
               class="text-accent font-semibold inline-flex items-center gap-2 hover:gap-3 transition-all"
             >
               En savoir plus <i class="bx bx-right-arrow-alt"></i>
@@ -218,7 +241,7 @@
               Demande d'actes d'état civil, certificats et autres documents.
             </p>
             <router-link
-              to="/services/documents"
+              to="/construction"
               class="text-accent font-semibold inline-flex items-center gap-2 hover:gap-3 transition-all"
             >
               En savoir plus <i class="bx bx-right-arrow-alt"></i>
@@ -237,7 +260,7 @@
               Légalisation, certification et authentification de documents.
             </p>
             <router-link
-              to="/services/legalisation"
+              to="/construction"
               class="text-accent font-semibold inline-flex items-center gap-2 hover:gap-3 transition-all"
             >
               En savoir plus <i class="bx bx-right-arrow-alt"></i>
@@ -256,7 +279,7 @@
               Demande et renouvellement de passeport et titres de voyage.
             </p>
             <router-link
-              to="/services/passeport"
+              to="/construction"
               class="text-accent font-semibold inline-flex items-center gap-2 hover:gap-3 transition-all"
             >
               En savoir plus <i class="bx bx-right-arrow-alt"></i>
@@ -275,7 +298,7 @@
               Service d'envoi et de réception de documents en express.
             </p>
             <router-link
-              to="/services/express"
+              to="/construction"
               class="text-accent font-semibold inline-flex items-center gap-2 hover:gap-3 transition-all"
             >
               En savoir plus <i class="bx bx-right-arrow-alt"></i>
@@ -297,7 +320,7 @@
             </h2>
             <div class="space-y-4">
               <router-link
-                to="/services/visa"
+                to="/construction"
                 class="block bg-gray-50 p-5 rounded-xl hover:bg-primary hover:text-white group transition-all"
               >
                 <div class="flex items-center justify-between">
@@ -308,7 +331,7 @@
                 </div>
               </router-link>
               <router-link
-                to="/services/passeport"
+                to="/construction"
                 class="block bg-gray-50 p-5 rounded-xl hover:bg-primary hover:text-white group transition-all"
               >
                 <div class="flex items-center justify-between">
@@ -319,7 +342,7 @@
                 </div>
               </router-link>
               <router-link
-                to="/services/legalisation"
+                to="/construction"
                 class="block bg-gray-50 p-5 rounded-xl hover:bg-primary hover:text-white group transition-all"
               >
                 <div class="flex items-center justify-between">
@@ -330,7 +353,7 @@
                 </div>
               </router-link>
               <router-link
-                to="/services/inscription"
+                to="/construction"
                 class="block bg-gray-50 p-5 rounded-xl hover:bg-primary hover:text-white group transition-all"
               >
                 <div class="flex items-center justify-between">
@@ -387,7 +410,7 @@
           <h2 class="text-4xl font-bold text-primary mb-4">ACTUALITÉS RÉCENTES</h2>
           <div class="w-24 h-1 bg-secondary mx-auto mb-4"></div>
           <p class="text-gray-600 text-lg max-w-2xl mx-auto">
-            Restez informé des dernières nouvelles de l'ambassade et de la Guinée
+            Restez informé des dernières nouvelles de l'ambassade
           </p>
         </div>
 
@@ -461,16 +484,23 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useActualites, formaterDate, formaterDateCourte } from '@/composables/useActualites'
+import { useTenantStore } from '@/stores/tenant'
+import { useIdentite, articleDuPays } from '@/tenant/identite'
+
+const tenant = useTenantStore()
+const { nomOfficiel, nomDeLAmbassade, logo, drapeau } = useIdentite()
+
+// Rubriques de contenu : ouvertes tant que l'ambassade ne les ferme pas.
+const dirigeantsOuverts = computed(() => tenant.rubriqueOuverte('dirigeants'))
+const vitrineOuverte = computed(() => tenant.rubriqueOuverte('vitrine'))
 
 // Import des 4 photos de fond pour le hero
-import heroPhoto1 from '@/assets/images/hero3.webp' // Logo avec bouclier
 import heroPhoto2 from '@/assets/images/hero4.webp' // Gare
 import heroPhoto3 from '@/assets/images/hero5.webp' // Paysage orange
 import heroPhoto4 from '@/assets/images/hero6.webp' // Cascade
 import bgHero from '@/assets/images/bghero.webp'
 
 // Import du logo de l'ambassade
-import logoAmbassade from '@/assets/images/logo.webp'
 
 // Import des photos du président et de l'ambassadeur
 import presidentImage from '@/assets/images/president.webp'

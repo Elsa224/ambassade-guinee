@@ -21,7 +21,7 @@
         <h1 class="text-4xl lg:text-5xl font-bold text-white mb-4">Actualités</h1>
         <div class="w-24 h-1 bg-secondary mx-auto mb-6"></div>
         <p class="text-xl text-white/90 max-w-3xl mx-auto">
-          Restez informé des dernières nouvelles de l'Ambassade et de la Guinée
+          Restez informé des dernières nouvelles de l'Ambassade
         </p>
       </div>
     </section>

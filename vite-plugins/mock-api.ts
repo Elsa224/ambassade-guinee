@@ -31,6 +31,10 @@ interface Categorie {
 export function mockApi(): Plugin {
   // Etat en memoire : remis a zero a chaque redemarrage du serveur de dev.
   let articles = (fixture('articles') as { data: unknown[] }).data as Record<string, unknown>[]
+  const articlesGabon = (fixture('articles-gabon') as { data: unknown[] }).data as Record<
+    string,
+    unknown
+  >[]
 
   interface EvenementSimule {
     publicToken: string
@@ -76,6 +80,16 @@ export function mockApi(): Plugin {
    */
   const gestionnaireApi = (requete: IncomingMessage, reponse: ServerResponse) => {
     const url = new URL(requete.url ?? '/', 'http://localhost')
+
+    // L'en-tete prime sur le parametre : le front envoie toujours
+    // `?domain=<hostname>`, qui vaut « localhost » en developpement et ne
+    // designe donc aucune ambassade. `X-Embassy-Domain` est le forcage
+    // explicite, celui que la vraie API accepte aussi.
+    const entete = requete.headers['x-embassy-domain']
+    const domaineDemande = String(
+      (Array.isArray(entete) ? entete[0] : entete) || url.searchParams.get('domain') || '',
+    )
+    const estGabon = domaineDemande.includes('gabon')
     const chemin = url.pathname
     const methode = requete.method ?? 'GET'
 
@@ -103,12 +117,7 @@ export function mockApi(): Plugin {
       })
 
     if (chemin === '/bootstrap') {
-      // Le domaine choisit le tenant, comme le fera le middleware Laravel :
-      // c'est ce qui permet de voir le site du Gabon en developpement, avec
-      // ses couleurs et ses rubriques fermees, sans deployer quoi que ce soit.
-      const domaine = url.searchParams.get('domain') ?? ''
-      const nomFixture = domaine.includes('gabon') ? 'bootstrap-gabon' : 'bootstrap'
-      return repondre(200, fixture(nomFixture))
+      return repondre(200, fixture(estGabon ? 'bootstrap-gabon' : 'bootstrap'))
     }
 
     if (chemin === '/auth/login' && methode === 'POST') {
@@ -180,7 +189,8 @@ export function mockApi(): Plugin {
       const statutDemande = url.searchParams.get('statut')
       const categorieDemandee = url.searchParams.get('categorie')
 
-      const filtres = articles.filter((article) => {
+      const corpus = estGabon ? articlesGabon : articles
+      const filtres = corpus.filter((article) => {
         if (statutDemande && article.statut !== statutDemande) return false
         if (categorieDemandee) {
           const categorie = article.categorie as Categorie | undefined

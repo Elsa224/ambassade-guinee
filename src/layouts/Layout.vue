@@ -6,8 +6,18 @@
         <div class="flex items-center justify-between">
           <div class="flex flex-col gap-1">
             <div class="flex items-center gap-4">
-              <img :src="logo1" alt="Logo 1" class="h-12 w-auto object-contain" />
-              <img :src="logoSimandou" alt="Simandou" class="h-12 w-auto object-contain" />
+              <img
+                v-if="logo"
+                :src="logo"
+                :alt="nomDeLAmbassade"
+                class="h-12 w-auto object-contain"
+              />
+              <img
+                v-if="drapeau"
+                :src="drapeau"
+                :alt="`Drapeau ${articleDuPays(nomOfficiel)} ${nomOfficiel}`"
+                class="h-12 w-auto object-contain"
+              />
             </div>
           </div>
 
@@ -388,24 +398,26 @@
             <div class="sm:col-span-2 lg:col-span-1">
               <div class="flex gap-4 mb-4">
                 <img
+                  v-if="logo"
                   loading="lazy"
-                  :src="logo1"
-                  alt="Logo Guinée"
+                  :src="logo"
+                  :alt="`Armoiries ${articleDuPays(nomOfficiel)} ${nomOfficiel}`"
                   class="h-14 w-auto bg-white/10 p-2 rounded-lg backdrop-blur-sm"
                 />
                 <img
+                  v-if="drapeau"
                   loading="lazy"
-                  :src="logoSimandou"
-                  alt="Simandou"
+                  :src="drapeau"
+                  :alt="`Drapeau ${articleDuPays(nomOfficiel)} ${nomOfficiel}`"
                   class="h-14 w-auto bg-white/10 p-2 rounded-lg backdrop-blur-sm"
                 />
               </div>
               <h3 class="text-secondary font-semibold text-lg mb-2">
-                Ambassade de la République de Guinée
+                {{ nomDeLAmbassade }}
               </h3>
-              <p class="text-white/80 text-sm leading-relaxed">
-                Représentation diplomatique de la Guinée aux États-Unis, au service de la communauté
-                guinéenne et du renforcement des relations bilatérales.
+              <p v-if="gentile" class="text-white/80 text-sm leading-relaxed">
+                Représentation diplomatique, au service de la communauté {{ gentile }}e et du
+                renforcement des relations bilatérales.
               </p>
 
               <!-- Réseaux sociaux -->
@@ -542,24 +554,26 @@
               </h4>
 
               <div class="space-y-4">
-                <div class="flex items-start gap-3">
+                <!-- Chaque ligne disparait si l'ambassade ne l'a pas fournie :
+                     une coordonnee vide vaut mieux que celle d'une autre. -->
+                <div v-if="adresse" class="flex items-start gap-3">
                   <i class="bx bx-map text-secondary text-xl mt-1"></i>
-                  <p class="text-white/80 text-sm">2112 Leroy Place NW, Washington, DC 20008</p>
+                  <p class="text-white/80 text-sm">{{ adresse }}</p>
                 </div>
 
-                <div class="flex items-center gap-3">
+                <div v-if="telephone" class="flex items-center gap-3">
                   <i class="bx bx-phone text-secondary text-xl"></i>
-                  <p class="text-white/80">+1 (202) 483 9420</p>
+                  <p class="text-white/80">{{ telephone }}</p>
                 </div>
 
-                <div class="flex items-center gap-3">
+                <div v-if="courriel" class="flex items-center gap-3">
                   <i class="bx bx-envelope text-secondary text-xl"></i>
-                  <p class="text-white/80">info@ambaguinee-us.org</p>
+                  <p class="text-white/80">{{ courriel }}</p>
                 </div>
 
-                <div class="flex items-center gap-3">
+                <div v-if="horaires" class="flex items-center gap-3">
                   <i class="bx bx-time text-secondary text-xl"></i>
-                  <p class="text-white/80">Lun-Ven: 9h - 17h</p>
+                  <p class="text-white/80">{{ horaires }}</p>
                 </div>
               </div>
             </div>
@@ -588,7 +602,7 @@
               class="text-white/70 hover:text-secondary text-sm transition-colors flex items-center gap-1"
             >
               <i class="bx bx-chevron-right text-secondary text-xs"></i>
-              La Guinée
+              {{ nomCourt }}
             </router-link>
             <router-link
               to="/construction"
@@ -612,8 +626,7 @@
               class="flex flex-col sm:flex-row justify-between items-start sm:items-center text-white/70 text-xs sm:text-sm gap-4"
             >
               <div>
-                <p>© 2024 Ambassade de la République de Guinée. Tous droits réservés.</p>
-                <p class="mt-1 text-xs">près les Etats-Unis d'Amérique - Washington DC</p>
+                <p>© {{ anneeCourante }} {{ nomDeLAmbassade }}. Tous droits réservés.</p>
               </div>
 
               <div class="flex items-center gap-2">
@@ -645,13 +658,27 @@
 
 <script setup>
 import { ref, reactive, computed } from 'vue'
-import logo1 from '@/assets/images/logo.webp'
-import logoSimandou from '@/assets/images/masque.webp'
 import BientotDisponible from '@/components/BientotDisponible.vue'
 import { useTenantStore } from '@/stores/tenant'
 import { rubriqueDuChemin } from '@/tenant/rubriques'
+import { useIdentite, articleDuPays } from '@/tenant/identite'
 
 const tenant = useTenantStore()
+
+const {
+  nomOfficiel,
+  nomCourt,
+  gentile,
+  nomDeLAmbassade,
+  logo,
+  drapeau,
+  adresse,
+  telephone,
+  courriel,
+  horaires,
+} = useIdentite()
+
+const anneeCourante = new Date().getFullYear()
 
 /** Un chemin est ouvert si l'ambassade n'a pas ferme la rubrique dont il depend. */
 function rubriqueOuverte(chemin) {
@@ -666,7 +693,7 @@ const openDropdowns = reactive({
   ambassade: false,
   relations: false,
   services: false,
-  guinee: false,
+  pays: false,
   venir: false,
 })
 
@@ -676,7 +703,7 @@ const openSubmenus = reactive({
   ambassade: false,
   relations: false,
   services: false,
-  guinee: false,
+  pays: false,
   venir: false,
 })
 
@@ -728,11 +755,11 @@ const mobileMenus = ref([
     ],
   },
   {
-    key: 'guinee',
-    label: 'La Guinée',
+    key: 'pays',
+    label: nomCourt.value,
     path: '/construction',
     items: [
-      { label: 'Présentation de la Guinée', path: '/construction' },
+      { label: 'Présentation du pays', path: '/construction' },
       { label: 'Le Président de la République', path: '/construction' },
       { label: 'Le Gouvernement', path: '/construction' },
       { label: "Les institutions de l'Etat", path: '/construction' },
@@ -745,8 +772,8 @@ const mobileMenus = ref([
     path: '/construction',
     items: [
       { label: 'Visas', path: '/construction' },
-      { label: 'Visiter la Guinée', path: '/construction' },
-      { label: 'Investir en Guinée', path: '/construction' },
+      { label: 'Visiter le pays', path: '/construction' },
+      { label: 'Investir sur place', path: '/construction' },
     ],
   },
 ])
