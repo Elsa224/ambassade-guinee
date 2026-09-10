@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
 
 // Layouts
 import Layout from '@/layouts/Layout.vue'
@@ -258,6 +259,27 @@ const router = createRouter({
     // Redirection 404 éventuelle (optionnelle)
     // { path: '/:pathMatch(.*)*', redirect: '/' }
   ]
+})
+
+/**
+ * Garde d acces au back-office.
+ * Le dashboard etait jusqu ici entierement ouvert : toute route sous
+ * /dashboard exige desormais une session. La destination demandee est
+ * conservee pour y revenir apres la connexion.
+ */
+router.beforeEach((destination) => {
+  const auth = useAuthStore()
+  const versDashboard = destination.path.startsWith('/dashboard')
+
+  if (versDashboard && !auth.estAuthentifie) {
+    return { path: '/connexion', query: { redirect: destination.fullPath } }
+  }
+
+  if (destination.path === '/connexion' && auth.estAuthentifie) {
+    return { path: '/dashboard' }
+  }
+
+  return true
 })
 
 export default router
