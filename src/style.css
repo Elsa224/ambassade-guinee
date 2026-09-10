@@ -6,20 +6,29 @@
  * a partir de la config du tenant (GET /api/bootstrap). Les valeurs ci-dessous
  * sont les couleurs de l'ambassade de Guinee, utilisees comme repli si le
  * bootstrap echoue ou renvoie une config incomplete.
- * Les nuances sont derivees par color-mix() : elles suivent donc
- * automatiquement la couleur de base injectee, sans calcul en JavaScript.
+ * Les nuances sont derivees par syntaxe de couleur relative en OKLCH
+ * (`oklch(from var(...) ...)`) : L, C et H sont chacun mis a l'echelle
+ * independamment, ce qui permet de reproduire une teinte cible dont le chroma
+ * est superieur a celui de la base (un simple color-mix() avec du blanc ou du
+ * noir ne peut pas augmenter le chroma, il ne peut que le diluer). Les
+ * facteurs ci-dessous ont ete calibres a partir du rapport OKLCH mesure entre
+ * chaque couleur de base et sa nuance cible dans la palette figee de la
+ * Guinee : ne pas les modifier sans reverifier au navigateur que les cinq
+ * nuances reproduisent exactement les hex d'origine (#004c2a, #009460,
+ * #e6b800, #b30f20, #8b0b1a). Elles suivent malgre tout la couleur de base
+ * injectee par applyTheme(), puisque le calcul est relatif a var(--color-*).
  */
 @theme {
   --color-primary: #006633;
-  --color-primary-dark: color-mix(in oklab, var(--color-primary) 78%, black);
-  --color-primary-light: color-mix(in oklab, var(--color-primary) 82%, white);
+  --color-primary-dark: oklch(from var(--color-primary) calc(l * 0.8189) calc(c * 0.7662) calc(h + 3.36));
+  --color-primary-light: oklch(from var(--color-primary) calc(l * 1.3148) calc(c * 1.1519) calc(h + 7.09));
 
   --color-secondary: #fcd116;
-  --color-secondary-dark: color-mix(in oklab, var(--color-secondary) 88%, black);
+  --color-secondary-dark: oklch(from var(--color-secondary) calc(l * 0.9179) calc(c * 0.9317) calc(h + -2.95));
 
   --color-accent: #ce1126;
-  --color-accent-dark: color-mix(in oklab, var(--color-accent) 86%, black);
-  --color-accent-deep: color-mix(in oklab, var(--color-accent) 66%, black);
+  --color-accent-dark: oklch(from var(--color-accent) calc(l * 0.9019) calc(c * 0.8970) calc(h + 0.05));
+  --color-accent-deep: oklch(from var(--color-accent) calc(l * 0.7513) calc(c * 0.7400) calc(h + -0.96));
 
   /* Gris bleutes du dashboard : non pilotes par le tenant. */
   --color-ink: #346778;
