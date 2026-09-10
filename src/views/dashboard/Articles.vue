@@ -46,7 +46,6 @@
           <option value="Publié">Publié</option>
           <option value="Brouillon">Brouillon</option>
           <option value="À valider">À valider</option>
-          <option value="En attente">En attente</option>
         </select>
 
         <select
@@ -265,7 +264,6 @@
                   <option value="Brouillon">Brouillon</option>
                   <option value="Publié">Publié</option>
                   <option value="À valider">À valider</option>
-                  <option value="En attente">En attente</option>
                 </select>
               </div>
               <div>

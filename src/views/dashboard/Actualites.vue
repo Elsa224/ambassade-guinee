@@ -49,7 +49,6 @@
           <option value="Publié">Publié</option>
           <option value="Brouillon">Brouillon</option>
           <option value="À valider">À valider</option>
-          <option value="Programmé">Programmé</option>
         </select>
 
         <!-- Trier par -->
@@ -276,7 +275,6 @@
                   <option value="Brouillon">Brouillon</option>
                   <option value="Publié">Publié</option>
                   <option value="À valider">À valider</option>
-                  <option value="Programmé">Programmé</option>
                 </select>
               </div>
               <div>
