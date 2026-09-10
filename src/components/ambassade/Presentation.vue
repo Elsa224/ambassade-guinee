@@ -264,17 +264,8 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
 import logo1 from '@/assets/images/logo.png'
 import logoSimandou from '@/assets/images/masque.png'
-
-// Données pour les stats (optionnel, pour animation plus tard)
-const stats = ref([
-  { nombre: 1959, label: "Année d'établissement" },
-  { nombre: 1818, label: "Représentations étrangères aux USA" },
-  { nombre: 186, label: "Ambassades à Washington DC" },
-  { nombre: 4, label: "Pays sous juridiction" }
-])
 </script>
 
 <style scoped>

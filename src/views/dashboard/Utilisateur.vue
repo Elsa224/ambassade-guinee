@@ -12,10 +12,9 @@
 
 <script setup>
 import { computed } from "vue";
-import { useRoute, useRouter } from "vue-router";
+import { useRoute } from "vue-router";
 
 const route = useRoute();
-const router = useRouter();
 
 // 🧭 Titre dynamique selon la page
 const pageTitle = computed(() => {

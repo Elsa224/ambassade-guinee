@@ -453,8 +453,6 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-
 // Import des 4 photos de fond pour le hero
 import heroPhoto1 from '@/assets/images/hero3.jpg' // Logo avec bouclier
 import heroPhoto2 from '@/assets/images/hero4.jpg' // Gare

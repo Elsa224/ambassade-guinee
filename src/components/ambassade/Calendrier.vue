@@ -372,25 +372,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
 import calendrierImage from '@/assets/images/calendrierjoursferiesguinee.jpeg' // Import de l'image du calendrier
-
-// Vous pouvez aussi définir un tableau de données pour les jours fériés
-const joursFeries = ref([
-  { date: '1er janvier', nom: 'Jour de l\'An', type: 'Fête légale', couleur: 'ce1126' },
-  { date: '20 mars', nom: 'Anniversaire de l\'investiture du Président', type: 'Fête nationale', couleur: 'fcd116' },
-  { date: 'Variable (avril)', nom: 'Lundi de Pâques', type: 'Fête religieuse', couleur: '009460' },
-  { date: '1er mai', nom: 'Fête du Travail', type: 'Fête légale', couleur: 'ce1126' },
-  { date: 'Variable (mai)', nom: 'Jeudi de l\'Ascension', type: 'Fête religieuse', couleur: 'fcd116' },
-  { date: 'Variable (mai)', nom: 'Lundi de Pentecôte', type: 'Fête religieuse', couleur: '009460' },
-  { date: 'Variable (juin)', nom: 'Tabaski (Aïd el-Kébir)', type: 'Fête musulmane', couleur: 'ce1126' },
-  { date: '15 août', nom: 'Assomption', type: 'Fête religieuse', couleur: 'fcd116' },
-  { date: 'Variable (septembre)', nom: 'Maouloud', type: 'Fête musulmane', couleur: '009460' },
-  { date: '2 octobre', nom: 'Anniversaire de l\'Indépendance', type: 'Fête nationale', couleur: 'ce1126' },
-  { date: '1er novembre', nom: 'Toussaint', type: 'Fête religieuse', couleur: 'fcd116' },
-  { date: '25 décembre', nom: 'Noël', type: 'Fête religieuse', couleur: '009460' },
-  { date: 'Variable (décembre)', nom: 'Fête de la Raison (Aïd el-Fitr)', type: 'Fête musulmane', couleur: 'ce1126' }
-])
 </script>
 
 <style scoped>

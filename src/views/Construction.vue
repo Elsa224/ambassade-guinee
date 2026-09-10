@@ -134,14 +134,8 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
 import logo1 from '@/assets/images/logo.png'
 import logoSimandou from '@/assets/images/masque.png'
-
-// Vous pouvez également définir d'autres données si nécessaire
-const pageTitle = ref('Page en construction')
-const progress = ref(65)
-const launchDate = ref('Avril 2025')
 </script>
 
 <style scoped>

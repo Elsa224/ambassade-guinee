@@ -209,7 +209,7 @@ const filteredTasks = computed(() => {
   return filtered
 })
 
-const getPriorityClass = (priority) => {
+const getPriorityClass = () => {
   return 'bg-red-100 text-red-800'
 }
 

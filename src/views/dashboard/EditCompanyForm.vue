@@ -220,7 +220,24 @@
 <script setup lang="ts">
 import { reactive, watch } from "vue";
 
-const props = defineProps<{ company: any }>();
+interface Company {
+  nom?: string
+  idNumber?: string
+  industry?: string
+  numEmployees?: string
+  address?: string
+  city?: string
+  region?: string
+  country?: string
+  zip?: string
+  contact?: string
+  title?: string
+  email?: string
+  phone?: string
+  logo?: string
+}
+
+const props = defineProps<{ company: Company }>();
 const emit = defineEmits(["submit", "close"]);
 
 const editedCompany = reactive({ ...props.company });

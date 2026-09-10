@@ -125,7 +125,7 @@ function supprimer(id: string) {
   activeMenu.value = null;
 }
 
-function modifier(user: any) {
+function modifier(user: (typeof attendanceList.value)[number]) {
   alert(`Modifier ${user.name}`);
   activeMenu.value = null;
 }

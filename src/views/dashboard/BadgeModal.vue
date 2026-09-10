@@ -113,7 +113,19 @@
 </template>
 
 <script setup lang="ts">
-defineProps<{ company: any }>()
+interface Company {
+  logo?: string
+  qrCode?: string
+  id?: string
+  eventName?: string
+  host?: string
+  location?: string
+  address?: string
+  date?: string
+  time?: string
+}
+
+defineProps<{ company: Company }>()
 </script>
 
 <style scoped>

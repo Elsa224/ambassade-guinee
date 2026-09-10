@@ -126,7 +126,7 @@ const pageNumbers = computed(() => {
   const total = totalPages.value
   const current = currentPage.value
   let start = Math.max(1, current - 1)
-  let end = Math.min(total, start + 2)
+  const end = Math.min(total, start + 2)
   if (end - start < 2) start = Math.max(1, end - 2)
   return Array.from({ length: end - start + 1 }, (_, i) => start + i)
 })
@@ -134,7 +134,9 @@ const pageNumbers = computed(() => {
 function goToPage(page: number) {
   if (page >= 1 && page <= totalPages.value) currentPage.value = page
 }
-function editItem(item: any) { alert(`Modifier ${item.nom}`) }
-function deleteItem(item: any) { alert(`Supprimer ${item.nom}`) }
-function addItem(item: any) { alert(`Ajouter ${item.nom}`) }
+type QrItem = (typeof qrList.value)[number]
+
+function editItem(item: QrItem) { alert(`Modifier ${item.nom}`) }
+function deleteItem(item: QrItem) { alert(`Supprimer ${item.nom}`) }
+function addItem(item: QrItem) { alert(`Ajouter ${item.nom}`) }
 </script>
