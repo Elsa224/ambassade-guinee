@@ -39,7 +39,6 @@ const QUALITE_PAR_DEFAUT = 80
 const QUALITE_TEXTE = 90
 
 const USAGES = {
-  'hero1.jpg': 'banniere',
   'hero3.jpg': 'banniere',
   'hero4.jpg': 'banniere',
   'hero5.jpg': 'banniere',
@@ -47,12 +46,6 @@ const USAGES = {
   'bghero.jpeg': 'banniere',
   'Cascade.jpg': 'illustration',
   'partenaire.jpg': 'illustration',
-  'partenariat.jpg': 'illustration',
-  'vision.jpg': 'illustration',
-  'infrastructure.jpg': 'illustration',
-  '8.jpg': 'illustration',
-  '18474.jpg': 'illustration',
-  'demarcheconsulaire.png': 'illustration',
   'actualite1.jpg': 'carte',
   'actualite2.jpg': 'carte',
   'actualite3.jpg': 'carte',
@@ -68,7 +61,7 @@ const USAGES = {
   'masque.png': null,
 }
 
-const A_TEXTE = new Set(['calendrierjoursferiesguinee.jpeg', 'demarcheconsulaire.png'])
+const A_TEXTE = new Set(['calendrierjoursferiesguinee.jpeg'])
 const EXTENSIONS_SOURCE = new Set(['.jpg', '.jpeg', '.png'])
 
 const verifierSeulement = process.argv.includes('--verifier')

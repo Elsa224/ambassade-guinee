@@ -346,65 +346,31 @@
               <span class="w-2 h-8 bg-secondary rounded-full"></span>
               Actualités récentes
             </h2>
-            <div class="space-y-4">
-              <div class="bg-gray-50 p-5 rounded-xl hover:shadow-lg transition-all">
+            <p v-if="chargement" class="text-gray-500">Chargement des actualités…</p>
+            <p v-else-if="erreur" class="text-gray-500">{{ erreur }}</p>
+            <p v-else-if="troisDernieres.length === 0" class="text-gray-500">
+              Aucune actualité publiée pour le moment.
+            </p>
+            <div v-else class="space-y-4">
+              <router-link
+                v-for="actu in troisDernieres"
+                :key="actu.id"
+                :to="`/actualites/${actu.slug}`"
+                class="bg-gray-50 p-5 rounded-xl hover:shadow-lg transition-all block"
+              >
                 <div class="flex items-start gap-4">
                   <div
-                    class="w-16 h-16 bg-accent rounded-xl flex items-center justify-center text-white font-bold"
+                    class="w-16 h-16 rounded-xl flex items-center justify-center text-white font-bold text-center leading-tight shrink-0"
+                    :style="{ backgroundColor: actu.categorie?.couleur }"
                   >
-                    15 MAR
+                    {{ formaterDateCourte(actu.date_publication) }}
                   </div>
                   <div>
-                    <h3 class="font-semibold text-lg mb-1">Réunion diplomatique</h3>
-                    <p class="text-gray-600 text-sm">
-                      Rencontre avec le secrétaire d'État américain
-                    </p>
+                    <h3 class="font-semibold text-lg mb-1">{{ actu.titre }}</h3>
+                    <p class="text-gray-600 text-sm">{{ actu.resume }}</p>
                   </div>
                 </div>
-              </div>
-              <div class="bg-gray-50 p-5 rounded-xl hover:shadow-lg transition-all">
-                <div class="flex items-start gap-4">
-                  <div
-                    class="w-16 h-16 bg-primary rounded-xl flex items-center justify-center text-white font-bold"
-                  >
-                    10 MAR
-                  </div>
-                  <div>
-                    <h3 class="font-semibold text-lg mb-1">Célébration du 8 Mars</h3>
-                    <p class="text-gray-600 text-sm">
-                      Journée internationale des droits des femmes
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div class="bg-gray-50 p-5 rounded-xl hover:shadow-lg transition-all">
-                <div class="flex items-start gap-4">
-                  <div
-                    class="w-16 h-16 bg-secondary rounded-xl flex items-center justify-center text-primary font-bold"
-                  >
-                    05 MAR
-                  </div>
-                  <div>
-                    <h3 class="font-semibold text-lg mb-1">Forum économique</h3>
-                    <p class="text-gray-600 text-sm">Promotion des investissements en Guinée</p>
-                  </div>
-                </div>
-              </div>
-              <div class="bg-gray-50 p-5 rounded-xl hover:shadow-lg transition-all">
-                <div class="flex items-start gap-4">
-                  <div
-                    class="w-16 h-16 bg-accent rounded-xl flex items-center justify-center text-white font-bold"
-                  >
-                    28 FEV
-                  </div>
-                  <div>
-                    <h3 class="font-semibold text-lg mb-1">Journée culturelle</h3>
-                    <p class="text-gray-600 text-sm">
-                      Célébration de la culture guinéenne à Washington
-                    </p>
-                  </div>
-                </div>
-              </div>
+              </router-link>
             </div>
           </div>
         </div>
@@ -422,146 +388,50 @@
           </p>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          <!-- Actualité 1 -->
-          <div
-            class="bg-white rounded-2xl shadow-lg overflow-hidden transform hover:-translate-y-2 transition-all duration-300"
-          >
-            <div class="h-48 overflow-hidden relative">
-              <div
-                class="absolute top-4 left-4 bg-accent text-white px-3 py-1 rounded-full text-sm font-semibold z-10"
-              >
-                Diplomatie
-              </div>
-              <img
-                :src="actualite1"
-                alt="Actualité diplomatique"
-                class="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
-              />
-            </div>
-            <div class="p-6">
-              <div class="flex items-center gap-2 text-sm text-gray-500 mb-3">
-                <i class="bx bx-calendar"></i>
-                <span>15 Mars 2024</span>
-              </div>
-              <h3 class="font-bold text-lg mb-2 text-primary">
-                Rencontre diplomatique de haut niveau
-              </h3>
-              <p class="text-gray-600 text-sm mb-4">
-                L'ambassadeur reçu par le secrétaire d'État américain pour renforcer la coopération
-                bilatérale.
-              </p>
-              <router-link
-                to="/actualite"
-                class="text-accent font-semibold inline-flex items-center gap-1 hover:gap-2 transition-all"
-              >
-                Lire la suite <i class="bx bx-right-arrow-alt"></i>
-              </router-link>
-            </div>
-          </div>
+        <p v-if="chargement" class="text-center text-gray-500 py-12">Chargement des actualités…</p>
 
-          <!-- Actualité 2 -->
-          <div
-            class="bg-white rounded-2xl shadow-lg overflow-hidden transform hover:-translate-y-2 transition-all duration-300"
+        <div v-else-if="erreur" class="text-center py-12">
+          <p class="text-gray-700 mb-4">{{ erreur }}</p>
+          <button
+            @click="recharger"
+            class="bg-primary hover:bg-primary-dark text-white px-6 py-2.5 rounded-full font-semibold transition-colors"
           >
-            <div class="h-48 overflow-hidden relative">
-              <div
-                class="absolute top-4 left-4 bg-primary text-white px-3 py-1 rounded-full text-sm font-semibold z-10"
-              >
-                Culture
-              </div>
-              <img
-                :src="actualite2"
-                alt="Célébration culturelle"
-                class="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
-              />
-            </div>
-            <div class="p-6">
-              <div class="flex items-center gap-2 text-sm text-gray-500 mb-3">
-                <i class="bx bx-calendar"></i>
-                <span>10 Mars 2024</span>
-              </div>
-              <h3 class="font-bold text-lg mb-2 text-primary">
-                Célébration de la Journée Internationale de la Femme
-              </h3>
-              <p class="text-gray-600 text-sm mb-4">
-                Événement spécial à l'ambassade mettant à l'honneur les femmes guinéennes.
-              </p>
-              <router-link
-                to="/actualite"
-                class="text-accent font-semibold inline-flex items-center gap-1 hover:gap-2 transition-all"
-              >
-                Lire la suite <i class="bx bx-right-arrow-alt"></i>
-              </router-link>
-            </div>
-          </div>
+            Réessayer
+          </button>
+        </div>
 
-          <!-- Actualité 3 -->
-          <div
-            class="bg-white rounded-2xl shadow-lg overflow-hidden transform hover:-translate-y-2 transition-all duration-300"
-          >
-            <div class="h-48 overflow-hidden relative">
-              <div
-                class="absolute top-4 left-4 bg-secondary text-primary px-3 py-1 rounded-full text-sm font-semibold z-10"
-              >
-                Économie
-              </div>
-              <img
-                :src="actualite3"
-                alt="Forum économique"
-                class="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
-              />
-            </div>
-            <div class="p-6">
-              <div class="flex items-center gap-2 text-sm text-gray-500 mb-3">
-                <i class="bx bx-calendar"></i>
-                <span>5 Mars 2024</span>
-              </div>
-              <h3 class="font-bold text-lg mb-2 text-primary">
-                Forum économique Guinée-États-Unis
-              </h3>
-              <p class="text-gray-600 text-sm mb-4">
-                Promotion des opportunités d'investissement en Guinée devant les investisseurs
-                américains.
-              </p>
-              <router-link
-                to="/actualite"
-                class="text-accent font-semibold inline-flex items-center gap-1 hover:gap-2 transition-all"
-              >
-                Lire la suite <i class="bx bx-right-arrow-alt"></i>
-              </router-link>
-            </div>
-          </div>
+        <p v-else-if="quatreDernieres.length === 0" class="text-center text-gray-500 py-12">
+          Aucune actualité publiée pour le moment.
+        </p>
 
-          <!-- Actualité 4 -->
+        <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           <div
+            v-for="actu in quatreDernieres"
+            :key="actu.id"
             class="bg-white rounded-2xl shadow-lg overflow-hidden transform hover:-translate-y-2 transition-all duration-300"
           >
             <div class="h-48 overflow-hidden relative">
               <div
-                class="absolute top-4 left-4 bg-accent text-white px-3 py-1 rounded-full text-sm font-semibold z-10"
+                class="absolute top-4 left-4 text-white px-3 py-1 rounded-full text-sm font-semibold z-10"
+                :style="{ backgroundColor: actu.categorie?.couleur }"
               >
-                Communauté
+                {{ actu.categorie?.nom }}
               </div>
               <img
-                :src="actualite4"
-                alt="Journée culturelle"
+                :src="actu.image"
+                :alt="actu.titre"
                 class="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
               />
             </div>
             <div class="p-6">
               <div class="flex items-center gap-2 text-sm text-gray-500 mb-3">
                 <i class="bx bx-calendar"></i>
-                <span>28 Fev 2024</span>
+                <span>{{ formaterDate(actu.date_publication) }}</span>
               </div>
-              <h3 class="font-bold text-lg mb-2 text-primary">
-                Journée culturelle guinéenne à Washington
-              </h3>
-              <p class="text-gray-600 text-sm mb-4">
-                Célébration de la richesse culturelle de la Guinée avec la diaspora.
-              </p>
+              <h3 class="font-bold text-lg mb-2 text-primary">{{ actu.titre }}</h3>
+              <p class="text-gray-600 text-sm mb-4">{{ actu.resume }}</p>
               <router-link
-                to="/actualite"
+                :to="`/actualites/${actu.slug}`"
                 class="text-accent font-semibold inline-flex items-center gap-1 hover:gap-2 transition-all"
               >
                 Lire la suite <i class="bx bx-right-arrow-alt"></i>
@@ -572,7 +442,7 @@
 
         <div class="text-center mt-12">
           <router-link
-            to="/actualites"
+            to="/actualite"
             class="inline-flex items-center gap-2 bg-primary text-white px-8 py-4 rounded-lg font-semibold hover:bg-primary-dark transition-all"
           >
             Voir toutes les actualités
@@ -584,7 +454,10 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
+import { computed } from 'vue'
+import { useActualites, formaterDate, formaterDateCourte } from '@/composables/useActualites'
+
 // Import des 4 photos de fond pour le hero
 import heroPhoto1 from '@/assets/images/hero3.webp' // Logo avec bouclier
 import heroPhoto2 from '@/assets/images/hero4.webp' // Gare
@@ -601,11 +474,11 @@ import ambassadeurImage from '@/assets/images/ambassadeur.webp'
 // Import de la photo du Ministre
 import ministreImage from '@/assets/images/ministre.webp'
 
-// Import des images pour les actualités (4 cards)
-import actualite1 from '@/assets/images/actualite1.webp'
-import actualite2 from '@/assets/images/actualite2.webp'
-import actualite3 from '@/assets/images/actualite3.webp'
-import actualite4 from '@/assets/images/actualite4.webp'
+// Actualites de la page d'accueil : l'API renvoie la liste deja triee du plus
+// recent au plus ancien, les deux sections en prennent simplement le debut.
+const { articles, chargement, erreur, recharger } = useActualites()
+const troisDernieres = computed(() => articles.value.slice(0, 3))
+const quatreDernieres = computed(() => articles.value.slice(0, 4))
 </script>
 
 <style scoped>

@@ -37,8 +37,10 @@ describe('poids des images livrees', () => {
 
   it('trouve bien des images a verifier', () => {
     // Sans cette assertion, un chemin devenu faux rendrait les deux tests
-    // suivants verts sur un ensemble vide.
-    expect(images.length).toBeGreaterThan(20)
+    // suivants verts sur un ensemble vide. Le seuil garde contre un chemin
+    // casse, pas contre un inventaire precis : supprimer une image inutilisee
+    // est une bonne chose et ne doit pas faire echouer ce test.
+    expect(images.length).toBeGreaterThan(10)
   })
 
   it('ne laisse aucune image depasser le plafond unitaire', () => {

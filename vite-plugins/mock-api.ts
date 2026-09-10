@@ -1,7 +1,8 @@
 import type { Plugin, PreviewServer, ViteDevServer } from 'vite'
 import type { IncomingMessage, ServerResponse } from 'node:http'
-import { readFileSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
+import path from 'node:path'
 
 /**
  * Sert /api/* depuis les fixtures pendant le developpement, le CMS Laravel
@@ -125,9 +126,25 @@ export function mockApi(): Plugin {
     }
 
     if (chemin === '/articles' && methode === 'GET') {
+      // Le site public demande statut=publie ; le back-office ne filtre pas.
+      // Le simulateur doit honorer les deux, sinon un brouillon apparaitrait
+      // en developpement sur des pages publiques et personne ne le verrait
+      // avant la mise en ligne.
+      const statutDemande = url.searchParams.get('statut')
+      const categorieDemandee = url.searchParams.get('categorie')
+
+      const filtres = articles.filter((article) => {
+        if (statutDemande && article.statut !== statutDemande) return false
+        if (categorieDemandee) {
+          const categorie = article.categorie as Categorie | undefined
+          if (categorie?.slug !== categorieDemandee) return false
+        }
+        return true
+      })
+
       return repondre(200, {
-        data: articles,
-        meta: { total: articles.length, page: 1, par_page: 10 },
+        data: filtres,
+        meta: { total: filtres.length, page: 1, par_page: 10 },
       })
     }
 
@@ -200,14 +217,49 @@ export function mockApi(): Plugin {
     return repondre(404, { message: `Route simulee absente : ${methode} /api${chemin}` })
   }
 
+  /**
+   * Sert les vignettes de /fixtures/*, celles que les fixtures JSON declarent
+   * en guise d'URL de media. En production ces URL pointeront vers S3 ; en
+   * developpement elles doivent bien renvoyer une image, sinon chaque page
+   * s'affiche avec des visuels casses et l'on ne voit plus les vraies
+   * regressions. Les fichiers vivent hors de public/, qui part en production.
+   */
+  const DOSSIER_VIGNETTES = fileURLToPath(new URL('../dev-fixtures/', import.meta.url))
+  const TYPES_MIME: Record<string, string> = {
+    '.png': 'image/png',
+    '.jpg': 'image/jpeg',
+    '.jpeg': 'image/jpeg',
+    '.webp': 'image/webp',
+  }
+
+  const gestionnaireVignettes = (requete: IncomingMessage, reponse: ServerResponse) => {
+    const url = new URL(requete.url ?? '/', 'http://localhost')
+    // basename seul : un nom contenant ../ ne doit pas permettre de remonter
+    // hors du dossier des vignettes.
+    const nom = path.basename(decodeURIComponent(url.pathname))
+    const chemin = path.join(DOSSIER_VIGNETTES, nom)
+    const typeMime = TYPES_MIME[path.extname(nom).toLowerCase()]
+
+    if (!typeMime || !existsSync(chemin)) {
+      reponse.statusCode = 404
+      reponse.setHeader('Content-Type', 'application/json')
+      return reponse.end(JSON.stringify({ message: `Vignette de developpement absente : ${nom}` }))
+    }
+
+    reponse.statusCode = 200
+    reponse.setHeader('Content-Type', typeMime)
+    reponse.end(readFileSync(chemin))
+  }
+
+  const monter = (serveur: ViteDevServer | PreviewServer) => {
+    serveur.middlewares.use('/api', gestionnaireApi)
+    serveur.middlewares.use('/fixtures', gestionnaireVignettes)
+  }
+
   return {
     name: 'mock-api',
     apply: 'serve',
-    configureServer(serveur: ViteDevServer) {
-      serveur.middlewares.use('/api', gestionnaireApi)
-    },
-    configurePreviewServer(serveur: PreviewServer) {
-      serveur.middlewares.use('/api', gestionnaireApi)
-    },
+    configureServer: monter,
+    configurePreviewServer: monter,
   }
 }

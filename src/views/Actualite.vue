@@ -33,10 +33,10 @@
           <!-- Filtres par catégorie -->
           <div class="flex flex-wrap gap-2">
             <button
-              @click="selectedCategorie = 'tous'"
+              @click="categorieActive = 'tous'"
               class="px-4 py-2 rounded-full text-sm font-semibold transition-all"
               :class="
-                selectedCategorie === 'tous'
+                categorieActive === 'tous'
                   ? 'bg-primary text-white'
                   : 'bg-gray-100 text-gray-700 hover:bg-secondary hover:text-primary'
               "
@@ -45,13 +45,18 @@
             </button>
             <button
               v-for="categorie in categories"
-              :key="categorie.id"
-              @click="selectedCategorie = categorie.id"
+              :key="categorie.slug"
+              @click="categorieActive = categorie.slug"
               class="px-4 py-2 rounded-full text-sm font-semibold transition-all"
               :class="
-                selectedCategorie === categorie.id
-                  ? categorie.color + ' text-white'
+                categorieActive === categorie.slug
+                  ? 'text-white'
                   : 'bg-gray-100 text-gray-700 hover:bg-secondary hover:text-primary'
+              "
+              :style="
+                categorieActive === categorie.slug
+                  ? { backgroundColor: categorie.couleur }
+                  : undefined
               "
             >
               {{ categorie.nom }}
@@ -62,7 +67,7 @@
           <div class="relative w-full lg:w-96">
             <input
               type="text"
-              v-model="searchQuery"
+              v-model="recherche"
               placeholder="Rechercher une actualité..."
               class="w-full px-4 py-2 pl-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
             />
@@ -75,8 +80,20 @@
     <!-- Section actualités principales -->
     <section class="py-12">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <p v-if="chargement" class="text-center text-gray-500 py-20">Chargement des actualités…</p>
+
+        <div v-else-if="erreur" class="text-center py-20">
+          <p class="text-gray-700 mb-4">{{ erreur }}</p>
+          <button
+            @click="recharger"
+            class="bg-primary hover:bg-primary-dark text-white px-6 py-2.5 rounded-full font-semibold transition-colors"
+          >
+            Réessayer
+          </button>
+        </div>
+
         <!-- Actualité à la une -->
-        <div v-if="actualiteUne" class="mb-16">
+        <div v-if="!chargement && !erreur && actualiteUne" class="mb-16">
           <div
             class="bg-white rounded-3xl shadow-2xl overflow-hidden transform hover:-translate-y-2 transition-all duration-500"
           >
@@ -91,23 +108,23 @@
               <div class="p-8 lg:p-12 flex flex-col justify-center">
                 <div class="flex items-center gap-3 mb-4">
                   <span
-                    class="px-3 py-1 rounded-full text-sm font-semibold"
-                    :class="getCategorieColor(actualiteUne.categorie)"
+                    class="px-3 py-1 rounded-full text-sm font-semibold text-white"
+                    :style="{ backgroundColor: actualiteUne.categorie?.couleur }"
                   >
-                    {{ getCategorieNom(actualiteUne.categorie) }}
+                    {{ actualiteUne.categorie?.nom }}
                   </span>
                   <span class="text-sm text-gray-500 flex items-center gap-1">
                     <i class="bx bx-calendar"></i>
-                    {{ formatDate(actualiteUne.date) }}
+                    {{ formaterDate(actualiteUne.date_publication) }}
                   </span>
                 </div>
                 <h2 class="text-3xl lg:text-4xl font-bold text-primary mb-4">
                   {{ actualiteUne.titre }}
                 </h2>
-                <p class="text-gray-600 text-lg mb-6">{{ actualiteUne.description }}</p>
+                <p class="text-gray-600 text-lg mb-6">{{ actualiteUne.resume }}</p>
                 <div class="flex items-center justify-between">
                   <router-link
-                    to="/actualite"
+                    :to="`/actualites/${actualiteUne.slug}`"
                     class="inline-flex items-center gap-2 bg-secondary text-primary px-6 py-3 rounded-lg font-semibold hover:bg-primary hover:text-white transition-all group"
                   >
                     Lire l'article complet
@@ -126,9 +143,12 @@
         </div>
 
         <!-- Grille des actualités -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div
+          v-if="!chargement && !erreur"
+          class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+        >
           <div
-            v-for="actualite in actualitesFiltrees"
+            v-for="actualite in articlesDeLaPage"
             :key="actualite.id"
             class="bg-white rounded-2xl shadow-lg overflow-hidden transform hover:-translate-y-2 transition-all duration-300 hover:shadow-2xl"
           >
@@ -140,40 +160,34 @@
               />
               <div class="absolute top-4 left-4 flex gap-2">
                 <span
-                  class="px-3 py-1 rounded-full text-xs font-semibold"
-                  :class="getCategorieColor(actualite.categorie)"
+                  class="px-3 py-1 rounded-full text-xs font-semibold text-white"
+                  :style="{ backgroundColor: actualite.categorie?.couleur }"
                 >
-                  {{ getCategorieNom(actualite.categorie) }}
+                  {{ actualite.categorie?.nom }}
                 </span>
-              </div>
-              <div class="absolute top-4 right-4">
-                <button
-                  @click="toggleLike(actualite.id)"
-                  class="bg-white/90 hover:bg-white p-2 rounded-full transition-all"
-                >
-                  <i class="bx bx-heart text-red-500" :class="{ 'bxs-heart': actualite.liked }"></i>
-                </button>
               </div>
             </div>
 
             <div class="p-6">
               <div class="flex items-center gap-2 text-sm text-gray-500 mb-3">
                 <i class="bx bx-calendar"></i>
-                <span>{{ formatDate(actualite.date) }}</span>
+                <span>{{ formaterDate(actualite.date_publication) }}</span>
                 <span class="mx-2">•</span>
                 <i class="bx bx-time"></i>
-                <span>{{ actualite.tempsLecture }} min</span>
+                <span>{{ actualite.temps_lecture }} min</span>
               </div>
 
               <h3 class="font-bold text-xl mb-3 text-primary hover:text-accent transition-colors">
-                <router-link to="/actualite">{{ actualite.titre }}</router-link>
+                <router-link :to="`/actualites/${actualite.slug}`">{{
+                  actualite.titre
+                }}</router-link>
               </h3>
 
-              <p class="text-gray-600 text-sm mb-4 line-clamp-2">{{ actualite.description }}</p>
+              <p class="text-gray-600 text-sm mb-4 line-clamp-2">{{ actualite.resume }}</p>
 
               <div class="flex items-center justify-between">
                 <router-link
-                  to="/actualite"
+                  :to="`/actualites/${actualite.slug}`"
                   class="text-accent font-semibold inline-flex items-center gap-1 hover:gap-2 transition-all group"
                 >
                   Lire la suite
@@ -183,19 +197,14 @@
                 </router-link>
 
                 <div class="flex items-center gap-3 text-sm text-gray-500">
-                  <button
-                    @click="toggleLike(actualite.id)"
-                    class="flex items-center gap-1 hover:text-red-500 transition-colors"
-                  >
-                    <i
-                      class="bx bx-heart"
-                      :class="{ 'bxs-heart text-red-500': actualite.liked }"
-                    ></i>
+                  <span class="flex items-center gap-1">
+                    <i class="bx bx-heart"></i>
                     <span>{{ actualite.likes }}</span>
-                  </button>
-                  <button class="flex items-center gap-1 hover:text-primary transition-colors">
-                    <i class="bx bx-share-alt"></i>
-                  </button>
+                  </span>
+                  <span class="flex items-center gap-1">
+                    <i class="bx bx-show"></i>
+                    <span>{{ actualite.vues }}</span>
+                  </span>
                 </div>
               </div>
             </div>
@@ -203,14 +212,17 @@
         </div>
 
         <!-- Message si aucune actualité -->
-        <div v-if="actualitesFiltrees.length === 0" class="text-center py-20">
+        <div
+          v-if="!chargement && !erreur && articlesDeLaPage.length === 0"
+          class="text-center py-20"
+        >
           <div class="text-6xl mb-4">📰</div>
           <h3 class="text-2xl font-bold text-gray-700 mb-2">Aucune actualité trouvée</h3>
           <p class="text-gray-500">Essayez de modifier vos filtres ou votre recherche</p>
         </div>
 
-        <!-- Pagination -->
-        <div class="mt-12 flex justify-center">
+        <!-- Pagination : inutile tant qu'il n'y a qu'une page. -->
+        <div v-if="!chargement && !erreur && pagesTotales > 1" class="mt-12 flex justify-center">
           <nav class="flex items-center gap-2">
             <button
               @click="pageCourante--"
@@ -255,7 +267,7 @@
         </p>
 
         <form
-          @submit.prevent="subscribeNewsletter"
+          @submit.prevent="abonnerNewsletter"
           class="flex flex-col sm:flex-row gap-4 max-w-lg mx-auto"
         >
           <input
@@ -283,225 +295,63 @@
   </div>
 </template>
 
-<script setup>
-import { ref, computed } from 'vue'
+<script setup lang="ts">
+import { ref, computed, watch } from 'vue'
+import { useActualites, formaterDate } from '@/composables/useActualites'
 
-// État pour les filtres et recherche
-const selectedCategorie = ref('tous')
-const searchQuery = ref('')
+const { articles, categories, chargement, erreur, recharger } = useActualites()
+
+const categorieActive = ref('tous')
+const recherche = ref('')
 const pageCourante = ref(1)
-const articlesParPage = 6
+const ARTICLES_PAR_PAGE = 6
 const email = ref('')
 
-// Catégories disponibles
-const categories = [
-  { id: 'ambassade', nom: 'Ambassade', color: 'bg-primary' },
-  { id: 'diplomatie', nom: 'Diplomatie', color: 'bg-accent' },
-  { id: 'economie', nom: 'Économie', color: 'bg-secondary text-primary' },
-  { id: 'culture', nom: 'Culture', color: 'bg-purple-600' },
-  { id: 'communique', nom: 'Communiqué', color: 'bg-gray-700' },
-  { id: 'evenement', nom: 'Événement', color: 'bg-blue-600' },
-]
+/**
+ * Une seule source de verite pour le filtrage : la pagination et le compteur
+ * de pages en derivent tous les deux. La version precedente recalculait le
+ * meme filtre a deux endroits, avec le risque qu'ils divergent.
+ */
+const articlesCorrespondants = computed(() => {
+  // La une est retiree de la grille : elle est deja affichee en tete.
+  let resultat = articles.value.slice(1)
 
-// Données simulées des actualités
-const toutesActualites = ref([
-  {
-    id: 1,
-    titre: 'Rencontre diplomatique entre la Guinée et les États-Unis',
-    description:
-      "L'ambassadeur S.E. Madame Sidibé Fatoumata KABA a été reçue par le secrétaire d'État américain pour discuter du renforcement de la coopération bilatérale entre nos deux pays.",
-    image: new URL('@/assets/images/vision.webp', import.meta.url).href,
-    date: '2024-03-15',
-    categorie: 'diplomatie',
-    tempsLecture: 3,
-    vues: 1245,
-    likes: 89,
-    liked: false,
-  },
-  {
-    id: 2,
-    titre: "Célébration de la Journée Internationale de la Femme à l'Ambassade",
-    description:
-      'Une cérémonie spéciale a été organisée pour honorer les femmes guinéennes et leur contribution au développement de notre pays.',
-    image: new URL('@/assets/images/18474.webp', import.meta.url).href,
-    date: '2024-03-10',
-    categorie: 'ambassade',
-    tempsLecture: 2,
-    vues: 876,
-    likes: 156,
-    liked: false,
-  },
-  {
-    id: 3,
-    titre: "Forum économique Guinée-États-Unis : Nouvelles opportunités d'investissement",
-    description:
-      "Plus de 200 investisseurs américains ont participé au forum visant à promouvoir les opportunités d'affaires en Guinée.",
-    image: new URL('@/assets/images/partenariat.webp', import.meta.url).href,
-    date: '2024-03-05',
-    categorie: 'economie',
-    tempsLecture: 4,
-    vues: 2341,
-    likes: 234,
-    liked: false,
-  },
-  {
-    id: 4,
-    titre: 'Journée culturelle guinéenne à Washington',
-    description:
-      "La diaspora guinéenne s'est réunie pour célébrer la richesse culturelle de notre pays à travers la musique, la danse et la gastronomie.",
-    image: new URL('@/assets/images/Cascade.webp', import.meta.url).href,
-    date: '2024-02-28',
-    categorie: 'culture',
-    tempsLecture: 3,
-    vues: 654,
-    likes: 98,
-    liked: false,
-  },
-  {
-    id: 5,
-    titre: 'Communiqué sur les nouvelles procédures de visa',
-    description:
-      "L'Ambassade informe ses ressortissants des changements concernant les procédures de demande de visa à compter du 1er avril 2024.",
-    image: new URL('@/assets/images/partenaire.webp', import.meta.url).href,
-    date: '2024-02-25',
-    categorie: 'communique',
-    tempsLecture: 2,
-    vues: 4321,
-    likes: 67,
-    liked: false,
-  },
-  {
-    id: 6,
-    titre: 'Inauguration du nouveau centre culturel guinéen',
-    description:
-      'Un espace dédié à la promotion de la culture guinéenne a ouvert ses portes au cœur de Washington.',
-    image: new URL('@/assets/images/infrastructure.webp', import.meta.url).href,
-    date: '2024-02-20',
-    categorie: 'culture',
-    tempsLecture: 3,
-    vues: 987,
-    likes: 145,
-    liked: false,
-  },
-  {
-    id: 7,
-    titre: 'Rencontre avec la communauté guinéenne de New York',
-    description:
-      "L'ambassadeur a rencontré les représentants de la communauté guinéenne pour échanger sur leurs préoccupations.",
-    image: new URL('@/assets/images/8.webp', import.meta.url).href,
-    date: '2024-02-15',
-    categorie: 'ambassade',
-    tempsLecture: 3,
-    vues: 765,
-    likes: 112,
-    liked: false,
-  },
-  {
-    id: 8,
-    titre: "Signature d'un accord de coopération éducative",
-    description:
-      "Un partenariat a été signé entre l'Ambassade et plusieurs universités américaines pour faciliter les échanges d'étudiants.",
-    image: new URL('@/assets/images/demarcheconsulaire.webp', import.meta.url).href,
-    date: '2024-02-10',
-    categorie: 'diplomatie',
-    tempsLecture: 4,
-    vues: 543,
-    likes: 78,
-    liked: false,
-  },
-  {
-    id: 9,
-    titre: "Célébration de l'indépendance de la Guinée",
-    description:
-      "La communauté guinéenne s'est rassemblée pour célébrer le 66ème anniversaire de l'indépendance de notre pays.",
-    image: new URL('@/assets/images/hero1.webp', import.meta.url).href,
-    date: '2024-02-05',
-    categorie: 'evenement',
-    tempsLecture: 3,
-    vues: 1890,
-    likes: 267,
-    liked: false,
-  },
-])
-
-// Actualité à la une (la plus récente et importante)
-const actualiteUne = computed(() => {
-  return toutesActualites.value[0] // La première actualité
-})
-
-// Actualités filtrées (sans l'actualité à la une)
-const actualitesFiltrees = computed(() => {
-  let filtered = toutesActualites.value.slice(1) // Exclure l'actualité à la une
-
-  // Filtre par catégorie
-  if (selectedCategorie.value !== 'tous') {
-    filtered = filtered.filter((a) => a.categorie === selectedCategorie.value)
+  if (categorieActive.value !== 'tous') {
+    resultat = resultat.filter((article) => article.categorie?.slug === categorieActive.value)
   }
 
-  // Filtre par recherche
-  if (searchQuery.value) {
-    const query = searchQuery.value.toLowerCase()
-    filtered = filtered.filter(
-      (a) => a.titre.toLowerCase().includes(query) || a.description.toLowerCase().includes(query),
+  const requete = recherche.value.trim().toLowerCase()
+  if (requete) {
+    resultat = resultat.filter(
+      (article) =>
+        article.titre.toLowerCase().includes(requete) ||
+        article.resume.toLowerCase().includes(requete),
     )
   }
 
-  // Pagination
-  const debut = (pageCourante.value - 1) * articlesParPage
-  return filtered.slice(debut, debut + articlesParPage)
+  return resultat
 })
 
-// Nombre total de pages
-const pagesTotales = computed(() => {
-  let filtered = toutesActualites.value.slice(1)
-  if (selectedCategorie.value !== 'tous') {
-    filtered = filtered.filter((a) => a.categorie === selectedCategorie.value)
-  }
-  if (searchQuery.value) {
-    const query = searchQuery.value.toLowerCase()
-    filtered = filtered.filter(
-      (a) => a.titre.toLowerCase().includes(query) || a.description.toLowerCase().includes(query),
-    )
-  }
-  return Math.ceil(filtered.length / articlesParPage)
+const pagesTotales = computed(() =>
+  Math.max(1, Math.ceil(articlesCorrespondants.value.length / ARTICLES_PAR_PAGE)),
+)
+
+const articlesDeLaPage = computed(() => {
+  const debut = (pageCourante.value - 1) * ARTICLES_PAR_PAGE
+  return articlesCorrespondants.value.slice(debut, debut + ARTICLES_PAR_PAGE)
 })
 
-// Fonctions utilitaires
-const formatDate = (date) => {
-  const options = { year: 'numeric', month: 'long', day: 'numeric' }
-  return new Date(date).toLocaleDateString('fr-FR', options)
-}
+// Sans cette remise a zero, filtrer depuis la page 3 laisse le visiteur sur
+// une page qui n'existe plus dans le resultat filtre, donc sur du vide.
+watch([categorieActive, recherche], () => {
+  pageCourante.value = 1
+})
 
-const getCategorieNom = (categorieId) => {
-  const categorie = categories.find((c) => c.id === categorieId)
-  return categorie ? categorie.nom : categorieId
-}
+/** Article mis en avant : le plus recent, l'API renvoyant la liste triee. */
+const actualiteUne = computed(() => articles.value[0])
 
-const getCategorieColor = (categorieId) => {
-  const categorie = categories.find((c) => c.id === categorieId)
-  return categorie ? categorie.color : 'bg-gray-500 text-white'
-}
-
-const toggleLike = (id) => {
-  const actualite = toutesActualites.value.find((a) => a.id === id)
-  if (actualite) {
-    actualite.liked = !actualite.liked
-    actualite.likes += actualite.liked ? 1 : -1
-  }
-}
-
-const subscribeNewsletter = () => {
-  // Logique d'abonnement à la newsletter
+function abonnerNewsletter() {
   alert(`Merci pour votre abonnement avec l'adresse : ${email.value}`)
   email.value = ''
 }
 </script>
-
-<style scoped>
-.line-clamp-2 {
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-</style>

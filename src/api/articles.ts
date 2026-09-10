@@ -67,9 +67,38 @@ export function statutDepuisLibelle(libelle: string): StatutArticle {
   return trouve ?? 'brouillon'
 }
 
-export async function listerArticles(): Promise<Article[]> {
-  const reponse = await apiGet<Enveloppe<Article[]>>('/api/articles')
+/** Filtres acceptes par la liste d'articles. */
+export interface FiltresArticles {
+  statut?: StatutArticle
+  /** Slug de categorie, tel que renvoye dans `categorie.slug`. */
+  categorie?: string
+}
+
+function versChaineDeRequete(filtres: FiltresArticles): string {
+  const parametres = new URLSearchParams()
+  if (filtres.statut) parametres.set('statut', filtres.statut)
+  if (filtres.categorie) parametres.set('categorie', filtres.categorie)
+  const chaine = parametres.toString()
+  return chaine ? `?${chaine}` : ''
+}
+
+export async function listerArticles(filtres: FiltresArticles = {}): Promise<Article[]> {
+  const reponse = await apiGet<Enveloppe<Article[]>>(`/api/articles${versChaineDeRequete(filtres)}`)
   return reponse.data
+}
+
+/**
+ * Liste destinee au site public.
+ *
+ * Le filtre `statut=publie` est demande au serveur, puis reapplique ici. Cette
+ * seconde passe n'est pas une securite : un brouillon renvoye par l'API aurait
+ * deja quitte le serveur. Elle garantit seulement qu'un defaut de filtrage
+ * cote back ne se traduit pas par la publication accidentelle d'un brouillon
+ * sur le site public. Le filtrage qui fait autorite reste celui du serveur.
+ */
+export async function listerArticlesPublies(categorie?: string): Promise<Article[]> {
+  const articles = await listerArticles({ statut: 'publie', categorie })
+  return articles.filter((article) => article.statut === 'publie')
 }
 
 export async function recupererArticleParSlug(slug: string): Promise<Article> {
