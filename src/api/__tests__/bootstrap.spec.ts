@@ -40,14 +40,12 @@ describe('resolution du tenant par le domaine', () => {
     expect(embassy.demonym).toBe('gabonais')
   })
 
-  it("laisse intacte l'identite deja posee a plat", async () => {
-    // Si le back rejoint le contrat, la normalisation ne doit rien casser.
+  it('reprend le libelle complet quand le tenant en porte un', async () => {
     vi.mocked(fetch).mockResolvedValue(reponse(guineeFixture))
 
     const embassy = await fetchBootstrap('embassyofguineausa.org')
 
-    expect(embassy.country_name_official).toBe('Republique de Guinee')
-    expect(embassy.logo_image).toBe('/fixtures/logo-guinee.png')
+    expect(embassy.display_name).toBe('Ambassade de Guinee aux Etats-Unis')
   })
 })
 
@@ -70,8 +68,18 @@ describe("normalisation d'une ambassade servie", () => {
 
   it('rend un jeu de modules vide plutot qu absent', () => {
     // Un `modules` manquant ferait planter tout appel a `modules[nom]`.
-    const embassy = normaliserEmbassy({ slug: 'sans-modules' })
+    const { modules, ...sansModules } = gabonProduction.embassy
+    const embassy = normaliserEmbassy(sansModules)
 
+    expect(modules).toBeDefined()
     expect(embassy.modules).toEqual({})
+  })
+
+  it("laisse vide le libelle complet d'un tenant provisionne avant la colonne", () => {
+    // Le contrat prevoit ce cas pour toute ambassade creee avant
+    // `display_name` : le gabarit se rabat alors sur le nom du pays.
+    const embassy = normaliserEmbassy(gabonProduction.embassy)
+
+    expect(embassy.display_name).toBe('')
   })
 })

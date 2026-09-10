@@ -2,8 +2,7 @@ import { describe, it, expect, beforeEach } from 'vitest'
 import { createPinia, setActivePinia } from 'pinia'
 import { libelleAmbassade, articleDuPays, useIdentite } from '../identite'
 import { useTenantStore } from '@/stores/tenant'
-import type { Embassy } from '@/api/bootstrap'
-import gabonFixture from '@/api/fixtures/bootstrap-gabon.json'
+import { GABON } from '@/api/fixtures/tenants'
 
 describe("libelle d'une ambassade", () => {
   it('accorde l article au nom officiel du pays', () => {
@@ -46,17 +45,17 @@ describe("identite de l'ambassade courante", () => {
   })
 
   it('reprend les valeurs du tenant', () => {
-    useTenantStore().embassy = gabonFixture.embassy as unknown as Embassy
+    useTenantStore().embassy = GABON
     const identite = useIdentite()
 
-    expect(identite.nomDeLAmbassade.value).toBe('Ambassade de la Republique Gabonaise')
+    expect(identite.nomDeLAmbassade.value).toBe('Ambassade de la Republique du Gabon en Guinee')
     expect(identite.nomCourt.value).toBe('Gabon')
     expect(identite.gentile.value).toBe('gabonais')
     expect(identite.courriel.value).toBe('ambassade@gabon-gn.org')
   })
 
   it('laisse vides les coordonnees que l ambassade n a pas fournies', () => {
-    useTenantStore().embassy = gabonFixture.embassy as unknown as Embassy
+    useTenantStore().embassy = GABON
     const identite = useIdentite()
 
     // L'ambassade du Gabon n'a pas encore transmis son adresse ni son
@@ -72,7 +71,7 @@ describe("identite de l'ambassade courante", () => {
     // « en Guinee » plutot que « aux USA » ou « au Maroc » ; seul le back
     // peut le transmettre.
     useTenantStore().embassy = {
-      ...(gabonFixture.embassy as unknown as Embassy),
+      ...GABON,
       display_name: 'Ambassade de la République du Gabon en Guinée',
     }
 
@@ -83,7 +82,7 @@ describe("identite de l'ambassade courante", () => {
 
   it('se rabat sur le nom du pays quand le libelle complet manque', () => {
     useTenantStore().embassy = {
-      ...(gabonFixture.embassy as unknown as Embassy),
+      ...GABON,
       display_name: '   ',
     }
 

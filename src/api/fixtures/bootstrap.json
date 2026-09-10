@@ -3,11 +3,14 @@
     "id": 1,
     "slug": "guinee-usa",
     "domain": "embassyofguineausa.org",
-    "country_name_official": "Republique de Guinee",
-    "country_name_short": "Guinee",
-    "demonym": "guineen",
-    "flag_image": "/fixtures/flag-guinee.png",
-    "logo_image": "/fixtures/logo-guinee.png",
+    "display_name": "Ambassade de Guinee aux Etats-Unis",
+    "identite": {
+      "country_name_official": "Republique de Guinee",
+      "country_name_short": "Guinee",
+      "demonym": "guineen",
+      "flag_image": "/fixtures/flag-guinee.png",
+      "logo_image": "/fixtures/logo-guinee.png"
+    },
     "theme": {
       "color_primary": "#006633",
       "color_secondary": "#fcd116",
