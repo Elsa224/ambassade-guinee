@@ -11,6 +11,8 @@ import type { Embassy } from '@/api/bootstrap'
 import gabonFixture from '@/api/fixtures/bootstrap-gabon.json'
 import guineeFixture from '@/api/fixtures/bootstrap.json'
 import articlesGabon from '@/api/fixtures/articles-gabon.json'
+import gabonProduction from '@/api/fixtures/bootstrap-gabon-production.json'
+import { normaliserEmbassy } from '@/api/bootstrap'
 
 /**
  * Le meme build sert tous les domaines. Le risque propre a cette architecture
@@ -132,5 +134,40 @@ describe("etancheite de l'identite entre ambassades", () => {
     expect(wrapper.text()).toContain('Ambassade de la Republique de Guinee')
     // Ses rubriques editoriales restent ouvertes : rien ne disparait.
     expect(wrapper.text()).toContain('Chers compatriotes')
+  })
+
+  /**
+   * La configuration reellement servie par l'API en production, relevee sur
+   * ambagabonguinee.com le 2026-09-10.
+   *
+   * Elle differe de la fixture sur deux points qui ont chacun produit une
+   * fuite visible par le public : l'identite y est imbriquee dans un objet
+   * `identite`, si bien que le titre s'affichait « Ambassade » sans pays ; et
+   * elle ne declare ni `dirigeants` ni `vitrine`, si bien que le defaut
+   * ouvert de l'epoque affichait les dirigeants guineens sur l'accueil
+   * gabonais.
+   */
+  describe('sur la configuration reellement servie en production', () => {
+    const tenant = normaliserEmbassy(gabonProduction.embassy)
+
+    it("n'affiche aucun dirigeant guineen faute de rubrique declaree", async () => {
+      const wrapper = await rendre('/', tenant)
+
+      expect(wrapper.text().match(IDENTITE_ETRANGERE)).toBeNull()
+    })
+
+    it("n'expose pas non plus les portraits guineens", async () => {
+      const wrapper = await rendre('/', tenant)
+      const sources = wrapper.findAll('img').map((i) => i.attributes('src') ?? '')
+
+      expect(sources.filter((s) => /guinee|president|ministre|ambassadeur/i.test(s))).toEqual([])
+    })
+
+    it("retrouve le nom du pays malgre l'identite imbriquee", async () => {
+      const wrapper = await rendre('/', tenant)
+
+      // Sans normalisation, le gabarit affichait « Ambassade » tout court.
+      expect(wrapper.text()).toContain('Republique Gabonaise')
+    })
   })
 })

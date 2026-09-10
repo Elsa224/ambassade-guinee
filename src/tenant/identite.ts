@@ -20,6 +20,12 @@ const ARTICLES: ReadonlyArray<readonly [RegExp, string]> = [
   [/^(Royaume|Etat|État|Grand-Duche|Grand-Duché|Sultanat|Emirat|Émirat|Commonwealth)\b/i, 'du'],
 ]
 
+/** La valeur si elle porte autre chose que des espaces, sinon `undefined`. */
+function nonVide(valeur: string | undefined): string | undefined {
+  const texte = valeur?.trim()
+  return texte ? texte : undefined
+}
+
 /** Article a placer devant un nom officiel de pays, sans espace final. */
 export function articleDuPays(nomOfficiel: string): string {
   const nom = nomOfficiel.trim()
@@ -67,7 +73,15 @@ export function useIdentite(): Identite {
     nomOfficiel: computed(() => embassy.value?.country_name_official ?? ''),
     nomCourt: computed(() => embassy.value?.country_name_short ?? ''),
     gentile: computed(() => embassy.value?.demonym ?? ''),
-    nomDeLAmbassade: computed(() => libelleAmbassade(embassy.value?.country_name_official ?? '')),
+    // Le libelle complet, pays d'accueil compris, ne peut venir que de la
+    // configuration : rien dans la reponse ne dit ou l'ambassade est
+    // installee. Tant qu'il n'est pas renseigne, on affiche le nom du pays
+    // represente, qui est juste quoique incomplet.
+    nomDeLAmbassade: computed(
+      () =>
+        nonVide(embassy.value?.display_name) ??
+        libelleAmbassade(embassy.value?.country_name_official ?? ''),
+    ),
     logo: computed(() => embassy.value?.logo_image ?? ''),
     drapeau: computed(() => embassy.value?.flag_image ?? ''),
     adresse: computed(() => embassy.value?.contact?.address ?? ''),
