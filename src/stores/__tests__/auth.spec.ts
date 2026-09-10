@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
 import { setActivePinia, createPinia } from 'pinia'
 import { useAuthStore } from '../auth'
+import { setAuthToken } from '@/api/client'
 
 function reponse(corps: unknown, statut = 200) {
   return new Response(corps === null ? null : JSON.stringify(corps), {
@@ -18,6 +19,9 @@ describe('store auth', () => {
   beforeEach(() => {
     setActivePinia(createPinia())
     localStorage.clear()
+    // Le client HTTP garde le jeton dans un etat de module : sans cette remise
+    // a zero, un test contaminerait le suivant.
+    setAuthToken(null)
     vi.stubGlobal('fetch', vi.fn())
   })
 
@@ -87,6 +91,23 @@ describe('store auth', () => {
     expect(store.utilisateur).toBeNull()
     expect(store.estAuthentifie).toBe(false)
     expect(localStorage.getItem('cms_token')).toBeNull()
+  })
+
+  it("ne joint plus le jeton aux requetes apres la deconnexion", async () => {
+    vi.mocked(fetch).mockResolvedValue(reponse(CONNEXION_OK))
+    const store = useAuthStore()
+    await store.login('admin@exemple-ambassade.test', 'motdepasse')
+
+    vi.mocked(fetch).mockResolvedValue(new Response(null, { status: 204 }))
+    await store.logout()
+
+    vi.mocked(fetch).mockResolvedValue(reponse({ data: [] }))
+    const { apiGet } = await import('@/api/client')
+    await apiGet('/api/articles')
+
+    const appels = vi.mocked(fetch).mock.calls
+    const options = appels[appels.length - 1]![1] as RequestInit
+    expect((options.headers as Record<string, string>).Authorization).toBeUndefined()
   })
 
   it('efface le jeton meme si l appel de deconnexion echoue', async () => {
