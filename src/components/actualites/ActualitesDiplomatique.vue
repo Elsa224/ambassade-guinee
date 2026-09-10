@@ -92,14 +92,14 @@
 import { ref, computed } from 'vue'
 
 // ✅ IMPORT DES IMAGES (CORRECTION ICI)
-import img1 from '@/assets/images/partenariat.jpg'
-import img2 from '@/assets/images/18474.jpg'
-import img3 from '@/assets/images/8.jpg'
-import img4 from '@/assets/images/Cascade.jpg'
-import img5 from '@/assets/images/actualite4.jpg'
-import img6 from '@/assets/images/actualite3.jpg'
-import img7 from '@/assets/images/actualite2.jpg'
-import img8 from '@/assets/images/actualite1.jpg'
+import img1 from '@/assets/images/partenariat.webp'
+import img2 from '@/assets/images/18474.webp'
+import img3 from '@/assets/images/8.webp'
+import img4 from '@/assets/images/Cascade.webp'
+import img5 from '@/assets/images/actualite4.webp'
+import img6 from '@/assets/images/actualite3.webp'
+import img7 from '@/assets/images/actualite2.webp'
+import img8 from '@/assets/images/actualite1.webp'
 
 // Données
 const actualites = ref([

@@ -271,7 +271,7 @@
 
 <script setup>
 import { ref } from 'vue'
-import ambassadeurPhoto from '@/assets/images/ambassadeur.jpeg' // Assurez-vous que le chemin est correct
+import ambassadeurPhoto from '@/assets/images/ambassadeur.webp' // Assurez-vous que le chemin est correct
 
 // Données de l'ambassadeur
 const ambassadeur = ref({

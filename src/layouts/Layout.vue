@@ -384,8 +384,8 @@
 
 <script setup>
 import { ref, reactive } from 'vue'
-import logo1 from '@/assets/images/logo.png'
-import logoSimandou from '@/assets/images/masque.png'
+import logo1 from '@/assets/images/logo.webp'
+import logoSimandou from '@/assets/images/masque.webp'
 
 const isMobileMenuOpen = ref(false)
 

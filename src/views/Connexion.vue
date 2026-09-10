@@ -96,8 +96,8 @@ import { ref, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useTenantStore } from '@/stores/tenant'
-import illustration from '@/assets/images/hero3.jpg'
-import logoParDefaut from '@/assets/images/logo.png'
+import illustration from '@/assets/images/hero3.webp'
+import logoParDefaut from '@/assets/images/logo.webp'
 
 const router = useRouter()
 const route = useRoute()
