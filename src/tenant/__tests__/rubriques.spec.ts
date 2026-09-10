@@ -3,8 +3,7 @@ import { createPinia, setActivePinia } from 'pinia'
 import { useTenantStore } from '@/stores/tenant'
 import { rubriqueDuChemin, RUBRIQUE_PAR_CHEMIN } from '../rubriques'
 import type { Embassy } from '@/api/bootstrap'
-import guineeFixture from '@/api/fixtures/bootstrap.json'
-import gabonFixture from '@/api/fixtures/bootstrap-gabon.json'
+import { GUINEE, GABON } from '@/api/fixtures/tenants'
 
 function ouvert(chemin: string): boolean {
   return useTenantStore().rubriqueOuverte(rubriqueDuChemin(chemin))
@@ -61,7 +60,7 @@ describe('ouverture des rubriques selon l ambassade', () => {
 
   describe('sur les deux ambassades reellement configurees', () => {
     it('garde le site guineen entierement ouvert', () => {
-      useTenantStore().embassy = guineeFixture.embassy as unknown as Embassy
+      useTenantStore().embassy = GUINEE
 
       const fermes = Object.keys(RUBRIQUE_PAR_CHEMIN).filter((chemin) => !ouvert(chemin))
 
@@ -69,7 +68,7 @@ describe('ouverture des rubriques selon l ambassade', () => {
     })
 
     it('ferme au Gabon les rubriques dont l ambassade n a pas fourni le contenu', () => {
-      useTenantStore().embassy = gabonFixture.embassy as unknown as Embassy
+      useTenantStore().embassy = GABON
 
       const fermes = Object.keys(RUBRIQUE_PAR_CHEMIN).filter((chemin) => !ouvert(chemin))
 
@@ -94,7 +93,7 @@ describe('ouverture des rubriques selon l ambassade', () => {
     })
 
     it('garde ouvertes au Gabon les pages que le site publie vraiment', () => {
-      useTenantStore().embassy = gabonFixture.embassy as unknown as Embassy
+      useTenantStore().embassy = GABON
 
       const publiees = ['/', '/actualite', '/demarche-ligne', '/actualites-ambassade']
 

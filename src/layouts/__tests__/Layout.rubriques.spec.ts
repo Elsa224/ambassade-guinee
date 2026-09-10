@@ -6,8 +6,7 @@ import { defineComponent, h } from 'vue'
 import Layout from '../Layout.vue'
 import { useTenantStore } from '@/stores/tenant'
 import type { Embassy } from '@/api/bootstrap'
-import gabonFixture from '@/api/fixtures/bootstrap-gabon.json'
-import guineeFixture from '@/api/fixtures/bootstrap.json'
+import { GUINEE, GABON } from '@/api/fixtures/tenants'
 
 const TEMOIN = 'CONTENU-DE-LA-CHANCELLERIE'
 
@@ -46,34 +45,34 @@ describe('rubriques fermees dans le gabarit public', () => {
   it('n instancie pas la page d une rubrique fermee, meme par URL directe', async () => {
     // Masquer le lien au menu ne protege rien : c'est ce chemin-la, saisi a la
     // main, qui ferait apparaitre le contenu d'une autre ambassade.
-    const wrapper = await visiter('/chancellerie', gabonFixture.embassy)
+    const wrapper = await visiter('/chancellerie', GABON)
 
     expect(wrapper.text()).not.toContain(TEMOIN)
     expect(wrapper.text()).toContain('Rubrique en préparation')
   })
 
   it('ferme aussi les pages bilaterales par URL directe', async () => {
-    const wrapper = await visiter('/usa', gabonFixture.embassy)
+    const wrapper = await visiter('/usa', GABON)
 
     expect(wrapper.text()).not.toContain(TEMOIN)
     expect(wrapper.text()).toContain('Rubrique en préparation')
   })
 
   it('rend normalement une page ouverte', async () => {
-    const wrapper = await visiter('/demarche-ligne', gabonFixture.embassy)
+    const wrapper = await visiter('/demarche-ligne', GABON)
 
     expect(wrapper.text()).toContain(TEMOIN)
     expect(wrapper.text()).not.toContain('Rubrique en préparation')
   })
 
   it('ne ferme rien sur le site guineen', async () => {
-    const wrapper = await visiter('/chancellerie', guineeFixture.embassy)
+    const wrapper = await visiter('/chancellerie', GUINEE)
 
     expect(wrapper.text()).toContain(TEMOIN)
   })
 
   it('retire du menu les liens des rubriques fermees', async () => {
-    const wrapper = await visiter('/', gabonFixture.embassy)
+    const wrapper = await visiter('/', GABON)
     const liens = wrapper
       .findAllComponents({ name: 'RouterLink' })
       .map((l) => String(l.props('to')))
@@ -84,7 +83,7 @@ describe('rubriques fermees dans le gabarit public', () => {
   })
 
   it('garde au menu les liens des rubriques ouvertes', async () => {
-    const wrapper = await visiter('/', gabonFixture.embassy)
+    const wrapper = await visiter('/', GABON)
     const liens = wrapper
       .findAllComponents({ name: 'RouterLink' })
       .map((l) => String(l.props('to')))
@@ -95,7 +94,7 @@ describe('rubriques fermees dans le gabarit public', () => {
   })
 
   it('garde l intitule « Services » cliquable meme si le consulat est ferme', async () => {
-    const wrapper = await visiter('/', gabonFixture.embassy)
+    const wrapper = await visiter('/', GABON)
 
     // Sans repli, l'intitule disparaitrait et la barre de menu garderait un
     // chevron seul, sans texte.
@@ -107,7 +106,7 @@ describe('rubriques fermees dans le gabarit public', () => {
   })
 
   it('conserve tous les liens sur le site guineen', async () => {
-    const wrapper = await visiter('/', guineeFixture.embassy)
+    const wrapper = await visiter('/', GUINEE)
     const liens = wrapper
       .findAllComponents({ name: 'RouterLink' })
       .map((l) => String(l.props('to')))

@@ -8,11 +8,8 @@ import Home from '@/views/Home.vue'
 import Actualite from '@/views/Actualite.vue'
 import { useTenantStore } from '@/stores/tenant'
 import type { Embassy } from '@/api/bootstrap'
-import gabonFixture from '@/api/fixtures/bootstrap-gabon.json'
-import guineeFixture from '@/api/fixtures/bootstrap.json'
+import { GUINEE, GABON, GABON_AVANT_COLONNES } from '@/api/fixtures/tenants'
 import articlesGabon from '@/api/fixtures/articles-gabon.json'
-import gabonProduction from '@/api/fixtures/bootstrap-gabon-production.json'
-import { normaliserEmbassy } from '@/api/bootstrap'
 
 /**
  * Le meme build sert tous les domaines. Le risque propre a cette architecture
@@ -62,8 +59,8 @@ function routeur(chemin: string) {
   return r
 }
 
-async function rendre(chemin: string, embassy: unknown) {
-  useTenantStore().embassy = embassy as Embassy
+async function rendre(chemin: string, embassy: Embassy) {
+  useTenantStore().embassy = embassy
   const r = routeur(chemin)
   await r.isReady()
   const wrapper = mount(Layout, { global: { plugins: [r] } })
@@ -85,20 +82,20 @@ describe("etancheite de l'identite entre ambassades", () => {
   })
 
   it("ne laisse aucune trace guineenne sur l'accueil du domaine gabonais", async () => {
-    const wrapper = await rendre('/', gabonFixture.embassy)
+    const wrapper = await rendre('/', GABON)
     const traces = wrapper.text().match(IDENTITE_ETRANGERE)
 
     expect(traces).toBeNull()
   })
 
   it('ne laisse aucune trace guineenne sur la page des actualites', async () => {
-    const wrapper = await rendre('/actualite', gabonFixture.embassy)
+    const wrapper = await rendre('/actualite', GABON)
 
     expect(wrapper.text().match(IDENTITE_ETRANGERE)).toBeNull()
   })
 
   it("n'expose pas non plus d'image guineenne", async () => {
-    const wrapper = await rendre('/', gabonFixture.embassy)
+    const wrapper = await rendre('/', GABON)
     const sources = wrapper.findAll('img').map((i) => i.attributes('src') ?? '')
 
     // Les images du depot sont compilees sous un nom derive du fichier
@@ -108,13 +105,15 @@ describe("etancheite de l'identite entre ambassades", () => {
   })
 
   it("affiche l'identite gabonaise a la place", async () => {
-    const wrapper = await rendre('/', gabonFixture.embassy)
+    const wrapper = await rendre('/', GABON)
 
-    expect(wrapper.text()).toContain('Ambassade de la Republique Gabonaise')
+    // Le libelle complet vient de `display_name` : le pays d'accueil n'est
+    // porte par aucun autre champ.
+    expect(wrapper.text()).toContain('Ambassade de la Republique du Gabon en Guinee')
   })
 
   it("n'affiche aucune coordonnee tant que l'ambassade n'en a pas fourni", async () => {
-    const wrapper = await rendre('/', gabonFixture.embassy)
+    const wrapper = await rendre('/', GABON)
 
     // L'adresse et le telephone sont vides dans la configuration : les lignes
     // doivent disparaitre, pas afficher celles de l'ambassade voisine.
@@ -123,15 +122,15 @@ describe("etancheite de l'identite entre ambassades", () => {
   })
 
   it('rend bien les articles servis, sans quoi le test ne prouverait rien', async () => {
-    const wrapper = await rendre('/', gabonFixture.embassy)
+    const wrapper = await rendre('/', GABON)
 
     expect(wrapper.text()).toContain(articlesGabon.data[0]!.titre)
   })
 
   it('laisse le site guineen afficher sa propre identite', async () => {
-    const wrapper = await rendre('/', guineeFixture.embassy)
+    const wrapper = await rendre('/', GUINEE)
 
-    expect(wrapper.text()).toContain('Ambassade de la Republique de Guinee')
+    expect(wrapper.text()).toContain('Ambassade de Guinee aux Etats-Unis')
     // Ses rubriques editoriales restent ouvertes : rien ne disparait.
     expect(wrapper.text()).toContain('Chers compatriotes')
   })
@@ -148,7 +147,7 @@ describe("etancheite de l'identite entre ambassades", () => {
    * gabonais.
    */
   describe('sur la configuration reellement servie en production', () => {
-    const tenant = normaliserEmbassy(gabonProduction.embassy)
+    const tenant = GABON_AVANT_COLONNES
 
     it("n'affiche aucun dirigeant guineen faute de rubrique declaree", async () => {
       const wrapper = await rendre('/', tenant)
@@ -167,7 +166,8 @@ describe("etancheite de l'identite entre ambassades", () => {
       const wrapper = await rendre('/', tenant)
 
       // Sans normalisation, le gabarit affichait « Ambassade » tout court.
-      expect(wrapper.text()).toContain('Republique Gabonaise')
+      // Ce tenant n'a pas de `display_name` : le repli est le nom du pays.
+      expect(wrapper.text()).toContain('Ambassade de la Republique Gabonaise')
     })
   })
 })

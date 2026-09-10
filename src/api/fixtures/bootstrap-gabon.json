@@ -3,11 +3,14 @@
     "id": 2,
     "slug": "gabon-guinee",
     "domain": "ambagabonguinee.com",
-    "country_name_official": "Republique Gabonaise",
-    "country_name_short": "Gabon",
-    "demonym": "gabonais",
-    "flag_image": "/fixtures/flag-gabon.png",
-    "logo_image": "/fixtures/logo-gabon.png",
+    "display_name": "Ambassade de la Republique du Gabon en Guinee",
+    "identite": {
+      "country_name_official": "Republique Gabonaise",
+      "country_name_short": "Gabon",
+      "demonym": "gabonais",
+      "flag_image": "/fixtures/flag-gabon.png",
+      "logo_image": "/fixtures/logo-gabon.png"
+    },
     "theme": {
       "color_primary": "#009E60",
       "color_secondary": "#FCD116",
@@ -20,20 +23,20 @@
       "hours": "Du lundi au vendredi, 8h - 16h"
     },
     "modules": {
-      "ambassadeur": false,
       "bilateral": false,
-      "calendrier": false,
       "chancellerie": false,
-      "consulat": false,
-      "consuls_honoraires": false,
-      "dirigeants": false,
-      "galerie": false,
-      "presentation": false,
-      "rendez_vous": false,
-      "secure_events": false,
-      "secure_rdv": false,
       "services": false,
-      "vitrine": false
+      "consuls_honoraires": false,
+      "calendrier": false,
+      "consulat": false,
+      "rendez_vous": false,
+      "galerie": false,
+      "dirigeants": false,
+      "vitrine": false,
+      "presentation": false,
+      "ambassadeur": false,
+      "secure_events": false,
+      "secure_rdv": false
     }
   }
 }
