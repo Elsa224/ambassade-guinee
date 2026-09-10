@@ -125,21 +125,25 @@
                   >L'Ambassadeur</router-link
                 >
                 <router-link
+                  v-if="rubriqueOuverte('/chancellerie')"
                   to="/chancellerie"
                   class="block px-4 py-2 text-sm text-gray-800 hover:bg-secondary hover:text-primary transition-all border-b border-gray-100"
                   >La chancellerie diplomatique</router-link
                 >
                 <router-link
+                  v-if="rubriqueOuverte('/services-ambassadeur')"
                   to="/services-ambassadeur"
                   class="block px-4 py-2 text-sm text-gray-800 hover:bg-secondary hover:text-primary transition-all border-b border-gray-100"
                   >Les Services</router-link
                 >
                 <router-link
+                  v-if="rubriqueOuverte('/consuls-honoraires')"
                   to="/consuls-honoraires"
                   class="block px-4 py-2 text-sm text-gray-800 hover:bg-secondary hover:text-primary transition-all border-b border-gray-100"
                   >Les consuls Honoraires</router-link
                 >
                 <router-link
+                  v-if="rubriqueOuverte('/calendrier')"
                   to="/calendrier"
                   class="block px-4 py-2 text-sm text-gray-800 hover:bg-secondary hover:text-primary transition-all"
                   >Calendrier des fêtes légales</router-link
@@ -148,7 +152,7 @@
             </div>
 
             <!-- Relations - Menu cliquable avec chevron -->
-            <div class="relative group">
+            <div v-if="rubriqueOuverte('/relations-bilaterales')" class="relative group">
               <div class="flex items-center">
                 <router-link
                   to="/relations-bilaterales"
@@ -213,8 +217,11 @@
             <!-- Services - Menu cliquable avec chevron -->
             <div class="relative group">
               <div class="flex items-center">
+                <!-- L'intitule reste toujours visible : il mene au consulat quand
+                     la rubrique est ouverte, sinon a la premiere page disponible
+                     de la section. -->
                 <router-link
-                  to="/consulat"
+                  :to="rubriqueOuverte('/consulat') ? '/consulat' : '/demarche-ligne'"
                   class="nav-item px-3 py-2 rounded-l hover:bg-secondary hover:text-primary transition text-primary"
                   active-class="hover-active"
                 >
@@ -246,11 +253,13 @@
                 class="absolute top-full left-0 min-w-[220px] bg-white rounded-lg shadow-lg z-50 py-1 mt-1"
               >
                 <router-link
+                  v-if="rubriqueOuverte('/consulat')"
                   to="/consulat"
                   class="block px-4 py-2 text-sm text-gray-800 hover:bg-secondary hover:text-primary transition-all border-b border-gray-100"
                   >Le consulat</router-link
                 >
                 <router-link
+                  v-if="rubriqueOuverte('/rendez-vous')"
                   to="/rendez-vous"
                   class="block px-4 py-2 text-sm text-gray-800 hover:bg-secondary hover:text-primary transition-all border-b border-gray-100"
                   >Prise de rendez-vous</router-link
@@ -284,7 +293,7 @@
             >
 
             <!-- Version mobile avec accordéon -->
-            <div v-for="menu in mobileMenus" :key="menu.key">
+            <div v-for="menu in menusMobilesOuverts" :key="menu.key">
               <div
                 class="flex items-center justify-between px-3 py-2 rounded hover:bg-secondary hover:text-primary text-primary"
               >
@@ -319,7 +328,7 @@
             </div>
 
             <router-link
-              to="/videos"
+              to="/construction"
               class="block px-3 py-2 rounded hover:bg-secondary hover:text-primary text-primary"
               >Vidéos</router-link
             >
@@ -336,7 +345,12 @@
     <!-- Main content -->
     <main class="flex-1 pt-10">
       <div class="flex-1">
-        <router-view></router-view>
+        <!-- Masquer le lien au menu ne suffit pas : une URL tapee a la main
+             atteindrait quand meme la page. La rubrique fermee n'instancie
+             donc jamais son composant. -->
+        <router-view v-slot="{ Component, route }">
+          <component :is="rubriqueOuverte(route.path) ? Component : BientotDisponible" />
+        </router-view>
       </div>
 
       <!-- Footer amélioré avec vagues -->
@@ -432,7 +446,7 @@
               <ul class="space-y-3">
                 <li>
                   <router-link
-                    to="/ambassade/mot"
+                    to="/construction"
                     class="text-white/80 hover:text-white transition-all duration-200 flex items-center gap-2 group"
                   >
                     <i
@@ -443,7 +457,7 @@
                 </li>
                 <li>
                   <router-link
-                    to="/ambassade/equipe"
+                    to="/construction"
                     class="text-white/80 hover:text-white transition-all duration-200 flex items-center gap-2 group"
                   >
                     <i
@@ -454,7 +468,7 @@
                 </li>
                 <li>
                   <router-link
-                    to="/ambassade/coordonnees"
+                    to="/construction"
                     class="text-white/80 hover:text-white transition-all duration-200 flex items-center gap-2 group"
                   >
                     <i
@@ -475,7 +489,7 @@
               <ul class="space-y-3">
                 <li>
                   <router-link
-                    to="/services/visa"
+                    to="/construction"
                     class="text-white/80 hover:text-white transition-all duration-200 flex items-center gap-2 group"
                   >
                     <i
@@ -486,7 +500,7 @@
                 </li>
                 <li>
                   <router-link
-                    to="/services/passeport"
+                    to="/construction"
                     class="text-white/80 hover:text-white transition-all duration-200 flex items-center gap-2 group"
                   >
                     <i
@@ -497,7 +511,7 @@
                 </li>
                 <li>
                   <router-link
-                    to="/services/legalisation"
+                    to="/construction"
                     class="text-white/80 hover:text-white transition-all duration-200 flex items-center gap-2 group"
                   >
                     <i
@@ -508,7 +522,7 @@
                 </li>
                 <li>
                   <router-link
-                    to="/services/inscription"
+                    to="/construction"
                     class="text-white/80 hover:text-white transition-all duration-200 flex items-center gap-2 group"
                   >
                     <i
@@ -556,35 +570,35 @@
             class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 py-6 border-t border-white/20"
           >
             <router-link
-              to="/actualites"
+              to="/actualite"
               class="text-white/70 hover:text-secondary text-sm transition-colors flex items-center gap-1"
             >
               <i class="bx bx-chevron-right text-secondary text-xs"></i>
               Actualités
             </router-link>
             <router-link
-              to="/relations/bilaterales"
+              to="/construction"
               class="text-white/70 hover:text-secondary text-sm transition-colors flex items-center gap-1"
             >
               <i class="bx bx-chevron-right text-secondary text-xs"></i>
               Relations
             </router-link>
             <router-link
-              to="/guinee/histoire"
+              to="/construction"
               class="text-white/70 hover:text-secondary text-sm transition-colors flex items-center gap-1"
             >
               <i class="bx bx-chevron-right text-secondary text-xs"></i>
               La Guinée
             </router-link>
             <router-link
-              to="/services/visa"
+              to="/construction"
               class="text-white/70 hover:text-secondary text-sm transition-colors flex items-center gap-1"
             >
               <i class="bx bx-chevron-right text-secondary text-xs"></i>
               Services
             </router-link>
             <router-link
-              to="/videos"
+              to="/construction"
               class="text-white/70 hover:text-secondary text-sm transition-colors flex items-center gap-1"
             >
               <i class="bx bx-chevron-right text-secondary text-xs"></i>
@@ -609,13 +623,13 @@
 
               <div class="flex flex-col sm:flex-row gap-2 sm:gap-4">
                 <router-link
-                  to="/mentions-legales"
+                  to="/construction"
                   class="hover:text-secondary transition-colors duration-200"
                 >
                   Mentions légales
                 </router-link>
                 <router-link
-                  to="/confidentialite"
+                  to="/construction"
                   class="hover:text-secondary transition-colors duration-200"
                 >
                   Confidentialité
@@ -630,9 +644,19 @@
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue'
+import { ref, reactive, computed } from 'vue'
 import logo1 from '@/assets/images/logo.webp'
 import logoSimandou from '@/assets/images/masque.webp'
+import BientotDisponible from '@/components/BientotDisponible.vue'
+import { useTenantStore } from '@/stores/tenant'
+import { rubriqueDuChemin } from '@/tenant/rubriques'
+
+const tenant = useTenantStore()
+
+/** Un chemin est ouvert si l'ambassade n'a pas ferme la rubrique dont il depend. */
+function rubriqueOuverte(chemin) {
+  return tenant.rubriqueOuverte(rubriqueDuChemin(chemin))
+}
 
 const isMobileMenuOpen = ref(false)
 
@@ -726,6 +750,17 @@ const mobileMenus = ref([
     ],
   },
 ])
+
+/**
+ * Menu mobile filtre : chaque rubrique fermee disparait, et une section dont
+ * tous les liens sont fermes disparait avec eux plutot que de laisser un
+ * intitule qui n'ouvre rien.
+ */
+const menusMobilesOuverts = computed(() =>
+  mobileMenus.value
+    .map((menu) => ({ ...menu, items: menu.items.filter((item) => rubriqueOuverte(item.path)) }))
+    .filter((menu) => menu.items.length > 0),
+)
 
 // Fonctions
 const toggleMobileMenu = () => {

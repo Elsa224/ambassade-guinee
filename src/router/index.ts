@@ -34,7 +34,7 @@ import Consulat from '@/components/services/Consulat.vue'
 import RendezVous from '@/components/services/RendezVous.vue'
 import DemarcheLigne from '@/components/services/DemarcheLigne.vue'
 
-import Construction from '@/views/Construction.vue'
+import BientotDisponible from '@/components/BientotDisponible.vue'
 
 // ===================== DASHBOARD =====================
 // Pages principales (conteneurs avec <router-view>)
@@ -156,7 +156,7 @@ const router = createRouter({
         { path: 'rendez-vous', name: 'rendez-vous', component: RendezVous },
         { path: 'demarche-ligne', name: 'demarche-ligne', component: DemarcheLigne },
 
-        { path: 'construction', name: 'construction', component: Construction },
+        { path: 'construction', name: 'construction', component: BientotDisponible },
       ],
     },
 

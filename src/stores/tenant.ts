@@ -21,6 +21,17 @@ export const useTenantStore = defineStore('tenant', () => {
   }
 
   /**
+   * Une rubrique n'est fermee que si l'ambassade l'a explicitement mise a
+   * `false`. L'absence de declaration laisse la rubrique ouverte, et un
+   * bootstrap en echec n'en ferme aucune : sur un site d'ambassade, une panne
+   * de configuration ne doit pas eteindre le site entier.
+   */
+  function rubriqueOuverte(nom: string | null): boolean {
+    if (nom === null) return true
+    return embassy.value?.modules?.[nom] !== false
+  }
+
+  /**
    * Charge la config du tenant et applique son thème.
    * Ne lève jamais : un échec de bootstrap laisse l'application se monter avec
    * le thème de repli déclaré dans style.css, ce qui vaut mieux qu'une page
@@ -41,5 +52,5 @@ export const useTenantStore = defineStore('tenant', () => {
     }
   }
 
-  return { embassy, chargement, erreur, nomCourt, moduleActif, charger }
+  return { embassy, chargement, erreur, nomCourt, moduleActif, rubriqueOuverte, charger }
 })

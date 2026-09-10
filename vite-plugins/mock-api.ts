@@ -93,7 +93,12 @@ export function mockApi(): Plugin {
       })
 
     if (chemin === '/bootstrap') {
-      return repondre(200, fixture('bootstrap'))
+      // Le domaine choisit le tenant, comme le fera le middleware Laravel :
+      // c'est ce qui permet de voir le site du Gabon en developpement, avec
+      // ses couleurs et ses rubriques fermees, sans deployer quoi que ce soit.
+      const domaine = url.searchParams.get('domain') ?? ''
+      const nomFixture = domaine.includes('gabon') ? 'bootstrap-gabon' : 'bootstrap'
+      return repondre(200, fixture(nomFixture))
     }
 
     if (chemin === '/auth/login' && methode === 'POST') {
