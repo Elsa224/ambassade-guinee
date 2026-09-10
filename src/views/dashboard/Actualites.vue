@@ -48,6 +48,7 @@
           <option value="">Tous les statuts</option>
           <option value="Publié">Publié</option>
           <option value="Brouillon">Brouillon</option>
+          <option value="À valider">À valider</option>
           <option value="Programmé">Programmé</option>
         </select>
 
@@ -82,6 +83,17 @@
         <p class="text-2xl font-bold text-blue-600">{{ totalVues }}</p>
         <p class="text-sm text-gray-600">Total vues</p>
       </div>
+    </div>
+
+    <!-- État de chargement / erreur -->
+    <p v-if="chargement" class="text-gray-500 py-4">Chargement en cours...</p>
+
+    <div
+      v-else-if="erreurApi"
+      role="alert"
+      class="rounded-lg border border-accent bg-accent/10 px-4 py-3 text-sm text-accent-dark mb-4"
+    >
+      {{ erreurApi }}
     </div>
 
     <!-- Liste des actualités -->
@@ -263,6 +275,7 @@
                 >
                   <option value="Brouillon">Brouillon</option>
                   <option value="Publié">Publié</option>
+                  <option value="À valider">À valider</option>
                   <option value="Programmé">Programmé</option>
                 </select>
               </div>
