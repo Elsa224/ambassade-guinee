@@ -11,9 +11,7 @@ import Home from '@/views/Home.vue'
 // Actualités
 import Actualite from '@/views/Actualite.vue'
 import ActualiteDetail from '@/views/ActualiteDetail.vue'
-import ActualitesAmbassade from '@/components/actualites/ActualitesAmbassade.vue'
-import ActualitesDiplomatique from '@/components/actualites/ActualitesDiplomatique.vue'
-import ActualitesGouvernementale from '@/components/actualites/ActualitesGouvernementale.vue'
+import ActualitesParCategorie from '@/components/actualites/ActualitesParCategorie.vue'
 
 // Ambassade
 import Presentation from '@/components/ambassade/Presentation.vue'
@@ -107,20 +105,29 @@ const router = createRouter({
         { path: '', name: 'home', component: Home },
         { path: 'actualite', name: 'actualite', component: Actualite },
         { path: 'actualites/:slug', name: 'actualite-detail', component: ActualiteDetail },
+        // Les trois rubriques partagent le meme composant : seules la categorie
+        // filtree et le sous-titre changent. Le slug passe ici doit exister
+        // dans la taxonomie du CMS, c'est lui qui filtre la requete.
         {
           path: 'actualites-ambassade',
           name: 'actualites-ambassade',
-          component: ActualitesAmbassade,
+          component: ActualitesParCategorie,
+          props: { categorie: 'actualites-ambassade', sousTitre: "Actualités de l'Ambassade" },
         },
         {
           path: 'actualites-diplomatique',
           name: 'actualites-diplomatique',
-          component: ActualitesDiplomatique,
+          component: ActualitesParCategorie,
+          props: { categorie: 'actualites-diplomatique', sousTitre: 'Actualités Diplomatiques' },
         },
         {
           path: 'actualites-gouvernementale',
           name: 'actualites-gouvernementale',
-          component: ActualitesGouvernementale,
+          component: ActualitesParCategorie,
+          props: {
+            categorie: 'actualites-gouvernementale',
+            sousTitre: 'Actualités Gouvernementales',
+          },
         },
 
         { path: 'presentation', name: 'presentation', component: Presentation },

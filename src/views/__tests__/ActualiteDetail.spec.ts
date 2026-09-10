@@ -5,6 +5,12 @@ import { defineComponent, h } from 'vue'
 import ActualiteDetail from '../ActualiteDetail.vue'
 import articlesFixture from '@/api/fixtures/articles.json'
 
+// Selection par slug, jamais par index : la fixture est triee par date, son
+// ordre change des qu'un article est ajoute.
+const ARTICLE_TEMOIN = articlesFixture.data.find(
+  (article) => article.slug === 'rencontre-bilaterale-a-washington',
+)!
+
 const Vide = defineComponent({ render: () => h('div') })
 
 function reponse(corps: unknown, statut = 200) {
@@ -39,7 +45,7 @@ describe("page de detail d'une actualite", () => {
   })
 
   it('recupere l article correspondant au slug de l URL', async () => {
-    vi.mocked(fetch).mockResolvedValue(reponse({ data: articlesFixture.data[0]! }))
+    vi.mocked(fetch).mockResolvedValue(reponse({ data: ARTICLE_TEMOIN }))
 
     await monter('rencontre-bilaterale-a-washington')
 
@@ -49,12 +55,12 @@ describe("page de detail d'une actualite", () => {
   })
 
   it('affiche le titre et le contenu de l article', async () => {
-    vi.mocked(fetch).mockResolvedValue(reponse({ data: articlesFixture.data[0]! }))
+    vi.mocked(fetch).mockResolvedValue(reponse({ data: ARTICLE_TEMOIN }))
 
     const wrapper = await monter('rencontre-bilaterale-a-washington')
 
-    expect(wrapper.text()).toContain('Rencontre bilaterale a Washington')
-    expect(wrapper.html()).toContain('Une rencontre de travail s est tenue a Washington.')
+    expect(wrapper.text()).toContain(ARTICLE_TEMOIN.titre)
+    expect(wrapper.html()).toContain(ARTICLE_TEMOIN.contenu)
   })
 
   it('affiche un message clair quand l article n existe pas', async () => {
