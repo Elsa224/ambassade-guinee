@@ -1,0 +1,25 @@
+# Sorties de build, brouillons et dependances
+dist
+.superpowers
+node_modules
+coverage
+playwright-report
+test-results
+
+# Binaires : Prettier n'a rien a y faire, et les lister evite qu'il les ouvre
+*.woff
+*.woff2
+*.webp
+*.png
+*.jpg
+*.jpeg
+*.svg
+
+# Documentation de conception et plans : ce sont des documents rediges a la
+# main, dont la mise en forme porte du sens (tableaux alignes, blocs de code
+# recopies d'une session a l'autre). Les reformater les rendrait illisibles
+# en revue sans rien apporter.
+docs
+
+# Verrou npm : regenere par npm, jamais edite a la main.
+package-lock.json

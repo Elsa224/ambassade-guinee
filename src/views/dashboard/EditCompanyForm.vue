@@ -14,7 +14,7 @@
             @click="$emit('close')"
             class="text-white hover:bg-white/20 rounded-full w-8 h-8 flex items-center justify-center transition-colors"
           >
-            <i class='bx bx-x text-lg'></i>
+            <i class="bx bx-x text-lg"></i>
           </button>
         </div>
       </div>
@@ -24,10 +24,12 @@
         <form @submit.prevent="submitForm" class="p-6 space-y-6">
           <!-- Section Logo -->
           <div class="border-b pb-4">
-            <h3 class="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">Logo de l'entreprise</h3>
+            <h3 class="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">
+              Logo de l'entreprise
+            </h3>
             <div class="flex items-center gap-4">
               <div class="w-16 h-16 bg-gray-100 rounded-lg border flex items-center justify-center">
-                <i class='bx bx-building text-gray-400 text-2xl'></i>
+                <i class="bx bx-building text-gray-400 text-2xl"></i>
               </div>
               <div class="flex-1">
                 <label class="block mb-2 text-sm font-medium text-gray-700">Changer le logo</label>
@@ -43,10 +45,14 @@
 
           <!-- Section Informations de base -->
           <div class="border-b pb-4">
-            <h3 class="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">Informations de base</h3>
+            <h3 class="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">
+              Informations de base
+            </h3>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label class="block mb-2 text-sm font-medium text-gray-700">Nom de l'entreprise</label>
+                <label class="block mb-2 text-sm font-medium text-gray-700"
+                  >Nom de l'entreprise</label
+                >
                 <input
                   v-model="editedCompany.nom"
                   type="text"
@@ -56,7 +62,9 @@
               </div>
 
               <div>
-                <label class="block mb-2 text-sm font-medium text-gray-700">Numéro d'identification</label>
+                <label class="block mb-2 text-sm font-medium text-gray-700"
+                  >Numéro d'identification</label
+                >
                 <input
                   v-model="editedCompany.idNumber"
                   type="text"
@@ -66,7 +74,9 @@
               </div>
 
               <div>
-                <label class="block mb-2 text-sm font-medium text-gray-700">Secteur d'activité</label>
+                <label class="block mb-2 text-sm font-medium text-gray-700"
+                  >Secteur d'activité</label
+                >
                 <input
                   v-model="editedCompany.industry"
                   type="text"
@@ -76,13 +86,17 @@
               </div>
 
               <div>
-                <label class="block mb-2 text-sm font-medium text-gray-700">Nombre d'employés</label>
+                <label class="block mb-2 text-sm font-medium text-gray-700"
+                  >Nombre d'employés</label
+                >
                 <select
                   v-model="editedCompany.numEmployees"
                   class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-ink focus:border-transparent"
                 >
                   <option value="" disabled>Sélectionnez</option>
-                  <option v-for="n in 100" :key="n" :value="n">{{ n }} employé{{ n > 1 ? 's' : '' }}</option>
+                  <option v-for="n in 100" :key="n" :value="n">
+                    {{ n }} employé{{ n > 1 ? 's' : '' }}
+                  </option>
                 </select>
               </div>
             </div>
@@ -90,7 +104,9 @@
 
           <!-- Section Adresse -->
           <div class="border-b pb-4">
-            <h3 class="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">Adresse</h3>
+            <h3 class="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">
+              Adresse
+            </h3>
             <div class="space-y-4">
               <div>
                 <label class="block mb-2 text-sm font-medium text-gray-700">Adresse complète</label>
@@ -150,7 +166,9 @@
 
           <!-- Section Contact -->
           <div>
-            <h3 class="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">Personne à contacter</h3>
+            <h3 class="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">
+              Personne à contacter
+            </h3>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label class="block mb-2 text-sm font-medium text-gray-700">Nom du contact</label>
@@ -207,7 +225,7 @@
               type="submit"
               class="px-6 py-2.5 bg-ink text-white rounded-lg text-sm font-medium hover:bg-ink-dark transition-colors flex items-center gap-2"
             >
-              <i class='bx bx-check'></i>
+              <i class="bx bx-check"></i>
               Soumettre
             </button>
           </div>
@@ -218,7 +236,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, watch } from "vue";
+import { reactive, watch } from 'vue'
 
 interface Company {
   nom?: string
@@ -237,29 +255,29 @@ interface Company {
   logo?: string
 }
 
-const props = defineProps<{ company: Company }>();
-const emit = defineEmits(["submit", "close"]);
+const props = defineProps<{ company: Company }>()
+const emit = defineEmits(['submit', 'close'])
 
-const editedCompany = reactive({ ...props.company });
+const editedCompany = reactive({ ...props.company })
 
 watch(
   () => props.company,
   (newCompany) => {
-    if (newCompany) Object.assign(editedCompany, newCompany);
+    if (newCompany) Object.assign(editedCompany, newCompany)
   },
-  { immediate: true }
-);
+  { immediate: true },
+)
 
 function onFileChange(e: Event) {
-  const file = (e.target as HTMLInputElement).files?.[0];
-  if (file) editedCompany.logo = URL.createObjectURL(file);
+  const file = (e.target as HTMLInputElement).files?.[0]
+  if (file) editedCompany.logo = URL.createObjectURL(file)
 }
 
 function submitForm() {
-  emit("submit", { ...editedCompany });
+  emit('submit', { ...editedCompany })
 }
 </script>
 
 <style scoped>
-@import url("https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css");
+@import url('https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css');
 </style>

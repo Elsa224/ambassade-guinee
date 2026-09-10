@@ -19,23 +19,33 @@
             <div class="flex items-center gap-4">
               <!-- Recherche -->
               <div class="relative hidden md:block">
-                <i class='bx bx-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400'></i>
+                <i
+                  class="bx bx-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                ></i>
                 <input
                   type="text"
                   placeholder="Rechercher..."
                   class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary focus:border-secondary w-64"
-                >
+                />
               </div>
 
               <!-- Notifications -->
               <div class="relative">
                 <button @click="toggleNotifications" class="relative">
-                  <i class='bx bx-bell text-2xl text-gray-600 hover:text-primary transition-colors'></i>
-                  <span class="absolute -top-1 -right-1 bg-red-600 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">3</span>
+                  <i
+                    class="bx bx-bell text-2xl text-gray-600 hover:text-primary transition-colors"
+                  ></i>
+                  <span
+                    class="absolute -top-1 -right-1 bg-red-600 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center"
+                    >3</span
+                  >
                 </button>
 
                 <!-- Dropdown notifications -->
-                <div v-if="showNotifications" class="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-xl z-50">
+                <div
+                  v-if="showNotifications"
+                  class="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-xl z-50"
+                >
                   <div class="p-3 border-b border-gray-200">
                     <h3 class="font-semibold text-gray-800">Notifications</h3>
                   </div>
@@ -55,12 +65,20 @@
               <!-- Messages -->
               <div class="relative hidden sm:block">
                 <button @click="toggleMessages" class="relative">
-                  <i class='bx bx-envelope text-2xl text-gray-600 hover:text-primary transition-colors'></i>
-                  <span class="absolute -top-1 -right-1 bg-secondary text-primary text-xs rounded-full w-4 h-4 flex items-center justify-center">2</span>
+                  <i
+                    class="bx bx-envelope text-2xl text-gray-600 hover:text-primary transition-colors"
+                  ></i>
+                  <span
+                    class="absolute -top-1 -right-1 bg-secondary text-primary text-xs rounded-full w-4 h-4 flex items-center justify-center"
+                    >2</span
+                  >
                 </button>
 
                 <!-- Dropdown messages -->
-                <div v-if="showMessages" class="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-xl z-50">
+                <div
+                  v-if="showMessages"
+                  class="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-xl z-50"
+                >
                   <div class="p-3 border-b border-gray-200">
                     <h3 class="font-semibold text-gray-800">Messages</h3>
                   </div>
@@ -80,27 +98,39 @@
                     src="https://via.placeholder.com/40"
                     alt="Avatar"
                     class="w-10 h-10 rounded-full object-cover"
-                  >
+                  />
                   <div class="hidden lg:block text-left">
                     <p class="text-sm font-medium text-gray-800">Administrateur</p>
                     <p class="text-xs text-gray-500">admin@ambaguinee.org</p>
                   </div>
-                  <i class='bx bx-chevron-down text-gray-600'></i>
+                  <i class="bx bx-chevron-down text-gray-600"></i>
                 </button>
 
                 <!-- Dropdown profil -->
-                <div v-if="showProfile" class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl z-50">
-                  <router-link to="/admin/profil" class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                    <i class='bx bx-user'></i>
+                <div
+                  v-if="showProfile"
+                  class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl z-50"
+                >
+                  <router-link
+                    to="/admin/profil"
+                    class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  >
+                    <i class="bx bx-user"></i>
                     <span>Mon profil</span>
                   </router-link>
-                  <router-link to="/admin/parametres" class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                    <i class='bx bx-cog'></i>
+                  <router-link
+                    to="/admin/parametres"
+                    class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  >
+                    <i class="bx bx-cog"></i>
                     <span>Paramètres</span>
                   </router-link>
-                  <hr class="my-1">
-                  <button @click="deconnexion" class="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-gray-100">
-                    <i class='bx bx-log-out'></i>
+                  <hr class="my-1" />
+                  <button
+                    @click="deconnexion"
+                    class="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+                  >
+                    <i class="bx bx-log-out"></i>
                     <span>Déconnexion</span>
                   </button>
                 </div>
@@ -144,7 +174,7 @@ const currentPageTitle = computed(() => {
     '/admin/commentaires': 'Commentaires',
     '/admin/utilisateurs': 'Utilisateurs',
     '/admin/parametres': 'Paramètres',
-    '/admin/profil': 'Mon profil'
+    '/admin/profil': 'Mon profil',
   }
   return titles[route.path] || 'Administration'
 })
@@ -161,7 +191,7 @@ const currentPageIcon = computed(() => {
     '/admin/commentaires': 'bx bxs-chat',
     '/admin/utilisateurs': 'bx bxs-user',
     '/admin/parametres': 'bx bxs-cog',
-    '/admin/profil': 'bx bxs-user-circle'
+    '/admin/profil': 'bx bxs-user-circle',
   }
   return icons[route.path] || 'bx bxs-dashboard'
 })

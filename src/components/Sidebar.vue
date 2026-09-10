@@ -2,7 +2,7 @@
   <aside
     :class="[
       'fixed left-0 top-0 h-full bg-gradient-to-b from-primary to-primary-dark text-white shadow-xl flex flex-col transition-all duration-300 z-[1000]',
-      isCollapsed ? 'w-20' : 'w-72'
+      isCollapsed ? 'w-20' : 'w-72',
     ]"
   >
     <!-- Bouton toggle -->
@@ -19,17 +19,13 @@
         <img
           :src="logo1"
           alt="Logo"
-          :class="[
-            'object-contain transition-all duration-300',
-            isCollapsed ? 'w-12' : 'w-20'
-          ]"
+          :class="['object-contain transition-all duration-300', isCollapsed ? 'w-12' : 'w-20']"
         />
       </router-link>
     </div>
 
     <!-- Navigation -->
     <nav class="flex-1 flex flex-col gap-1 px-3 overflow-y-auto">
-
       <!-- ========== GROUPE ADMIN ========== -->
       <div>
         <div
@@ -37,7 +33,7 @@
           class="flex items-center justify-between px-4 py-3 rounded-xl cursor-pointer transition-all duration-300 text-white hover:bg-yellow-500/20 hover:text-secondary"
         >
           <div class="flex items-center gap-3">
-            <i class='bx bx-user-circle text-xl flex-shrink-0'></i>
+            <i class="bx bx-user-circle text-xl flex-shrink-0"></i>
             <span v-if="!isCollapsed" class="font-medium text-sm">Admin</span>
           </div>
           <i
@@ -53,7 +49,7 @@
             class="flex items-center gap-3 px-4 py-2 rounded-xl text-white no-underline transition-all duration-300 text-sm font-medium hover:bg-yellow-500/20 hover:text-secondary hover:translate-x-1"
             active-class="!bg-secondary !text-primary"
           >
-            <i class='bx bxs-dashboard text-xl flex-shrink-0'></i>
+            <i class="bx bxs-dashboard text-xl flex-shrink-0"></i>
             <span v-if="!isCollapsed">Tableau de bord</span>
           </router-link>
 
@@ -62,7 +58,7 @@
             class="flex items-center gap-3 px-4 py-2 rounded-xl text-white no-underline transition-all duration-300 text-sm font-medium hover:bg-yellow-500/20 hover:text-secondary hover:translate-x-1"
             active-class="!bg-secondary !text-primary"
           >
-            <i class='bx bxs-news text-xl flex-shrink-0'></i>
+            <i class="bx bxs-news text-xl flex-shrink-0"></i>
             <span v-if="!isCollapsed">Articles</span>
           </router-link>
 
@@ -71,7 +67,7 @@
             class="flex items-center gap-3 px-4 py-2 rounded-xl text-white no-underline transition-all duration-300 text-sm font-medium hover:bg-yellow-500/20 hover:text-secondary hover:translate-x-1"
             active-class="!bg-secondary !text-primary"
           >
-            <i class='bx bxs-megaphone text-xl flex-shrink-0'></i>
+            <i class="bx bxs-megaphone text-xl flex-shrink-0"></i>
             <span v-if="!isCollapsed">Actualités</span>
           </router-link>
 
@@ -80,7 +76,7 @@
             class="flex items-center gap-3 px-4 py-2 rounded-xl text-white no-underline transition-all duration-300 text-sm font-medium hover:bg-yellow-500/20 hover:text-secondary hover:translate-x-1"
             active-class="!bg-secondary !text-primary"
           >
-            <i class='bx bxs-image text-xl flex-shrink-0'></i>
+            <i class="bx bxs-image text-xl flex-shrink-0"></i>
             <span v-if="!isCollapsed">Galerie photos</span>
           </router-link>
 
@@ -89,7 +85,7 @@
             class="flex items-center gap-3 px-4 py-2 rounded-xl text-white no-underline transition-all duration-300 text-sm font-medium hover:bg-yellow-500/20 hover:text-secondary hover:translate-x-1"
             active-class="!bg-secondary !text-primary"
           >
-            <i class='bx bxs-bell text-xl flex-shrink-0'></i>
+            <i class="bx bxs-bell text-xl flex-shrink-0"></i>
             <span v-if="!isCollapsed">Nouvelles</span>
           </router-link>
 
@@ -99,7 +95,7 @@
             class="flex items-center gap-3 px-4 py-2 rounded-xl text-white no-underline transition-all duration-300 text-sm font-medium hover:bg-yellow-500/20 hover:text-secondary hover:translate-x-1"
             active-class="!bg-secondary !text-primary"
           >
-            <i class='bx bx-globe text-xl flex-shrink-0'></i>
+            <i class="bx bx-globe text-xl flex-shrink-0"></i>
             <span v-if="!isCollapsed">Site Internet</span>
           </router-link>
         </div>
@@ -112,7 +108,7 @@
           class="flex items-center justify-between px-4 py-3 rounded-xl cursor-pointer transition-all duration-300 text-white hover:bg-yellow-500/20 hover:text-secondary"
         >
           <div class="flex items-center gap-3">
-            <i class='bx bx-shield text-xl flex-shrink-0'></i>
+            <i class="bx bx-shield text-xl flex-shrink-0"></i>
             <span v-if="!isCollapsed" class="font-medium text-sm">Ambassade Secure</span>
           </div>
           <i
@@ -123,13 +119,12 @@
         </div>
 
         <div v-show="isAmbassadeOpen" class="ml-2 flex flex-col gap-1">
-
           <router-link
             to="/dashboard/utilisateurs"
             class="flex items-center gap-3 px-4 py-2 rounded-xl text-white no-underline transition-all duration-300 text-sm font-medium hover:bg-yellow-500/20 hover:text-secondary hover:translate-x-1"
             active-class="!bg-secondary !text-primary"
           >
-            <i class='bx bx-user text-xl flex-shrink-0'></i>
+            <i class="bx bx-user text-xl flex-shrink-0"></i>
             <span v-if="!isCollapsed">Utilisateurs</span>
           </router-link>
 
@@ -138,7 +133,7 @@
             class="flex items-center gap-3 px-4 py-2 rounded-xl text-white no-underline transition-all duration-300 text-sm font-medium hover:bg-yellow-500/20 hover:text-secondary hover:translate-x-1"
             active-class="!bg-secondary !text-primary"
           >
-            <i class='bx bx-qr-scan text-xl flex-shrink-0'></i>
+            <i class="bx bx-qr-scan text-xl flex-shrink-0"></i>
             <span v-if="!isCollapsed">Scanner QR Code</span>
           </router-link>
 
@@ -147,7 +142,7 @@
             class="flex items-center gap-3 px-4 py-2 rounded-xl text-white no-underline transition-all duration-300 text-sm font-medium hover:bg-yellow-500/20 hover:text-secondary hover:translate-x-1"
             active-class="!bg-secondary !text-primary"
           >
-            <i class='bx bx-calendar-event text-xl flex-shrink-0'></i>
+            <i class="bx bx-calendar-event text-xl flex-shrink-0"></i>
             <span v-if="!isCollapsed">Evènements</span>
           </router-link>
 
@@ -156,7 +151,7 @@
             class="flex items-center gap-3 px-4 py-2 rounded-xl text-white no-underline transition-all duration-300 text-sm font-medium hover:bg-yellow-500/20 hover:text-secondary hover:translate-x-1"
             active-class="!bg-secondary !text-primary"
           >
-            <i class='bx bx-list-ul text-xl flex-shrink-0'></i>
+            <i class="bx bx-list-ul text-xl flex-shrink-0"></i>
             <span v-if="!isCollapsed">Liste des visiteurs</span>
           </router-link>
 
@@ -165,7 +160,7 @@
             class="flex items-center gap-3 px-4 py-2 rounded-xl text-white no-underline transition-all duration-300 text-sm font-medium hover:bg-yellow-500/20 hover:text-secondary hover:translate-x-1"
             active-class="!bg-secondary !text-primary"
           >
-            <i class='bx bx-envelope text-xl flex-shrink-0'></i>
+            <i class="bx bx-envelope text-xl flex-shrink-0"></i>
             <span v-if="!isCollapsed">Demande</span>
           </router-link>
 
@@ -174,7 +169,7 @@
             class="flex items-center gap-3 px-4 py-2 rounded-xl text-white no-underline transition-all duration-300 text-sm font-medium hover:bg-yellow-500/20 hover:text-secondary hover:translate-x-1"
             active-class="!bg-secondary !text-primary"
           >
-            <i class='bx bx-check-square text-xl flex-shrink-0'></i>
+            <i class="bx bx-check-square text-xl flex-shrink-0"></i>
             <span v-if="!isCollapsed">Liste de présence</span>
           </router-link>
 
@@ -183,7 +178,7 @@
             class="flex items-center gap-3 px-4 py-2 rounded-xl text-white no-underline transition-all duration-300 text-sm font-medium hover:bg-yellow-500/20 hover:text-secondary hover:translate-x-1"
             active-class="!bg-secondary !text-primary"
           >
-            <i class='bx bx-id-card text-xl flex-shrink-0'></i>
+            <i class="bx bx-id-card text-xl flex-shrink-0"></i>
             <span v-if="!isCollapsed">Carte de membre</span>
           </router-link>
 
@@ -192,7 +187,7 @@
             class="flex items-center gap-3 px-4 py-2 rounded-xl text-white no-underline transition-all duration-300 text-sm font-medium hover:bg-yellow-500/20 hover:text-secondary hover:translate-x-1"
             active-class="!bg-secondary !text-primary"
           >
-            <i class='bx bx-mail-send text-xl flex-shrink-0'></i>
+            <i class="bx bx-mail-send text-xl flex-shrink-0"></i>
             <span v-if="!isCollapsed">Liste de courriers</span>
           </router-link>
 
@@ -201,7 +196,7 @@
             class="flex items-center gap-3 px-4 py-2 rounded-xl text-white no-underline transition-all duration-300 text-sm font-medium hover:bg-yellow-500/20 hover:text-secondary hover:translate-x-1"
             active-class="!bg-secondary !text-primary"
           >
-            <i class='bx bx-task text-xl flex-shrink-0'></i>
+            <i class="bx bx-task text-xl flex-shrink-0"></i>
             <span v-if="!isCollapsed">Tâches</span>
           </router-link>
 
@@ -210,7 +205,7 @@
             class="flex items-center gap-3 px-4 py-2 rounded-xl text-white no-underline transition-all duration-300 text-sm font-medium hover:bg-yellow-500/20 hover:text-secondary hover:translate-x-1"
             active-class="!bg-secondary !text-primary"
           >
-            <i class='bx bx-folder text-xl flex-shrink-0'></i>
+            <i class="bx bx-folder text-xl flex-shrink-0"></i>
             <span v-if="!isCollapsed">Projets</span>
           </router-link>
 
@@ -219,13 +214,11 @@
             class="flex items-center gap-3 px-4 py-2 rounded-xl text-white no-underline transition-all duration-300 text-sm font-medium hover:bg-yellow-500/20 hover:text-secondary hover:translate-x-1"
             active-class="!bg-secondary !text-primary"
           >
-            <i class='bx bx-file text-xl flex-shrink-0'></i>
+            <i class="bx bx-file text-xl flex-shrink-0"></i>
             <span v-if="!isCollapsed">Documents</span>
           </router-link>
-
         </div>
       </div>
-
     </nav>
 
     <!-- Déconnexion -->
@@ -234,7 +227,7 @@
         @click="deconnexion"
         class="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-red-600/20 text-red-300 border border-red-600/50 cursor-pointer transition-all duration-300 text-sm font-medium hover:bg-red-600 hover:text-white hover:border-red-600"
       >
-        <i class='bx bx-log-out-circle text-xl'></i>
+        <i class="bx bx-log-out-circle text-xl"></i>
         <span v-if="!isCollapsed">Déconnexion</span>
       </button>
     </div>
@@ -252,8 +245,8 @@ const auth = useAuthStore()
 const isCollapsed = ref(false)
 
 // État d'ouverture des groupes
-const isAdminOpen = ref(true)      // ouvert par défaut
-const isAmbassadeOpen = ref(true)  // ouvert par défaut
+const isAdminOpen = ref(true) // ouvert par défaut
+const isAmbassadeOpen = ref(true) // ouvert par défaut
 
 const toggleSidebar = () => {
   isCollapsed.value = !isCollapsed.value

@@ -3,9 +3,7 @@
     <div class="max-w-7xl mx-auto">
       <!-- Header -->
       <div class="flex flex-col md:flex-row items-center justify-between mb-6 gap-4">
-        <h2 class="text-2xl md:text-3xl font-bold flex items-center gap-2">
-          Liste des Documents
-        </h2>
+        <h2 class="text-2xl md:text-3xl font-bold flex items-center gap-2">Liste des Documents</h2>
         <button
           @click="showAdd = true"
           class="bg-primary text-white px-5 py-2 rounded-lg shadow hover:bg-primary-dark transition flex items-center gap-2"
@@ -82,7 +80,9 @@
       v-if="showPreview"
       class="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm z-50 p-4"
     >
-      <div class="bg-white rounded-2xl w-full max-w-4xl shadow-2xl relative overflow-hidden border border-gray-100 max-h-[90vh] overflow-y-auto">
+      <div
+        class="bg-white rounded-2xl w-full max-w-4xl shadow-2xl relative overflow-hidden border border-gray-100 max-h-[90vh] overflow-y-auto"
+      >
         <!-- En-tête avec dégradé -->
         <div class="bg-primary p-6 text-white sticky top-0 z-10">
           <div class="flex justify-between items-center">
@@ -175,10 +175,14 @@
           <div class="bg-primary/10 rounded-xl p-4 border border-primary/20 mb-8">
             <h3 class="font-semibold text-primary mb-3">Éditeur</h3>
             <div class="flex gap-3">
-              <button class="bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary-dark transition-colors text-sm font-medium">
+              <button
+                class="bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary-dark transition-colors text-sm font-medium"
+              >
                 Approuver
               </button>
-              <button class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors text-sm font-medium">
+              <button
+                class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors text-sm font-medium"
+              >
                 Éditer
               </button>
             </div>
@@ -228,21 +232,26 @@
     </div>
 
     <!-- Edit Modal -->
-    <div
-      v-if="showEdit"
-      class="fixed inset-0 flex items-center justify-center bg-black/40 z-50"
-    >
+    <div v-if="showEdit" class="fixed inset-0 flex items-center justify-center bg-black/40 z-50">
       <div class="bg-white rounded-xl w-[90%] md:w-[60%] p-8 shadow-lg relative">
         <h3 class="text-2xl font-bold mb-6 text-center text-primary">✏️ Éditer un document</h3>
         <form class="space-y-6">
           <div class="grid md:grid-cols-2 gap-4">
             <div>
               <label class="font-semibold text-primary">Entreprise destinataire :</label>
-              <input type="text" placeholder="Ex: SCB" class="w-full border rounded-lg px-3 py-2 mt-1 outline-none focus:ring-2 focus:ring-primary" />
+              <input
+                type="text"
+                placeholder="Ex: SCB"
+                class="w-full border rounded-lg px-3 py-2 mt-1 outline-none focus:ring-2 focus:ring-primary"
+              />
             </div>
             <div>
               <label class="font-semibold text-primary">Titre :</label>
-              <input type="text" placeholder="Permission RE" class="w-full border rounded-lg px-3 py-2 mt-1 outline-none focus:ring-2 focus:ring-primary" />
+              <input
+                type="text"
+                placeholder="Permission RE"
+                class="w-full border rounded-lg px-3 py-2 mt-1 outline-none focus:ring-2 focus:ring-primary"
+              />
             </div>
           </div>
           <div>
@@ -251,15 +260,34 @@
           </div>
           <div>
             <label class="font-semibold text-primary">Description :</label>
-            <textarea rows="3" placeholder="Permission" class="w-full border rounded-lg px-3 py-2 mt-1 outline-none focus:ring-2 focus:ring-primary"></textarea>
+            <textarea
+              rows="3"
+              placeholder="Permission"
+              class="w-full border rounded-lg px-3 py-2 mt-1 outline-none focus:ring-2 focus:ring-primary"
+            ></textarea>
           </div>
           <div class="flex justify-between gap-4">
-            <button @click="showEdit = false" type="button" class="bg-gray-300 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-400 transition">
+            <button
+              @click="showEdit = false"
+              type="button"
+              class="bg-gray-300 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-400 transition"
+            >
               ← Retour à la liste
             </button>
             <div class="flex gap-2">
-              <button type="button" @click="showEdit = false" class="bg-red-500 text-white px-6 py-2 rounded-lg hover:bg-red-600 transition">Annuler</button>
-              <button type="submit" class="bg-primary text-white px-6 py-2 rounded-lg hover:bg-primary-dark transition">Soumettre</button>
+              <button
+                type="button"
+                @click="showEdit = false"
+                class="bg-red-500 text-white px-6 py-2 rounded-lg hover:bg-red-600 transition"
+              >
+                Annuler
+              </button>
+              <button
+                type="submit"
+                class="bg-primary text-white px-6 py-2 rounded-lg hover:bg-primary-dark transition"
+              >
+                Soumettre
+              </button>
             </div>
           </div>
         </form>
@@ -267,21 +295,28 @@
     </div>
 
     <!-- Add Modal -->
-    <div
-      v-if="showAdd"
-      class="fixed inset-0 flex items-center justify-center bg-black/40 z-50"
-    >
+    <div v-if="showAdd" class="fixed inset-0 flex items-center justify-center bg-black/40 z-50">
       <div class="bg-white rounded-xl w-[90%] md:w-[60%] p-8 shadow-lg relative">
         <h3 class="text-2xl font-bold mb-6 text-center text-primary">📝 Soumettre un document</h3>
         <form class="space-y-6" @submit.prevent="addDocument">
           <div class="grid md:grid-cols-2 gap-4">
             <div>
               <label class="font-semibold text-primary">Entreprise destinataire :</label>
-              <input v-model="newDoc.compagnie" type="text" placeholder="Ex: SCB" class="w-full border rounded-lg px-3 py-2 mt-1 outline-none focus:ring-2 focus:ring-primary" />
+              <input
+                v-model="newDoc.compagnie"
+                type="text"
+                placeholder="Ex: SCB"
+                class="w-full border rounded-lg px-3 py-2 mt-1 outline-none focus:ring-2 focus:ring-primary"
+              />
             </div>
             <div>
               <label class="font-semibold text-primary">Titre :</label>
-              <input v-model="newDoc.titre" type="text" placeholder="Permission RE" class="w-full border rounded-lg px-3 py-2 mt-1 outline-none focus:ring-2 focus:ring-primary" />
+              <input
+                v-model="newDoc.titre"
+                type="text"
+                placeholder="Permission RE"
+                class="w-full border rounded-lg px-3 py-2 mt-1 outline-none focus:ring-2 focus:ring-primary"
+              />
             </div>
           </div>
           <div>
@@ -290,15 +325,35 @@
           </div>
           <div>
             <label class="font-semibold text-primary">Description :</label>
-            <textarea v-model="newDoc.description" rows="3" placeholder="Permission" class="w-full border rounded-lg px-3 py-2 mt-1 outline-none focus:ring-2 focus:ring-primary"></textarea>
+            <textarea
+              v-model="newDoc.description"
+              rows="3"
+              placeholder="Permission"
+              class="w-full border rounded-lg px-3 py-2 mt-1 outline-none focus:ring-2 focus:ring-primary"
+            ></textarea>
           </div>
           <div class="flex justify-between gap-4">
-            <button @click="showAdd = false" type="button" class="bg-gray-300 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-400 transition">
+            <button
+              @click="showAdd = false"
+              type="button"
+              class="bg-gray-300 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-400 transition"
+            >
               ← Retour à la liste
             </button>
             <div class="flex gap-2">
-              <button type="button" @click="showAdd = false" class="bg-red-500 text-white px-6 py-2 rounded-lg hover:bg-red-600 transition">Annuler</button>
-              <button type="submit" class="bg-primary text-white px-6 py-2 rounded-lg hover:bg-primary-dark transition">Soumettre</button>
+              <button
+                type="button"
+                @click="showAdd = false"
+                class="bg-red-500 text-white px-6 py-2 rounded-lg hover:bg-red-600 transition"
+              >
+                Annuler
+              </button>
+              <button
+                type="submit"
+                class="bg-primary text-white px-6 py-2 rounded-lg hover:bg-primary-dark transition"
+              >
+                Soumettre
+              </button>
             </div>
           </div>
         </form>
@@ -308,68 +363,66 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed } from 'vue'
 
-const showAdd = ref(false);
-const showPreview = ref(false);
-const showEdit = ref(false);
-const search = ref("");
+const showAdd = ref(false)
+const showPreview = ref(false)
+const showEdit = ref(false)
+const search = ref('')
 
 const documents = ref([
   {
-    dateEmission: "22/10/2025",
-    compagnie: "SCB",
-    emetteur: "Front Desk",
-    titre: "Permission RE",
-    statusSuperviseur: "✅ Validé",
-    dateApprobation: "22/10/2025",
-    approuvePar: "DG Manager",
-    statusApprobation: "✅ Validé",
+    dateEmission: '22/10/2025',
+    compagnie: 'SCB',
+    emetteur: 'Front Desk',
+    titre: 'Permission RE',
+    statusSuperviseur: '✅ Validé',
+    dateApprobation: '22/10/2025',
+    approuvePar: 'DG Manager',
+    statusApprobation: '✅ Validé',
   },
   {
-    dateEmission: "22/10/2025",
-    compagnie: "SCB",
-    emetteur: "Front Desk",
-    titre: "Permission",
-    statusSuperviseur: "⏳ En attente",
-    dateApprobation: "22/10/2025",
-    approuvePar: "DG Manager",
-    statusApprobation: "✅ Validé",
+    dateEmission: '22/10/2025',
+    compagnie: 'SCB',
+    emetteur: 'Front Desk',
+    titre: 'Permission',
+    statusSuperviseur: '⏳ En attente',
+    dateApprobation: '22/10/2025',
+    approuvePar: 'DG Manager',
+    statusApprobation: '✅ Validé',
   },
   {
-    dateEmission: "22/10/2025",
-    compagnie: "SCB",
-    emetteur: "Employee Admin",
-    titre: "Demande de congés annuels",
-    statusSuperviseur: "✅ Validé",
-    dateApprobation: "22/10/2025",
-    approuvePar: "Employee Admin",
-    statusApprobation: "❌ Refusé",
+    dateEmission: '22/10/2025',
+    compagnie: 'SCB',
+    emetteur: 'Employee Admin',
+    titre: 'Demande de congés annuels',
+    statusSuperviseur: '✅ Validé',
+    dateApprobation: '22/10/2025',
+    approuvePar: 'Employee Admin',
+    statusApprobation: '❌ Refusé',
   },
-]);
+])
 
-const newDoc = ref({ compagnie: "", titre: "", description: "" });
+const newDoc = ref({ compagnie: '', titre: '', description: '' })
 
 const addDocument = () => {
   documents.value.push({
     dateEmission: new Date().toLocaleDateString(),
     compagnie: newDoc.value.compagnie,
-    emetteur: "Utilisateur",
+    emetteur: 'Utilisateur',
     titre: newDoc.value.titre,
-    statusSuperviseur: "⏳ En attente",
-    dateApprobation: "-",
-    approuvePar: "-",
-    statusApprobation: "⏳ En attente",
-  });
-  newDoc.value = { compagnie: "", titre: "", description: "" };
-  showAdd.value = false;
-};
+    statusSuperviseur: '⏳ En attente',
+    dateApprobation: '-',
+    approuvePar: '-',
+    statusApprobation: '⏳ En attente',
+  })
+  newDoc.value = { compagnie: '', titre: '', description: '' }
+  showAdd.value = false
+}
 
 const filteredDocs = computed(() => {
   return documents.value.filter((d) =>
-    Object.values(d).some((val) =>
-      val.toLowerCase().includes(search.value.toLowerCase())
-    )
-  );
-});
+    Object.values(d).some((val) => val.toLowerCase().includes(search.value.toLowerCase())),
+  )
+})
 </script>

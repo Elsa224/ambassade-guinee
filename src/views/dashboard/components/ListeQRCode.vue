@@ -29,7 +29,10 @@
             <img :src="item.qrCode" class="h-12 w-12 object-contain" />
           </td>
           <td class="px-6 py-3 text-center relative">
-            <button @click="item.showActions = !item.showActions" class="flex items-center justify-center w-full">
+            <button
+              @click="item.showActions = !item.showActions"
+              class="flex items-center justify-center w-full"
+            >
               <i class="bx bx-dots-vertical text-xl text-gray-600 hover:text-primary"></i>
             </button>
 
@@ -37,13 +40,22 @@
               v-if="item.showActions"
               class="absolute right-4 mt-2 bg-white border rounded-md shadow-md flex flex-col gap-1 w-36 z-10"
             >
-              <button @click="editItem(item)" class="flex items-center gap-2 px-3 py-2 hover:bg-gray-100 text-sm">
+              <button
+                @click="editItem(item)"
+                class="flex items-center gap-2 px-3 py-2 hover:bg-gray-100 text-sm"
+              >
                 <i class="bx bx-pencil text-blue-500"></i> Modifier
               </button>
-              <button @click="deleteItem(item)" class="flex items-center gap-2 px-3 py-2 hover:bg-gray-100 text-sm">
+              <button
+                @click="deleteItem(item)"
+                class="flex items-center gap-2 px-3 py-2 hover:bg-gray-100 text-sm"
+              >
                 <i class="bx bx-trash text-red-500"></i> Supprimer
               </button>
-              <button @click="addItem(item)" class="flex items-center gap-2 px-3 py-2 hover:bg-gray-100 text-sm">
+              <button
+                @click="addItem(item)"
+                class="flex items-center gap-2 px-3 py-2 hover:bg-gray-100 text-sm"
+              >
                 <i class="bx bx-plus-circle text-green-500"></i> Ajouter
               </button>
             </div>
@@ -81,7 +93,7 @@
           @click="goToPage(page)"
           :class="[
             'px-3 py-1 rounded-md border border-gray-300 hover:bg-gray-50',
-            currentPage === page ? 'bg-primary text-white border-primary' : ''
+            currentPage === page ? 'bg-primary text-white border-primary' : '',
           ]"
         >
           {{ page }}
@@ -110,8 +122,8 @@ const qrList = ref(
     contact: `+225000000${i + 1}`,
     image: `https://i.pravatar.cc/150?img=${i + 10}`,
     qrCode: `https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=QR${i + 1}`,
-    showActions: false
-  }))
+    showActions: false,
+  })),
 )
 
 const currentPage = ref(1)
@@ -136,7 +148,13 @@ function goToPage(page: number) {
 }
 type QrItem = (typeof qrList.value)[number]
 
-function editItem(item: QrItem) { alert(`Modifier ${item.nom}`) }
-function deleteItem(item: QrItem) { alert(`Supprimer ${item.nom}`) }
-function addItem(item: QrItem) { alert(`Ajouter ${item.nom}`) }
+function editItem(item: QrItem) {
+  alert(`Modifier ${item.nom}`)
+}
+function deleteItem(item: QrItem) {
+  alert(`Supprimer ${item.nom}`)
+}
+function addItem(item: QrItem) {
+  alert(`Ajouter ${item.nom}`)
+}
 </script>

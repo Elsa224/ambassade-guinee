@@ -93,7 +93,7 @@ describe('store auth', () => {
     expect(localStorage.getItem('cms_token')).toBeNull()
   })
 
-  it("ne joint plus le jeton aux requetes apres la deconnexion", async () => {
+  it('ne joint plus le jeton aux requetes apres la deconnexion', async () => {
     vi.mocked(fetch).mockResolvedValue(reponse(CONNEXION_OK))
     const store = useAuthStore()
     await store.login('admin@exemple-ambassade.test', 'motdepasse')

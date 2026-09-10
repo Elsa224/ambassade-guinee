@@ -11,15 +11,15 @@
 </template>
 
 <script setup>
-import { computed } from "vue";
-import { useRoute } from "vue-router";
+import { computed } from 'vue'
+import { useRoute } from 'vue-router'
 
-const route = useRoute();
+const route = useRoute()
 
 // 🧭 Titre dynamique selon la page
 const pageTitle = computed(() => {
-  if (route.name === "AddUser") return "➕ Ajouter un Utilisateur";
-  if (route.name === "UserList") return "👥 Liste des Utilisateurs";
-  return "👤 Gestion des Utilisateurs";
-});
+  if (route.name === 'AddUser') return '➕ Ajouter un Utilisateur'
+  if (route.name === 'UserList') return '👥 Liste des Utilisateurs'
+  return '👤 Gestion des Utilisateurs'
+})
 </script>

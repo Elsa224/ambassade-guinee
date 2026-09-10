@@ -28,12 +28,17 @@ function creerRouteur(): Router {
 function connecter(): void {
   const auth = useAuthStore()
   auth.token = 'jeton-de-test'
-  auth.utilisateur = { id: 1, nom: 'Administrateur', email: 'admin@exemple-ambassade.test', role: 'admin' }
+  auth.utilisateur = {
+    id: 1,
+    nom: 'Administrateur',
+    email: 'admin@exemple-ambassade.test',
+    role: 'admin',
+  }
   setAuthToken('jeton-de-test')
   localStorage.setItem('cms_token', 'jeton-de-test')
 }
 
-describe('déconnexion depuis l\'interface', () => {
+describe("déconnexion depuis l'interface", () => {
   beforeEach(() => {
     setActivePinia(createPinia())
     localStorage.clear()
@@ -55,7 +60,9 @@ describe('déconnexion depuis l\'interface', () => {
 
     const wrapper = mount(Sidebar, { global: { plugins: [routeur] } })
 
-    const boutonDeconnexion = wrapper.findAll('button').find((b) => b.text().includes('Déconnexion'))
+    const boutonDeconnexion = wrapper
+      .findAll('button')
+      .find((b) => b.text().includes('Déconnexion'))
     expect(boutonDeconnexion).toBeTruthy()
     await boutonDeconnexion!.trigger('click')
     await flushPromises()
@@ -96,7 +103,7 @@ describe('déconnexion depuis l\'interface', () => {
     expect(routeur.currentRoute.value.path).toBe('/connexion')
   })
 
-  it('l\'appel POST /api/auth/logout est bien émis', async () => {
+  it("l'appel POST /api/auth/logout est bien émis", async () => {
     vi.mocked(fetch).mockResolvedValue(new Response(null, { status: 204 }))
     connecter()
     const routeur = creerRouteur()
@@ -104,7 +111,9 @@ describe('déconnexion depuis l\'interface', () => {
     await routeur.isReady()
 
     const wrapper = mount(Sidebar, { global: { plugins: [routeur] } })
-    const boutonDeconnexion = wrapper.findAll('button').find((b) => b.text().includes('Déconnexion'))
+    const boutonDeconnexion = wrapper
+      .findAll('button')
+      .find((b) => b.text().includes('Déconnexion'))
     expect(boutonDeconnexion).toBeTruthy()
     await boutonDeconnexion!.trigger('click')
     await flushPromises()

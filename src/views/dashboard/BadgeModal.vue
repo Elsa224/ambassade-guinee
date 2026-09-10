@@ -80,7 +80,9 @@
             <i class="bx bx-current-location text-xl"></i>
             <div>
               <h3 class="font-bold">Adresse</h3>
-              <p class="text-xs leading-tight">{{ company.address || '1050 Connecticut Ave NW, Washington DC' }}</p>
+              <p class="text-xs leading-tight">
+                {{ company.address || '1050 Connecticut Ave NW, Washington DC' }}
+              </p>
             </div>
           </div>
 

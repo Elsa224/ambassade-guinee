@@ -21,7 +21,7 @@
               'px-4 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap',
               categorieActive === categorie
                 ? 'bg-accent text-white'
-                : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'
+                : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200',
             ]"
           >
             {{ categorie }}
@@ -34,7 +34,7 @@
             v-model="recherche"
             placeholder="Rechercher une actualité..."
             class="w-full px-4 py-2 pl-10 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
-          >
+          />
         </div>
       </div>
 
@@ -48,11 +48,11 @@
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div
             v-for="(actu, index) in actualitesVedette"
-            :key="'vedette-'+index"
+            :key="'vedette-' + index"
             class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow group cursor-pointer"
           >
             <div class="relative h-64 overflow-hidden">
-              <img :src="actu.image" class="w-full h-full object-cover">
+              <img :src="actu.image" class="w-full h-full object-cover" />
             </div>
 
             <div class="p-6">
@@ -72,7 +72,7 @@
           :key="index"
           class="bg-white rounded-lg shadow-md overflow-hidden"
         >
-          <img :src="actu.image" class="w-full h-48 object-cover">
+          <img :src="actu.image" class="w-full h-48 object-cover" />
 
           <div class="p-4">
             <h3 class="font-bold text-gray-800 mb-2">
@@ -107,71 +107,75 @@ const actualites = ref([
     titre: "Cérémonie de commémoration de l'indépendance de la Guinée",
     resume: "L'Ambassade a organisé une cérémonie officielle.",
     image: img1,
-    categorie: "Événements",
-    estVedette: true
+    categorie: 'Événements',
+    estVedette: true,
   },
   {
-    titre: "Nouveau service de visa en ligne",
-    resume: "Lancement du portail visa.",
+    titre: 'Nouveau service de visa en ligne',
+    resume: 'Lancement du portail visa.',
     image: img2,
-    categorie: "Services",
-    estVedette: true
+    categorie: 'Services',
+    estVedette: true,
   },
   {
-    titre: "Rencontre diplomatique",
-    resume: "Discussion des relations bilatérales.",
+    titre: 'Rencontre diplomatique',
+    resume: 'Discussion des relations bilatérales.',
     image: img3,
-    categorie: "Diplomatie",
-    estVedette: false
+    categorie: 'Diplomatie',
+    estVedette: false,
   },
   {
-    titre: "Forum économique",
-    resume: "Forum Guinée-USA.",
+    titre: 'Forum économique',
+    resume: 'Forum Guinée-USA.',
     image: img4,
-    categorie: "Économie",
-    estVedette: false
+    categorie: 'Économie',
+    estVedette: false,
   },
   {
-    titre: "Journée culturelle",
-    resume: "Culture guinéenne.",
+    titre: 'Journée culturelle',
+    resume: 'Culture guinéenne.',
     image: img5,
-    categorie: "Culture",
-    estVedette: false
+    categorie: 'Culture',
+    estVedette: false,
   },
   {
-    titre: "Recrutement",
-    resume: "Poste disponible.",
+    titre: 'Recrutement',
+    resume: 'Poste disponible.',
     image: img6,
-    categorie: "Recrutement",
-    estVedette: false
+    categorie: 'Recrutement',
+    estVedette: false,
   },
   {
-    titre: "Visite officielle",
-    resume: "Renforcement échanges.",
+    titre: 'Visite officielle',
+    resume: 'Renforcement échanges.',
     image: img7,
-    categorie: "Diplomatie",
-    estVedette: false
+    categorie: 'Diplomatie',
+    estVedette: false,
   },
   {
-    titre: "Procédure consulaire",
-    resume: "Mise à jour.",
+    titre: 'Procédure consulaire',
+    resume: 'Mise à jour.',
     image: img8,
-    categorie: "Services",
-    estVedette: false
-  }
+    categorie: 'Services',
+    estVedette: false,
+  },
 ])
 
-const categories = ref(['Toutes', 'Événements', 'Diplomatie', 'Services', 'Culture', 'Économie', 'Recrutement'])
+const categories = ref([
+  'Toutes',
+  'Événements',
+  'Diplomatie',
+  'Services',
+  'Culture',
+  'Économie',
+  'Recrutement',
+])
 const categorieActive = ref('Toutes')
 const recherche = ref('')
 
-const actualitesVedette = computed(() =>
-  actualites.value.filter(a => a.estVedette)
-)
+const actualitesVedette = computed(() => actualites.value.filter((a) => a.estVedette))
 
-const actualitesFiltrees = computed(() =>
-  actualites.value.filter(a => !a.estVedette)
-)
+const actualitesFiltrees = computed(() => actualites.value.filter((a) => !a.estVedette))
 </script>
 
 <style scoped>

@@ -9,16 +9,10 @@ import { mockApi } from './vite-plugins/mock-api'
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [
-    vue(),
-    tailwindcss(),
-    vueJsx(),
-    vueDevTools(),
-    mockApi(),
-  ],
+  plugins: [vue(), tailwindcss(), vueJsx(), vueDevTools(), mockApi()],
   resolve: {
     alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url))
+      '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
 })

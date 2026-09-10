@@ -74,8 +74,6 @@ import CreerQRCode from '@/views/dashboard/components/CreerQRCode.vue'
 import AjouterEvenement from '@/views/dashboard/components/AjouterEvenement.vue'
 import ListeEvenement from '@/views/dashboard/components/ListeEvenement.vue'
 
-
-
 // Courriers
 import AjouterCourrier from '@/views/dashboard/components/AjouterCourrier.vue'
 import ListeCourrier from '@/views/dashboard/components/ListeCourrier.vue'
@@ -109,18 +107,38 @@ const router = createRouter({
         { path: '', name: 'home', component: Home },
         { path: 'actualite', name: 'actualite', component: Actualite },
         { path: 'actualites/:slug', name: 'actualite-detail', component: ActualiteDetail },
-        { path: 'actualites-ambassade', name: 'actualites-ambassade', component: ActualitesAmbassade },
-        { path: 'actualites-diplomatique', name: 'actualites-diplomatique', component: ActualitesDiplomatique },
-        { path: 'actualites-gouvernementale', name: 'actualites-gouvernementale', component: ActualitesGouvernementale },
+        {
+          path: 'actualites-ambassade',
+          name: 'actualites-ambassade',
+          component: ActualitesAmbassade,
+        },
+        {
+          path: 'actualites-diplomatique',
+          name: 'actualites-diplomatique',
+          component: ActualitesDiplomatique,
+        },
+        {
+          path: 'actualites-gouvernementale',
+          name: 'actualites-gouvernementale',
+          component: ActualitesGouvernementale,
+        },
 
         { path: 'presentation', name: 'presentation', component: Presentation },
         { path: 'ambassadeur', name: 'ambassadeur', component: Ambassadeur },
         { path: 'chancellerie', name: 'chancellerie', component: Chancellerie },
-        { path: 'services-ambassadeur', name: 'services-ambassadeur', component: ServicesAmbassadeur },
+        {
+          path: 'services-ambassadeur',
+          name: 'services-ambassadeur',
+          component: ServicesAmbassadeur,
+        },
         { path: 'consuls-honoraires', name: 'consuls-honoraires', component: ConsulsHonoraires },
         { path: 'calendrier', name: 'calendrier', component: Calendrier },
 
-        { path: 'relations-bilaterales', name: 'relations-bilaterales', component: RelationsBilaterales },
+        {
+          path: 'relations-bilaterales',
+          name: 'relations-bilaterales',
+          component: RelationsBilaterales,
+        },
         { path: 'usa', name: 'usa', component: Usa },
         { path: 'costa-rica', name: 'costa-rica', component: CostaRica },
         { path: 'haiti', name: 'haiti', component: Haiti },
@@ -131,8 +149,8 @@ const router = createRouter({
         { path: 'rendez-vous', name: 'rendez-vous', component: RendezVous },
         { path: 'demarche-ligne', name: 'demarche-ligne', component: DemarcheLigne },
 
-        { path: 'construction', name: 'construction', component: Construction }
-      ]
+        { path: 'construction', name: 'construction', component: Construction },
+      ],
     },
 
     // ---------- DASHBOARD (APP) ----------
@@ -155,8 +173,8 @@ const router = createRouter({
           redirect: '/dashboard/utilisateurs/liste',
           children: [
             { path: 'ajouter', name: 'AddUser', component: AddUser },
-            { path: 'liste', name: 'UserList', component: UserList }
-          ]
+            { path: 'liste', name: 'UserList', component: UserList },
+          ],
         },
 
         // Scanner QR Code
@@ -168,8 +186,8 @@ const router = createRouter({
             { path: 'liste', name: 'ListeQRCode', component: ListeQRCode },
             { path: 'scan', name: 'ScannerQRCode', component: ScannerQRCode },
             { path: 'manuel', name: 'QRManuel', component: QRManuel },
-            { path: 'creer', name: 'CreerQRCode', component: CreerQRCode }
-          ]
+            { path: 'creer', name: 'CreerQRCode', component: CreerQRCode },
+          ],
         },
 
         // Événements
@@ -179,8 +197,8 @@ const router = createRouter({
           redirect: '/dashboard/evenement/liste',
           children: [
             { path: 'liste', name: 'ListeEvenement', component: ListeEvenement },
-            { path: 'creer', name: 'AjouterEvenement', component: AjouterEvenement }
-          ]
+            { path: 'creer', name: 'AjouterEvenement', component: AjouterEvenement },
+          ],
         },
 
         // Liste des visiteurs
@@ -199,8 +217,8 @@ const router = createRouter({
           redirect: '/dashboard/cartes/liste',
           children: [
             { path: 'liste', name: 'CardList', component: CardList },
-            { path: 'creer', name: 'CreateCard', component: CreateCard }
-          ]
+            { path: 'creer', name: 'CreateCard', component: CreateCard },
+          ],
         },
 
         // Courriers
@@ -210,8 +228,8 @@ const router = createRouter({
           redirect: '/dashboard/courriers/liste',
           children: [
             { path: 'ajouter', name: 'AjouterCourrier', component: AjouterCourrier },
-            { path: 'liste', name: 'ListeCourrier', component: ListeCourrier }
-          ]
+            { path: 'liste', name: 'ListeCourrier', component: ListeCourrier },
+          ],
         },
 
         // Tâches
@@ -227,8 +245,12 @@ const router = createRouter({
             { path: 'times/ajouter/:id', name: 'AddTimeEntry', component: AddTimeEntry },
             { path: 'commentaires/:id', name: 'TaskComments', component: TaskComments },
             { path: 'commentaires/ajouter/:id', name: 'AddComment', component: AddComment },
-            { path: 'commentaires/editer/:id/:commentId', name: 'EditComment', component: AddComment }
-          ]
+            {
+              path: 'commentaires/editer/:id/:commentId',
+              name: 'EditComment',
+              component: AddComment,
+            },
+          ],
         },
 
         // Projets
@@ -239,28 +261,28 @@ const router = createRouter({
           children: [
             { path: 'liste', name: 'ProjectList', component: ProjectList },
             { path: 'document/:id', name: 'DocumentPreview', component: DocumentPreview },
-            { path: 'editer/:id', name: 'EditProject', component: EditProject }
-          ]
+            { path: 'editer/:id', name: 'EditProject', component: EditProject },
+          ],
         },
 
         // Documents
         { path: 'documents', name: 'Documents', component: Documents },
 
         // Profil
-        { path: 'profile', name: 'Profile', component: Profile }
-      ]
+        { path: 'profile', name: 'Profile', component: Profile },
+      ],
     },
 
     // ---------- CONNEXION (sans layout) ----------
     {
       path: '/connexion',
       name: 'connexion',
-      component: () => import('@/views/Connexion.vue')
+      component: () => import('@/views/Connexion.vue'),
     },
 
     // Redirection 404 éventuelle (optionnelle)
     // { path: '/:pathMatch(.*)*', redirect: '/' }
-  ]
+  ],
 })
 
 /**

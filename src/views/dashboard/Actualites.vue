@@ -10,7 +10,7 @@
         @click="openModal('add')"
         class="bg-primary text-white px-5 py-2.5 rounded-lg hover:bg-primary-dark transition-colors flex items-center gap-2 shadow-md"
       >
-        <i class='bx bx-plus-circle text-xl'></i>
+        <i class="bx bx-plus-circle text-xl"></i>
         Nouvelle actualité
       </button>
     </div>
@@ -20,13 +20,15 @@
       <div class="flex flex-col md:flex-row gap-4">
         <!-- Recherche -->
         <div class="flex-1 relative">
-          <i class='bx bx-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400'></i>
+          <i
+            class="bx bx-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+          ></i>
           <input
             v-model="searchQuery"
             type="text"
             placeholder="Rechercher une actualité..."
             class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary focus:border-secondary"
-          >
+          />
         </div>
 
         <!-- Filtre type -->
@@ -101,61 +103,110 @@
         <table class="w-full">
           <thead class="bg-gray-50 border-b">
             <tr>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Image</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Titre</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vues</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                Image
+              </th>
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                Titre
+              </th>
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                Type
+              </th>
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                Statut
+              </th>
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                Date
+              </th>
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                Vues
+              </th>
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                Actions
+              </th>
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-200">
-            <tr v-for="actualite in actualitesPaginees" :key="actualite.id" class="hover:bg-gray-50 transition-colors">
+            <tr
+              v-for="actualite in actualitesPaginees"
+              :key="actualite.id"
+              class="hover:bg-gray-50 transition-colors"
+            >
               <td class="px-6 py-4">
-                <img :src="actualite.image" alt="Image" class="w-12 h-12 rounded-lg object-cover">
+                <img :src="actualite.image" alt="Image" class="w-12 h-12 rounded-lg object-cover" />
               </td>
               <td class="px-6 py-4">
                 <div class="text-sm font-medium text-gray-900">{{ actualite.titre }}</div>
                 <div class="text-xs text-gray-500 mt-1">{{ actualite.resume }}</div>
               </td>
               <td class="px-6 py-4">
-                <span :class="[
-                  'px-2 py-1 text-xs rounded-full',
-                  actualite.type === 'actualites-ambassade' ? 'bg-purple-100 text-purple-600' :
-                  actualite.type === 'actualites-diplomatique' ? 'bg-blue-100 text-blue-600' : 'bg-green-100 text-green-600'
-                ]">
+                <span
+                  :class="[
+                    'px-2 py-1 text-xs rounded-full',
+                    actualite.type === 'actualites-ambassade'
+                      ? 'bg-purple-100 text-purple-600'
+                      : actualite.type === 'actualites-diplomatique'
+                        ? 'bg-blue-100 text-blue-600'
+                        : 'bg-green-100 text-green-600',
+                  ]"
+                >
                   {{ getTypeLabel(actualite.type) }}
                 </span>
-               </td>
+              </td>
               <td class="px-6 py-4">
-                <span :class="[
-                  'px-2 py-1 text-xs rounded-full',
-                  actualite.statut === 'Publié' ? 'bg-green-100 text-green-600' :
-                  actualite.statut === 'Brouillon' ? 'bg-yellow-100 text-yellow-600' : 'bg-gray-100 text-gray-600'
-                ]">
+                <span
+                  :class="[
+                    'px-2 py-1 text-xs rounded-full',
+                    actualite.statut === 'Publié'
+                      ? 'bg-green-100 text-green-600'
+                      : actualite.statut === 'Brouillon'
+                        ? 'bg-yellow-100 text-yellow-600'
+                        : 'bg-gray-100 text-gray-600',
+                  ]"
+                >
                   {{ actualite.statut }}
                 </span>
-               </td>
+              </td>
               <td class="px-6 py-4 text-sm text-gray-500">
                 {{ formatDate(actualite.date) }}
-               </td>
-              <td class="px-6 py-4 text-sm text-gray-500">
-                {{ actualite.vues }} vues
-               </td>
+              </td>
+              <td class="px-6 py-4 text-sm text-gray-500">{{ actualite.vues }} vues</td>
               <td class="px-6 py-4">
                 <div class="flex gap-2">
-                  <button @click="viewActualite(actualite)" class="text-blue-600 hover:text-blue-800">
-                    <i class='bx bx-show text-xl'></i>
+                  <button
+                    @click="viewActualite(actualite)"
+                    class="text-blue-600 hover:text-blue-800"
+                  >
+                    <i class="bx bx-show text-xl"></i>
                   </button>
-                  <button @click="editActualite(actualite)" class="text-secondary hover:text-secondary-dark">
-                    <i class='bx bx-edit-alt text-xl'></i>
+                  <button
+                    @click="editActualite(actualite)"
+                    class="text-secondary hover:text-secondary-dark"
+                  >
+                    <i class="bx bx-edit-alt text-xl"></i>
                   </button>
-                  <button @click="deleteActualite(actualite.id)" class="text-red-600 hover:text-red-800">
-                    <i class='bx bx-trash text-xl'></i>
+                  <button
+                    @click="deleteActualite(actualite.id)"
+                    class="text-red-600 hover:text-red-800"
+                  >
+                    <i class="bx bx-trash text-xl"></i>
                   </button>
                 </div>
-               </td>
+              </td>
               '
             </tr>
           </tbody>
@@ -165,7 +216,9 @@
       <!-- Pagination -->
       <div class="px-6 py-4 border-t flex items-center justify-between">
         <div class="text-sm text-gray-500">
-          Affichage de {{ (pageCourante - 1) * itemsParPage + 1 }} à {{ Math.min(pageCourante * itemsParPage, actualitesFiltrees.length) }} sur {{ actualitesFiltrees.length }} actualités
+          Affichage de {{ (pageCourante - 1) * itemsParPage + 1 }} à
+          {{ Math.min(pageCourante * itemsParPage, actualitesFiltrees.length) }} sur
+          {{ actualitesFiltrees.length }} actualités
         </div>
         <div class="flex gap-2">
           <button
@@ -173,7 +226,7 @@
             :disabled="pageCourante === 1"
             class="px-3 py-1 border rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <i class='bx bx-chevron-left'></i>
+            <i class="bx bx-chevron-left"></i>
           </button>
           <span class="px-3 py-1 bg-primary text-white rounded-lg">{{ pageCourante }}</span>
           <button
@@ -181,7 +234,7 @@
             :disabled="pageCourante === totalPages"
             class="px-3 py-1 border rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <i class='bx bx-chevron-right'></i>
+            <i class="bx bx-chevron-right"></i>
           </button>
         </div>
       </div>
@@ -189,26 +242,31 @@
 
     <!-- ========== MODAL AJOUTER/MODIFIER - CENTRÉE ========== -->
     <Teleport to="body">
-      <div v-if="showModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div
+        v-if="showModal"
+        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+      >
         <div class="bg-white rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto">
           <div class="flex justify-between items-center p-4 border-b">
             <h3 class="text-xl font-bold">{{ modalTitle }}</h3>
             <button @click="closeModal" class="text-gray-400 hover:text-gray-600">
-              <i class='bx bx-x text-2xl'></i>
+              <i class="bx bx-x text-2xl"></i>
             </button>
           </div>
 
           <form @submit.prevent="saveActualite" class="p-4">
             <!-- Titre -->
             <div class="mb-4">
-              <label class="block text-sm font-medium text-gray-700 mb-1">Titre de l'actualité *</label>
+              <label class="block text-sm font-medium text-gray-700 mb-1"
+                >Titre de l'actualité *</label
+              >
               <input
                 v-model="formActualite.titre"
                 type="text"
                 required
                 class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary"
                 placeholder="Entrez le titre de l'actualité"
-              >
+              />
             </div>
 
             <!-- Type d'actualité -->
@@ -252,14 +310,13 @@
             <div class="mb-4">
               <label class="block text-sm font-medium text-gray-700 mb-1">Image principale</label>
               <div class="flex items-center gap-4">
-                <input
-                  type="file"
-                  @change="handleImageUpload"
-                  accept="image/*"
-                  class="flex-1"
-                >
+                <input type="file" @change="handleImageUpload" accept="image/*" class="flex-1" />
                 <div v-if="formActualite.imagePreview" class="w-16 h-16">
-                  <img :src="formActualite.imagePreview" alt="Preview" class="w-full h-full object-cover rounded">
+                  <img
+                    :src="formActualite.imagePreview"
+                    alt="Preview"
+                    class="w-full h-full object-cover rounded"
+                  />
                 </div>
               </div>
             </div>
@@ -278,26 +335,34 @@
                 </select>
               </div>
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Date de publication</label>
+                <label class="block text-sm font-medium text-gray-700 mb-1"
+                  >Date de publication</label
+                >
                 <input
                   v-model="formActualite.date"
                   type="date"
                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary"
-                >
+                />
               </div>
             </div>
 
             <!-- Mots-clés -->
             <div class="mb-4">
-              <label class="block text-sm font-medium text-gray-700 mb-1">Mots-clés (séparés par des virgules)</label>
+              <label class="block text-sm font-medium text-gray-700 mb-1"
+                >Mots-clés (séparés par des virgules)</label
+              >
               <input
                 v-model="formActualite.tags"
                 type="text"
                 class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary"
                 placeholder="ex: diplomatie, coopération, économie"
-              >
+              />
               <div v-if="formActualite.tags" class="flex gap-2 mt-2 flex-wrap">
-                <span v-for="tag in formActualite.tags.split(',')" :key="tag" class="bg-gray-100 text-gray-700 px-2 py-1 rounded-full text-xs">
+                <span
+                  v-for="tag in formActualite.tags.split(',')"
+                  :key="tag"
+                  class="bg-gray-100 text-gray-700 px-2 py-1 rounded-full text-xs"
+                >
                   {{ tag.trim() }}
                 </span>
               </div>
@@ -305,10 +370,17 @@
 
             <!-- Boutons -->
             <div class="flex justify-end gap-3 pt-4 border-t">
-              <button type="button" @click="closeModal" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300">
+              <button
+                type="button"
+                @click="closeModal"
+                class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
+              >
                 Annuler
               </button>
-              <button type="submit" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark">
+              <button
+                type="submit"
+                class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark"
+              >
                 {{ modalButtonText }}
               </button>
             </div>
@@ -319,35 +391,53 @@
 
     <!-- ========== MODAL VOIR ACTUALITÉ - CENTRÉE ========== -->
     <Teleport to="body">
-      <div v-if="showViewModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div
+        v-if="showViewModal"
+        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+      >
         <div class="bg-white rounded-lg w-full max-w-3xl max-h-[90vh] overflow-y-auto">
           <div class="flex justify-between items-center p-4 border-b">
             <h3 class="text-xl font-bold">Aperçu de l'actualité</h3>
             <button @click="closeViewModal" class="text-gray-400 hover:text-gray-600">
-              <i class='bx bx-x text-2xl'></i>
+              <i class="bx bx-x text-2xl"></i>
             </button>
           </div>
 
           <div class="p-4">
-            <img :src="viewActualiteData.image" alt="Image" class="w-full h-64 object-cover rounded-lg mb-4">
+            <img
+              :src="viewActualiteData.image"
+              alt="Image"
+              class="w-full h-64 object-cover rounded-lg mb-4"
+            />
             <h2 class="text-2xl font-bold text-gray-800 mb-2">{{ viewActualiteData.titre }}</h2>
             <div class="flex gap-4 text-sm text-gray-500 mb-4">
               <span>{{ formatDate(viewActualiteData.date) }}</span>
-              <span :class="[
-                'px-2 py-1 text-xs rounded-full',
-                viewActualiteData.type === 'actualites-ambassade' ? 'bg-purple-100 text-purple-600' :
-                viewActualiteData.type === 'actualites-diplomatique' ? 'bg-blue-100 text-blue-600' : 'bg-green-100 text-green-600'
-              ]">
+              <span
+                :class="[
+                  'px-2 py-1 text-xs rounded-full',
+                  viewActualiteData.type === 'actualites-ambassade'
+                    ? 'bg-purple-100 text-purple-600'
+                    : viewActualiteData.type === 'actualites-diplomatique'
+                      ? 'bg-blue-100 text-blue-600'
+                      : 'bg-green-100 text-green-600',
+                ]"
+              >
                 {{ getTypeLabel(viewActualiteData.type) }}
               </span>
               <span>{{ viewActualiteData.vues }} vues</span>
             </div>
-            <p class="text-gray-600 italic bg-gray-50 p-3 rounded-lg mb-4">{{ viewActualiteData.resume }}</p>
+            <p class="text-gray-600 italic bg-gray-50 p-3 rounded-lg mb-4">
+              {{ viewActualiteData.resume }}
+            </p>
             <div class="text-gray-700 whitespace-pre-wrap">{{ viewActualiteData.contenu }}</div>
             <div v-if="viewActualiteData.tags" class="mt-4 pt-4 border-t">
               <span class="font-medium text-sm text-gray-600">Mots-clés :</span>
               <div class="flex gap-2 mt-1 flex-wrap">
-                <span v-for="tag in viewActualiteData.tags.split(',')" :key="tag" class="bg-gray-100 text-gray-700 px-2 py-1 rounded-full text-xs">
+                <span
+                  v-for="tag in viewActualiteData.tags.split(',')"
+                  :key="tag"
+                  class="bg-gray-100 text-gray-700 px-2 py-1 rounded-full text-xs"
+                >
                   {{ tag.trim() }}
                 </span>
               </div>
@@ -355,7 +445,10 @@
           </div>
 
           <div class="flex justify-end p-4 border-t">
-            <button @click="closeViewModal" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300">
+            <button
+              @click="closeViewModal"
+              class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
+            >
               Fermer
             </button>
           </div>
@@ -405,36 +498,41 @@ const formActualite = ref({
   tags: '',
   image: '',
   imagePreview: '',
-  imageFile: null
+  imageFile: null,
 })
 
 // Vue actualité
 const viewActualiteData = ref({})
 
 // Computed
-const modalTitle = computed(() => modalMode.value === 'add' ? 'Ajouter une actualité' : 'Modifier l\'actualité')
-const modalButtonText = computed(() => modalMode.value === 'add' ? 'Publier l\'actualité' : 'Enregistrer les modifications')
+const modalTitle = computed(() =>
+  modalMode.value === 'add' ? 'Ajouter une actualité' : "Modifier l'actualité",
+)
+const modalButtonText = computed(() =>
+  modalMode.value === 'add' ? "Publier l'actualité" : 'Enregistrer les modifications',
+)
 
 // Filtres et tris
 const actualitesFiltrees = computed(() => {
   let result = [...actualites.value]
 
   if (searchQuery.value) {
-    result = result.filter(a =>
-      a.titre.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-      a.resume.toLowerCase().includes(searchQuery.value.toLowerCase())
+    result = result.filter(
+      (a) =>
+        a.titre.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+        a.resume.toLowerCase().includes(searchQuery.value.toLowerCase()),
     )
   }
 
   if (filtreType.value) {
-    result = result.filter(a => a.type === filtreType.value)
+    result = result.filter((a) => a.type === filtreType.value)
   }
 
   if (filtreStatut.value) {
-    result = result.filter(a => a.statut === filtreStatut.value)
+    result = result.filter((a) => a.statut === filtreStatut.value)
   }
 
-  switch(tri.value) {
+  switch (tri.value) {
     case 'recent':
       result.sort((a, b) => new Date(b.date) - new Date(a.date))
       break
@@ -458,8 +556,10 @@ const actualitesPaginees = computed(() => {
   return actualitesFiltrees.value.slice(start, end)
 })
 
-const actualitesPubliees = computed(() => actualites.value.filter(a => a.statut === 'Publié'))
-const actualitesBrouillons = computed(() => actualites.value.filter(a => a.statut === 'Brouillon'))
+const actualitesPubliees = computed(() => actualites.value.filter((a) => a.statut === 'Publié'))
+const actualitesBrouillons = computed(() =>
+  actualites.value.filter((a) => a.statut === 'Brouillon'),
+)
 const totalVues = computed(() => actualites.value.reduce((sum, a) => sum + a.vues, 0))
 const totalPages = computed(() => Math.ceil(actualitesFiltrees.value.length / itemsParPage))
 
@@ -468,7 +568,7 @@ const getTypeLabel = (type) => {
   const labels = {
     'actualites-ambassade': 'Ambassade',
     'actualites-diplomatique': 'Diplomatique',
-    'actualites-gouvernementale': 'Gouvernementale'
+    'actualites-gouvernementale': 'Gouvernementale',
   }
   return labels[type] || type
 }
@@ -477,7 +577,7 @@ const formatDate = (date) => {
   return new Date(date).toLocaleDateString('fr-FR', {
     day: 'numeric',
     month: 'long',
-    year: 'numeric'
+    year: 'numeric',
   })
 }
 
@@ -508,7 +608,7 @@ const openModal = (mode, actualite = null) => {
       tags: '',
       image: '',
       imagePreview: '',
-      imageFile: null
+      imageFile: null,
     }
     editId.value = null
   } else if (mode === 'edit' && actualite) {
@@ -522,7 +622,7 @@ const openModal = (mode, actualite = null) => {
       tags: actualite.tags || '',
       image: actualite.image,
       imagePreview: actualite.image,
-      imageFile: null
+      imageFile: null,
     }
     editId.value = actualite.id
   }
@@ -553,7 +653,7 @@ const saveActualite = async () => {
     closeModal()
     await chargerActualites()
   } catch (souleve) {
-    erreurApi.value = "Enregistrement impossible. Vérifiez les champs et réessayez."
+    erreurApi.value = 'Enregistrement impossible. Vérifiez les champs et réessayez.'
     console.error("Échec de l'enregistrement de l'actualité :", souleve)
   }
 }

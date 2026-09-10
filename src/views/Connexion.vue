@@ -59,7 +59,9 @@
               />
               <button
                 type="button"
-                :aria-label="motDePasseVisible ? 'Masquer le mot de passe' : 'Afficher le mot de passe'"
+                :aria-label="
+                  motDePasseVisible ? 'Masquer le mot de passe' : 'Afficher le mot de passe'
+                "
                 class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 hover:text-primary"
                 @click="motDePasseVisible = !motDePasseVisible"
               >

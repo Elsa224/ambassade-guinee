@@ -1,5 +1,12 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
-import { ApiError, apiGet, apiPost, apiDelete, setAuthToken, setUnauthorizedHandler } from '../client'
+import {
+  ApiError,
+  apiGet,
+  apiPost,
+  apiDelete,
+  setAuthToken,
+  setUnauthorizedHandler,
+} from '../client'
 
 function reponse(corps: unknown, statut = 200) {
   return new Response(corps === null ? null : JSON.stringify(corps), {

@@ -29,7 +29,7 @@
               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-info-dark focus:border-transparent"
               placeholder="0"
               v-model="duration"
-            >
+            />
           </div>
 
           <!-- Commentaire -->

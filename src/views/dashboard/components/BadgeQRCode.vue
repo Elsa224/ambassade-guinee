@@ -107,18 +107,18 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref } from 'vue'
 
 // Logo et QR par défaut
-const logo = ref("/logo.png"); // Mets ton vrai logo ici
-const qrCodeUrl = ref("https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=ExempleQR");
+const logo = ref('/logo.png') // Mets ton vrai logo ici
+const qrCodeUrl = ref('https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=ExempleQR')
 
 // Exemple de données du badge (à remplacer dynamiquement plus tard)
 const request = ref({
-  id: "SCB-001",
-  reason: "Forum Sécurité Digitale",
-  host: "SCB Group",
-  email: "contact@scbgroup.com",
-  contact: "+225 07 07 07 07",
-});
+  id: 'SCB-001',
+  reason: 'Forum Sécurité Digitale',
+  host: 'SCB Group',
+  email: 'contact@scbgroup.com',
+  contact: '+225 07 07 07 07',
+})
 </script>

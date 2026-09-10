@@ -49,11 +49,7 @@ async function requete<T>(chemin: string, options: RequestInit, avecCorps: boole
     reponse = await fetch(chemin, { ...options, headers: entetes(avecCorps) })
   } catch (erreur) {
     // Panne reseau, DNS ou serveur injoignable : fetch rejette sans reponse.
-    throw new ApiError(
-      erreur instanceof Error ? erreur.message : 'Serveur injoignable',
-      0,
-      null,
-    )
+    throw new ApiError(erreur instanceof Error ? erreur.message : 'Serveur injoignable', 0, null)
   }
 
   // 204 No Content, ou reponse vide : rien a deserialiser.
