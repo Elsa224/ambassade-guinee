@@ -357,15 +357,19 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 
-// ==================== IMPORT DES IMAGES ====================
-import rencontreWashingtonImage from '@/assets/images/hero4.jpg'
-import accordCostaRicaImage from '@/assets/images/hero6.jpg'
-import feteNationaleImage from '@/assets/images/hero2.jpg'
-import loiInvestissementImage from '@/assets/images/hero5.jpg'
-import visitePresidentImage from '@/assets/images/hero4.jpg'
+import {
+  listerArticles,
+  creerArticle,
+  modifierArticle,
+  supprimerArticle,
+  libelleStatut,
+  statutDepuisLibelle,
+} from '@/api/articles'
 
 // Données des actualités
 const actualites = ref([])
+const chargement = ref(false)
+const erreurApi = ref(null)
 const searchQuery = ref('')
 const filtreType = ref('')
 const filtreStatut = ref('')
@@ -519,29 +523,28 @@ const closeModal = () => {
 }
 
 const saveActualite = async () => {
-  const newActualite = {
-    id: modalMode.value === 'add' ? Date.now() : editId.value,
+  const brouillon = {
     titre: formActualite.value.titre,
-    type: formActualite.value.type,
     resume: formActualite.value.resume,
     contenu: formActualite.value.contenu,
-    statut: formActualite.value.statut,
-    date: formActualite.value.date,
-    tags: formActualite.value.tags,
-    image: formActualite.value.imagePreview || 'https://via.placeholder.com/100',
-    vues: modalMode.value === 'add' ? 0 : actualites.value.find(a => a.id === editId.value)?.vues || 0
+    categorie_slug: formActualite.value.type,
+    statut: statutDepuisLibelle(formActualite.value.statut),
+    date_publication: formActualite.value.date,
+    image: formActualite.value.imagePreview || undefined,
   }
 
-  if (modalMode.value === 'add') {
-    actualites.value.unshift(newActualite)
-  } else {
-    const index = actualites.value.findIndex(a => a.id === editId.value)
-    if (index !== -1) {
-      actualites.value[index] = newActualite
+  try {
+    if (modalMode.value === 'add') {
+      await creerArticle(brouillon)
+    } else {
+      await modifierArticle(editId.value, brouillon)
     }
+    closeModal()
+    await chargerActualites()
+  } catch (souleve) {
+    erreurApi.value = "Enregistrement impossible. Verifiez les champs et reessayez."
+    console.error("Echec de l enregistrement de l actualite :", souleve)
   }
-
-  closeModal()
 }
 
 const viewActualite = (actualite) => {
@@ -558,81 +561,39 @@ const editActualite = (actualite) => {
   openModal('edit', actualite)
 }
 
-const deleteActualite = (id) => {
-  if (confirm('Êtes-vous sûr de vouloir supprimer cette actualité ?')) {
-    actualites.value = actualites.value.filter(a => a.id !== id)
+const deleteActualite = async (id) => {
+  if (!confirm('Etes-vous sur de vouloir supprimer cette actualite ?')) return
+
+  try {
+    await supprimerArticle(id)
+    await chargerActualites()
+  } catch (souleve) {
+    erreurApi.value = 'Suppression impossible.'
+    console.error("Echec de la suppression de l actualite :", souleve)
   }
 }
 
-// Charger les données avec les images importées
-const loadActualites = () => {
-  actualites.value = [
-    {
-      id: 1,
-      titre: 'Rencontre diplomatique à Washington',
-      type: 'actualites-diplomatique',
-      resume: 'L\'Ambassadeur a rencontré les autorités américaines pour renforcer les relations bilatérales...',
-      contenu: 'L\'Ambassadeur de Guinée aux États-Unis a rencontré aujourd\'hui les autorités américaines pour discuter des relations bilatérales. Les deux parties ont exprimé leur volonté de renforcer la coopération dans les domaines de l\'économie, de l\'éducation et de la sécurité.',
-      statut: 'Publié',
-      date: '2024-01-15',
-      tags: 'diplomatie,USA,coopération',
-      image: rencontreWashingtonImage,
-      vues: 245
-    },
-    {
-      id: 2,
-      titre: 'Signature d\'un accord avec le Costa Rica',
-      type: 'actualites-diplomatique',
-      resume: 'Un accord de coopération économique a été signé entre la Guinée et le Costa Rica...',
-      contenu: 'La Guinée et le Costa Rica ont signé aujourd\'hui un accord de coopération économique visant à renforcer les échanges commerciaux et les investissements entre les deux pays.',
-      statut: 'Publié',
-      date: '2024-01-14',
-      tags: 'Costa Rica,économie,accord',
-      image: accordCostaRicaImage,
-      vues: 189
-    },
-    {
-      id: 3,
-      titre: 'Célébration de la fête nationale à l\'ambassade',
-      type: 'actualites-ambassade',
-      resume: 'L\'ambassade a organisé une cérémonie pour célébrer la fête nationale de la Guinée...',
-      contenu: 'L\'ambassade de Guinée a organisé une cérémonie officielle pour célébrer la fête nationale. De nombreux invités étaient présents, dont des représentants du gouvernement américain et du corps diplomatique.',
-      statut: 'Publié',
-      date: '2024-01-12',
-      tags: 'fête nationale,célébration,ambassade',
-      image: feteNationaleImage,
-      vues: 356
-    },
-    {
-      id: 4,
-      titre: 'Nouvelle loi sur l\'investissement en Guinée',
-      type: 'actualites-gouvernementale',
-      resume: 'Le gouvernement guinéen annonce une nouvelle loi pour attirer les investisseurs...',
-      contenu: 'Le gouvernement de la République de Guinée a adopté une nouvelle loi sur l\'investissement visant à créer un environnement favorable aux investisseurs nationaux et internationaux.',
-      statut: 'Brouillon',
-      date: '2024-01-10',
-      tags: 'investissement,loi,économie',
-      image: loiInvestissementImage,
-      vues: 78
-    },
-    {
-      id: 5,
-      titre: 'Le Président guinéen en visite aux États-Unis',
-      type: 'actualites-gouvernementale',
-      resume: 'Le Président de la République effectue une visite officielle aux États-Unis...',
-      contenu: 'Le Président de la République de Guinée est arrivé à Washington pour une visite officielle de trois jours. Il rencontrera le Président américain et des responsables du gouvernement.',
-      statut: 'Programmé',
-      date: '2024-01-20',
-      tags: 'président,visite,USA',
-      image: visitePresidentImage,
-      vues: 0
-    }
-  ]
+const versVue = (article) => ({
+  ...article,
+  type: article.categorie?.slug ?? '',
+  statut: libelleStatut(article.statut),
+  date: article.date_publication,
+})
+
+const chargerActualites = async () => {
+  chargement.value = true
+  erreurApi.value = null
+  try {
+    actualites.value = (await listerArticles()).map(versVue)
+  } catch (souleve) {
+    erreurApi.value = 'Impossible de charger les actualites.'
+    console.error('Echec du chargement des actualites :', souleve)
+  } finally {
+    chargement.value = false
+  }
 }
 
-onMounted(() => {
-  loadActualites()
-})
+onMounted(chargerActualites)
 </script>
 
 <style scoped>
