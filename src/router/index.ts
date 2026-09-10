@@ -36,6 +36,7 @@ import DemarcheLigne from '@/components/services/DemarcheLigne.vue'
 
 import BientotDisponible from '@/components/BientotDisponible.vue'
 import InscriptionEvenement from '@/views/evenements/InscriptionEvenement.vue'
+import Evenements from '@/views/evenements/Evenements.vue'
 
 // ===================== DASHBOARD =====================
 // Pages principales (conteneurs avec <router-view>)
@@ -106,6 +107,14 @@ const router = createRouter({
         { path: '', name: 'home', component: Home },
         { path: 'actualite', name: 'actualite', component: Actualite },
         { path: 'actualites/:slug', name: 'actualite-detail', component: ActualiteDetail },
+        { path: 'evenements', name: 'evenements', component: Evenements },
+        // La carte d'un evenement porte deja son formulaire d'inscription :
+        // plutot que deux URL au contenu identique, celle-ci renvoie vers
+        // celle que le QR imprime, qui fait autorite.
+        {
+          path: 'evenements/:token',
+          redirect: (destination) => `/evenements/inscription/${destination.params.token}`,
+        },
         // Chemin impose par le QR d'inscription genere par le CMS
         // (SECURECHECK_REGISTRATION_PATH) : il doit correspondre exactement.
         {

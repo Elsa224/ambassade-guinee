@@ -29,6 +29,32 @@ export function rubriqueDuChemin(chemin: string): string | null {
 }
 
 /**
+ * Pages que le site n'offre que si l'ambassade a provisionne le module dont
+ * elles dependent.
+ *
+ * Le defaut est ici l'inverse de celui des rubriques de contenu : un module
+ * qui n'existe pas encore ne doit pas s'annoncer, alors qu'une page
+ * editoriale absente de la configuration reste consultable sur le site dont
+ * le gabarit porte le contenu.
+ *
+ * La page d'inscription `/evenements/inscription/{token}` n'y figure
+ * volontairement pas. Elle n'est pas offerte par le site : on l'atteint par
+ * un QR code imprime, remis en main propre, et qui peut circuler alors que le
+ * module vient d'etre active ou desactive. Le back fait autorite sur ce
+ * jeton-la — il rend 404 quand le module est inactif — et la page presente ce
+ * cas avec un message qui parle du lien, la ou « Rubrique en preparation »
+ * laisserait le porteur du QR sans explication.
+ */
+export const MODULE_PAR_CHEMIN: Readonly<Record<string, string>> = {
+  '/evenements': 'secure_events',
+}
+
+/** Module dont depend un chemin, ou `null` s'il n'en depend d'aucun. */
+export function moduleDuChemin(chemin: string): string | null {
+  return MODULE_PAR_CHEMIN[chemin] ?? null
+}
+
+/**
  * Ambassade dont le gabarit porte encore le contenu en dur.
  *
  * Tant que les pages editoriales ne sont pas servies par l'API, leur texte,
@@ -68,4 +94,16 @@ export function rubriqueOuverte(nom: string | null, tenant: TenantConsulte | nul
   // Sans configuration chargee du tout, on est sur le site d'origine tant
   // qu'aucun autre tenant ne s'est annonce.
   return (tenant?.slug ?? CONTENU_INTEGRE_DE) === CONTENU_INTEGRE_DE
+}
+
+/**
+ * Decide si un chemin du site public est accessible, en appliquant a chaque
+ * cas son defaut : ferme pour un module a provisionner, ouvert pour une
+ * rubrique de contenu de l'ambassade d'origine.
+ */
+export function cheminOuvert(chemin: string, tenant: TenantConsulte | null): boolean {
+  const module = moduleDuChemin(chemin)
+  if (module !== null) return tenant?.modules?.[module] === true
+
+  return rubriqueOuverte(rubriqueDuChemin(chemin), tenant)
 }
