@@ -35,6 +35,7 @@ import RendezVous from '@/components/services/RendezVous.vue'
 import DemarcheLigne from '@/components/services/DemarcheLigne.vue'
 
 import BientotDisponible from '@/components/BientotDisponible.vue'
+import InscriptionEvenement from '@/views/evenements/InscriptionEvenement.vue'
 
 // ===================== DASHBOARD =====================
 // Pages principales (conteneurs avec <router-view>)
@@ -105,6 +106,13 @@ const router = createRouter({
         { path: '', name: 'home', component: Home },
         { path: 'actualite', name: 'actualite', component: Actualite },
         { path: 'actualites/:slug', name: 'actualite-detail', component: ActualiteDetail },
+        // Chemin impose par le QR d'inscription genere par le CMS
+        // (SECURECHECK_REGISTRATION_PATH) : il doit correspondre exactement.
+        {
+          path: 'evenements/inscription/:token',
+          name: 'inscription-evenement',
+          component: InscriptionEvenement,
+        },
         // Les trois rubriques partagent le meme composant : seules la categorie
         // filtree et le sous-titre changent. Le slug passe ici doit exister
         // dans la taxonomie du CMS, c'est lui qui filtre la requete.

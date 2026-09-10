@@ -1,0 +1,46 @@
+{
+  "data": [
+    {
+      "publicToken": "AbC123ouvert",
+      "name": "Journée portes ouvertes de la chancellerie",
+      "date": "2036-12-01",
+      "time": "18:00",
+      "location": "Chancellerie, Conakry",
+      "typeLabel": "Culturel",
+      "description": "Visite guidée des locaux, présentation des services consulaires et échange avec l'équipe de l'ambassade.",
+      "registrationOpen": true,
+      "registrationDeadline": "2036-11-25",
+      "spotsRemaining": 42,
+      "isRegistrationClosed": false,
+      "logoUrl": null
+    },
+    {
+      "publicToken": "DeF456complet",
+      "name": "Réception de la fête nationale",
+      "date": "2036-08-17",
+      "time": "19:30",
+      "location": "Résidence de l'Ambassadeur",
+      "typeLabel": "Officiel",
+      "description": "Réception annuelle donnée à l'occasion de la fête nationale.",
+      "registrationOpen": false,
+      "registrationDeadline": "2036-08-10",
+      "spotsRemaining": 0,
+      "isRegistrationClosed": true,
+      "logoUrl": null
+    },
+    {
+      "publicToken": "GhI789illimite",
+      "name": "Conférence économique",
+      "date": "2036-10-14",
+      "time": "09:00",
+      "location": "Hôtel Kaloum",
+      "typeLabel": "Économique",
+      "description": "Présentation des opportunités d'investissement.",
+      "registrationOpen": true,
+      "registrationDeadline": null,
+      "spotsRemaining": null,
+      "isRegistrationClosed": false,
+      "logoUrl": null
+    }
+  ]
+}

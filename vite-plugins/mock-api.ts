@@ -31,6 +31,16 @@ interface Categorie {
 export function mockApi(): Plugin {
   // Etat en memoire : remis a zero a chaque redemarrage du serveur de dev.
   let articles = (fixture('articles') as { data: unknown[] }).data as Record<string, unknown>[]
+
+  interface EvenementSimule {
+    publicToken: string
+    isRegistrationClosed: boolean
+    [cle: string]: unknown
+  }
+
+  /** Rechargee a chaque appel pour que l'edition de la fixture soit visible sans redemarrage. */
+  const evenementsPublics = (): EvenementSimule[] =>
+    (fixture('evenements') as { data: EvenementSimule[] }).data
   let prochainId = 100
   let prochainIdCategorie = 100
 
@@ -128,6 +138,38 @@ export function mockApi(): Plugin {
 
     if (chemin === '/auth/logout' && methode === 'POST') {
       return repondre(204, null)
+    }
+
+    // --- Module Evenements, surface visiteur ---------------------------
+    // Le back rend 404 aussi bien pour un module inactif que pour un
+    // evenement non publie : le simulateur ne distingue pas davantage.
+
+    if (chemin === '/secure/events' && methode === 'GET') {
+      return repondre(200, { data: evenementsPublics() })
+    }
+
+    const carteEvenement = chemin.match(/^\/secure\/events\/([^/]+)$/)
+    if (carteEvenement && methode === 'GET') {
+      const evenement = evenementsPublics().find((e) => e.publicToken === carteEvenement[1])
+      if (!evenement) return repondre(404, { message: "Cet evenement n'est pas disponible." })
+      return repondre(200, { data: evenement })
+    }
+
+    const inscription = chemin.match(/^\/secure\/events\/([^/]+)\/register$/)
+    if (inscription && methode === 'POST') {
+      const evenement = evenementsPublics().find((e) => e.publicToken === inscription[1])
+      if (!evenement) return repondre(404, { message: "Cet evenement n'est pas disponible." })
+      if (evenement.isRegistrationClosed) {
+        return repondre(409, { message: 'Les inscriptions sont closes pour cet evenement.' })
+      }
+      return void lireCorps().then((corps) => {
+        const nom = typeof corps?.fullName === 'string' ? corps.fullName.trim() : ''
+        const courriel = typeof corps?.email === 'string' ? corps.email.trim() : ''
+        if (nom === '' || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(courriel)) {
+          return repondre(422, { message: 'Certaines informations sont incorrectes.' })
+        }
+        return repondre(201, { data: { registered: true } })
+      })
     }
 
     if (chemin === '/articles' && methode === 'GET') {
