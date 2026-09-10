@@ -372,7 +372,7 @@
 </template>
 
 <script setup>
-import calendrierImage from '@/assets/images/calendrierjoursferiesguinee.jpeg' // Import de l'image du calendrier
+import calendrierImage from '@/assets/images/calendrierjoursferiesguinee.webp' // Import de l'image du calendrier
 </script>
 
 <style scoped>

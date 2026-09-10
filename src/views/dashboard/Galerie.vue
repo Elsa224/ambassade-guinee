@@ -401,19 +401,19 @@ import { ref, computed, onMounted } from 'vue'
 
 // ==================== IMPORT DES IMAGES ====================
 // Photos principales
-import rencontreOfficielleImage from '@/assets/images/activites.jpeg'
-import signatureAccordImage from '@/assets/images/actualite1.jpg'
-import feteNationalePhoto from '@/assets/images/actualite2.jpg'
-import conferencePresseImage from '@/assets/images/actualite3.jpg'
-import remiseLettresImage from '@/assets/images/actualite4.jpg'
-import galaDiplomatiqueImage from '@/assets/images/ambassadeur.jpeg'
-import seminaireEconomiqueImage from '@/assets/images/Cascade.jpg'
-import visiteCulturelleImage from '@/assets/images/partenaire.jpg'
+import rencontreOfficielleImage from '@/assets/images/activites.webp'
+import signatureAccordImage from '@/assets/images/actualite1.webp'
+import feteNationalePhoto from '@/assets/images/actualite2.webp'
+import conferencePresseImage from '@/assets/images/actualite3.webp'
+import remiseLettresImage from '@/assets/images/actualite4.webp'
+import galaDiplomatiqueImage from '@/assets/images/ambassadeur.webp'
+import seminaireEconomiqueImage from '@/assets/images/Cascade.webp'
+import visiteCulturelleImage from '@/assets/images/partenaire.webp'
 
 // Images de couverture des albums
-import visitesOfficiellesCover from '@/assets/images/president.jpeg'
-import ceremoniesCover from '@/assets/images/hero5.jpg'
-import conferencesCover from '@/assets/images/hero6.jpg'
+import visitesOfficiellesCover from '@/assets/images/president.webp'
+import ceremoniesCover from '@/assets/images/hero5.webp'
+import conferencesCover from '@/assets/images/hero6.webp'
 
 // Données
 const photos = ref([])

@@ -245,7 +245,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
-import logo1 from '@/assets/images/logo.png'
+import logo1 from '@/assets/images/logo.webp'
 
 const router = useRouter()
 const auth = useAuthStore()

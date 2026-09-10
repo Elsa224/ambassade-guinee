@@ -454,26 +454,26 @@
 
 <script setup>
 // Import des 4 photos de fond pour le hero
-import heroPhoto1 from '@/assets/images/hero3.jpg' // Logo avec bouclier
-import heroPhoto2 from '@/assets/images/hero4.jpg' // Gare
-import heroPhoto3 from '@/assets/images/hero5.jpg' // Paysage orange
-import heroPhoto4 from '@/assets/images/hero6.jpg' // Cascade
-import bgHero from "@/assets/images/bghero.jpeg"
+import heroPhoto1 from '@/assets/images/hero3.webp' // Logo avec bouclier
+import heroPhoto2 from '@/assets/images/hero4.webp' // Gare
+import heroPhoto3 from '@/assets/images/hero5.webp' // Paysage orange
+import heroPhoto4 from '@/assets/images/hero6.webp' // Cascade
+import bgHero from "@/assets/images/bghero.webp"
 
 // Import du logo de l'ambassade
-import logoAmbassade from '@/assets/images/logo.png'
+import logoAmbassade from '@/assets/images/logo.webp'
 
 // Import des photos du président et de l'ambassadeur
-import presidentImage from '@/assets/images/president.jpeg'
-import ambassadeurImage from '@/assets/images/ambassadeur.jpeg'
+import presidentImage from '@/assets/images/president.webp'
+import ambassadeurImage from '@/assets/images/ambassadeur.webp'
 // Import de la photo du Ministre
-import ministreImage from '@/assets/images/ministre.jpeg'
+import ministreImage from '@/assets/images/ministre.webp'
 
 // Import des images pour les actualités (4 cards)
-import actualite1 from '@/assets/images/actualite1.jpg'
-import actualite2 from '@/assets/images/actualite2.jpg'
-import actualite3 from '@/assets/images/actualite3.jpg'
-import actualite4 from '@/assets/images/actualite4.jpg'
+import actualite1 from '@/assets/images/actualite1.webp'
+import actualite2 from '@/assets/images/actualite2.webp'
+import actualite3 from '@/assets/images/actualite3.webp'
+import actualite4 from '@/assets/images/actualite4.webp'
 </script>
 
 <style scoped>

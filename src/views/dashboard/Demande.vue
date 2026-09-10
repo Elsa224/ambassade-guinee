@@ -199,7 +199,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from "vue";
-import logo from "@/assets/images/logo.png";
+import logo from "@/assets/images/logo.webp";
 
 // Types
 const statusValues = ["Pending", "Approved", "Rejected"] as const;
