@@ -89,11 +89,11 @@ describe('service Articles', () => {
   })
 
   it('traduit les statuts entre l API et l interface', () => {
-    expect(libelleStatut('publie')).toBe('Publie')
-    expect(libelleStatut('a_valider')).toBe('A valider')
+    expect(libelleStatut('publie')).toBe('Publié')
+    expect(libelleStatut('a_valider')).toBe('À valider')
     expect(libelleStatut('brouillon')).toBe('Brouillon')
-    expect(statutDepuisLibelle('Publie')).toBe('publie')
-    expect(statutDepuisLibelle('A valider')).toBe('a_valider')
+    expect(statutDepuisLibelle('Publié')).toBe('publie')
+    expect(statutDepuisLibelle('À valider')).toBe('a_valider')
     expect(statutDepuisLibelle('Brouillon')).toBe('brouillon')
     expect(statutDepuisLibelle('valeur inattendue')).toBe('brouillon')
   })

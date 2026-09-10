@@ -19,10 +19,42 @@ function fixture(nom: string): unknown {
   return JSON.parse(readFileSync(chemin, 'utf8'))
 }
 
+interface Categorie {
+  id: number
+  nom: string
+  slug: string
+  couleur: string
+}
+
 export function mockApi(): Plugin {
   // Etat en memoire : remis a zero a chaque redemarrage du serveur de dev.
   let articles = (fixture('articles') as { data: unknown[] }).data as Record<string, unknown>[]
   let prochainId = 100
+  let prochainIdCategorie = 100
+
+  // Taxonomie connue : reprise des categories deja presentes dans la fixture,
+  // pour que le simulateur reponde avec la meme forme que l'API reelle
+  // (objet categorie imbrique) plutot qu'avec le seul categorie_slug envoye.
+  const categories = new Map<string, Categorie>(
+    articles
+      .map((a) => a.categorie as Categorie | undefined)
+      .filter((c): c is Categorie => c != null)
+      .map((c) => [c.slug, c]),
+  )
+
+  /** Retrouve la categorie d un slug connu, ou en fabrique une coherente. */
+  function categorieDepuisSlug(slug: string): Categorie {
+    const existante = categories.get(slug)
+    if (existante) return existante
+    const creee: Categorie = {
+      id: prochainIdCategorie++,
+      nom: slug.charAt(0).toUpperCase() + slug.slice(1).replace(/-/g, ' '),
+      slug,
+      couleur: '#64748b',
+    }
+    categories.set(slug, creee)
+    return creee
+  }
 
   return {
     name: 'mock-api',
@@ -99,7 +131,16 @@ export function mockApi(): Plugin {
         if (chemin === '/articles' && methode === 'POST') {
           return void lireCorps().then((corps) => {
             if (corps === null) return repondre(422, { message: 'Corps de requete illisible.' })
-            const article = { ...corps, id: prochainId++, vues: 0, likes: 0, temps_lecture: 1 }
+            const { categorie_slug: categorieSlug, ...reste } = corps
+            const article = {
+              ...reste,
+              categorie:
+                typeof categorieSlug === 'string' ? categorieDepuisSlug(categorieSlug) : undefined,
+              id: prochainId++,
+              vues: 0,
+              likes: 0,
+              temps_lecture: 1,
+            }
             articles = [article, ...articles]
             return repondre(201, { data: article })
           })
@@ -119,7 +160,17 @@ export function mockApi(): Plugin {
               if (corps === null) return repondre(422, { message: 'Corps de requete illisible.' })
               const index = articles.findIndex((a) => a.id === id)
               if (index === -1) return repondre(404, { message: 'Introuvable.' })
-              articles[index] = { ...articles[index], ...corps, id }
+              const { categorie_slug: categorieSlug, ...reste } = corps
+              const existant = articles[index]!
+              articles[index] = {
+                ...existant,
+                ...reste,
+                categorie:
+                  typeof categorieSlug === 'string'
+                    ? categorieDepuisSlug(categorieSlug)
+                    : existant.categorie,
+                id,
+              }
               return repondre(200, { data: articles[index] })
             })
           }

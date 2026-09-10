@@ -46,8 +46,8 @@ interface Enveloppe<T> {
 
 const LIBELLES: Record<StatutArticle, string> = {
   brouillon: 'Brouillon',
-  a_valider: 'A valider',
-  publie: 'Publie',
+  a_valider: 'À valider',
+  publie: 'Publié',
 }
 
 /** Libelle affichable d un statut. */
