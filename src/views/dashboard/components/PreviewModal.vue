@@ -24,11 +24,9 @@
           <div
             class="bg-gradient-to-r from-orange-400 to-orange-600 text-white p-8 rounded-2xl text-center w-full max-w-md"
           >
-            <img
-              src="https://upload.wikimedia.org/wikipedia/commons/5/5b/Orange_logo.svg"
-              alt="Orange"
-              class="h-12 mx-auto mb-4"
-            />
+            <!-- Voir Document.vue : logo remplace par du texte pour ne pas
+                 dependre d'une image hebergee chez un tiers. -->
+            <span class="block font-bold text-2xl tracking-wide mb-4">Orange</span>
             <div class="text-2xl font-bold uppercase tracking-wide">PAIEMENT DE SALAIRE</div>
           </div>
         </div>

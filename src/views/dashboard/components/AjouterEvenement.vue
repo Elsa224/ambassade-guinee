@@ -242,6 +242,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import avatarDefaut from '@/assets/avatar-defaut.svg'
 
 const emit = defineEmits(['add-event'])
 
@@ -270,7 +271,8 @@ const eventForBadge = ref({
 
 const qrCodeUrl = ref('')
 const showQrCard = ref(false)
-const logo = ref('https://via.placeholder.com/80') // logo temporaire pour test
+// Logo par defaut du badge, tant que l'evenement n'en porte pas.
+const logo = ref(avatarDefaut)
 
 function ajouterEvenement() {
   if (

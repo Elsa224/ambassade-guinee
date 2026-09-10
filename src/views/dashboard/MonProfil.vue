@@ -6,11 +6,7 @@
     <div class="max-w-3xl mx-auto p-6">
       <!-- Avatar et nom -->
       <div class="flex items-center gap-6 mb-6">
-        <img
-          src="https://i.pravatar.cc/100"
-          alt="Avatar"
-          class="w-24 h-24 rounded-full border-2 border-ink"
-        />
+        <img :src="avatarDefaut" alt="Avatar" class="w-24 h-24 rounded-full border-2 border-ink" />
         <div>
           <h2 class="text-2xl font-semibold text-gray-700">John Doe</h2>
           <p class="text-gray-500">Utilisateur du dashboard</p>
@@ -73,6 +69,7 @@
 </template>
 
 <script setup>
+import avatarDefaut from '@/assets/avatar-defaut.svg'
 import { reactive } from 'vue'
 
 const user = reactive({

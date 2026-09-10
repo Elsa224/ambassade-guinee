@@ -76,7 +76,12 @@
             :to="`/actualites/${actu.slug}`"
             class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow block"
           >
-            <img :src="actu.image" :alt="actu.titre" class="w-full h-48 object-cover" />
+            <img
+              :src="actu.image"
+              :alt="actu.titre"
+              class="w-full h-48 object-cover"
+              loading="lazy"
+            />
 
             <div class="p-4">
               <p class="text-xs text-gray-500 mb-2">{{ formaterDate(actu.date_publication) }}</p>

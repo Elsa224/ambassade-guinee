@@ -6,10 +6,11 @@ import tailwindcss from '@tailwindcss/vite'
 import vueJsx from '@vitejs/plugin-vue-jsx'
 import vueDevTools from 'vite-plugin-vue-devtools'
 import { mockApi } from './vite-plugins/mock-api'
+import { policeIcones } from './vite-plugins/police-icones'
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [vue(), tailwindcss(), vueJsx(), vueDevTools(), mockApi()],
+  plugins: [vue(), tailwindcss(), vueJsx(), vueDevTools(), mockApi(), policeIcones()],
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),

@@ -374,11 +374,13 @@
             <div class="sm:col-span-2 lg:col-span-1">
               <div class="flex gap-4 mb-4">
                 <img
+                  loading="lazy"
                   :src="logo1"
                   alt="Logo Guinée"
                   class="h-14 w-auto bg-white/10 p-2 rounded-lg backdrop-blur-sm"
                 />
                 <img
+                  loading="lazy"
                   :src="logoSimandou"
                   alt="Simandou"
                   class="h-14 w-auto bg-white/10 p-2 rounded-lg backdrop-blur-sm"
