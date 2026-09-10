@@ -29,9 +29,14 @@ import articlesGabon from '@/api/fixtures/articles-gabon.json'
  * test sur du contenu parfaitement correct. Ce qui ne doit jamais apparaitre,
  * c'est le nom, l'adresse, le courriel ou les responsables de l'autre
  * ambassade.
+ *
+ * Le pays d'accueil de l'ambassade d'origine compte tout autant : « demande
+ * de visa pour les Etats-Unis » est arrive en production sur le domaine
+ * gabonais, ou l'ambassade est installee a Conakry. Ce n'est pas le nom de
+ * l'autre ambassade, mais c'est bien son identite qui transparait.
  */
 const IDENTITE_ETRANGERE =
-  /Ambassade de la R[ée]publique de Guin[ée]|ambaguinee|leroy place|doumbouya|kouyat[ée]|n'da[ïi]ry/i
+  /Ambassade de la R[ée]publique de Guin[ée]|ambaguinee|leroy place|doumbouya|kouyat[ée]|n'da[ïi]ry|[ÉE]tats-Unis|\bUSA\b|Washington/i
 
 const Vide = defineComponent({ render: () => h('div') })
 
@@ -119,6 +124,18 @@ describe("etancheite de l'identite entre ambassades", () => {
     // doivent disparaitre, pas afficher celles de l'ambassade voisine.
     expect(wrapper.text()).not.toContain('Leroy Place')
     expect(wrapper.text()).toContain('ambassade@gabon-gn.org')
+  })
+
+  it("ne propose pas le formulaire de demarches d'une autre ambassade", async () => {
+    // Le bouton de l'accueil menait a `/demarche-ligne`, dont le formulaire
+    // reclame une « preuve de residence aux USA ». Le lien doit disparaitre
+    // avec la rubrique, pas seulement la page.
+    const wrapper = await rendre('/', GABON)
+    const liens = wrapper
+      .findAllComponents({ name: 'RouterLink' })
+      .map((l) => String(l.props('to')))
+
+    expect(liens).not.toContain('/demarche-ligne')
   })
 
   it('rend bien les articles servis, sans quoi le test ne prouverait rien', async () => {

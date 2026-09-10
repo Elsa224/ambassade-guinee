@@ -9,6 +9,10 @@
 export const RUBRIQUE_PAR_CHEMIN: Readonly<Record<string, string>> = {
   '/chancellerie': 'chancellerie',
   '/services-ambassadeur': 'services',
+  // Le formulaire porte les pieces exigees par un seul pays d'accueil
+  // (« preuve de residence aux USA ») : il suit la rubrique des services et
+  // n'est pas un chemin neutre, contrairement a ce qu'on avait suppose.
+  '/demarche-ligne': 'services',
   '/consuls-honoraires': 'consuls_honoraires',
   '/calendrier': 'calendrier',
   '/consulat': 'consulat',
