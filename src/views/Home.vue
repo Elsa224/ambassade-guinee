@@ -368,7 +368,7 @@
               </div>
               <h3 class="font-bold text-lg mb-2 text-primary">Rencontre diplomatique de haut niveau</h3>
               <p class="text-gray-600 text-sm mb-4">L'ambassadeur reçu par le secrétaire d'État américain pour renforcer la coopération bilatérale.</p>
-              <router-link to="/actualites/1" class="text-accent font-semibold inline-flex items-center gap-1 hover:gap-2 transition-all">
+              <router-link to="/actualite" class="text-accent font-semibold inline-flex items-center gap-1 hover:gap-2 transition-all">
                 Lire la suite <i class='bx bx-right-arrow-alt'></i>
               </router-link>
             </div>
@@ -389,7 +389,7 @@
               </div>
               <h3 class="font-bold text-lg mb-2 text-primary">Célébration de la Journée Internationale de la Femme</h3>
               <p class="text-gray-600 text-sm mb-4">Événement spécial à l'ambassade mettant à l'honneur les femmes guinéennes.</p>
-              <router-link to="/actualites/2" class="text-accent font-semibold inline-flex items-center gap-1 hover:gap-2 transition-all">
+              <router-link to="/actualite" class="text-accent font-semibold inline-flex items-center gap-1 hover:gap-2 transition-all">
                 Lire la suite <i class='bx bx-right-arrow-alt'></i>
               </router-link>
             </div>
@@ -410,7 +410,7 @@
               </div>
               <h3 class="font-bold text-lg mb-2 text-primary">Forum économique Guinée-États-Unis</h3>
               <p class="text-gray-600 text-sm mb-4">Promotion des opportunités d'investissement en Guinée devant les investisseurs américains.</p>
-              <router-link to="/actualites/3" class="text-accent font-semibold inline-flex items-center gap-1 hover:gap-2 transition-all">
+              <router-link to="/actualite" class="text-accent font-semibold inline-flex items-center gap-1 hover:gap-2 transition-all">
                 Lire la suite <i class='bx bx-right-arrow-alt'></i>
               </router-link>
             </div>
@@ -431,7 +431,7 @@
               </div>
               <h3 class="font-bold text-lg mb-2 text-primary">Journée culturelle guinéenne à Washington</h3>
               <p class="text-gray-600 text-sm mb-4">Célébration de la richesse culturelle de la Guinée avec la diaspora.</p>
-              <router-link to="/actualites/4" class="text-accent font-semibold inline-flex items-center gap-1 hover:gap-2 transition-all">
+              <router-link to="/actualite" class="text-accent font-semibold inline-flex items-center gap-1 hover:gap-2 transition-all">
                 Lire la suite <i class='bx bx-right-arrow-alt'></i>
               </router-link>
             </div>

@@ -10,6 +10,7 @@ import Home from '@/views/Home.vue'
 
 // Actualités
 import Actualite from '@/views/Actualite.vue'
+import ActualiteDetail from '@/views/ActualiteDetail.vue'
 import ActualitesAmbassade from '@/components/actualites/ActualitesAmbassade.vue'
 import ActualitesDiplomatique from '@/components/actualites/ActualitesDiplomatique.vue'
 import ActualitesGouvernementale from '@/components/actualites/ActualitesGouvernementale.vue'
@@ -107,6 +108,7 @@ const router = createRouter({
       children: [
         { path: '', name: 'home', component: Home },
         { path: 'actualite', name: 'actualite', component: Actualite },
+        { path: 'actualites/:slug', name: 'actualite-detail', component: ActualiteDetail },
         { path: 'actualites-ambassade', name: 'actualites-ambassade', component: ActualitesAmbassade },
         { path: 'actualites-diplomatique', name: 'actualites-diplomatique', component: ActualitesDiplomatique },
         { path: 'actualites-gouvernementale', name: 'actualites-gouvernementale', component: ActualitesGouvernementale },

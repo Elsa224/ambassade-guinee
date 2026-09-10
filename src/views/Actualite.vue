@@ -80,7 +80,7 @@
                 <p class="text-gray-600 text-lg mb-6">{{ actualiteUne.description }}</p>
                 <div class="flex items-center justify-between">
                   <router-link
-                    :to="`/actualites/${actualiteUne.id}`"
+                    :to="`/actualites/${actualiteUne.slug ?? ''}`"
                     class="inline-flex items-center gap-2 bg-secondary text-primary px-6 py-3 rounded-lg font-semibold hover:bg-primary hover:text-white transition-all group"
                   >
                     Lire l'article complet
@@ -127,14 +127,14 @@
               </div>
 
               <h3 class="font-bold text-xl mb-3 text-primary hover:text-accent transition-colors">
-                <router-link :to="`/actualites/${actualite.id}`">{{ actualite.titre }}</router-link>
+                <router-link :to="`/actualites/${actualite.slug ?? ''}`">{{ actualite.titre }}</router-link>
               </h3>
 
               <p class="text-gray-600 text-sm mb-4 line-clamp-2">{{ actualite.description }}</p>
 
               <div class="flex items-center justify-between">
                 <router-link
-                  :to="`/actualites/${actualite.id}`"
+                  :to="`/actualites/${actualite.slug ?? ''}`"
                   class="text-accent font-semibold inline-flex items-center gap-1 hover:gap-2 transition-all group"
                 >
                   Lire la suite
