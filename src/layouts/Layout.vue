@@ -282,6 +282,16 @@
               </div>
             </div>
 
+            <!-- Le module Evenements n'est pas provisionne pour toutes les
+                 ambassades : l'entree disparait quand il ne l'est pas. -->
+            <router-link
+              v-if="rubriqueOuverte('/evenements')"
+              to="/evenements"
+              class="nav-item px-3 py-2 rounded hover:bg-secondary hover:text-primary transition text-primary"
+              active-class="hover-active"
+              >Évènements</router-link
+            >
+
             <!-- Bouton de connexion -->
             <router-link
               to="/connexion"
@@ -337,6 +347,12 @@
               </div>
             </div>
 
+            <router-link
+              v-if="rubriqueOuverte('/evenements')"
+              to="/evenements"
+              class="block px-3 py-2 rounded hover:bg-secondary hover:text-primary text-primary"
+              >Évènements</router-link
+            >
             <router-link
               to="/construction"
               class="block px-3 py-2 rounded hover:bg-secondary hover:text-primary text-primary"
@@ -660,7 +676,7 @@
 import { ref, reactive, computed } from 'vue'
 import BientotDisponible from '@/components/BientotDisponible.vue'
 import { useTenantStore } from '@/stores/tenant'
-import { rubriqueDuChemin } from '@/tenant/rubriques'
+import { cheminOuvert } from '@/tenant/rubriques'
 import { useIdentite, articleDuPays } from '@/tenant/identite'
 
 const tenant = useTenantStore()
@@ -680,9 +696,13 @@ const {
 
 const anneeCourante = new Date().getFullYear()
 
-/** Un chemin est ouvert si l'ambassade n'a pas ferme la rubrique dont il depend. */
+/**
+ * Accessibilite d'un chemin du site public. La regle vit dans `rubriques.ts`,
+ * qui applique a chaque cas son defaut : ferme pour un module a provisionner,
+ * ouvert pour une rubrique de contenu.
+ */
 function rubriqueOuverte(chemin) {
-  return tenant.rubriqueOuverte(rubriqueDuChemin(chemin))
+  return cheminOuvert(chemin, tenant.embassy)
 }
 
 const isMobileMenuOpen = ref(false)
