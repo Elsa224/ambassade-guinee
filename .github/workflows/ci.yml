@@ -61,6 +61,13 @@ jobs:
     # @playwright/test dans package.json.
     container:
       image: mcr.microsoft.com/playwright:v1.58.2-noble
+    # Le travail s'execute en root dans le conteneur, alors que /github/home
+    # appartient a l'utilisateur pwuser de l'image : Firefox refuse de demarrer
+    # quand $HOME ne lui appartient pas. Chromium et WebKit s'en accommodent,
+    # pas Firefox. Ramener HOME sur /root est le contournement documente par
+    # Playwright, et garde le cache npm coherent avec « npm ci ».
+    env:
+      HOME: /root
     steps:
       - uses: actions/checkout@v4
 
