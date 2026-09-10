@@ -30,6 +30,7 @@
             </router-link>
 
             <router-link
+              v-if="servicesOuverts"
               to="/demarche-ligne"
               class="text-gray-700 font-semibold flex items-center gap-2 hover:text-primary transition-colors"
             >
@@ -178,8 +179,10 @@
         </div>
       </div>
     </section>
-    <!-- Section Services -->
-    <section class="py-20 bg-gray-50">
+    <!-- Section Services : le texte des cartes nomme le pays d'accueil de
+         l'ambassade d'origine (« visa pour les Etats-Unis »). Tant qu'il
+         n'est pas servi par l'API, il suit la rubrique des services. -->
+    <section v-if="servicesOuverts" class="py-20 bg-gray-50">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-16">
           <h2 class="text-4xl font-bold text-primary mb-4">NOS SERVICES</h2>
@@ -493,6 +496,7 @@ const { nomOfficiel, nomDeLAmbassade, logo, drapeau } = useIdentite()
 // Rubriques de contenu : ouvertes tant que l'ambassade ne les ferme pas.
 const dirigeantsOuverts = computed(() => tenant.rubriqueOuverte('dirigeants'))
 const vitrineOuverte = computed(() => tenant.rubriqueOuverte('vitrine'))
+const servicesOuverts = computed(() => tenant.rubriqueOuverte('services'))
 
 // Import des 4 photos de fond pour le hero
 import heroPhoto2 from '@/assets/images/hero4.webp' // Gare

@@ -93,6 +93,7 @@ describe('ouverture des rubriques selon l ambassade', () => {
           '/relations-bilaterales',
           '/rendez-vous',
           '/services-ambassadeur',
+          '/demarche-ligne',
           '/usa',
         ].sort(),
       )
@@ -101,7 +102,9 @@ describe('ouverture des rubriques selon l ambassade', () => {
     it('garde ouvertes au Gabon les pages que le site publie vraiment', () => {
       useTenantStore().embassy = GABON
 
-      const publiees = ['/', '/actualite', '/demarche-ligne', '/actualites-ambassade']
+      // `/demarche-ligne` n'en fait plus partie : son formulaire exige des
+      // pieces propres a un seul pays d'accueil.
+      const publiees = ['/', '/actualite', '/actualites-ambassade']
 
       expect(publiees.filter((chemin) => !ouvert(chemin))).toEqual([])
     })

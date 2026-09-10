@@ -23,6 +23,7 @@ function routeur() {
       { path: '/chancellerie', component: Chancellerie },
       { path: '/usa', component: Chancellerie },
       { path: '/demarche-ligne', component: Chancellerie },
+      { path: '/actualites-ambassade', component: Chancellerie },
     ],
   })
 }
@@ -59,7 +60,7 @@ describe('rubriques fermees dans le gabarit public', () => {
   })
 
   it('rend normalement une page ouverte', async () => {
-    const wrapper = await visiter('/demarche-ligne', GABON)
+    const wrapper = await visiter('/actualites-ambassade', GABON)
 
     expect(wrapper.text()).toContain(TEMOIN)
     expect(wrapper.text()).not.toContain('Rubrique en préparation')
@@ -88,16 +89,31 @@ describe('rubriques fermees dans le gabarit public', () => {
       .findAllComponents({ name: 'RouterLink' })
       .map((l) => String(l.props('to')))
 
-    const ouverts = ['/', '/actualite', '/demarche-ligne']
+    const ouverts = ['/', '/actualite']
 
     expect(ouverts.filter((chemin) => !liens.includes(chemin))).toEqual([])
   })
 
-  it('garde l intitule « Services » cliquable meme si le consulat est ferme', async () => {
+  it('retire le menu « Services » quand aucune de ses pages n est ouverte', async () => {
+    // L'intitule se rabattait sur `/demarche-ligne`. Ce n'est plus un repli :
+    // ce formulaire exige des pieces propres a un seul pays d'accueil, et il
+    // s'affichait tel quel sur le domaine gabonais.
     const wrapper = await visiter('/', GABON)
 
-    // Sans repli, l'intitule disparaitrait et la barre de menu garderait un
-    // chevron seul, sans texte.
+    const liens = wrapper
+      .findAllComponents({ name: 'RouterLink' })
+      .map((l) => String(l.props('to')))
+
+    // Le pied de page garde son intitule generique « Services consulaires »,
+    // qui ne nomme aucun pays : c'est bien la navigation qu'on verifie ici.
+    expect(liens).not.toContain('/demarche-ligne')
+    expect(liens).not.toContain('/consulat')
+    expect(liens).not.toContain('/rendez-vous')
+  })
+
+  it('garde le menu « Services » sur le site guineen', async () => {
+    const wrapper = await visiter('/', GUINEE)
+
     expect(wrapper.text()).toContain('Services')
     const liens = wrapper
       .findAllComponents({ name: 'RouterLink' })

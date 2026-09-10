@@ -225,13 +225,16 @@
             </div>
 
             <!-- Services - Menu cliquable avec chevron -->
-            <div class="relative group">
+            <!-- L'intitule menait autrefois a `/demarche-ligne` quand le
+                 consulat etait ferme. Ce repli n'en est plus un : ce
+                 formulaire nomme le pays d'accueil de l'ambassade d'origine et
+                 suit desormais la rubrique. Le menu entier disparait donc
+                 quand aucune de ses pages n'est ouverte, plutot que de mener a
+                 une page d'attente. -->
+            <div v-if="premierServiceOuvert" class="relative group">
               <div class="flex items-center">
-                <!-- L'intitule reste toujours visible : il mene au consulat quand
-                     la rubrique est ouverte, sinon a la premiere page disponible
-                     de la section. -->
                 <router-link
-                  :to="rubriqueOuverte('/consulat') ? '/consulat' : '/demarche-ligne'"
+                  :to="premierServiceOuvert"
                   class="nav-item px-3 py-2 rounded-l hover:bg-secondary hover:text-primary transition text-primary"
                   active-class="hover-active"
                 >
@@ -771,7 +774,7 @@ const mobileMenus = ref([
     items: [
       { label: 'Le consulat', path: '/consulat' },
       { label: 'Prise de rendez-vous', path: '/rendez-vous' },
-      { label: 'Vos démarches en ligne', path: '/construction' },
+      { label: 'Vos démarches en ligne', path: '/demarche-ligne' },
     ],
   },
   {
@@ -803,6 +806,15 @@ const mobileMenus = ref([
  * tous les liens sont fermes disparait avec eux plutot que de laisser un
  * intitule qui n'ouvre rien.
  */
+/**
+ * Premiere page ouverte de la section Services, ou `null` si l'ambassade n'en
+ * publie aucune. Sert a la fois de destination de l'intitule et de condition
+ * d'affichage du menu.
+ */
+const premierServiceOuvert = computed(
+  () => ['/consulat', '/rendez-vous', '/demarche-ligne'].find(rubriqueOuverte) ?? null,
+)
+
 const menusMobilesOuverts = computed(() =>
   mobileMenus.value
     .map((menu) => ({ ...menu, items: menu.items.filter((item) => rubriqueOuverte(item.path)) }))
