@@ -7,14 +7,14 @@
     <div class="self-start ml-6 mb-4">
       <button
         @click="$emit('close')"
-        class="flex items-center text-[#346778] font-semibold hover:text-[#2a5563] transition-colors"
+        class="flex items-center text-ink font-semibold hover:text-ink-dark transition-colors"
       >
         <i class="bx bx-arrow-back text-xl mr-2"></i> Retour
       </button>
     </div>
 
     <!-- Carte principale -->
-    <div class="relative bg-[#346778] text-white w-96 rounded-3xl shadow-lg overflow-hidden pt-4 pb-6">
+    <div class="relative bg-ink text-white w-96 rounded-3xl shadow-lg overflow-hidden pt-4 pb-6">
       <!-- Bouton fermeture X en haut à droite -->
       <button
         @click="$emit('close')"
@@ -26,7 +26,7 @@
       <!-- Cercle Logo -->
       <div class="flex justify-center">
         <div
-          class="w-28 h-28 bg-white rounded-full flex items-center justify-center shadow-md border-4 border-[#346778] -mt-14"
+          class="w-28 h-28 bg-white rounded-full flex items-center justify-center shadow-md border-4 border-ink -mt-14"
         >
           <img :src="company.logo" alt="Logo" class="w-20 h-20 object-contain mt-4" />
         </div>
@@ -80,7 +80,9 @@
             <i class="bx bx-current-location text-xl"></i>
             <div>
               <h3 class="font-bold">Adresse</h3>
-              <p class="text-xs leading-tight">{{ company.address || '1050 Connecticut Ave NW, Washington DC' }}</p>
+              <p class="text-xs leading-tight">
+                {{ company.address || '1050 Connecticut Ave NW, Washington DC' }}
+              </p>
             </div>
           </div>
 
@@ -99,12 +101,12 @@
     <!-- Boutons bas -->
     <div class="flex justify-center gap-4 mt-4 mb-8">
       <button
-        class="bg-[#346778] text-white px-6 py-3 rounded-lg flex items-center gap-2 shadow hover:bg-[#2a5563] transition-colors"
+        class="bg-ink text-white px-6 py-3 rounded-lg flex items-center gap-2 shadow hover:bg-ink-dark transition-colors"
       >
         <i class="bx bx-share-alt"></i> Partager
       </button>
       <button
-        class="bg-[#346778] text-white px-6 py-3 rounded-lg flex items-center gap-2 shadow hover:bg-[#2a5563] transition-colors"
+        class="bg-ink text-white px-6 py-3 rounded-lg flex items-center gap-2 shadow hover:bg-ink-dark transition-colors"
       >
         <i class="bx bx-download"></i> Capturer
       </button>
@@ -113,9 +115,17 @@
 </template>
 
 <script setup lang="ts">
-defineProps<{ company: any }>()
-</script>
+interface Company {
+  logo?: string
+  qrCode?: string
+  id?: string
+  eventName?: string
+  host?: string
+  location?: string
+  address?: string
+  date?: string
+  time?: string
+}
 
-<style scoped>
-@import url('https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css');
-</style>
+defineProps<{ company: Company }>()
+</script>

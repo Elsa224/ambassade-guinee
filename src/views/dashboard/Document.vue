@@ -3,12 +3,10 @@
     <div class="max-w-7xl mx-auto">
       <!-- Header -->
       <div class="flex flex-col md:flex-row items-center justify-between mb-6 gap-4">
-        <h2 class="text-2xl md:text-3xl font-bold flex items-center gap-2">
-          Liste des Documents
-        </h2>
+        <h2 class="text-2xl md:text-3xl font-bold flex items-center gap-2">Liste des Documents</h2>
         <button
           @click="showAdd = true"
-          class="bg-[#006633] text-white px-5 py-2 rounded-lg shadow hover:bg-[#004c2a] transition flex items-center gap-2"
+          class="bg-primary text-white px-5 py-2 rounded-lg shadow hover:bg-primary-dark transition flex items-center gap-2"
         >
           <span class="text-xl font-bold">+</span> Soumettre un document
         </button>
@@ -20,14 +18,14 @@
           v-model="search"
           type="text"
           placeholder=" Rechercher par titre, entreprise, statut"
-          class="w-full md:w-1/2 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#006633] outline-none"
+          class="w-full md:w-1/2 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary outline-none"
         />
       </div>
 
       <!-- Table -->
       <div class="bg-white shadow-md rounded-lg overflow-x-auto">
         <table class="w-full border-collapse text-sm">
-          <thead class="bg-[#006633] text-white uppercase">
+          <thead class="bg-primary text-white uppercase">
             <tr>
               <th class="p-3 text-left">Date Emission</th>
               <th class="p-3 text-left">Compagnie</th>
@@ -58,7 +56,7 @@
               <td class="p-3 text-center">
                 <button
                   @click="showPreview = true"
-                  class="text-gray-500 hover:text-[#346778] text-lg transition"
+                  class="text-gray-500 hover:text-ink text-lg transition"
                 >
                   📎
                 </button>
@@ -82,9 +80,11 @@
       v-if="showPreview"
       class="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm z-50 p-4"
     >
-      <div class="bg-white rounded-2xl w-full max-w-4xl shadow-2xl relative overflow-hidden border border-gray-100 max-h-[90vh] overflow-y-auto">
+      <div
+        class="bg-white rounded-2xl w-full max-w-4xl shadow-2xl relative overflow-hidden border border-gray-100 max-h-[90vh] overflow-y-auto"
+      >
         <!-- En-tête avec dégradé -->
-        <div class="bg-[#006633] p-6 text-white sticky top-0 z-10">
+        <div class="bg-primary p-6 text-white sticky top-0 z-10">
           <div class="flex justify-between items-center">
             <div class="flex items-center gap-3">
               <div class="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
@@ -109,16 +109,15 @@
           <!-- En-tête document -->
           <div class="text-center mb-8">
             <div class="flex justify-center mb-4">
-              <div class="bg-[#006633] p-3 rounded-lg">
-                <img
-                  src="https://upload.wikimedia.org/wikipedia/commons/5/5b/Orange_logo.svg"
-                  alt="Orange"
-                  class="h-8 filter brightness-0 invert"
-                />
+              <div class="bg-primary p-3 rounded-lg">
+                <!-- Maquette de bulletin : l'entete portait le logo Orange
+                     charge depuis Wikimedia. Le texte evite cette requete
+                     externe en attendant le logo fourni par l'ambassade. -->
+                <span class="text-white font-bold text-xl tracking-wide">Orange</span>
               </div>
             </div>
             <h1 class="text-3xl font-bold text-gray-800 mb-2">PAIEMENT DE SALAIRE</h1>
-            <div class="w-20 h-1 bg-[#006633] mx-auto"></div>
+            <div class="w-20 h-1 bg-primary mx-auto"></div>
           </div>
 
           <!-- Section Comment -->
@@ -127,7 +126,7 @@
             <div class="bg-gray-50 rounded-lg p-4">
               <div class="flex justify-between items-center mb-2">
                 <span class="font-medium">ScB</span>
-                <span class="text-[#006633] font-semibold">1 sur 12</span>
+                <span class="text-primary font-semibold">1 sur 12</span>
               </div>
               <div class="space-y-2 text-sm text-gray-600">
                 <div class="flex justify-between">
@@ -157,9 +156,9 @@
               <p class="text-sm text-green-600 mt-2">Date de création 02/09/2019</p>
             </div>
 
-            <div class="bg-[#006633]/10 rounded-xl p-4 border border-[#006633]/20">
-              <h3 class="font-semibold text-[#006633] mb-2">OMCUT technique</h3>
-              <p class="text-[#006633]">SPECIFICATIONS API</p>
+            <div class="bg-primary/10 rounded-xl p-4 border border-primary/20">
+              <h3 class="font-semibold text-primary mb-2">OMCUT technique</h3>
+              <p class="text-primary">SPECIFICATIONS API</p>
             </div>
           </div>
 
@@ -172,22 +171,26 @@
           </div>
 
           <!-- Section Éditeur -->
-          <div class="bg-[#006633]/10 rounded-xl p-4 border border-[#006633]/20 mb-8">
-            <h3 class="font-semibold text-[#006633] mb-3">Éditeur</h3>
+          <div class="bg-primary/10 rounded-xl p-4 border border-primary/20 mb-8">
+            <h3 class="font-semibold text-primary mb-3">Éditeur</h3>
             <div class="flex gap-3">
-              <button class="bg-[#006633] text-white px-4 py-2 rounded-lg hover:bg-[#004c2a] transition-colors text-sm font-medium">
+              <button
+                class="bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary-dark transition-colors text-sm font-medium"
+              >
                 Approuver
               </button>
-              <button class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors text-sm font-medium">
+              <button
+                class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors text-sm font-medium"
+              >
                 Éditer
               </button>
             </div>
           </div>
 
           <!-- Section Spécifications -->
-          <div class="bg-[#006633]/10 rounded-xl p-4 border border-[#006633]/20">
-            <h3 class="font-semibold text-[#006633] mb-3">SPECIFICATIONS API</h3>
-            <div class="text-[#006633]">
+          <div class="bg-primary/10 rounded-xl p-4 border border-primary/20">
+            <h3 class="font-semibold text-primary mb-3">SPECIFICATIONS API</h3>
+            <div class="text-primary">
               <p class="text-sm">Document technique contenant les spécifications détaillées...</p>
             </div>
           </div>
@@ -213,7 +216,7 @@
               </button>
               <button
                 @click="showPreview = false"
-                class="bg-gradient-to-r from-[#006633] to-[#004c2a] text-white px-8 py-3 rounded-xl hover:from-[#004c2a] hover:to-[#00331a] transition-all duration-300 shadow-lg hover:shadow-xl font-semibold flex items-center gap-2"
+                class="bg-gradient-to-r from-primary to-primary-dark text-white px-8 py-3 rounded-xl hover:from-primary-dark hover:to-primary-dark transition-all duration-300 shadow-lg hover:shadow-xl font-semibold flex items-center gap-2"
               >
                 <span>✓</span>
                 Approuver le document
@@ -223,43 +226,67 @@
         </div>
 
         <!-- Effet de brillance -->
-        <div class="absolute top-0 left-0 w-full h-1 bg-[#006633]"></div>
+        <div class="absolute top-0 left-0 w-full h-1 bg-primary"></div>
       </div>
     </div>
 
     <!-- Edit Modal -->
-    <div
-      v-if="showEdit"
-      class="fixed inset-0 flex items-center justify-center bg-black/40 z-50"
-    >
+    <div v-if="showEdit" class="fixed inset-0 flex items-center justify-center bg-black/40 z-50">
       <div class="bg-white rounded-xl w-[90%] md:w-[60%] p-8 shadow-lg relative">
-        <h3 class="text-2xl font-bold mb-6 text-center text-[#006633]">✏️ Éditer un document</h3>
+        <h3 class="text-2xl font-bold mb-6 text-center text-primary">✏️ Éditer un document</h3>
         <form class="space-y-6">
           <div class="grid md:grid-cols-2 gap-4">
             <div>
-              <label class="font-semibold text-[#006633]">Entreprise destinataire :</label>
-              <input type="text" placeholder="Ex: SCB" class="w-full border rounded-lg px-3 py-2 mt-1 outline-none focus:ring-2 focus:ring-[#006633]" />
+              <label class="font-semibold text-primary">Entreprise destinataire :</label>
+              <input
+                type="text"
+                placeholder="Ex: SCB"
+                class="w-full border rounded-lg px-3 py-2 mt-1 outline-none focus:ring-2 focus:ring-primary"
+              />
             </div>
             <div>
-              <label class="font-semibold text-[#006633]">Titre :</label>
-              <input type="text" placeholder="Permission RE" class="w-full border rounded-lg px-3 py-2 mt-1 outline-none focus:ring-2 focus:ring-[#006633]" />
+              <label class="font-semibold text-primary">Titre :</label>
+              <input
+                type="text"
+                placeholder="Permission RE"
+                class="w-full border rounded-lg px-3 py-2 mt-1 outline-none focus:ring-2 focus:ring-primary"
+              />
             </div>
           </div>
           <div>
-            <label class="font-semibold text-[#006633]">Document :</label>
+            <label class="font-semibold text-primary">Document :</label>
             <input type="file" class="w-full border rounded-lg px-3 py-2 mt-1" />
           </div>
           <div>
-            <label class="font-semibold text-[#006633]">Description :</label>
-            <textarea rows="3" placeholder="Permission" class="w-full border rounded-lg px-3 py-2 mt-1 outline-none focus:ring-2 focus:ring-[#006633]"></textarea>
+            <label class="font-semibold text-primary">Description :</label>
+            <textarea
+              rows="3"
+              placeholder="Permission"
+              class="w-full border rounded-lg px-3 py-2 mt-1 outline-none focus:ring-2 focus:ring-primary"
+            ></textarea>
           </div>
           <div class="flex justify-between gap-4">
-            <button @click="showEdit = false" type="button" class="bg-gray-300 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-400 transition">
+            <button
+              @click="showEdit = false"
+              type="button"
+              class="bg-gray-300 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-400 transition"
+            >
               ← Retour à la liste
             </button>
             <div class="flex gap-2">
-              <button type="button" @click="showEdit = false" class="bg-red-500 text-white px-6 py-2 rounded-lg hover:bg-red-600 transition">Annuler</button>
-              <button type="submit" class="bg-[#006633] text-white px-6 py-2 rounded-lg hover:bg-[#004c2a] transition">Soumettre</button>
+              <button
+                type="button"
+                @click="showEdit = false"
+                class="bg-red-500 text-white px-6 py-2 rounded-lg hover:bg-red-600 transition"
+              >
+                Annuler
+              </button>
+              <button
+                type="submit"
+                class="bg-primary text-white px-6 py-2 rounded-lg hover:bg-primary-dark transition"
+              >
+                Soumettre
+              </button>
             </div>
           </div>
         </form>
@@ -267,38 +294,65 @@
     </div>
 
     <!-- Add Modal -->
-    <div
-      v-if="showAdd"
-      class="fixed inset-0 flex items-center justify-center bg-black/40 z-50"
-    >
+    <div v-if="showAdd" class="fixed inset-0 flex items-center justify-center bg-black/40 z-50">
       <div class="bg-white rounded-xl w-[90%] md:w-[60%] p-8 shadow-lg relative">
-        <h3 class="text-2xl font-bold mb-6 text-center text-[#006633]">📝 Soumettre un document</h3>
+        <h3 class="text-2xl font-bold mb-6 text-center text-primary">📝 Soumettre un document</h3>
         <form class="space-y-6" @submit.prevent="addDocument">
           <div class="grid md:grid-cols-2 gap-4">
             <div>
-              <label class="font-semibold text-[#006633]">Entreprise destinataire :</label>
-              <input v-model="newDoc.compagnie" type="text" placeholder="Ex: SCB" class="w-full border rounded-lg px-3 py-2 mt-1 outline-none focus:ring-2 focus:ring-[#006633]" />
+              <label class="font-semibold text-primary">Entreprise destinataire :</label>
+              <input
+                v-model="newDoc.compagnie"
+                type="text"
+                placeholder="Ex: SCB"
+                class="w-full border rounded-lg px-3 py-2 mt-1 outline-none focus:ring-2 focus:ring-primary"
+              />
             </div>
             <div>
-              <label class="font-semibold text-[#006633]">Titre :</label>
-              <input v-model="newDoc.titre" type="text" placeholder="Permission RE" class="w-full border rounded-lg px-3 py-2 mt-1 outline-none focus:ring-2 focus:ring-[#006633]" />
+              <label class="font-semibold text-primary">Titre :</label>
+              <input
+                v-model="newDoc.titre"
+                type="text"
+                placeholder="Permission RE"
+                class="w-full border rounded-lg px-3 py-2 mt-1 outline-none focus:ring-2 focus:ring-primary"
+              />
             </div>
           </div>
           <div>
-            <label class="font-semibold text-[#006633]">Document :</label>
+            <label class="font-semibold text-primary">Document :</label>
             <input type="file" class="w-full border rounded-lg px-3 py-2 mt-1" />
           </div>
           <div>
-            <label class="font-semibold text-[#006633]">Description :</label>
-            <textarea v-model="newDoc.description" rows="3" placeholder="Permission" class="w-full border rounded-lg px-3 py-2 mt-1 outline-none focus:ring-2 focus:ring-[#006633]"></textarea>
+            <label class="font-semibold text-primary">Description :</label>
+            <textarea
+              v-model="newDoc.description"
+              rows="3"
+              placeholder="Permission"
+              class="w-full border rounded-lg px-3 py-2 mt-1 outline-none focus:ring-2 focus:ring-primary"
+            ></textarea>
           </div>
           <div class="flex justify-between gap-4">
-            <button @click="showAdd = false" type="button" class="bg-gray-300 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-400 transition">
+            <button
+              @click="showAdd = false"
+              type="button"
+              class="bg-gray-300 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-400 transition"
+            >
               ← Retour à la liste
             </button>
             <div class="flex gap-2">
-              <button type="button" @click="showAdd = false" class="bg-red-500 text-white px-6 py-2 rounded-lg hover:bg-red-600 transition">Annuler</button>
-              <button type="submit" class="bg-[#006633] text-white px-6 py-2 rounded-lg hover:bg-[#004d26] transition">Soumettre</button>
+              <button
+                type="button"
+                @click="showAdd = false"
+                class="bg-red-500 text-white px-6 py-2 rounded-lg hover:bg-red-600 transition"
+              >
+                Annuler
+              </button>
+              <button
+                type="submit"
+                class="bg-primary text-white px-6 py-2 rounded-lg hover:bg-primary-dark transition"
+              >
+                Soumettre
+              </button>
             </div>
           </div>
         </form>
@@ -308,68 +362,66 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed } from 'vue'
 
-const showAdd = ref(false);
-const showPreview = ref(false);
-const showEdit = ref(false);
-const search = ref("");
+const showAdd = ref(false)
+const showPreview = ref(false)
+const showEdit = ref(false)
+const search = ref('')
 
 const documents = ref([
   {
-    dateEmission: "22/10/2025",
-    compagnie: "SCB",
-    emetteur: "Front Desk",
-    titre: "Permission RE",
-    statusSuperviseur: "✅ Validé",
-    dateApprobation: "22/10/2025",
-    approuvePar: "DG Manager",
-    statusApprobation: "✅ Validé",
+    dateEmission: '22/10/2025',
+    compagnie: 'SCB',
+    emetteur: 'Front Desk',
+    titre: 'Permission RE',
+    statusSuperviseur: '✅ Validé',
+    dateApprobation: '22/10/2025',
+    approuvePar: 'DG Manager',
+    statusApprobation: '✅ Validé',
   },
   {
-    dateEmission: "22/10/2025",
-    compagnie: "SCB",
-    emetteur: "Front Desk",
-    titre: "Permission",
-    statusSuperviseur: "⏳ En attente",
-    dateApprobation: "22/10/2025",
-    approuvePar: "DG Manager",
-    statusApprobation: "✅ Validé",
+    dateEmission: '22/10/2025',
+    compagnie: 'SCB',
+    emetteur: 'Front Desk',
+    titre: 'Permission',
+    statusSuperviseur: '⏳ En attente',
+    dateApprobation: '22/10/2025',
+    approuvePar: 'DG Manager',
+    statusApprobation: '✅ Validé',
   },
   {
-    dateEmission: "22/10/2025",
-    compagnie: "SCB",
-    emetteur: "Employee Admin",
-    titre: "Demande de congés annuels",
-    statusSuperviseur: "✅ Validé",
-    dateApprobation: "22/10/2025",
-    approuvePar: "Employee Admin",
-    statusApprobation: "❌ Refusé",
+    dateEmission: '22/10/2025',
+    compagnie: 'SCB',
+    emetteur: 'Employee Admin',
+    titre: 'Demande de congés annuels',
+    statusSuperviseur: '✅ Validé',
+    dateApprobation: '22/10/2025',
+    approuvePar: 'Employee Admin',
+    statusApprobation: '❌ Refusé',
   },
-]);
+])
 
-const newDoc = ref({ compagnie: "", titre: "", description: "" });
+const newDoc = ref({ compagnie: '', titre: '', description: '' })
 
 const addDocument = () => {
   documents.value.push({
     dateEmission: new Date().toLocaleDateString(),
     compagnie: newDoc.value.compagnie,
-    emetteur: "Utilisateur",
+    emetteur: 'Utilisateur',
     titre: newDoc.value.titre,
-    statusSuperviseur: "⏳ En attente",
-    dateApprobation: "-",
-    approuvePar: "-",
-    statusApprobation: "⏳ En attente",
-  });
-  newDoc.value = { compagnie: "", titre: "", description: "" };
-  showAdd.value = false;
-};
+    statusSuperviseur: '⏳ En attente',
+    dateApprobation: '-',
+    approuvePar: '-',
+    statusApprobation: '⏳ En attente',
+  })
+  newDoc.value = { compagnie: '', titre: '', description: '' }
+  showAdd.value = false
+}
 
 const filteredDocs = computed(() => {
   return documents.value.filter((d) =>
-    Object.values(d).some((val) =>
-      val.toLowerCase().includes(search.value.toLowerCase())
-    )
-  );
-});
+    Object.values(d).some((val) => val.toLowerCase().includes(search.value.toLowerCase())),
+  )
+})
 </script>

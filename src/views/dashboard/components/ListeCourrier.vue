@@ -8,7 +8,7 @@
           v-model="search"
           type="text"
           placeholder="Rechercher par objet ou destinateur..."
-          class="w-full p-3 rounded-lg border border-gray-300 focus:border-[#006633] focus:ring-2 focus:ring-[#006633] focus:outline-none transition-all duration-200"
+          class="w-full p-3 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary focus:outline-none transition-all duration-200"
         />
       </div>
     </div>
@@ -21,7 +21,7 @@
       <!-- Table Container -->
       <div class="overflow-auto flex-1">
         <table class="min-w-full text-left table-auto">
-          <thead class="bg-[#006633] text-white sticky top-0">
+          <thead class="bg-primary text-white sticky top-0">
             <tr>
               <th class="px-4 py-3 font-semibold">ID</th>
               <th class="px-4 py-3 font-semibold">Objet</th>
@@ -39,11 +39,15 @@
             <tr
               v-for="(courrier, index) in paginatedCourriers"
               :key="courrier.id"
-              :class="index % 2 === 0 ? 'bg-gray-50 hover:bg-gray-100' : 'bg-white hover:bg-gray-100'"
+              :class="
+                index % 2 === 0 ? 'bg-gray-50 hover:bg-gray-100' : 'bg-white hover:bg-gray-100'
+              "
               class="transition-colors duration-150"
             >
               <td class="px-4 py-3 text-sm font-medium text-gray-900">{{ courrier.id }}</td>
-              <td class="px-4 py-3 text-sm text-gray-700 max-w-xs truncate">{{ courrier.objet }}</td>
+              <td class="px-4 py-3 text-sm text-gray-700 max-w-xs truncate">
+                {{ courrier.objet }}
+              </td>
               <td class="px-4 py-3 text-sm text-gray-700">{{ courrier.destinateur }}</td>
               <td class="px-4 py-3 text-sm text-gray-700">{{ courrier.contact }}</td>
               <td class="px-4 py-3 text-sm text-gray-700">{{ courrier.date }}</td>
@@ -54,7 +58,7 @@
                     'text-sm font-medium px-2 py-1 rounded-full',
                     courrier.statut === 'En attente'
                       ? 'bg-yellow-100 text-yellow-800'
-                      : 'bg-green-100 text-green-800'
+                      : 'bg-green-100 text-green-800',
                   ]"
                 >
                   {{ courrier.statut }}
@@ -63,7 +67,7 @@
               <td class="px-4 py-3">
                 <button
                   @click="voirCourrier(courrier)"
-                  class="text-sm font-medium text-[#006633] hover:text-[#004c2a] hover:underline transition-colors duration-200"
+                  class="text-sm font-medium text-primary hover:text-primary-dark hover:underline transition-colors duration-200"
                 >
                   🧷
                 </button>
@@ -86,9 +90,9 @@
                     <!-- ✅ Ajouter -->
                     <button
                       @click="ajouter()"
-                      class="flex items-center w-full px-4 py-2 text-sm text-[#006633] hover:bg-green-50 transition-colors duration-150"
+                      class="flex items-center w-full px-4 py-2 text-sm text-primary hover:bg-green-50 transition-colors duration-150"
                     >
-                      <i class="bx bx-plus-circle mr-2 text-[#006633]"></i>
+                      <i class="bx bx-plus-circle mr-2 text-primary"></i>
                       Ajouter
                     </button>
 
@@ -176,8 +180,8 @@
             :class="[
               'px-3 py-2 rounded-lg border border-gray-300 hover:bg-white transition-colors duration-200 min-w-10',
               currentPage === page
-                ? 'bg-[#006633] text-white border-[#006633] hover:bg-[#004c2a]'
-                : 'bg-white text-gray-700'
+                ? 'bg-primary text-white border-primary hover:bg-primary-dark'
+                : 'bg-white text-gray-700',
             ]"
           >
             {{ page }}
@@ -195,86 +199,84 @@
     </div>
 
     <!-- ===== APERÇU LETTRE ===== -->
-<div v-else class="bg-white rounded-lg shadow-lg p-8 flex-1 relative max-w-4xl mx-auto">
-   <!-- Bouton Retour à la liste en haut -->
-  <div class="mb-4">
-    <button
-      @click="retourListe"
-      class="flex items-center gap-2 text-[#006633] hover:text-[#004c2a] text-lg font-semibold transition-colors duration-200"
-    >
-      <i class="bx bx-arrow-back"></i>
-      Retour à la liste
-    </button>
-  </div>
+    <div v-else class="bg-white rounded-lg shadow-lg p-8 flex-1 relative max-w-4xl mx-auto">
+      <!-- Bouton Retour à la liste en haut -->
+      <div class="mb-4">
+        <button
+          @click="retourListe"
+          class="flex items-center gap-2 text-primary hover:text-primary-dark text-lg font-semibold transition-colors duration-200"
+        >
+          <i class="bx bx-arrow-back"></i>
+          Retour à la liste
+        </button>
+      </div>
 
-  <!-- Entête -->
-  <div class="flex justify-between mb-6">
-    <!-- Destinateur -->
-    <div class="space-y-1">
-      <p class="text-xl font-bold text-[#006633]">{{ courrierSelectionne.destinateur }}</p>
-      <p class="text-gray-600">{{ courrierSelectionne.contact }}</p>
-      <p class="text-gray-600">{{ courrierSelectionne.adresse || 'Abidjan, Côte d’Ivoire' }}</p>
+      <!-- Entête -->
+      <div class="flex justify-between mb-6">
+        <!-- Destinateur -->
+        <div class="space-y-1">
+          <p class="text-xl font-bold text-primary">{{ courrierSelectionne.destinateur }}</p>
+          <p class="text-gray-600">{{ courrierSelectionne.contact }}</p>
+          <p class="text-gray-600">{{ courrierSelectionne.adresse || 'Abidjan, Côte d’Ivoire' }}</p>
+        </div>
+        <!-- Date -->
+        <p class="text-right text-lg font-medium text-gray-700">{{ courrierSelectionne.date }}</p>
+      </div>
+
+      <!-- À l’attention de -->
+      <div class="mb-6 text-right">
+        <p class="font-semibold text-lg">À l’attention de :</p>
+        <p class="text-lg">{{ courrierSelectionne.destinataire }}</p>
+      </div>
+
+      <!-- Objet -->
+      <h3 class="text-xl font-bold mb-6 text-primary border-b-2 border-primary pb-2">
+        Objet : {{ courrierSelectionne.objet }}
+      </h3>
+
+      <!-- Contenu du courrier -->
+      <div class="space-y-4 text-justify mb-12">
+        <p>
+          Cher(e) {{ courrierSelectionne.destinataire }},<br /><br />
+          Je me permets de vous adresser ce courrier afin d'attirer votre attention sur l'objet
+          mentionné ci-dessus. Nous espérons pouvoir bénéficier de votre considération à ce sujet et
+          restons à votre disposition pour tout complément d'information.
+        </p>
+
+        <p>
+          Dans l'attente de votre retour, je vous prie d'agréer,
+          {{ courrierSelectionne.destinataire }}, l'expression de mes salutations distinguées.
+        </p>
+      </div>
+
+      <!-- Signature -->
+      <div class="mb-12">
+        <p class="font-bold text-lg text-primary">Cordialement,</p>
+        <p class="text-xl font-semibold mt-2">{{ courrierSelectionne.destinateur }}</p>
+      </div>
+
+      <!-- Boutons en bas à droite -->
+      <div class="flex justify-center gap-3">
+        <button
+          @click="telecharger(courrierSelectionne)"
+          class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition"
+        >
+          Télécharger
+        </button>
+        <button
+          @click="annuler(courrierSelectionne)"
+          class="px-4 py-2 bg-gray-400 text-white rounded-lg hover:bg-gray-500 transition"
+        >
+          Annuler
+        </button>
+        <button
+          @click="approuver(courrierSelectionne)"
+          class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
+        >
+          Approuver
+        </button>
+      </div>
     </div>
-    <!-- Date -->
-    <p class="text-right text-lg font-medium text-gray-700">{{ courrierSelectionne.date }}</p>
-  </div>
-
-  <!-- À l’attention de -->
-  <div class="mb-6 text-right">
-    <p class="font-semibold text-lg">À l’attention de :</p>
-    <p class="text-lg">{{ courrierSelectionne.destinataire }}</p>
-  </div>
-
-  <!-- Objet -->
-  <h3 class="text-xl font-bold mb-6 text-[#006633] border-b-2 border-[#006633] pb-2">
-    Objet : {{ courrierSelectionne.objet }}
-  </h3>
-
-  <!-- Contenu du courrier -->
-  <div class="space-y-4 text-justify mb-12">
-    <p>
-      Cher(e) {{ courrierSelectionne.destinataire }},<br /><br />
-      Je me permets de vous adresser ce courrier afin d'attirer votre attention sur l'objet
-      mentionné ci-dessus. Nous espérons pouvoir bénéficier de votre considération à ce sujet
-      et restons à votre disposition pour tout complément d'information.
-    </p>
-
-    <p>
-      Dans l'attente de votre retour, je vous prie d'agréer,
-      {{ courrierSelectionne.destinataire }}, l'expression de mes salutations distinguées.
-    </p>
-  </div>
-
-  <!-- Signature -->
-  <div class="mb-12">
-    <p class="font-bold text-lg text-[#006633]">Cordialement,</p>
-    <p class="text-xl font-semibold mt-2">{{ courrierSelectionne.destinateur }}</p>
-  </div>
-
-  <!-- Boutons en bas à droite -->
-  <div class="flex justify-center gap-3">
-    <button
-      @click="telecharger(courrierSelectionne)"
-      class="px-4 py-2 bg-[#006633] text-white rounded-lg hover:bg-[#004c2a] transition"
-    >
-      Télécharger
-    </button>
-    <button
-      @click="annuler(courrierSelectionne)"
-      class="px-4 py-2 bg-gray-400 text-white rounded-lg hover:bg-gray-500 transition"
-    >
-      Annuler
-    </button>
-    <button
-      @click="approuver(courrierSelectionne)"
-      class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
-    >
-      Approuver
-    </button>
-  </div>
-
-</div>
-
   </div>
 </template>
 
@@ -321,14 +323,10 @@ const courriers = ref<Courrier[]>(
     contact: '07 00 00 ' + (i + 1).toString().padStart(2, '0'),
     date: '2025-10-' + (10 + (i % 20)).toString().padStart(2, '0'),
     destinataire:
-      i % 3 === 0
-        ? 'Monsieur Dupont'
-        : i % 3 === 1
-        ? 'Madame Martin'
-        : 'Docteur Lambert',
+      i % 3 === 0 ? 'Monsieur Dupont' : i % 3 === 1 ? 'Madame Martin' : 'Docteur Lambert',
     statut: i % 4 === 0 ? 'En attente' : 'Validé',
     adresse: i % 2 === 0 ? 'Abidjan Plateau' : undefined,
-  }))
+  })),
 )
 
 const filteredCourriers = computed(() =>
@@ -336,8 +334,8 @@ const filteredCourriers = computed(() =>
     (c) =>
       c.objet.toLowerCase().includes(search.value.toLowerCase()) ||
       c.destinateur.toLowerCase().includes(search.value.toLowerCase()) ||
-      c.destinataire.toLowerCase().includes(search.value.toLowerCase())
-  )
+      c.destinataire.toLowerCase().includes(search.value.toLowerCase()),
+  ),
 )
 
 const totalPages = computed(() => Math.ceil(filteredCourriers.value.length / perPage.value))
@@ -405,20 +403,19 @@ const supprimer = (id: number) => {
   activeMenu.value = null
 }
 const telecharger = (courrier: Courrier | null) => {
-  if (!courrier) return;
-  alert(`Télécharger ${courrier.objet}`);
-};
+  if (!courrier) return
+  alert(`Télécharger ${courrier.objet}`)
+}
 
 const annuler = (courrier: Courrier | null) => {
-  if (!courrier) return;
-  alert(`Annuler ${courrier.objet}`);
-};
+  if (!courrier) return
+  alert(`Annuler ${courrier.objet}`)
+}
 
 const approuver = (courrier: Courrier | null) => {
-  if (!courrier) return;
-  alert(`Approuver ${courrier.objet}`);
-};
-
+  if (!courrier) return
+  alert(`Approuver ${courrier.objet}`)
+}
 </script>
 
 <style scoped>

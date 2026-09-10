@@ -1,14 +1,16 @@
 <template>
   <div class="min-h-screen bg-gray-100 p-6">
     <!-- HEADER -->
-    <header class="flex items-center justify-between p-4 bg-white shadow-md fixed top-0 right-0 left-[258px] z-40">
+    <header
+      class="flex items-center justify-between p-4 bg-white shadow-md fixed top-0 right-0 left-[258px] z-40"
+    >
       <!-- TITRE -->
-      <h1 class="text-3xl font-bold text-[#346778]">Dashboard DSIMI</h1>
+      <h1 class="text-3xl font-bold text-ink">Dashboard DSIMI</h1>
 
       <div class="flex items-center space-x-4">
         <!-- ICONE NOTIFICATION -->
         <button class="relative w-10 h-10 flex items-center justify-center text-gray-700 text-2xl">
-          <i class='bx bx-bell'></i>
+          <i class="bx bx-bell"></i>
           <span class="absolute top-0 right-0 inline-block w-2 h-2 bg-red-600 rounded-full"></span>
         </button>
 
@@ -18,7 +20,7 @@
             @click="toggleMenu"
             class="w-10 h-10 flex items-center justify-center text-gray-800 text-2xl"
           >
-            <i class='bx bx-menu'></i>
+            <i class="bx bx-menu"></i>
           </button>
 
           <!-- MENU -->
@@ -59,22 +61,22 @@
 
     <!-- STATISTIQUES -->
     <section class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-      <div class="bg-[#346778] text-white p-6 rounded-lg shadow-lg">
+      <div class="bg-ink text-white p-6 rounded-lg shadow-lg">
         <h2 class="text-sm opacity-80">Revenus</h2>
         <p class="text-4xl font-bold mt-3">$628</p>
       </div>
 
-      <div class="bg-white p-6 rounded-lg shadow-lg border-l-4 border-[#346778]">
+      <div class="bg-white p-6 rounded-lg shadow-lg border-l-4 border-ink">
         <h2 class="text-sm text-gray-500">Partages</h2>
         <p class="text-4xl font-bold mt-3 text-gray-700">2 434</p>
       </div>
 
-      <div class="bg-white p-6 rounded-lg shadow-lg border-l-4 border-[#346778]">
+      <div class="bg-white p-6 rounded-lg shadow-lg border-l-4 border-ink">
         <h2 class="text-sm text-gray-500">Likes</h2>
         <p class="text-4xl font-bold mt-3 text-gray-700">1 259</p>
       </div>
 
-      <div class="bg-white p-6 rounded-lg shadow-lg border-l-4 border-[#346778]">
+      <div class="bg-white p-6 rounded-lg shadow-lg border-l-4 border-ink">
         <h2 class="text-sm text-gray-500">Note</h2>
         <p class="text-4xl font-bold mt-3 text-gray-700">8.5</p>
       </div>
@@ -87,7 +89,7 @@
         <div class="flex justify-between items-center mb-4">
           <h2 class="text-lg font-semibold text-gray-700">Résultats</h2>
           <button
-            class="bg-[#346778] text-white px-4 py-1 rounded-full text-sm hover:bg-[#2a5563] transition"
+            class="bg-ink text-white px-4 py-1 rounded-full text-sm hover:bg-ink-dark transition"
           >
             Voir plus
           </button>
@@ -98,7 +100,7 @@
       <!-- DONUT CHART -->
       <div class="p-6 flex flex-col items-center">
         <canvas ref="donutChart" width="200" height="200"></canvas>
-        <p class="text-2xl font-bold mt-4 text-[#346778]">45%</p>
+        <p class="text-2xl font-bold mt-4 text-ink">45%</p>
         <p class="text-gray-600">Taux de satisfaction</p>
       </div>
 
@@ -112,11 +114,7 @@
       <div class="p-6 text-center xl:col-span-1">
         <h2 class="text-lg font-semibold text-gray-700 mb-4">Liste des visiteurs</h2>
         <ul class="text-gray-700 space-y-2">
-          <li
-            v-for="visitor in visitors"
-            :key="visitor"
-            class="p-2 border-b border-gray-200"
-          >
+          <li v-for="visitor in visitors" :key="visitor" class="p-2 border-b border-gray-200">
             {{ visitor }}
           </li>
         </ul>
@@ -140,7 +138,7 @@ const visitors = ref([
   'Sophie Bernard',
   'Marc Leroy',
   'Claire Petit',
-  'Paul Durand'
+  'Paul Durand',
 ])
 
 const barChart = ref(null)
@@ -157,13 +155,13 @@ onMounted(() => {
         {
           label: '2024',
           data: [20, 30, 40, 25, 50, 35],
-          backgroundColor: '#346778',
+          backgroundColor: 'var(--color-ink)',
           borderRadius: 8,
         },
         {
           label: '2025',
           data: [15, 25, 35, 45, 40, 55],
-          backgroundColor: '#42637a',
+          backgroundColor: 'var(--color-ink-light)',
           borderRadius: 8,
         },
       ],
@@ -186,7 +184,7 @@ onMounted(() => {
       datasets: [
         {
           data: [45, 55],
-          backgroundColor: ['#346778', '#42637a'],
+          backgroundColor: ['var(--color-ink)', 'var(--color-ink-light)'],
           cutout: '70%',
         },
       ],
@@ -206,7 +204,7 @@ onMounted(() => {
         {
           label: 'Performance',
           data: [12, 19, 10, 25, 20, 30, 28],
-          borderColor: '#346778',
+          borderColor: 'var(--color-ink)',
           backgroundColor: 'rgba(52, 103, 120, 0.25)',
           fill: true,
           tension: 0.4,
@@ -214,7 +212,7 @@ onMounted(() => {
         {
           label: 'Progression',
           data: [8, 14, 9, 20, 15, 25, 22],
-          borderColor: '#42637a',
+          borderColor: 'var(--color-ink-light)',
           backgroundColor: 'rgba(66, 99, 122, 0.3)',
           fill: true,
           tension: 0.4,

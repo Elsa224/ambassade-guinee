@@ -17,21 +17,21 @@
           </button>
           <button
             @click="updateProject"
-            class="px-4 py-2 bg-[#006633] text-white rounded-lg hover:bg-[#004c2a] transition-colors"
+            class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
           >
             Sauvegarder
           </button>
         </div>
       </div>
-<!-- Bouton Retour à la liste -->
-<div class="mb-4">
-  <button
-    @click="goBack"
-    class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
-  >
-    ← Retour à la liste des projets
-  </button>
-</div>
+      <!-- Bouton Retour à la liste -->
+      <div class="mb-4">
+        <button
+          @click="goBack"
+          class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+        >
+          ← Retour à la liste des projets
+        </button>
+      </div>
 
       <!-- Formulaire -->
       <div class="bg-white rounded-lg shadow-lg p-6">
@@ -40,14 +40,12 @@
           <div class="space-y-6">
             <!-- Entreprise -->
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">
-                Entreprise
-              </label>
+              <label class="block text-sm font-medium text-gray-700 mb-2"> Entreprise </label>
               <input
                 type="text"
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0297B8] focus:border-transparent"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-info focus:border-transparent"
                 v-model="company"
-              >
+              />
             </div>
 
             <!-- Titre -->
@@ -59,7 +57,7 @@
                 type="text"
                 class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 v-model="title"
-              >
+              />
             </div>
 
             <!-- Date début -->
@@ -69,9 +67,9 @@
               </label>
               <input
                 type="text"
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#006633] focus:border-transparent"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                 v-model="startDate"
-              >
+              />
             </div>
 
             <!-- Statut -->
@@ -80,7 +78,7 @@
                 Statut <span class="text-red-500">*</span>
               </label>
               <select
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0297B8] focus:border-transparent"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-info focus:border-transparent"
                 v-model="status"
               >
                 <option value="Planifié">Planifié</option>
@@ -91,23 +89,18 @@
 
             <!-- Document -->
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">
-                Document
-              </label>
+              <label class="block text-sm font-medium text-gray-700 mb-2"> Document </label>
               <div class="flex items-center gap-3">
-                <input
-                  type="file"
-                  class="hidden"
-                  id="document-upload"
-                  @change="handleFileUpload"
-                >
+                <input type="file" class="hidden" id="document-upload" @change="handleFileUpload" />
                 <label
                   for="document-upload"
                   class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer"
                 >
                   Parcourir...
                 </label>
-                <span class="text-gray-500 text-sm">{{ selectedFile || 'Aucun fichier sélectionné' }}</span>
+                <span class="text-gray-500 text-sm">{{
+                  selectedFile || 'Aucun fichier sélectionné'
+                }}</span>
               </div>
             </div>
           </div>
@@ -116,15 +109,13 @@
           <div class="space-y-6">
             <!-- TANARES -->
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">
-                TANARES
-              </label>
+              <label class="block text-sm font-medium text-gray-700 mb-2"> TANARES </label>
               <input
                 type="text"
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0297B8] focus:border-transparent bg-gray-50"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-info focus:border-transparent bg-gray-50"
                 value="TANARES"
                 readonly
-              >
+              />
             </div>
 
             <!-- Date fin -->
@@ -134,24 +125,16 @@
               </label>
               <input
                 type="text"
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0297B8] focus:border-transparent"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-info focus:border-transparent"
                 v-model="endDate"
-              >
+              />
             </div>
 
             <!-- Progression -->
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">
-                Progression
-              </label>
+              <label class="block text-sm font-medium text-gray-700 mb-2"> Progression </label>
               <div class="flex items-center gap-3">
-                <input
-                  type="range"
-                  min="0"
-                  max="100"
-                  v-model="progress"
-                  class="w-full"
-                >
+                <input type="range" min="0" max="100" v-model="progress" class="w-full" />
                 <span class="text-sm text-gray-700 min-w-12">{{ progress }}%</span>
               </div>
             </div>
@@ -160,12 +143,10 @@
 
         <!-- Description -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">
-            Description :
-          </label>
+          <label class="block text-sm font-medium text-gray-700 mb-2"> Description : </label>
           <textarea
             rows="4"
-            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#006633] focus:border-transparent"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
             v-model="description"
           ></textarea>
         </div>
@@ -183,7 +164,7 @@
           </button>
           <button
             @click="updateProject"
-            class="px-6 py-2 bg-[#006633] text-white rounded-lg hover:bg-[#004c2a] transition-colors"
+            class="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
           >
             Mettre à jour
           </button>
@@ -205,7 +186,9 @@ const startDate = ref('27/10/2025')
 const endDate = ref('31/12/2025')
 const status = ref('Planifié')
 const progress = ref(0)
-const description = ref('Le TANARES est le Tableau National de Répartition des Spectres et Fréquences de l\'Agence Ivoirienne de Gestion des Fréquences')
+const description = ref(
+  "Le TANARES est le Tableau National de Répartition des Spectres et Fréquences de l'Agence Ivoirienne de Gestion des Fréquences",
+)
 const selectedFile = ref('')
 
 // Navigation

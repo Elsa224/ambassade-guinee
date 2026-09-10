@@ -1,16 +1,12 @@
 <template>
   <div class="p-6 min-h-screen bg-gray-100">
     <!-- Header -->
-    <h1 class="text-3xl font-bold text-[#346778] mb-6">Mon Profil</h1>
+    <h1 class="text-3xl font-bold text-ink mb-6">Mon Profil</h1>
 
     <div class="max-w-3xl mx-auto p-6">
       <!-- Avatar et nom -->
       <div class="flex items-center gap-6 mb-6">
-        <img
-          src="https://i.pravatar.cc/100"
-          alt="Avatar"
-          class="w-24 h-24 rounded-full border-2 border-[#346778]"
-        />
+        <img :src="avatarDefaut" alt="Avatar" class="w-24 h-24 rounded-full border-2 border-ink" />
         <div>
           <h2 class="text-2xl font-semibold text-gray-700">John Doe</h2>
           <p class="text-gray-500">Utilisateur du dashboard</p>
@@ -24,7 +20,7 @@
           <input
             type="text"
             v-model="user.nom"
-            class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#346778]"
+            class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-ink"
           />
         </div>
 
@@ -33,7 +29,7 @@
           <input
             type="text"
             v-model="user.prenom"
-            class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#346778]"
+            class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-ink"
           />
         </div>
 
@@ -42,7 +38,7 @@
           <input
             type="email"
             v-model="user.email"
-            class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#346778]"
+            class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-ink"
           />
         </div>
 
@@ -51,7 +47,7 @@
           <input
             type="text"
             v-model="user.telephone"
-            class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#346778]"
+            class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-ink"
           />
         </div>
       </div>
@@ -64,10 +60,7 @@
         >
           Annuler
         </button>
-        <button
-          class="px-4 py-2 rounded bg-[#346778] text-white hover:bg-[#42637a]"
-          @click="saveProfile"
-        >
+        <button class="px-4 py-2 rounded bg-ink text-white hover:bg-ink-light" @click="saveProfile">
           Enregistrer
         </button>
       </div>
@@ -76,17 +69,20 @@
 </template>
 
 <script setup>
+import avatarDefaut from '@/assets/avatar-defaut.svg'
 import { reactive } from 'vue'
 
 const user = reactive({
   nom: 'Doe',
   prenom: 'John',
   email: 'john.doe@example.com',
-  telephone: '+225 01 23 45 67 89'
+  telephone: '+225 01 23 45 67 89',
 })
 
 const saveProfile = () => {
-  alert(`Profil sauvegardé !\nNom: ${user.nom}\nPrénom: ${user.prenom}\nEmail: ${user.email}\nTéléphone: ${user.telephone}`)
+  alert(
+    `Profil sauvegardé !\nNom: ${user.nom}\nPrénom: ${user.prenom}\nEmail: ${user.email}\nTéléphone: ${user.telephone}`,
+  )
 }
 
 const resetForm = () => {

@@ -1,7 +1,7 @@
 <!-- src/views/dashboard/components/ProjectList.vue -->
 <template>
   <div class="min-h-screen bg-gray-50 p-6">
-    <div class="max-w-5xl mx-auto ">
+    <div class="max-w-5xl mx-auto">
       <!-- En-tête -->
       <div class="mb-8">
         <h1 class="text-3xl font-bold text-gray-900 mb-2">Liste des Projets</h1>
@@ -12,11 +12,11 @@
           <input
             type="text"
             placeholder="Rechercher..."
-            class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#006633] focus:border-transparent"
+            class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
             v-model="searchQuery"
           />
           <button
-            class="px-6 py-2 bg-[#006633] text-white rounded-lg hover:bg-[#004c2a] transition-colors"
+            class="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
           >
             Filtrer
           </button>
@@ -25,7 +25,7 @@
 
       <!-- Tableau des projets -->
       <div class="bg-white rounded-lg shadow overflow-hidden">
-        <div class="overflow-x-auto  hide-scrollbar">
+        <div class="overflow-x-auto hide-scrollbar">
           <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
               <tr>
@@ -94,7 +94,7 @@
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                   {{ project.company }}
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-[#006633]">
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-primary">
                   {{ project.title }}
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
@@ -115,7 +115,7 @@
                   <div class="flex items-center">
                     <div class="w-16 bg-gray-200 rounded-full h-2 mr-2">
                       <div
-                        class="bg-[#006633] h-2 rounded-full"
+                        class="bg-primary h-2 rounded-full"
                         :style="{ width: project.progress }"
                       ></div>
                     </div>
@@ -126,7 +126,7 @@
                   {{ project.createdBy }}
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  <button class="text-[#006633] hover:text-[#004c2a] text-xl">
+                  <button class="text-primary hover:text-primary-dark text-xl">
                     <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                       <path
                         fill-rule="evenodd"
@@ -140,7 +140,7 @@
                   <!-- Bouton Éditer avec navigation -->
                   <button
                     @click="editProject(project.id)"
-                    class="text-[#006633] hover:text-[#004c2a] text-xl"
+                    class="text-primary hover:text-primary-dark text-xl"
                   >
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path
@@ -156,7 +156,7 @@
                   <!-- Bouton Document avec navigation -->
                   <button
                     @click="viewDocument(project.id)"
-                    class="text-[#006633] hover:text-[#004c2a] text-xl"
+                    class="text-primary hover:text-primary-dark text-xl"
                   >
                     <i class="bx bx-file"></i>
                   </button>
@@ -171,102 +171,102 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
-import { useRouter } from "vue-router";
+import { ref, computed } from 'vue'
+import { useRouter } from 'vue-router'
 
-const router = useRouter();
-const searchQuery = ref("");
+const router = useRouter()
+const searchQuery = ref('')
 
 const projects = ref([
   {
     id: 1,
-    creationDate: "27/10/2025",
-    company: "SCB",
-    title: "TAMARES",
-    startDate: "27/10/2025",
-    endDate: "31/12/2025",
-    status: "Planifié",
-    progress: "0%",
-    createdBy: "Master Admin",
+    creationDate: '27/10/2025',
+    company: 'SCB',
+    title: 'TAMARES',
+    startDate: '27/10/2025',
+    endDate: '31/12/2025',
+    status: 'Planifié',
+    progress: '0%',
+    createdBy: 'Master Admin',
   },
   {
     id: 2,
-    creationDate: "23/10/2025",
-    company: "SCB",
-    title: "Conseil Chekk",
-    startDate: "03/11/2025",
-    endDate: "21/11/2025",
-    status: "Planifié",
-    progress: "0%",
-    createdBy: "Master Admin",
+    creationDate: '23/10/2025',
+    company: 'SCB',
+    title: 'Conseil Chekk',
+    startDate: '03/11/2025',
+    endDate: '21/11/2025',
+    status: 'Planifié',
+    progress: '0%',
+    createdBy: 'Master Admin',
   },
   {
     id: 3,
-    creationDate: "23/10/2025",
-    company: "SCB",
-    title: "Apollo",
-    startDate: "23/10/2025",
-    endDate: "31/10/2025",
-    status: "Planifié",
-    progress: "0%",
-    createdBy: "Master Admin",
+    creationDate: '23/10/2025',
+    company: 'SCB',
+    title: 'Apollo',
+    startDate: '23/10/2025',
+    endDate: '31/10/2025',
+    status: 'Planifié',
+    progress: '0%',
+    createdBy: 'Master Admin',
   },
   {
     id: 4,
-    creationDate: "23/10/2025",
-    company: "SCB",
-    title: "BoursePay",
-    startDate: "01/10/2025",
-    endDate: "17/10/2025",
-    status: "Terminé",
-    progress: "20%",
-    createdBy: "Employee Admin",
+    creationDate: '23/10/2025',
+    company: 'SCB',
+    title: 'BoursePay',
+    startDate: '01/10/2025',
+    endDate: '17/10/2025',
+    status: 'Terminé',
+    progress: '20%',
+    createdBy: 'Employee Admin',
   },
   {
     id: 5,
-    creationDate: "17/10/2025",
-    company: "SCB",
-    title: "SecureCheck",
-    startDate: "17/10/2025",
-    endDate: "17/10/2025",
-    status: "En cours",
-    progress: "20%",
-    createdBy: "Employee Admin",
+    creationDate: '17/10/2025',
+    company: 'SCB',
+    title: 'SecureCheck',
+    startDate: '17/10/2025',
+    endDate: '17/10/2025',
+    status: 'En cours',
+    progress: '20%',
+    createdBy: 'Employee Admin',
   },
-]);
+])
 
 const filteredProjects = computed(() => {
-  if (!searchQuery.value) return projects.value;
+  if (!searchQuery.value) return projects.value
   return projects.value.filter(
     (project) =>
       project.title.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
       project.company.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-      project.status.toLowerCase().includes(searchQuery.value.toLowerCase())
-  );
-});
+      project.status.toLowerCase().includes(searchQuery.value.toLowerCase()),
+  )
+})
 
 const getStatusClass = (status) => {
   switch (status) {
-    case "Planifié":
-      return "bg-blue-100 text-blue-800";
-    case "En cours":
-      return "bg-yellow-100 text-yellow-800";
-    case "Terminé":
-      return "bg-green-100 text-green-800";
+    case 'Planifié':
+      return 'bg-blue-100 text-blue-800'
+    case 'En cours':
+      return 'bg-yellow-100 text-yellow-800'
+    case 'Terminé':
+      return 'bg-green-100 text-green-800'
     default:
-      return "bg-gray-100 text-gray-800";
+      return 'bg-gray-100 text-gray-800'
   }
-};
+}
 
 // Navigation vers l'édition du projet
 const editProject = (projectId) => {
-  router.push({ name: "EditProject", params: { id: projectId } });
-};
+  router.push({ name: 'EditProject', params: { id: projectId } })
+}
 
 // Navigation vers l'aperçu du document
 const viewDocument = (projectId) => {
-  router.push({ name: "DocumentPreview", params: { id: projectId } });
-};
+  router.push({ name: 'DocumentPreview', params: { id: projectId } })
+}
 </script>
 <style scoped>
 /* Cacher la scrollbar horizontale et verticale */

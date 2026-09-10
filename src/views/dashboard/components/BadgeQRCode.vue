@@ -7,7 +7,7 @@
     <div class="self-start ml-6 mb-4">
       <router-link
         to="/app/evenement/liste"
-        class="flex items-center text-[#006633] font-semibold hover:text-[#004c2a] transition-colors"
+        class="flex items-center text-primary font-semibold hover:text-primary-dark transition-colors"
       >
         <i class="bx bx-arrow-back text-xl mr-2"></i> Retour
       </router-link>
@@ -15,12 +15,12 @@
 
     <!-- 🎟️ Carte du badge -->
     <div
-      class="relative bg-[#006633] text-white w-96 rounded-3xl shadow-lg overflow-hidden pt-2 mb-6"
+      class="relative bg-primary text-white w-96 rounded-3xl shadow-lg overflow-hidden pt-2 mb-6"
     >
       <!-- Logo -->
       <div class="flex justify-center">
         <div
-          class="w-28 h-28 bg-white rounded-full flex items-center justify-center shadow-md border-4 border-[#006633] -mt-14"
+          class="w-28 h-28 bg-white rounded-full flex items-center justify-center shadow-md border-4 border-primary -mt-14"
         >
           <img :src="logo" alt="Logo" class="w-20 h-20 object-contain mt-6" />
         </div>
@@ -93,12 +93,12 @@
     <!-- Boutons bas -->
     <div class="flex justify-center gap-4 mb-8">
       <button
-        class="bg-[#006633] text-white px-6 py-3 rounded-lg flex items-center gap-2 shadow hover:bg-[#004c2a] transition-colors"
+        class="bg-primary text-white px-6 py-3 rounded-lg flex items-center gap-2 shadow hover:bg-primary-dark transition-colors"
       >
         <i class="bx bx-share-alt"></i> Partager
       </button>
       <button
-        class="bg-[#006633] text-white px-6 py-3 rounded-lg flex items-center gap-2 shadow hover:bg-[#004c2a] transition-colors"
+        class="bg-primary text-white px-6 py-3 rounded-lg flex items-center gap-2 shadow hover:bg-primary-dark transition-colors"
       >
         <i class="bx bx-download"></i> Capturer
       </button>
@@ -107,18 +107,18 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref } from 'vue'
 
 // Logo et QR par défaut
-const logo = ref("/logo.png"); // Mets ton vrai logo ici
-const qrCodeUrl = ref("https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=ExempleQR");
+const logo = ref('/logo.png') // Mets ton vrai logo ici
+const qrCodeUrl = ref('https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=ExempleQR')
 
 // Exemple de données du badge (à remplacer dynamiquement plus tard)
 const request = ref({
-  id: "SCB-001",
-  reason: "Forum Sécurité Digitale",
-  host: "SCB Group",
-  email: "contact@scbgroup.com",
-  contact: "+225 07 07 07 07",
-});
+  id: 'SCB-001',
+  reason: 'Forum Sécurité Digitale',
+  host: 'SCB Group',
+  email: 'contact@scbgroup.com',
+  contact: '+225 07 07 07 07',
+})
 </script>

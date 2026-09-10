@@ -12,7 +12,6 @@
 
     <!-- Formulaire -->
     <form @submit.prevent="soumettreCourrier" class="grid grid-cols-2 gap-4 bg-transparent">
-
       <!-- Entreprise avec menu déroulant -->
       <div>
         <label class="block font-medium mb-1">Entreprise</label>
@@ -41,7 +40,11 @@
 
       <div>
         <label class="block font-medium mb-1">Adresse du destinateur</label>
-        <input v-model="form.adresse" type="text" class="w-full border rounded-lg p-2 bg-gray-200" />
+        <input
+          v-model="form.adresse"
+          type="text"
+          class="w-full border rounded-lg p-2 bg-gray-200"
+        />
       </div>
 
       <div>
@@ -51,7 +54,11 @@
 
       <div>
         <label class="block font-medium mb-1">Contact du destinateur</label>
-        <input v-model="form.contact" type="text" class="w-full border rounded-lg p-2 bg-gray-200" />
+        <input
+          v-model="form.contact"
+          type="text"
+          class="w-full border rounded-lg p-2 bg-gray-200"
+        />
       </div>
 
       <div>
@@ -76,7 +83,11 @@
 
       <div>
         <label class="block font-medium mb-1">Destinataire</label>
-        <input v-model="form.destinataire" type="text" class="w-full border rounded-lg p-2 bg-gray-200" />
+        <input
+          v-model="form.destinataire"
+          type="text"
+          class="w-full border rounded-lg p-2 bg-gray-200"
+        />
       </div>
 
       <div>
@@ -102,11 +113,13 @@
 
       <!-- Bouton soumettre -->
       <div class="col-span-2 flex justify-center mt-6">
-        <button type="submit" class="bg-[#006633] text-white px-6 py-2 rounded-lg hover:bg-[#004c2a] transition">
+        <button
+          type="submit"
+          class="bg-primary text-white px-6 py-2 rounded-lg hover:bg-primary-dark transition"
+        >
           Soumettre
         </button>
       </div>
-
     </form>
   </div>
 </template>

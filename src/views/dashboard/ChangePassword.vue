@@ -1,7 +1,7 @@
 <template>
   <div class="p-6 min-h-screen bg-gray-100">
     <!-- Header -->
-    <h1 class="text-3xl font-bold text-[#346778] mb-6">Modifier le mot de passe</h1>
+    <h1 class="text-3xl font-bold text-ink mb-6">Modifier le mot de passe</h1>
 
     <div class="max-w-md mx-auto p-6">
       <form @submit.prevent="changePassword" class="space-y-4">
@@ -12,7 +12,7 @@
             type="password"
             v-model="password.old"
             placeholder="********"
-            class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#346778]"
+            class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-ink"
             required
           />
         </div>
@@ -24,7 +24,7 @@
             type="password"
             v-model="password.new"
             placeholder="********"
-            class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#346778]"
+            class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-ink"
             required
           />
         </div>
@@ -36,7 +36,7 @@
             type="password"
             v-model="password.confirm"
             placeholder="********"
-            class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#346778]"
+            class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-ink"
             required
           />
         </div>
@@ -55,7 +55,7 @@
           </button>
           <button
             type="submit"
-            class="px-4 py-2 rounded bg-[#346778] text-white hover:bg-[#2a5563] transition-colors"
+            class="px-4 py-2 rounded bg-ink text-white hover:bg-ink-dark transition-colors"
           >
             Enregistrer
           </button>
@@ -71,7 +71,7 @@ import { reactive, ref } from 'vue'
 const password = reactive({
   old: '',
   new: '',
-  confirm: ''
+  confirm: '',
 })
 
 const error = ref('')

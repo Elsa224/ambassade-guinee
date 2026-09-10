@@ -1,0 +1,98 @@
+# Livraison de production, declenchee A LA MAIN uniquement.
+#
+# Aucun evenement automatique n'est branche ici : ni push, ni fusion sur main.
+# Une fusion vers main ne met donc jamais la production a jour toute seule ;
+# il faut venir ouvrir l'onglet Actions et lancer ce workflow explicitement.
+#
+# Le travail « deployer » depend de l'environnement GitHub « production » :
+# une fois cet environnement configure avec des relecteurs obligatoires
+# (Parametres > Environments > production), le lancement reste en attente
+# d'une approbation humaine avant de toucher au serveur.
+name: Livraison production
+
+on:
+  workflow_dispatch:
+    inputs:
+      reference:
+        description: 'Branche ou etiquette a livrer'
+        required: true
+        default: main
+      confirmation:
+        description: 'Taper LIVRER pour confirmer'
+        required: true
+        default: ''
+
+concurrency:
+  group: livraison-production
+  cancel-in-progress: false
+
+jobs:
+  controle:
+    name: Controle de la demande
+    runs-on: ${{ vars.RUNNER_CI || 'ubuntu-latest' }}
+    steps:
+      - name: Verifier la confirmation saisie
+        run: |
+          if [ "${{ inputs.confirmation }}" != "LIVRER" ]; then
+            echo "Confirmation absente ou incorrecte : saisir LIVRER pour lancer la livraison." >&2
+            exit 1
+          fi
+
+  construire:
+    name: Verifier et construire
+    needs: controle
+    runs-on: ${{ vars.RUNNER_CI || 'ubuntu-latest' }}
+    container:
+      image: node:22-bookworm-slim
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.reference }}
+
+      - name: Restaurer le cache npm
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: npm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+          restore-keys: npm-${{ runner.os }}-
+
+      - name: Installer les dependances
+        run: npm ci
+
+      # On ne livre jamais un build qui n'a pas repasse les verifications, meme
+      # si la CI etait verte sur la branche : la reference livree peut differer.
+      - name: Lint, types et tests unitaires
+        run: npm run check
+
+      - name: Construire le bundle de production
+        run: npm run build
+
+      - name: Publier le bundle comme artefact
+        uses: actions/upload-artifact@v4
+        with:
+          name: bundle-production
+          path: dist/
+          retention-days: 30
+
+  deployer:
+    name: Deployer sur le serveur
+    needs: construire
+    runs-on: ${{ vars.RUNNER_CI || 'ubuntu-latest' }}
+    environment: production
+    steps:
+      - name: Recuperer le bundle
+        uses: actions/download-artifact@v4
+        with:
+          name: bundle-production
+          path: dist
+
+      # La mise en place sur le serveur (copie vers la racine des vhosts
+      # Apache, purge du cache, bascule) est definie par la session dediee au
+      # deploiement. Tant qu'elle n'est pas ecrite, ce travail s'arrete ici en
+      # echec plutot que de laisser croire qu'une livraison a eu lieu.
+      - name: Etape de deploiement
+        run: |
+          echo "Bundle recupere :" && ls -la dist | head -20
+          echo "L'etape de deploiement n'est pas encore definie dans ce depot." >&2
+          echo "Elle doit etre ajoutee par la session deploiement." >&2
+          exit 1

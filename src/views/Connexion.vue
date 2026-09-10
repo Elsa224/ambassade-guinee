@@ -1,136 +1,136 @@
 <template>
   <div class="min-h-screen flex flex-col md:flex-row">
-    <!-- 🟦 Formulaire à gauche (fond blanc) -->
+    <!-- Formulaire -->
     <div class="flex w-full md:w-1/2 items-center justify-center bg-white order-2 md:order-1">
       <div class="p-8 w-full max-w-md">
-        <!-- Bouton Retour à l'accueil -->
         <div class="mb-6">
-          <button
-            @click="goToHome"
-            class="inline-flex items-center gap-2 text-[#fcd116] hover:text-[#006633] transition-colors"
-          >
-            <i class='bx bx-arrow-back text-lg'></i>
-            <span class="text-sm font-medium">Retour à l'accueil</span>
-          </button>
-        </div>
-
-        <!-- Logo -->
-        <div class="flex flex-col items-center mb-6">
-          <img :src="formLogo" alt="Logo Secure Check" class="w-52 h-auto mb-2" />
-          <h2 class="text-2xl font-bold text-[#fcd116]">Bienvenue</h2>
-        </div>
-
-        <!-- Formulaire (sans soumission) -->
-        <form class="space-y-5">
-          <div>
-            <input
-              type="email"
-              placeholder="securecheck@scb.org"
-              v-model="email"
-              class="w-full px-4 py-2 border border-[#fcd116] rounded-lg focus:ring-2 focus:ring-[#fcd116] focus:outline-none"
-              required
-            />
-          </div>
-
-          <div class="relative">
-            <input
-              :type="showPassword ? 'text' : 'password'"
-              placeholder="* * * * * * * *"
-              v-model="password"
-              class="w-full px-4 py-2 border border-[#fcd116]/50 rounded-lg focus:ring-2 focus:ring-[#fcd116] focus:outline-none pr-10"
-              required
-            />
-            <!-- Bouton œil pour voir/masquer le mot de passe -->
-            <button
-              type="button"
-              @click="togglePasswordVisibility"
-              class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 hover:text-[#fcd116]"
-            >
-              <i :class="showPassword ? 'bx bx-hide' : 'bx bx-show'" class="text-lg"></i>
-            </button>
-          </div>
-
-          <div class="flex items-center justify-between text-sm text-gray-600">
-            <label class="flex items-center space-x-2">
-              <input type="checkbox" v-model="rememberMe" class="rounded text-[#fcd116] focus:ring-[#fcd116]" />
-              <span>Rester connecté</span>
-            </label>
-            <a href="#" class="text-[#fcd116] hover:underline">Mot de passe oublié ?</a>
-          </div>
-
-          <!-- 🔗 Bouton Se connecter en tant que router-link -->
           <router-link
-            to="/dashboard"
-            class="w-full bg-[#fcd116] hover:bg-[#fcd116]/80 text-white py-2 rounded-full font-semibold transition duration-200 text-center block"
+            to="/"
+            class="inline-flex items-center gap-2 text-ink hover:text-primary transition-colors"
           >
-            Se connecter
+            <i class="bx bx-arrow-back text-lg"></i>
+            <span class="text-sm font-medium">Retour à l'accueil</span>
           </router-link>
+        </div>
+
+        <div class="flex flex-col items-center mb-8">
+          <img v-if="logo" :src="logo" :alt="`Armoiries de ${nomCourt}`" class="w-40 h-auto mb-4" />
+          <h1 class="text-2xl font-bold text-primary text-center">Espace administration</h1>
+          <p class="text-sm text-gray-600 mt-1 text-center">
+            Connectez-vous pour gérer le contenu du site.
+          </p>
+        </div>
+
+        <form class="space-y-5" @submit.prevent="soumettre">
+          <div
+            v-if="auth.erreur"
+            role="alert"
+            class="rounded-lg border border-accent bg-accent/10 px-4 py-3 text-sm text-accent-dark"
+          >
+            {{ auth.erreur }}
+          </div>
+
+          <div>
+            <label for="email" class="block text-sm font-medium text-gray-700 mb-1">
+              Adresse électronique
+            </label>
+            <input
+              id="email"
+              v-model="email"
+              type="email"
+              autocomplete="username"
+              required
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary focus:outline-none"
+            />
+          </div>
+
+          <div>
+            <label for="mot-de-passe" class="block text-sm font-medium text-gray-700 mb-1">
+              Mot de passe
+            </label>
+            <div class="relative">
+              <input
+                id="mot-de-passe"
+                v-model="password"
+                :type="motDePasseVisible ? 'text' : 'password'"
+                autocomplete="current-password"
+                required
+                class="w-full px-4 py-2 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary focus:outline-none"
+              />
+              <button
+                type="button"
+                :aria-label="
+                  motDePasseVisible ? 'Masquer le mot de passe' : 'Afficher le mot de passe'
+                "
+                class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 hover:text-primary"
+                @click="motDePasseVisible = !motDePasseVisible"
+              >
+                <i :class="motDePasseVisible ? 'bx bx-hide' : 'bx bx-show'" class="text-lg"></i>
+              </button>
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            :disabled="auth.chargement"
+            class="w-full bg-primary hover:bg-primary-dark disabled:opacity-60 disabled:cursor-not-allowed text-white py-2.5 rounded-full font-semibold transition-colors"
+          >
+            {{ auth.chargement ? 'Connexion en cours...' : 'Se connecter' }}
+          </button>
         </form>
 
-        <!-- Créer un compte -->
-        <p class="text-center text-gray-600 text-sm mt-4">
-          Pas encore de compte ?
-          <router-link to="/creer-compte" class="text-[#fcd116] font-semibold hover:underline">
-            Créer un compte
-          </router-link>
-        </p>
-
-        <p class="text-center text-gray-500 text-sm mt-8 leading-tight">
-          L'application de gestion et suivie de vos colis avec Maposte<br />
-          de <span class="font-semibold text-[#fcd116]">Maposte</span>
+        <p class="text-center text-gray-500 text-xs mt-8 leading-relaxed">
+          Accès réservé aux personnels habilités de l'ambassade.
         </p>
       </div>
     </div>
 
-    <!-- 🖼️ Image à droite -->
-    <div class="hidden md:flex md:w-1/2 relative overflow-hidden order-1 md:order-2 bg-[#fcd116]/20">
-      <img
-        :src="loginImage"
-        alt="Maposte"
-        class="w-full h-full object-cover opacity-90"
-      />
-
-      <!-- Overlay bleu foncé léger -->
-      <div class="absolute inset-0 bg-black/20 z-10"></div>
+    <!-- Illustration -->
+    <div class="hidden md:flex md:w-1/2 relative overflow-hidden order-1 md:order-2 bg-primary/10">
+      <img :src="illustration" alt="" aria-hidden="true" class="w-full h-full object-cover" />
+      <div class="absolute inset-0 bg-primary/30"></div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-import formLogo from "@/assets/images/logo.png"
-import loginImage from "@/assets/images/hero3.jpg"
+import { ref, computed } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
+import { useTenantStore } from '@/stores/tenant'
+import illustration from '@/assets/images/hero3.webp'
+import logoParDefaut from '@/assets/images/logo.webp'
 
 const router = useRouter()
+const route = useRoute()
+const auth = useAuthStore()
+const tenant = useTenantStore()
 
-// Données du formulaire
 const email = ref('')
 const password = ref('')
-const rememberMe = ref(false)
-const showPassword = ref(false)
+const motDePasseVisible = ref(false)
 
-// Fonction pour basculer la visibilité du mot de passe
-const togglePasswordVisibility = () => {
-  showPassword.value = !showPassword.value
+// Le logo vient du tenant ; l'image compilée sert de repli si le bootstrap a échoué.
+const logo = computed(() => tenant.embassy?.logo_image || logoParDefaut)
+const nomCourt = computed(() => tenant.nomCourt || "l'ambassade")
+
+/**
+ * `redirect` vient de l'URL. Il n'est pas exploitable via `router.push` (qui
+ * ne résout que des routes internes), mais on valide quand même : seul un
+ * chemin commençant par un seul `/` est accepté, jamais une URL absolue
+ * déguisée en `//hôte/...`.
+ */
+function destinationSure(valeur: unknown): string {
+  if (typeof valeur === 'string' && valeur.startsWith('/') && !valeur.startsWith('//')) {
+    return valeur
+  }
+  return '/dashboard'
 }
 
-// Fonction pour naviguer vers l'accueil
-const goToHome = () => {
-  router.push('/')
-}
+async function soumettre(): Promise<void> {
+  const reussi = await auth.login(email.value, password.value)
+  if (!reussi) return
 
-// (La fonction handleSubmit a été supprimée car inutile)
+  await router.push(destinationSure(route.query.redirect))
+}
 </script>
-
-<style scoped>
-body {
-  font-family: "Poppins", sans-serif;
-}
-
-/* Style pour le champ mot de passe avec l'œil */
-.relative input[type="password"],
-.relative input[type="text"] {
-  padding-right: 2.5rem;
-}
-</style>

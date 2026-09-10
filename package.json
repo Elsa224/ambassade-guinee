@@ -14,7 +14,12 @@
     "lint": "run-s lint:*",
     "lint:oxlint": "oxlint . --fix",
     "lint:eslint": "eslint . --fix --cache",
-    "format": "prettier --write --experimental-cli src/"
+    "check": "run-s check:*",
+    "check:format": "prettier --check .",
+    "check:lint": "oxlint . && eslint .",
+    "check:types": "vue-tsc --build",
+    "check:unit": "vitest run",
+    "format": "prettier --write ."
   },
   "dependencies": {
     "boxicons": "^2.1.4",
@@ -45,6 +50,7 @@
     "npm-run-all2": "^8.0.4",
     "oxlint": "~1.50.0",
     "prettier": "3.8.1",
+    "sharp": "^0.35.4",
     "tailwindcss": "^4.2.1",
     "typescript": "~5.9.3",
     "vite": "^7.3.1",

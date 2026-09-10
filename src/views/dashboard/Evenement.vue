@@ -10,7 +10,7 @@
       <div v-if="!isCreatePage" class="space-x-4">
         <router-link
           to="/dashboard/evenement/creer"
-          class="px-4 py-2 rounded-lg font-semibold bg-[#006633] text-white hover:bg-[#004d26]"
+          class="px-4 py-2 rounded-lg font-semibold bg-primary text-white hover:bg-primary-dark"
         >
           Créer un Événement
         </router-link>
@@ -31,44 +31,51 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from "vue";
-import { useRoute } from "vue-router";
+import { ref, computed } from 'vue'
+import { useRoute } from 'vue-router'
 
-const route = useRoute();
+const route = useRoute()
 
-const perPage = ref(5);
-const currentPage = ref(1);
-const events = ref([{ nom: "Forum Digital" }, { nom: "Conférence Élite" }]);
+// Les événements reçus des sous-vues (création, édition) portent des champs
+// variables (entreprise, lieu, date, heure, lien, qrCode, etc.) en plus du
+// nom : on ne connaît pas leur forme exacte à l'avance, d'où ce type ouvert.
+interface EvenementItem {
+  nom: string
+  [key: string]: unknown
+}
 
-const selectedEvent = ref<any>(null);
-const showParticipants = ref(false);
+const perPage = ref(5)
+const currentPage = ref(1)
+const events = ref<EvenementItem[]>([{ nom: 'Forum Digital' }, { nom: 'Conférence Élite' }])
+
+const selectedEvent = ref<EvenementItem | null>(null)
 
 // Détection de la page actuelle pour changer le titre
 const pageTitle = computed(() => {
-  if (route.path.includes("creer")) return "Créer un Événement";
-  if (route.path.includes("participants")) return "Participants de l’Événement";
-  return "Liste des Événements";
-});
+  if (route.path.includes('creer')) return 'Créer un Événement'
+  if (route.path.includes('participants')) return 'Participants de l’Événement'
+  return 'Liste des Événements'
+})
 
 // Vérifie si on est sur la page de création (pour cacher le bouton)
-const isCreatePage = computed(() => route.path.includes("creer"));
+const isCreatePage = computed(() => route.path.includes('creer'))
 
-function handleAddEvent(event: any) {
-  events.value.push(event);
+function handleAddEvent(event: EvenementItem) {
+  events.value.push(event)
   // après création, rediriger vers la liste
-  window.location.href = "/dashboard/evenement/liste";
+  window.location.href = '/dashboard/evenement/liste'
 }
 
-function modifierEvent(event: any) {
-  alert(`Modifier ${event.nom}`);
+function modifierEvent(event: EvenementItem) {
+  alert(`Modifier ${event.nom}`)
 }
 
 function supprimerEvent(index: number) {
-  if (confirm("Supprimer cet événement ?")) events.value.splice(index, 1);
+  if (confirm('Supprimer cet événement ?')) events.value.splice(index, 1)
 }
 
-function voirParticipants(event: any) {
-  selectedEvent.value = event;
-  window.location.href = `/dashboard/evenement/participants/${event.nom}`;
+function voirParticipants(event: EvenementItem) {
+  selectedEvent.value = event
+  window.location.href = `/dashboard/evenement/participants/${event.nom}`
 }
 </script>

@@ -1,0 +1,104 @@
+# Integration continue du front.
+#
+# Les travaux s'executent dans des conteneurs Docker : le serveur qui heberge
+# le runner auto-heberge n'a donc besoin que de Docker, sans Node ni
+# navigateurs installes a demeure, et l'environnement de test reste identique
+# d'une execution a l'autre.
+#
+# Choix du runner : tant qu'aucun runner auto-heberge n'est declare, la
+# variable de depot RUNNER_CI est vide et les travaux tombent sur les runners
+# GitHub. Une fois le runner installe sur le serveur, il suffit de definir
+# RUNNER_CI (par exemple « self-hosted ») dans Parametres > Secrets and
+# variables > Actions > Variables : aucun fichier de workflow n'est a modifier.
+name: CI
+
+on:
+  pull_request:
+    branches: [develop, main]
+  push:
+    branches: [develop]
+  workflow_dispatch:
+
+# Une nouvelle poussee sur une branche annule l'execution precedente encore en
+# cours : sur un runner unique, cela evite d'accumuler une file d'attente.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verifications:
+    name: Lint, types et tests unitaires
+    runs-on: ${{ vars.RUNNER_CI || 'ubuntu-latest' }}
+    container:
+      image: node:22-bookworm-slim
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Restaurer le cache npm
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: npm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+          restore-keys: npm-${{ runner.os }}-
+
+      - name: Installer les dependances
+        run: npm ci
+
+      - name: Formatage
+        run: npm run check:format
+
+      - name: Lint (oxlint puis ESLint, sans correction automatique)
+        run: npm run check:lint
+
+      - name: Verification des types
+        run: npm run check:types
+
+      - name: Tests unitaires
+        run: npm run check:unit
+
+  bout-en-bout:
+    name: Build et tests de bout en bout
+    runs-on: ${{ vars.RUNNER_CI || 'ubuntu-latest' }}
+    # Image officielle Playwright : elle embarque les navigateurs et leurs
+    # dependances systeme. Sa version doit rester alignee sur celle de
+    # @playwright/test dans package.json.
+    container:
+      image: mcr.microsoft.com/playwright:v1.58.2-noble
+    # Le travail s'execute en root dans le conteneur, alors que /github/home
+    # appartient a l'utilisateur pwuser de l'image : Firefox refuse de demarrer
+    # quand $HOME ne lui appartient pas. Chromium et WebKit s'en accommodent,
+    # pas Firefox. Ramener HOME sur /root est le contournement documente par
+    # Playwright, et garde le cache npm coherent avec « npm ci ».
+    env:
+      HOME: /root
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Restaurer le cache npm
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: npm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+          restore-keys: npm-${{ runner.os }}-
+
+      - name: Installer les dependances
+        run: npm ci
+
+      - name: Construire le bundle de production
+        run: npm run build
+
+      # Playwright sert ce bundle via « npm run preview » (voir
+      # playwright.config.ts) : les tests valident donc le build reel, et non
+      # le serveur de developpement.
+      - name: Tests de bout en bout
+        run: npm run test:e2e
+        env:
+          CI: 'true'
+
+      - name: Publier le rapport Playwright en cas d'echec
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rapport-playwright
+          path: playwright-report/
+          retention-days: 7
