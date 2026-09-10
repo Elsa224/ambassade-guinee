@@ -20,15 +20,25 @@
  */
 @theme {
   --color-primary: #006633;
-  --color-primary-dark: oklch(from var(--color-primary) calc(l * 0.8189) calc(c * 0.7662) calc(h + 3.36));
-  --color-primary-light: oklch(from var(--color-primary) calc(l * 1.3148) calc(c * 1.1519) calc(h + 7.09));
+  --color-primary-dark: oklch(
+    from var(--color-primary) calc(l * 0.8189) calc(c * 0.7662) calc(h + 3.36)
+  );
+  --color-primary-light: oklch(
+    from var(--color-primary) calc(l * 1.3148) calc(c * 1.1519) calc(h + 7.09)
+  );
 
   --color-secondary: #fcd116;
-  --color-secondary-dark: oklch(from var(--color-secondary) calc(l * 0.9179) calc(c * 0.9317) calc(h + -2.95));
+  --color-secondary-dark: oklch(
+    from var(--color-secondary) calc(l * 0.9179) calc(c * 0.9317) calc(h + -2.95)
+  );
 
   --color-accent: #ce1126;
-  --color-accent-dark: oklch(from var(--color-accent) calc(l * 0.9019) calc(c * 0.8970) calc(h + 0.05));
-  --color-accent-deep: oklch(from var(--color-accent) calc(l * 0.7513) calc(c * 0.7400) calc(h + -0.96));
+  --color-accent-dark: oklch(
+    from var(--color-accent) calc(l * 0.9019) calc(c * 0.897) calc(h + 0.05)
+  );
+  --color-accent-deep: oklch(
+    from var(--color-accent) calc(l * 0.7513) calc(c * 0.74) calc(h + -0.96)
+  );
 
   /* Gris bleutes du dashboard : non pilotes par le tenant. */
   --color-ink: #346778;
@@ -47,8 +57,9 @@
   font-style: normal;
   font-weight: 300;
   font-display: swap;
-  src: url('./assets/fonts/FuturaLTPro-Light.woff2') format('woff2'),
-       url('./assets/fonts/FuturaLTPro-Light.woff') format('woff');
+  src:
+    url('./assets/fonts/FuturaLTPro-Light.woff2') format('woff2'),
+    url('./assets/fonts/FuturaLTPro-Light.woff') format('woff');
 }
 
 @font-face {
@@ -56,8 +67,9 @@
   font-style: normal;
   font-weight: 400;
   font-display: swap;
-  src: url('./assets/fonts/FuturaLTPro-Book.woff2') format('woff2'),
-       url('./assets/fonts/FuturaLTPro-Book.woff') format('woff');
+  src:
+    url('./assets/fonts/FuturaLTPro-Book.woff2') format('woff2'),
+    url('./assets/fonts/FuturaLTPro-Book.woff') format('woff');
 }
 
 @font-face {
@@ -65,8 +77,9 @@
   font-style: normal;
   font-weight: 500;
   font-display: swap;
-  src: url('./assets/fonts/FuturaLTPro-Medium.woff2') format('woff2'),
-       url('./assets/fonts/FuturaLTPro-Medium.woff') format('woff');
+  src:
+    url('./assets/fonts/FuturaLTPro-Medium.woff2') format('woff2'),
+    url('./assets/fonts/FuturaLTPro-Medium.woff') format('woff');
 }
 
 @font-face {
@@ -74,8 +87,9 @@
   font-style: normal;
   font-weight: 700;
   font-display: swap;
-  src: url('./assets/fonts/FuturaLTPro-Bold.woff2') format('woff2'),
-       url('./assets/fonts/FuturaLTPro-Bold.woff') format('woff');
+  src:
+    url('./assets/fonts/FuturaLTPro-Bold.woff2') format('woff2'),
+    url('./assets/fonts/FuturaLTPro-Bold.woff') format('woff');
 }
 
 @font-face {
@@ -83,8 +97,9 @@
   font-style: normal;
   font-weight: 800;
   font-display: swap;
-  src: url('./assets/fonts/FuturaLTPro-XBold.woff2') format('woff2'),
-       url('./assets/fonts/FuturaLTPro-XBold.woff') format('woff');
+  src:
+    url('./assets/fonts/FuturaLTPro-XBold.woff2') format('woff2'),
+    url('./assets/fonts/FuturaLTPro-XBold.woff') format('woff');
 }
 
 @font-face {
@@ -92,12 +107,12 @@
   font-style: normal;
   font-weight: 900;
   font-display: swap;
-  src: url('./assets/fonts/FuturaLTPro-Heavy.woff2') format('woff2'),
-       url('./assets/fonts/FuturaLTPro-Heavy.woff') format('woff');
+  src:
+    url('./assets/fonts/FuturaLTPro-Heavy.woff2') format('woff2'),
+    url('./assets/fonts/FuturaLTPro-Heavy.woff') format('woff');
 }
 
 /* Ajoutez vos styles personnalisés ci-dessous */
 body {
   font-family: 'Futura LT Pro', 'Segoe UI', system-ui, sans-serif;
 }
-

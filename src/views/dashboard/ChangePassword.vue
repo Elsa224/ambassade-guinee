@@ -71,7 +71,7 @@ import { reactive, ref } from 'vue'
 const password = reactive({
   old: '',
   new: '',
-  confirm: ''
+  confirm: '',
 })
 
 const error = ref('')

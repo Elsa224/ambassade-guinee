@@ -64,10 +64,7 @@
         >
           Annuler
         </button>
-        <button
-          class="px-4 py-2 rounded bg-ink text-white hover:bg-ink-light"
-          @click="saveProfile"
-        >
+        <button class="px-4 py-2 rounded bg-ink text-white hover:bg-ink-light" @click="saveProfile">
           Enregistrer
         </button>
       </div>
@@ -82,11 +79,13 @@ const user = reactive({
   nom: 'Doe',
   prenom: 'John',
   email: 'john.doe@example.com',
-  telephone: '+225 01 23 45 67 89'
+  telephone: '+225 01 23 45 67 89',
 })
 
 const saveProfile = () => {
-  alert(`Profil sauvegardé !\nNom: ${user.nom}\nPrénom: ${user.prenom}\nEmail: ${user.email}\nTéléphone: ${user.telephone}`)
+  alert(
+    `Profil sauvegardé !\nNom: ${user.nom}\nPrénom: ${user.prenom}\nEmail: ${user.email}\nTéléphone: ${user.telephone}`,
+  )
 }
 
 const resetForm = () => {

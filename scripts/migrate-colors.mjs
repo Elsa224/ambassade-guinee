@@ -69,8 +69,9 @@ const NEUTRES = {
  */
 const EXCLUS = ['style.css', '__tests__/no-hardcoded-brand-colors.spec.ts']
 
-const fichiers = globSync('**/*.{vue,ts,css}', { cwd: RACINE })
-  .filter((chemin) => !EXCLUS.includes(chemin))
+const fichiers = globSync('**/*.{vue,ts,css}', { cwd: RACINE }).filter(
+  (chemin) => !EXCLUS.includes(chemin),
+)
 
 let modifies = 0
 

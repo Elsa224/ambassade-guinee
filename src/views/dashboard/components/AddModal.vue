@@ -8,18 +8,26 @@
             <h3 class="text-2xl font-bold">📝 Nouveau Document</h3>
             <p class="text-green-100 mt-1">Ajoutez un nouveau document au système</p>
           </div>
-          <button @click="$emit('close')" class="text-white hover:bg-white/20 rounded-full w-10 h-10 flex items-center justify-center transition-colors">
+          <button
+            @click="$emit('close')"
+            class="text-white hover:bg-white/20 rounded-full w-10 h-10 flex items-center justify-center transition-colors"
+          >
             <i class="bx bx-x text-2xl"></i>
           </button>
         </div>
       </div>
 
       <!-- Formulaire -->
-      <form @submit.prevent="$emit('submit', formData)" class="p-6 overflow-y-auto max-h-[calc(90vh-200px)]">
+      <form
+        @submit.prevent="$emit('submit', formData)"
+        class="p-6 overflow-y-auto max-h-[calc(90vh-200px)]"
+      >
         <div class="space-y-6">
           <div class="grid md:grid-cols-2 gap-6">
             <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-2">Entreprise destinataire *</label>
+              <label class="block text-sm font-semibold text-gray-700 mb-2"
+                >Entreprise destinataire *</label
+              >
               <input
                 v-model="formData.compagnie"
                 type="text"
@@ -29,7 +37,9 @@
               />
             </div>
             <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-2">Titre du document *</label>
+              <label class="block text-sm font-semibold text-gray-700 mb-2"
+                >Titre du document *</label
+              >
               <input
                 v-model="formData.titre"
                 type="text"
@@ -42,11 +52,16 @@
 
           <div>
             <label class="block text-sm font-semibold text-gray-700 mb-2">Document *</label>
-            <div class="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center hover:border-green-500 transition-colors">
+            <div
+              class="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center hover:border-green-500 transition-colors"
+            >
               <i class="bx bx-cloud-upload text-3xl text-gray-400 mb-2"></i>
               <p class="text-gray-600 mb-2">Glissez-déposez votre fichier ou</p>
               <input type="file" required class="hidden" id="file-upload-new" />
-              <label for="file-upload-new" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors cursor-pointer">
+              <label
+                for="file-upload-new"
+                class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors cursor-pointer"
+              >
                 Parcourir les fichiers
               </label>
             </div>
@@ -87,21 +102,25 @@
 </template>
 
 <script setup>
-import { reactive, watch } from 'vue';
+import { reactive, watch } from 'vue'
 
 defineProps({
-  show: Boolean
-});
+  show: Boolean,
+})
 
-defineEmits(['close', 'submit']);
+defineEmits(['close', 'submit'])
 
 const formData = reactive({
   compagnie: '',
   titre: '',
-  description: ''
-});
+  description: '',
+})
 
-watch(() => formData, () => {
-  // Reset form when modal opens
-}, { deep: true });
+watch(
+  () => formData,
+  () => {
+    // Reset form when modal opens
+  },
+  { deep: true },
+)
 </script>

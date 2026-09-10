@@ -37,6 +37,8 @@ describe('applyTheme', () => {
     applyTheme({ color_primary: '#0a3d62', color_secondary: '', color_accent: '' })
 
     expect(document.documentElement.style.getPropertyValue('--color-primary')).toBe('#0a3d62')
-    expect(document.documentElement.style.getPropertyValue('--color-accent')).toBe('var(--color-accent)')
+    expect(document.documentElement.style.getPropertyValue('--color-accent')).toBe(
+      'var(--color-accent)',
+    )
   })
 })

@@ -72,9 +72,10 @@ test.describe('tokens de theme derives (oklch color-mix relatif)', () => {
     const primaryDarkApres = await mesurerVariable(page, '--color-primary-dark')
     const primaryLightApres = await mesurerVariable(page, '--color-primary-light')
 
-    expect(primaryDarkApres, 'primary-dark doit changer avec la couleur de base du tenant').not.toBe(
-      primaryDarkAvant,
-    )
+    expect(
+      primaryDarkApres,
+      'primary-dark doit changer avec la couleur de base du tenant',
+    ).not.toBe(primaryDarkAvant)
     expect(
       primaryLightApres,
       'primary-light doit changer avec la couleur de base du tenant',

@@ -80,7 +80,7 @@ describe('page de connexion', () => {
     expect(routeur.currentRoute.value.path).toBe('/dashboard/articles')
   })
 
-  it("affiche le message d erreur du store et ne navigue pas", async () => {
+  it('affiche le message d erreur du store et ne navigue pas', async () => {
     const routeur = creerRouteur()
     const wrapper = await monter(routeur)
     const auth = useAuthStore()

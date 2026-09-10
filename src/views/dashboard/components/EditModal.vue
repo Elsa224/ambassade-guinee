@@ -8,7 +8,10 @@
             <h3 class="text-2xl font-bold">✏️ Édition du Document</h3>
             <p class="text-yellow-100 mt-1">Modifiez les informations du document</p>
           </div>
-          <button @click="$emit('close')" class="text-white hover:bg-white/20 rounded-full w-10 h-10 flex items-center justify-center transition-colors">
+          <button
+            @click="$emit('close')"
+            class="text-white hover:bg-white/20 rounded-full w-10 h-10 flex items-center justify-center transition-colors"
+          >
             <i class="bx bx-x text-2xl"></i>
           </button>
         </div>
@@ -19,7 +22,9 @@
         <div class="space-y-6">
           <div class="grid md:grid-cols-2 gap-6">
             <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-2">Entreprise destinataire</label>
+              <label class="block text-sm font-semibold text-gray-700 mb-2"
+                >Entreprise destinataire</label
+              >
               <input
                 v-model="formData.compagnie"
                 type="text"
@@ -28,7 +33,9 @@
               />
             </div>
             <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-2">Titre du document</label>
+              <label class="block text-sm font-semibold text-gray-700 mb-2"
+                >Titre du document</label
+              >
               <input
                 v-model="formData.titre"
                 type="text"
@@ -40,11 +47,16 @@
 
           <div>
             <label class="block text-sm font-semibold text-gray-700 mb-2">Document</label>
-            <div class="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center hover:border-yellow-500 transition-colors">
+            <div
+              class="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center hover:border-yellow-500 transition-colors"
+            >
               <i class="bx bx-cloud-upload text-3xl text-gray-400 mb-2"></i>
               <p class="text-gray-600 mb-2">Glissez-déposez votre fichier ou</p>
               <input type="file" class="hidden" id="file-upload" />
-              <label for="file-upload" class="bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600 transition-colors cursor-pointer">
+              <label
+                for="file-upload"
+                class="bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600 transition-colors cursor-pointer"
+              >
                 Parcourir les fichiers
               </label>
             </div>
@@ -85,28 +97,32 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue';
+import { ref, watch } from 'vue'
 
 const props = defineProps({
   show: Boolean,
-  document: Object
-});
+  document: Object,
+})
 
-const emit = defineEmits(['close', 'save']);
+const emit = defineEmits(['close', 'save'])
 
 const formData = ref({
   compagnie: '',
   titre: '',
-  description: ''
-});
+  description: '',
+})
 
-watch(() => props.document, (newDoc) => {
-  if (newDoc) {
-    formData.value = { ...newDoc };
-  }
-}, { immediate: true });
+watch(
+  () => props.document,
+  (newDoc) => {
+    if (newDoc) {
+      formData.value = { ...newDoc }
+    }
+  },
+  { immediate: true },
+)
 
 const handleSubmit = () => {
-  emit('save', formData.value);
-};
+  emit('save', formData.value)
+}
 </script>

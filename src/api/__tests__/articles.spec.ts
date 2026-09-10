@@ -52,12 +52,16 @@ describe('service Articles', () => {
 
     const article = await recupererArticleParSlug('rencontre-bilaterale-a-washington')
 
-    expect(vi.mocked(fetch).mock.calls[0]![0]).toBe('/api/articles/rencontre-bilaterale-a-washington')
+    expect(vi.mocked(fetch).mock.calls[0]![0]).toBe(
+      '/api/articles/rencontre-bilaterale-a-washington',
+    )
     expect(article.titre).toBe('Rencontre bilaterale a Washington')
   })
 
   it('cree un article par POST', async () => {
-    vi.mocked(fetch).mockResolvedValue(reponse({ data: { ...articlesFixture.data[0]!, id: 42 } }, 201))
+    vi.mocked(fetch).mockResolvedValue(
+      reponse({ data: { ...articlesFixture.data[0]!, id: 42 } }, 201),
+    )
 
     const article = await creerArticle(BROUILLON)
 

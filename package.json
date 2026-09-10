@@ -15,10 +15,11 @@
     "lint:oxlint": "oxlint . --fix",
     "lint:eslint": "eslint . --fix --cache",
     "check": "run-s check:*",
+    "check:format": "prettier --check .",
     "check:lint": "oxlint . && eslint .",
     "check:types": "vue-tsc --build",
     "check:unit": "vitest run",
-    "format": "prettier --write --experimental-cli src/"
+    "format": "prettier --write ."
   },
   "dependencies": {
     "boxicons": "^2.1.4",

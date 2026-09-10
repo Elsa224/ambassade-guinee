@@ -1,7 +1,7 @@
 <!-- src/views/dashboard/components/ProjectList.vue -->
 <template>
   <div class="min-h-screen bg-gray-50 p-6">
-    <div class="max-w-5xl mx-auto ">
+    <div class="max-w-5xl mx-auto">
       <!-- En-tête -->
       <div class="mb-8">
         <h1 class="text-3xl font-bold text-gray-900 mb-2">Liste des Projets</h1>
@@ -25,7 +25,7 @@
 
       <!-- Tableau des projets -->
       <div class="bg-white rounded-lg shadow overflow-hidden">
-        <div class="overflow-x-auto  hide-scrollbar">
+        <div class="overflow-x-auto hide-scrollbar">
           <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
               <tr>
@@ -171,102 +171,102 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
-import { useRouter } from "vue-router";
+import { ref, computed } from 'vue'
+import { useRouter } from 'vue-router'
 
-const router = useRouter();
-const searchQuery = ref("");
+const router = useRouter()
+const searchQuery = ref('')
 
 const projects = ref([
   {
     id: 1,
-    creationDate: "27/10/2025",
-    company: "SCB",
-    title: "TAMARES",
-    startDate: "27/10/2025",
-    endDate: "31/12/2025",
-    status: "Planifié",
-    progress: "0%",
-    createdBy: "Master Admin",
+    creationDate: '27/10/2025',
+    company: 'SCB',
+    title: 'TAMARES',
+    startDate: '27/10/2025',
+    endDate: '31/12/2025',
+    status: 'Planifié',
+    progress: '0%',
+    createdBy: 'Master Admin',
   },
   {
     id: 2,
-    creationDate: "23/10/2025",
-    company: "SCB",
-    title: "Conseil Chekk",
-    startDate: "03/11/2025",
-    endDate: "21/11/2025",
-    status: "Planifié",
-    progress: "0%",
-    createdBy: "Master Admin",
+    creationDate: '23/10/2025',
+    company: 'SCB',
+    title: 'Conseil Chekk',
+    startDate: '03/11/2025',
+    endDate: '21/11/2025',
+    status: 'Planifié',
+    progress: '0%',
+    createdBy: 'Master Admin',
   },
   {
     id: 3,
-    creationDate: "23/10/2025",
-    company: "SCB",
-    title: "Apollo",
-    startDate: "23/10/2025",
-    endDate: "31/10/2025",
-    status: "Planifié",
-    progress: "0%",
-    createdBy: "Master Admin",
+    creationDate: '23/10/2025',
+    company: 'SCB',
+    title: 'Apollo',
+    startDate: '23/10/2025',
+    endDate: '31/10/2025',
+    status: 'Planifié',
+    progress: '0%',
+    createdBy: 'Master Admin',
   },
   {
     id: 4,
-    creationDate: "23/10/2025",
-    company: "SCB",
-    title: "BoursePay",
-    startDate: "01/10/2025",
-    endDate: "17/10/2025",
-    status: "Terminé",
-    progress: "20%",
-    createdBy: "Employee Admin",
+    creationDate: '23/10/2025',
+    company: 'SCB',
+    title: 'BoursePay',
+    startDate: '01/10/2025',
+    endDate: '17/10/2025',
+    status: 'Terminé',
+    progress: '20%',
+    createdBy: 'Employee Admin',
   },
   {
     id: 5,
-    creationDate: "17/10/2025",
-    company: "SCB",
-    title: "SecureCheck",
-    startDate: "17/10/2025",
-    endDate: "17/10/2025",
-    status: "En cours",
-    progress: "20%",
-    createdBy: "Employee Admin",
+    creationDate: '17/10/2025',
+    company: 'SCB',
+    title: 'SecureCheck',
+    startDate: '17/10/2025',
+    endDate: '17/10/2025',
+    status: 'En cours',
+    progress: '20%',
+    createdBy: 'Employee Admin',
   },
-]);
+])
 
 const filteredProjects = computed(() => {
-  if (!searchQuery.value) return projects.value;
+  if (!searchQuery.value) return projects.value
   return projects.value.filter(
     (project) =>
       project.title.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
       project.company.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-      project.status.toLowerCase().includes(searchQuery.value.toLowerCase())
-  );
-});
+      project.status.toLowerCase().includes(searchQuery.value.toLowerCase()),
+  )
+})
 
 const getStatusClass = (status) => {
   switch (status) {
-    case "Planifié":
-      return "bg-blue-100 text-blue-800";
-    case "En cours":
-      return "bg-yellow-100 text-yellow-800";
-    case "Terminé":
-      return "bg-green-100 text-green-800";
+    case 'Planifié':
+      return 'bg-blue-100 text-blue-800'
+    case 'En cours':
+      return 'bg-yellow-100 text-yellow-800'
+    case 'Terminé':
+      return 'bg-green-100 text-green-800'
     default:
-      return "bg-gray-100 text-gray-800";
+      return 'bg-gray-100 text-gray-800'
   }
-};
+}
 
 // Navigation vers l'édition du projet
 const editProject = (projectId) => {
-  router.push({ name: "EditProject", params: { id: projectId } });
-};
+  router.push({ name: 'EditProject', params: { id: projectId } })
+}
 
 // Navigation vers l'aperçu du document
 const viewDocument = (projectId) => {
-  router.push({ name: "DocumentPreview", params: { id: projectId } });
-};
+  router.push({ name: 'DocumentPreview', params: { id: projectId } })
+}
 </script>
 <style scoped>
 /* Cacher la scrollbar horizontale et verticale */

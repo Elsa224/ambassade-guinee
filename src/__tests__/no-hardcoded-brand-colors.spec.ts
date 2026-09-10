@@ -10,9 +10,20 @@ import { dirname, join } from 'node:path'
  * en repli du bootstrap.
  */
 const COULEURS_DE_MARQUE = [
-  '#006633', '#004c2a', '#004d26', '#00331a', '#006b44', '#007a4d', '#009460',
-  '#fcd116', '#e6b800', '#e6a800',
-  '#ce1126', '#b30f20', '#a10e1f', '#8b0b1a',
+  '#006633',
+  '#004c2a',
+  '#004d26',
+  '#00331a',
+  '#006b44',
+  '#007a4d',
+  '#009460',
+  '#fcd116',
+  '#e6b800',
+  '#e6a800',
+  '#ce1126',
+  '#b30f20',
+  '#a10e1f',
+  '#8b0b1a',
 ]
 
 // `new URL('..', import.meta.url)` echoue sous l'environnement de test jsdom
@@ -25,8 +36,9 @@ describe('couleurs de marque', () => {
     // style.css porte les couleurs de repli ; ce fichier-ci porte la liste a interdire.
     const EXCLUS = ['style.css', '__tests__/no-hardcoded-brand-colors.spec.ts']
 
-    const fichiers = globSync('**/*.{vue,ts,css}', { cwd: racine })
-      .filter((chemin) => !EXCLUS.includes(chemin))
+    const fichiers = globSync('**/*.{vue,ts,css}', { cwd: racine }).filter(
+      (chemin) => !EXCLUS.includes(chemin),
+    )
 
     const fautifs: string[] = []
     for (const chemin of fichiers) {

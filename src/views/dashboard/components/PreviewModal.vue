@@ -8,7 +8,10 @@
             <h3 class="text-2xl font-bold">🧾 Aperçu du Document</h3>
             <p class="text-blue-100 mt-1">{{ document?.titre }}</p>
           </div>
-          <button @click="$emit('close')" class="text-white hover:bg-white/20 rounded-full w-10 h-10 flex items-center justify-center transition-colors">
+          <button
+            @click="$emit('close')"
+            class="text-white hover:bg-white/20 rounded-full w-10 h-10 flex items-center justify-center transition-colors"
+          >
             <i class="bx bx-x text-2xl"></i>
           </button>
         </div>
@@ -18,8 +21,14 @@
       <div class="p-6 overflow-y-auto max-h-[calc(90vh-200px)]">
         <!-- En-tête document -->
         <div class="flex justify-center mb-6">
-          <div class="bg-gradient-to-r from-orange-400 to-orange-600 text-white p-8 rounded-2xl text-center w-full max-w-md">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/5/5b/Orange_logo.svg" alt="Orange" class="h-12 mx-auto mb-4">
+          <div
+            class="bg-gradient-to-r from-orange-400 to-orange-600 text-white p-8 rounded-2xl text-center w-full max-w-md"
+          >
+            <img
+              src="https://upload.wikimedia.org/wikipedia/commons/5/5b/Orange_logo.svg"
+              alt="Orange"
+              class="h-12 mx-auto mb-4"
+            />
             <div class="text-2xl font-bold uppercase tracking-wide">PAIEMENT DE SALAIRE</div>
           </div>
         </div>
@@ -102,8 +111,8 @@
 <script setup>
 defineProps({
   show: Boolean,
-  document: Object
-});
+  document: Object,
+})
 
-defineEmits(['close', 'approve']);
+defineEmits(['close', 'approve'])
 </script>

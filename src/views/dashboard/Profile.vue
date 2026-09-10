@@ -1,14 +1,16 @@
 <template>
   <div class="min-h-screen bg-gray-100 p-6">
     <!-- HEADER -->
-    <header class="flex items-center justify-between p-4 bg-white shadow-md fixed top-0 right-0 left-[258px] z-40">
+    <header
+      class="flex items-center justify-between p-4 bg-white shadow-md fixed top-0 right-0 left-[258px] z-40"
+    >
       <!-- TITRE -->
       <h1 class="text-3xl font-bold text-ink">Dashboard DSIMI</h1>
 
       <div class="flex items-center space-x-4">
         <!-- ICONE NOTIFICATION -->
         <button class="relative w-10 h-10 flex items-center justify-center text-gray-700 text-2xl">
-          <i class='bx bx-bell'></i>
+          <i class="bx bx-bell"></i>
           <span class="absolute top-0 right-0 inline-block w-2 h-2 bg-red-600 rounded-full"></span>
         </button>
 
@@ -18,7 +20,7 @@
             @click="toggleMenu"
             class="w-10 h-10 flex items-center justify-center text-gray-800 text-2xl"
           >
-            <i class='bx bx-menu'></i>
+            <i class="bx bx-menu"></i>
           </button>
 
           <!-- MENU -->
@@ -112,11 +114,7 @@
       <div class="p-6 text-center xl:col-span-1">
         <h2 class="text-lg font-semibold text-gray-700 mb-4">Liste des visiteurs</h2>
         <ul class="text-gray-700 space-y-2">
-          <li
-            v-for="visitor in visitors"
-            :key="visitor"
-            class="p-2 border-b border-gray-200"
-          >
+          <li v-for="visitor in visitors" :key="visitor" class="p-2 border-b border-gray-200">
             {{ visitor }}
           </li>
         </ul>
@@ -140,7 +138,7 @@ const visitors = ref([
   'Sophie Bernard',
   'Marc Leroy',
   'Claire Petit',
-  'Paul Durand'
+  'Paul Durand',
 ])
 
 const barChart = ref(null)

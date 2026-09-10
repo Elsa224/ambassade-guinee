@@ -7,7 +7,9 @@
           {{ isEditing ? 'Éditer le Commentaire' : 'Ajouter un Commentaire' }} - Update liste
         </h1>
         <div class="flex justify-between items-center">
-          <p class="text-gray-600">{{ isEditing ? 'Modifier le commentaire' : 'Ajouter un nouveau commentaire' }}</p>
+          <p class="text-gray-600">
+            {{ isEditing ? 'Modifier le commentaire' : 'Ajouter un nouveau commentaire' }}
+          </p>
           <!-- Bouton Retour vers la liste des tâches -->
           <button
             @click="goBackToTasks"
@@ -47,18 +49,28 @@
                 id="file-upload"
                 @change="handleFileUpload"
                 ref="fileInput"
+              />
+              <label
+                for="file-upload"
+                class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer"
               >
-              <label for="file-upload" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer">
                 Choisir un fichier
               </label>
-              <span class="text-gray-500 text-sm">{{ selectedFile || 'Aucun fichier choisi' }}</span>
+              <span class="text-gray-500 text-sm">{{
+                selectedFile || 'Aucun fichier choisi'
+              }}</span>
               <button
                 v-if="selectedFile"
                 @click="removeFile"
                 class="text-red-600 hover:text-red-800 p-1"
               >
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 </svg>
               </button>
             </div>
@@ -71,7 +83,7 @@
               id="notify"
               v-model="notifyUsers"
               class="rounded border-gray-300 text-primary focus:ring-primary"
-            >
+            />
             <label for="notify" class="text-sm text-gray-700">
               Notifier les utilisateurs assignés à cette tâche
             </label>
@@ -139,7 +151,7 @@ const submitComment = () => {
     console.log('Commentaire soumis:', {
       content: commentText.value,
       file: selectedFile.value,
-      notify: notifyUsers.value
+      notify: notifyUsers.value,
     })
     goBackToTasks()
   }

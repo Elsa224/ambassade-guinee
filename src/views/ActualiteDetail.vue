@@ -92,5 +92,9 @@ async function charger(slug: string): Promise<void> {
 
 // `immediate` couvre le premier rendu ; le watch gère la navigation d'un
 // article à un autre, où le composant est réutilisé sans être remonté.
-watch(() => route.params.slug, (slug) => charger(String(slug)), { immediate: true })
+watch(
+  () => route.params.slug,
+  (slug) => charger(String(slug)),
+  { immediate: true },
+)
 </script>

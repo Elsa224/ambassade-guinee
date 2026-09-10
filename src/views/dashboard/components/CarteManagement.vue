@@ -1,7 +1,6 @@
 <template>
   <div class="min-h-screen bg-gray-100 p-6">
     <div class="max-w-6xl mx-auto">
-
       <!-- Barre action onglets -->
       <div class="flex justify-between items-center mb-6">
         <h2 class="text-3xl font-semibold text-primary">
@@ -18,7 +17,6 @@
       <!-- Onglets -->
       <CreateCard v-if="activeTab === 'createCard'" />
       <CardList v-else />
-
     </div>
   </div>
 </template>

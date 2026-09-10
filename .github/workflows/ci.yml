@@ -44,6 +44,9 @@ jobs:
       - name: Installer les dependances
         run: npm ci
 
+      - name: Formatage
+        run: npm run check:format
+
       - name: Lint (oxlint puis ESLint, sans correction automatique)
         run: npm run check:lint
 

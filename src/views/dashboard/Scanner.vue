@@ -19,20 +19,17 @@
     <!-- Navigation entre sous-pages (liste supprimée) -->
     <div class="flex flex-col md:flex-row items-center justify-between mb-6 gap-4">
       <div class="flex gap-4">
-        <RouterLink
-          to="/dashboard/scanner/scan"
-          :class="btnClass('ScannerQRCode')"
-        >Scanner un code</RouterLink>
+        <RouterLink to="/dashboard/scanner/scan" :class="btnClass('ScannerQRCode')"
+          >Scanner un code</RouterLink
+        >
 
-        <RouterLink
-          to="/dashboard/scanner/manuel"
-          :class="btnClass('QRManuel')"
-        >QR Code manuel</RouterLink>
+        <RouterLink to="/dashboard/scanner/manuel" :class="btnClass('QRManuel')"
+          >QR Code manuel</RouterLink
+        >
 
-        <RouterLink
-          to="/dashboard/scanner/creer"
-          :class="btnClass('CreerQRCode')"
-        >Créer QR code</RouterLink>
+        <RouterLink to="/dashboard/scanner/creer" :class="btnClass('CreerQRCode')"
+          >Créer QR code</RouterLink
+        >
       </div>
     </div>
 
@@ -42,39 +39,44 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+import { computed, onMounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 
-const route = useRoute();
-const router = useRouter();
+const route = useRoute()
+const router = useRouter()
 
 // Redirection automatique vers la liste si on tape juste /app/scanner
 onMounted(() => {
   if (route.path === '/app/scanner') {
-    router.replace({ name: 'ListeQRCode' });
+    router.replace({ name: 'ListeQRCode' })
   }
-});
+})
 
 // Titre dynamique
 const pageTitle = computed(() => {
   switch (route.name) {
-    case 'ScannerQRCode': return ' Scanner un code';
-    case 'QRManuel': return 'QR Code manuel';
-    case 'ListeQRCode': return ' Liste QR Code';
-    case 'CreerQRCode': return ' Créer un QR Code';
-    default: return 'La gestion des QR Codes';
+    case 'ScannerQRCode':
+      return ' Scanner un code'
+    case 'QRManuel':
+      return 'QR Code manuel'
+    case 'ListeQRCode':
+      return ' Liste QR Code'
+    case 'CreerQRCode':
+      return ' Créer un QR Code'
+    default:
+      return 'La gestion des QR Codes'
   }
-});
+})
 
 // Bouton retour à la liste
 function goToList() {
-  router.push({ name: 'ListeQRCode' });
+  router.push({ name: 'ListeQRCode' })
 }
 
 // Style des boutons
 function btnClass(tab: string) {
   return route.name === tab
     ? 'bg-primary text-white px-3 py-2 rounded-lg font-semibold hover:bg-primary hover:text-white transition'
-    : 'border-2 border-primary text-primary px-3 py-2 rounded-lg font-semibold hover:bg-primary hover:text-white transition';
+    : 'border-2 border-primary text-primary px-3 py-2 rounded-lg font-semibold hover:bg-primary hover:text-white transition'
 }
 </script>

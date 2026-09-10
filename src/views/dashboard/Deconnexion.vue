@@ -11,10 +11,7 @@
         >
           Annuler
         </button>
-        <button
-          @click="logout"
-          class="px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700"
-        >
+        <button @click="logout" class="px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700">
           Déconnecter
         </button>
       </div>
@@ -41,5 +38,4 @@ const logout = () => {
 }
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>
