@@ -39,11 +39,21 @@ export function mockApi(): Plugin {
           reponse.end(corps === null ? '' : JSON.stringify(corps))
         }
 
-        const lireCorps = (): Promise<Record<string, unknown>> =>
+        // Resout avec null si le corps n'est pas du JSON exploitable : l'exception
+        // ne doit pas s'echapper dans un ecouteur d'evenement, ou elle laisserait
+        // la requete sans reponse et ferait remonter une erreur non geree.
+        const lireCorps = (): Promise<Record<string, unknown> | null> =>
           new Promise((resoudre) => {
             let brut = ''
             requete.on('data', (morceau) => (brut += morceau))
-            requete.on('end', () => resoudre(brut ? JSON.parse(brut) : {}))
+            requete.on('end', () => {
+              if (brut === '') return resoudre({})
+              try {
+                resoudre(JSON.parse(brut) as Record<string, unknown>)
+              } catch {
+                resoudre(null)
+              }
+            })
           })
 
         if (chemin === '/bootstrap') {
@@ -52,6 +62,7 @@ export function mockApi(): Plugin {
 
         if (chemin === '/auth/login' && methode === 'POST') {
           return void lireCorps().then((corps) => {
+            if (corps === null) return repondre(422, { message: 'Corps de requete illisible.' })
             if (
               corps.email === IDENTIFIANTS_DEV.email &&
               corps.password === IDENTIFIANTS_DEV.password
@@ -87,6 +98,7 @@ export function mockApi(): Plugin {
 
         if (chemin === '/articles' && methode === 'POST') {
           return void lireCorps().then((corps) => {
+            if (corps === null) return repondre(422, { message: 'Corps de requete illisible.' })
             const article = { ...corps, id: prochainId++, vues: 0, likes: 0, temps_lecture: 1 }
             articles = [article, ...articles]
             return repondre(201, { data: article })
@@ -104,6 +116,7 @@ export function mockApi(): Plugin {
 
           if (methode === 'PUT') {
             return void lireCorps().then((corps) => {
+              if (corps === null) return repondre(422, { message: 'Corps de requete illisible.' })
               const index = articles.findIndex((a) => a.id === id)
               if (index === -1) return repondre(404, { message: 'Introuvable.' })
               articles[index] = { ...articles[index], ...corps, id }
