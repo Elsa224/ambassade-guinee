@@ -1,0 +1,46 @@
+# Deploiement automatique sur shared-dev a chaque push sur develop.
+#
+# Le template front est unifie : ce meme build sert tous les tenants
+# (guinee, gabon-guinee, ...), le tenant est resolu au runtime par hostname
+# via /api/bootstrap. Build directement sur la box (SSH) pour eviter de
+# transferer un dist volumineux.
+name: Deploiement dev (shared-dev)
+
+on:
+  push:
+    branches: [develop]
+    paths-ignore:
+      - 'docs/**'
+      - '**/*.md'
+      - 'LICENSE'
+      - '.editorconfig'
+      - '.gitignore'
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-dev-ambassade-guinee
+  cancel-in-progress: false
+
+jobs:
+  deployer:
+    name: Livrer le front sur shared-dev
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Deploiement via SSH
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SHARED_DEV_HOST }}
+          username: ${{ secrets.SHARED_DEV_USER }}
+          key: ${{ secrets.SHARED_DEV_SSH_KEY }}
+          command_timeout: 15m
+          script: |
+            set -euo pipefail
+            cd /var/www/ambassade-guinee
+
+            git fetch origin --quiet
+            git reset --hard origin/develop
+
+            export PATH=/home/ubuntu/.nvm/versions/node/v24.16.0/bin:$PATH
+            npm ci
+            npm run build
