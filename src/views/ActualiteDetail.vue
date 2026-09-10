@@ -1,17 +1,17 @@
 <template>
   <article class="max-w-3xl mx-auto px-4 py-12">
-    <p v-if="chargement" class="text-center text-gray-500 py-16">Chargement de l'actualite...</p>
+    <p v-if="chargement" class="text-center text-gray-500 py-16">Chargement de l'actualité…</p>
 
     <div v-else-if="introuvable" class="text-center py-16">
-      <h1 class="text-2xl font-bold text-ink mb-3">Cette actualite est introuvable</h1>
+      <h1 class="text-2xl font-bold text-ink mb-3">Cette actualité est introuvable</h1>
       <p class="text-gray-600 mb-6">
-        Elle a peut-etre ete retiree, ou le lien que vous avez suivi est incorrect.
+        Elle a peut-être été retirée, ou le lien que vous avez suivi est incorrect.
       </p>
       <router-link
         to="/actualite"
         class="inline-block bg-primary hover:bg-primary-dark text-white px-6 py-2.5 rounded-full font-semibold transition-colors"
       >
-        Voir toutes les actualites
+        Voir toutes les actualités
       </router-link>
     </div>
 
@@ -21,7 +21,7 @@
         class="inline-flex items-center gap-2 text-primary hover:text-primary-dark mb-6 text-sm font-medium"
       >
         <i class="bx bx-arrow-back"></i>
-        Retour aux actualites
+        Retour aux actualités
       </router-link>
 
       <p class="text-sm font-semibold text-accent uppercase tracking-wide mb-2">
@@ -33,7 +33,7 @@
       </h1>
 
       <p class="text-sm text-gray-500 mb-8">
-        Publie le {{ dateLisible }} &middot; {{ article.temps_lecture }} min de lecture
+        Publié le {{ dateLisible }} &middot; {{ article.temps_lecture }} min de lecture
       </p>
 
       <img
@@ -79,18 +79,18 @@ async function charger(slug: string): Promise<void> {
   try {
     article.value = await recupererArticleParSlug(slug)
   } catch (souleve) {
-    // Un 404 est un cas nominal (lien obsolete) ; toute autre erreur aussi
-    // aboutit a l ecran « introuvable », faute de contenu a afficher.
+    // Un 404 est un cas nominal (lien obsolète) ; toute autre erreur aussi
+    // aboutit à l'écran « introuvable », faute de contenu à afficher.
     introuvable.value = true
     if (!(souleve instanceof ApiError) || souleve.statut !== 404) {
-      console.error("Echec du chargement de l actualite :", souleve)
+      console.error("Échec du chargement de l'actualité :", souleve)
     }
   } finally {
     chargement.value = false
   }
 }
 
-// `immediate` couvre le premier rendu ; le watch gere la navigation d un
-// article a un autre, ou le composant est reutilise sans etre remonte.
+// `immediate` couvre le premier rendu ; le watch gère la navigation d'un
+// article à un autre, où le composant est réutilisé sans être remonté.
 watch(() => route.params.slug, (slug) => charger(String(slug)), { immediate: true })
 </script>

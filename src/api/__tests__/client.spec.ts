@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
-import { ApiError, apiGet, apiPost, apiDelete, setAuthToken } from '../client'
+import { ApiError, apiGet, apiPost, apiDelete, setAuthToken, setUnauthorizedHandler } from '../client'
 
 function reponse(corps: unknown, statut = 200) {
   return new Response(corps === null ? null : JSON.stringify(corps), {
@@ -16,6 +16,7 @@ describe('client API', () => {
 
   afterEach(() => {
     vi.unstubAllGlobals()
+    setUnauthorizedHandler(null)
   })
 
   it('appelle une URL relative pour rester en meme origine', async () => {
@@ -90,5 +91,25 @@ describe('client API', () => {
     vi.mocked(fetch).mockResolvedValue(new Response(null, { status: 204 }))
 
     await expect(apiDelete('/api/articles/1')).resolves.toBeUndefined()
+  })
+
+  it('déclenche le gestionnaire non autorisé sur une réponse 401', async () => {
+    const gestionnaire = vi.fn()
+    setUnauthorizedHandler(gestionnaire)
+    vi.mocked(fetch).mockResolvedValue(reponse({ message: 'Non authentifie' }, 401))
+
+    await expect(apiGet('/api/articles')).rejects.toBeInstanceOf(ApiError)
+
+    expect(gestionnaire).toHaveBeenCalledTimes(1)
+  })
+
+  it('ne déclenche pas le gestionnaire non autorisé sur une réponse 422', async () => {
+    const gestionnaire = vi.fn()
+    setUnauthorizedHandler(gestionnaire)
+    vi.mocked(fetch).mockResolvedValue(reponse({ message: 'Identifiants invalides' }, 422))
+
+    await expect(apiGet('/api/articles')).rejects.toBeInstanceOf(ApiError)
+
+    expect(gestionnaire).not.toHaveBeenCalled()
   })
 })

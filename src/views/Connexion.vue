@@ -9,7 +9,7 @@
             class="inline-flex items-center gap-2 text-ink hover:text-primary transition-colors"
           >
             <i class="bx bx-arrow-back text-lg"></i>
-            <span class="text-sm font-medium">Retour a l'accueil</span>
+            <span class="text-sm font-medium">Retour à l'accueil</span>
           </router-link>
         </div>
 
@@ -17,7 +17,7 @@
           <img v-if="logo" :src="logo" :alt="`Armoiries de ${nomCourt}`" class="w-40 h-auto mb-4" />
           <h1 class="text-2xl font-bold text-primary text-center">Espace administration</h1>
           <p class="text-sm text-gray-600 mt-1 text-center">
-            Connectez-vous pour gerer le contenu du site.
+            Connectez-vous pour gérer le contenu du site.
           </p>
         </div>
 
@@ -32,7 +32,7 @@
 
           <div>
             <label for="email" class="block text-sm font-medium text-gray-700 mb-1">
-              Adresse electronique
+              Adresse électronique
             </label>
             <input
               id="email"
@@ -78,7 +78,7 @@
         </form>
 
         <p class="text-center text-gray-500 text-xs mt-8 leading-relaxed">
-          Acces reserve aux personnels habilites de l'ambassade.
+          Accès réservé aux personnels habilités de l'ambassade.
         </p>
       </div>
     </div>
@@ -108,15 +108,27 @@ const email = ref('')
 const password = ref('')
 const motDePasseVisible = ref(false)
 
-// Le logo vient du tenant ; l image compilee sert de repli si le bootstrap a echoue.
+// Le logo vient du tenant ; l'image compilée sert de repli si le bootstrap a échoué.
 const logo = computed(() => tenant.embassy?.logo_image || logoParDefaut)
 const nomCourt = computed(() => tenant.nomCourt || "l'ambassade")
+
+/**
+ * `redirect` vient de l'URL. Il n'est pas exploitable via `router.push` (qui
+ * ne résout que des routes internes), mais on valide quand même : seul un
+ * chemin commençant par un seul `/` est accepté, jamais une URL absolue
+ * déguisée en `//hôte/...`.
+ */
+function destinationSure(valeur: unknown): string {
+  if (typeof valeur === 'string' && valeur.startsWith('/') && !valeur.startsWith('//')) {
+    return valeur
+  }
+  return '/dashboard'
+}
 
 async function soumettre(): Promise<void> {
   const reussi = await auth.login(email.value, password.value)
   if (!reussi) return
 
-  const destination = route.query.redirect
-  await router.push(typeof destination === 'string' ? destination : '/dashboard')
+  await router.push(destinationSure(route.query.redirect))
 }
 </script>

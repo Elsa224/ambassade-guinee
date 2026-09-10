@@ -36,7 +36,7 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  /** Rend true si la connexion a reussi ; le message d erreur reste dans `erreur`. */
+  /** Rend true si la connexion a réussi ; le message d'erreur reste dans `erreur`. */
   async function login(email: string, password: string): Promise<boolean> {
     chargement.value = true
     erreur.value = null
@@ -49,7 +49,7 @@ export const useAuthStore = defineStore('auth', () => {
       erreur.value =
         souleve instanceof ApiError && souleve.statut !== 0
           ? souleve.message
-          : 'Serveur injoignable. Reessayez dans un instant.'
+          : 'Serveur injoignable. Réessayez dans un instant.'
       return false
     } finally {
       chargement.value = false
@@ -57,22 +57,22 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   /**
-   * Deconnecte l administrateur. La session locale est effacee meme si l appel
-   * serveur echoue : laisser un jeton actif dans le navigateur apres un clic
-   * sur « se deconnecter » serait pire qu un jeton orphelin cote serveur.
+   * Déconnecte l'administrateur. La session locale est effacée même si l'appel
+   * serveur échoue : laisser un jeton actif dans le navigateur après un clic
+   * sur « se déconnecter » serait pire qu'un jeton orphelin côté serveur.
    */
   async function logout(): Promise<void> {
     try {
       await apiPost('/api/auth/logout', {})
     } catch {
-      // Deconnexion locale malgre tout.
+      // Déconnexion locale malgré tout.
     } finally {
       enregistrerJeton(null)
       utilisateur.value = null
     }
   }
 
-  /** Recharge le jeton persiste au demarrage de l application. */
+  /** Recharge le jeton persisté au démarrage de l'application. */
   function restaurerSession(): void {
     const persiste = localStorage.getItem(CLEF_JETON)
     if (persiste) {

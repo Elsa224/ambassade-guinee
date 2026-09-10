@@ -553,8 +553,8 @@ const saveActualite = async () => {
     closeModal()
     await chargerActualites()
   } catch (souleve) {
-    erreurApi.value = "Enregistrement impossible. Verifiez les champs et reessayez."
-    console.error("Echec de l enregistrement de l actualite :", souleve)
+    erreurApi.value = "Enregistrement impossible. Vérifiez les champs et réessayez."
+    console.error("Échec de l'enregistrement de l'actualité :", souleve)
   }
 }
 
@@ -573,14 +573,14 @@ const editActualite = (actualite) => {
 }
 
 const deleteActualite = async (id) => {
-  if (!confirm('Etes-vous sur de vouloir supprimer cette actualite ?')) return
+  if (!confirm('Êtes-vous sûr de vouloir supprimer cette actualité ?')) return
 
   try {
     await supprimerArticle(id)
     await chargerActualites()
   } catch (souleve) {
     erreurApi.value = 'Suppression impossible.'
-    console.error("Echec de la suppression de l actualite :", souleve)
+    console.error("Échec de la suppression de l'actualité :", souleve)
   }
 }
 
@@ -597,8 +597,8 @@ const chargerActualites = async () => {
   try {
     actualites.value = (await listerArticles()).map(versVue)
   } catch (souleve) {
-    erreurApi.value = 'Impossible de charger les actualites.'
-    console.error('Echec du chargement des actualites :', souleve)
+    erreurApi.value = 'Impossible de charger les actualités.'
+    console.error('Échec du chargement des actualités :', souleve)
   } finally {
     chargement.value = false
   }

@@ -17,7 +17,7 @@ const CORRESPONDANCE: Record<keyof ThemeColors, string> = {
 /**
  * Applique le theme du tenant en ecrivant les variables CSS de base.
  * Les nuances derivees (primary-dark, accent-deep...) sont calculees en CSS
- * par color-mix() dans style.css : rien d'autre n'est a injecter ici.
+ * via oklch(from var(...)) dans style.css : rien d'autre n'est a injecter ici.
  * Une couleur vide ou absente est ignoree, ce qui laisse la valeur de repli
  * declaree dans @theme s'appliquer.
  */

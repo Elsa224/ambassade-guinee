@@ -8,15 +8,15 @@ describe('applyTheme', () => {
 
   it('ecrit les trois couleurs du tenant sur la racine du document', () => {
     applyTheme({
-      color_primary: 'var(--color-primary)',
-      color_secondary: 'var(--color-secondary)',
-      color_accent: 'var(--color-accent)',
+      color_primary: '#0a3d62',
+      color_secondary: '#f6b93b',
+      color_accent: '#b71540',
     })
 
     const racine = document.documentElement.style
-    expect(racine.getPropertyValue('--color-primary')).toBe('var(--color-primary)')
-    expect(racine.getPropertyValue('--color-secondary')).toBe('var(--color-secondary)')
-    expect(racine.getPropertyValue('--color-accent')).toBe('var(--color-accent)')
+    expect(racine.getPropertyValue('--color-primary')).toBe('#0a3d62')
+    expect(racine.getPropertyValue('--color-secondary')).toBe('#f6b93b')
+    expect(racine.getPropertyValue('--color-accent')).toBe('#b71540')
   })
 
   it('applique le theme sur la cible fournie', () => {

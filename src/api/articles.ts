@@ -1,9 +1,9 @@
 import { apiGet, apiPost, apiPut, apiDelete } from './client'
 
-/** Statuts de moderation d un article (spec 4.2). */
+/** Statuts de modération d'un article (spec 4.2). */
 export type StatutArticle = 'brouillon' | 'a_valider' | 'publie'
 
-/** Taxonomie geree en base, en remplacement des listes en dur (spec 4.2). */
+/** Taxonomie gérée en base, en remplacement des listes en dur (spec 4.2). */
 export interface Categorie {
   id: number
   nom: string
@@ -25,11 +25,11 @@ export interface Article {
   likes: number
   locale: string
   source: string
-  /** Derive du nombre de mots cote serveur : jamais calcule ici. */
+  /** Dérivé du nombre de mots côté serveur : jamais calculé ici. */
   temps_lecture: number
 }
 
-/** Charge utile d ecriture : sous-ensemble modifiable depuis le back-office. */
+/** Charge utile d'écriture : sous-ensemble modifiable depuis le back-office. */
 export interface BrouillonArticle {
   titre: string
   resume: string
@@ -50,13 +50,13 @@ const LIBELLES: Record<StatutArticle, string> = {
   publie: 'Publié',
 }
 
-/** Libelle affichable d un statut. */
+/** Libellé affichable d'un statut. */
 export function libelleStatut(statut: StatutArticle): string {
   return LIBELLES[statut] ?? LIBELLES.brouillon
 }
 
 /**
- * Statut d API correspondant a un libelle d interface.
+ * Statut d'API correspondant à un libellé d'interface.
  * Repli sur `brouillon` : en cas de valeur inattendue, mieux vaut ne rien
  * publier que publier par accident.
  */

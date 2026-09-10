@@ -271,7 +271,8 @@ const router = createRouter({
  */
 router.beforeEach((destination) => {
   const auth = useAuthStore()
-  const versDashboard = destination.path.startsWith('/dashboard')
+  const versDashboard =
+    destination.path === '/dashboard' || destination.path.startsWith('/dashboard/')
 
   if (versDashboard && !auth.estAuthentifie) {
     return { path: '/connexion', query: { redirect: destination.fullPath } }

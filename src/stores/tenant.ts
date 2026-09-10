@@ -5,9 +5,9 @@ import { applyTheme } from '@/theme/applyTheme'
 import { ApiError } from '@/api/client'
 
 /**
- * Config du site courant, resolue par le nom de domaine.
- * Un seul build sert tous les domaines : tout ce qui differe d une ambassade
- * a l autre passe par ce store.
+ * Config du site courant, résolue par le nom de domaine.
+ * Un seul build sert tous les domaines : tout ce qui diffère d'une ambassade
+ * à l'autre passe par ce store.
  */
 export const useTenantStore = defineStore('tenant', () => {
   const embassy = ref<Embassy | null>(null)
@@ -21,10 +21,10 @@ export const useTenantStore = defineStore('tenant', () => {
   }
 
   /**
-   * Charge la config du tenant et applique son theme.
-   * Ne leve jamais : un echec de bootstrap laisse l application se monter avec
-   * le theme de repli declare dans style.css, ce qui vaut mieux qu une page
-   * blanche sur un site d ambassade.
+   * Charge la config du tenant et applique son thème.
+   * Ne lève jamais : un échec de bootstrap laisse l'application se monter avec
+   * le thème de repli déclaré dans style.css, ce qui vaut mieux qu'une page
+   * blanche sur un site d'ambassade.
    */
   async function charger(domain: string = window.location.hostname): Promise<void> {
     chargement.value = true
@@ -35,7 +35,7 @@ export const useTenantStore = defineStore('tenant', () => {
       applyTheme(resultat.theme)
     } catch (souleve) {
       erreur.value = souleve instanceof ApiError ? souleve.message : 'Configuration indisponible.'
-      console.error('Echec du bootstrap du tenant :', souleve)
+      console.error('Échec du bootstrap du tenant :', souleve)
     } finally {
       chargement.value = false
     }

@@ -22,9 +22,18 @@ export class ApiError extends Error {
 
 let jeton: string | null = null
 
-/** Definit (ou efface) le jeton porteur envoye avec chaque requete. */
+/** Définit (ou efface) le jeton porteur envoyé avec chaque requête. */
 export function setAuthToken(token: string | null): void {
   jeton = token
+}
+
+type GestionnaireNonAutorise = () => void
+
+let surNonAutorise: GestionnaireNonAutorise | null = null
+
+/** Enregistre le traitement applique quand le serveur repond 401 (session expiree). */
+export function setUnauthorizedHandler(gestionnaire: GestionnaireNonAutorise | null): void {
+  surNonAutorise = gestionnaire
 }
 
 function entetes(avecCorps: boolean): Record<string, string> {
@@ -61,6 +70,11 @@ async function requete<T>(chemin: string, options: RequestInit, avecCorps: boole
   }
 
   if (!reponse.ok) {
+    if (reponse.status === 401 && surNonAutorise) {
+      // Session expirée ou jeton révoqué : on purge avant de propager l'erreur.
+      surNonAutorise()
+    }
+
     const message =
       corps !== null && typeof corps === 'object' && 'message' in corps
         ? String((corps as { message: unknown }).message)

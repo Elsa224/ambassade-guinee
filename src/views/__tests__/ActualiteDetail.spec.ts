@@ -62,6 +62,6 @@ describe("page de detail d'une actualite", () => {
 
     const wrapper = await monter('slug-inexistant')
 
-    expect(wrapper.text()).toContain('Cette actualite est introuvable')
+    expect(wrapper.text()).toContain('Cette actualité est introuvable')
   })
 })

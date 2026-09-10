@@ -122,9 +122,11 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import Sidebar from '@/components/Sidebar.vue'
+import { useAuthStore } from '@/stores/auth'
 
 const route = useRoute()
 const router = useRouter()
+const auth = useAuthStore()
 const isSidebarCollapsed = ref(false)
 const showNotifications = ref(false)
 const showMessages = ref(false)
@@ -186,9 +188,9 @@ const toggleProfile = () => {
   showMessages.value = false
 }
 
-const deconnexion = () => {
-  localStorage.removeItem('token')
-  router.push('/connexion')
+const deconnexion = async () => {
+  await auth.logout()
+  await router.push('/connexion')
 }
 
 // Fermer les dropdowns quand on clique ailleurs

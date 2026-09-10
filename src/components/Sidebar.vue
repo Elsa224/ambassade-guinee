@@ -244,9 +244,11 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
 import logo1 from '@/assets/images/logo.png'
 
 const router = useRouter()
+const auth = useAuthStore()
 const isCollapsed = ref(false)
 
 // État d'ouverture des groupes
@@ -268,10 +270,9 @@ const toggleAmbassade = () => {
 
 const emit = defineEmits(['toggle'])
 
-const deconnexion = () => {
-  console.log('Déconnexion...')
-  localStorage.removeItem('token')
-  router.push('/connexion')
+const deconnexion = async () => {
+  await auth.logout()
+  await router.push('/connexion')
 }
 </script>
 

@@ -515,8 +515,8 @@ const saveArticle = async () => {
     closeModal()
     await chargerArticles()
   } catch (souleve) {
-    erreurApi.value = "Enregistrement impossible. Verifiez les champs et reessayez."
-    console.error("Echec de l enregistrement de l article :", souleve)
+    erreurApi.value = "Enregistrement impossible. Vérifiez les champs et réessayez."
+    console.error("Échec de l'enregistrement de l'article :", souleve)
   }
 }
 
@@ -535,21 +535,21 @@ const editArticle = (article) => {
 }
 
 const deleteArticle = async (id) => {
-  if (!confirm('Etes-vous sur de vouloir supprimer cet article ?')) return
+  if (!confirm('Êtes-vous sûr de vouloir supprimer cet article ?')) return
 
   try {
     await supprimerArticle(id)
     await chargerArticles()
   } catch (souleve) {
     erreurApi.value = 'Suppression impossible.'
-    console.error("Echec de la suppression de l article :", souleve)
+    console.error("Échec de la suppression de l'article :", souleve)
   }
 }
 
 /**
- * L API renvoie categorie sous forme d objet et statut en valeur technique.
- * Le gabarit existant attend des chaines plates : on adapte ici plutot que de
- * reecrire toute la vue.
+ * L'API renvoie catégorie sous forme d'objet et statut en valeur technique.
+ * Le gabarit existant attend des chaînes plates : on adapte ici plutôt que de
+ * réécrire toute la vue.
  */
 const versVue = (article) => ({
   ...article,
@@ -565,7 +565,7 @@ const chargerArticles = async () => {
     articles.value = (await listerArticles()).map(versVue)
   } catch (souleve) {
     erreurApi.value = "Impossible de charger les articles."
-    console.error('Echec du chargement des articles :', souleve)
+    console.error('Échec du chargement des articles :', souleve)
   } finally {
     chargement.value = false
   }
