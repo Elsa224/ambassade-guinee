@@ -112,14 +112,14 @@
                   class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl z-50"
                 >
                   <router-link
-                    to="/admin/profil"
+                    to="/dashboard/profile"
                     class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                   >
                     <i class="bx bx-user"></i>
                     <span>Mon profil</span>
                   </router-link>
                   <router-link
-                    to="/admin/parametres"
+                    to="/dashboard/profile"
                     class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                   >
                     <i class="bx bx-cog"></i>

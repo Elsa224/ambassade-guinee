@@ -16,9 +16,9 @@ test("le lien du QR mene a la page d'inscription de l'evenement", async ({ page 
 test("un visiteur s'inscrit et obtient une confirmation", async ({ page }) => {
   await page.goto(`${BASE}AbC123ouvert`)
 
-  await page.fill('#nom', 'Aissatou Diallo')
-  await page.fill('#courriel', 'aissatou@example.org')
-  await page.click('button[type=submit]')
+  await page.locator('#nom').fill('Aissatou Diallo')
+  await page.locator('#courriel').fill('aissatou@example.org')
+  await page.locator('button[type=submit]').click()
 
   await expect(page.getByText('Votre inscription est enregistrée')).toBeVisible()
   await expect(page.locator('form')).toHaveCount(0)

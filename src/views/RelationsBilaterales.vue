@@ -73,7 +73,7 @@
         <!-- Grille des pays -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <!-- États-Unis -->
-          <router-link to="/relations/etats-unis" class="group">
+          <router-link to="/usa" class="group">
             <div
               class="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all hover:-translate-y-2"
             >
@@ -99,7 +99,7 @@
           </router-link>
 
           <!-- Costa Rica -->
-          <router-link to="/relations/costa-rica" class="group">
+          <router-link to="/costa-rica" class="group">
             <div
               class="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all hover:-translate-y-2"
             >
@@ -125,7 +125,7 @@
           </router-link>
 
           <!-- Haïti -->
-          <router-link to="/relations/haiti" class="group">
+          <router-link to="/haiti" class="group">
             <div
               class="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all hover:-translate-y-2"
             >
@@ -151,7 +151,7 @@
           </router-link>
 
           <!-- Bahamas -->
-          <router-link to="/relations/bahamas" class="group">
+          <router-link to="/bahamas" class="group">
             <div
               class="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all hover:-translate-y-2"
             >
@@ -191,7 +191,7 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
           <!-- Institutions de Bretton Woods -->
-          <router-link to="/relations/bretton-woods" class="group">
+          <router-link to="/fond-monetaire" class="group">
             <div
               class="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all hover:-translate-y-2"
             >

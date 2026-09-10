@@ -330,7 +330,7 @@
 
           <!-- Lien vers liste des ambassadeurs -->
           <router-link
-            to="/ambassade/anciens-ambassadeurs"
+            to="/construction"
             class="block bg-gray-100 hover:bg-gray-200 rounded-2xl p-6 text-center transition-colors group"
           >
             <svg

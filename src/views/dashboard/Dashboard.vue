@@ -137,7 +137,7 @@
       <div class="bg-white rounded-xl shadow-md p-6">
         <div class="flex justify-between items-center mb-4">
           <h3 class="font-semibold text-gray-800">Derniers articles</h3>
-          <router-link to="/admin/articles" class="text-sm text-primary hover:underline"
+          <router-link to="/dashboard/articles" class="text-sm text-primary hover:underline"
             >Voir tous →</router-link
           >
         </div>
@@ -171,7 +171,7 @@
       <div class="bg-white rounded-xl shadow-md p-6">
         <div class="flex justify-between items-center mb-4">
           <h3 class="font-semibold text-gray-800">Messages récents</h3>
-          <router-link to="/admin/commentaires" class="text-sm text-primary hover:underline"
+          <router-link to="/dashboard/articles" class="text-sm text-primary hover:underline"
             >Voir tous →</router-link
           >
         </div>
@@ -246,7 +246,7 @@
         </button>
 
         <router-link
-          to="/admin/parametres"
+          to="/dashboard/profile"
           class="p-4 text-center hover:bg-gray-50 rounded-lg transition-colors block"
         >
           <div class="bg-gray-500/10 p-3 rounded-full inline-block mb-2">

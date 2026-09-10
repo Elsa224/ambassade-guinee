@@ -117,7 +117,7 @@
             </button>
 
             <router-link
-              to="/dashboard/utilisateur/ajouter"
+              to="/dashboard/utilisateurs/ajouter"
               class="bg-primary text-white px-4 py-2 rounded-lg shadow-md hover:bg-primary-dark transition flex items-center gap-2"
             >
               <i class="bx bx-plus text-lg"></i>
