@@ -11,7 +11,7 @@
               v-model="searchQuery"
               type="text"
               placeholder="Search"
-              class="w-full border border-gray-300 rounded-lg px-10 py-2 focus:outline-none focus:ring-2 focus:ring-[#346778]"
+              class="w-full border border-gray-300 rounded-lg px-10 py-2 focus:outline-none focus:ring-2 focus:ring-ink"
             />
             <i class="bx bx-search absolute left-3 top-2.5 text-gray-400 text-lg"></i>
           </div>
@@ -22,7 +22,7 @@
       <div class="bg-white rounded-lg shadow overflow-hidden">
         <div class="overflow-x-auto">
           <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-[#006633] text-white">
+            <thead class="bg-primary text-white">
               <tr>
                 <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider whitespace-nowrap">Visitor Email</th>
                 <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider whitespace-nowrap">Contact</th>
@@ -63,7 +63,7 @@
                   <div class="flex justify-center">
                     <button
                       @click="openConfirmation(request)"
-                      class="text-[#006633] hover:text-[#004d26] transition-colors p-1 rounded"
+                      class="text-primary hover:text-primary-dark transition-colors p-1 rounded"
                       title="Voir détails"
                     >
                       <i class="bx bx-show text-xl"></i>
@@ -90,13 +90,13 @@
 
     <!-- Page d'attente -->
     <div v-if="isConfirming" class="fixed inset-0 flex flex-col items-center justify-center bg-gray-50 text-center z-50">
-      <h2 class="text-2xl font-semibold text-[#006633] mb-6">
+      <h2 class="text-2xl font-semibold text-primary mb-6">
         En attente de confirmation<span class="animate-pulse">...</span>
       </h2>
       <div class="flex space-x-6">
         <button
           @click="generateQrCard(selectedRequest!)"
-          class="bg-[#006633] text-white px-8 py-3 rounded-lg text-lg font-semibold hover:bg-[#004d26] transition-colors"
+          class="bg-primary text-white px-8 py-3 rounded-lg text-lg font-semibold hover:bg-primary-dark transition-colors"
         >
           Valider
         </button>
@@ -117,16 +117,16 @@
       <div class="self-start ml-6 mb-4">
         <button
           @click="showQrCard = false"
-          class="flex items-center text-[#006633] font-semibold hover:text-[#004d26] transition-colors"
+          class="flex items-center text-primary font-semibold hover:text-primary-dark transition-colors"
         >
           <i class="bx bx-arrow-back text-xl mr-2"></i> Retour
         </button>
       </div>
 
       <!-- Carte principale -->
-      <div class="relative bg-[#006633] text-white w-96 rounded-3xl shadow-lg overflow-hidden pt-2">
+      <div class="relative bg-primary text-white w-96 rounded-3xl shadow-lg overflow-hidden pt-2">
         <div class="flex justify-center">
-          <div class="w-28 h-28 bg-white rounded-full flex items-center justify-center shadow-md border-4 border-[#006633] -mt-14">
+          <div class="w-28 h-28 bg-white rounded-full flex items-center justify-center shadow-md border-4 border-primary -mt-14">
             <img :src="logo" alt="Logo" class="w-20 h-20 object-contain mt-6" />
           </div>
         </div>
@@ -186,10 +186,10 @@
       </div>
 
       <div class="flex justify-center gap-4 mt-2 mb-8">
-        <button class="bg-[#006633] text-black px-6 py-3 rounded-lg flex items-center gap-2 shadow hover:bg-[#004d26] hover:text-white transition-colors">
+        <button class="bg-primary text-black px-6 py-3 rounded-lg flex items-center gap-2 shadow hover:bg-primary-dark hover:text-white transition-colors">
           <i class="bx bx-share-alt"></i> Partager
         </button>
-        <button class="bg-[#006633] text-black px-6 py-3 rounded-lg flex items-center gap-2 shadow hover:bg-[#004d26] hover:text-white transition-colors">
+        <button class="bg-primary text-black px-6 py-3 rounded-lg flex items-center gap-2 shadow hover:bg-primary-dark hover:text-white transition-colors">
           <i class="bx bx-download"></i> Capturer
         </button>
       </div>

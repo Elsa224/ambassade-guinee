@@ -8,7 +8,7 @@
       </div>
       <button
         @click="openModal('add')"
-        class="bg-[#006633] text-white px-5 py-2.5 rounded-lg hover:bg-[#004d26] transition-colors flex items-center gap-2 shadow-md"
+        class="bg-primary text-white px-5 py-2.5 rounded-lg hover:bg-primary-dark transition-colors flex items-center gap-2 shadow-md"
       >
         <i class='bx bx-plus-circle text-xl'></i>
         Nouvel article
@@ -24,13 +24,13 @@
             v-model="searchQuery"
             type="text"
             placeholder="Rechercher un article..."
-            class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#fcd116] focus:border-[#fcd116]"
+            class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary focus:border-secondary"
           >
         </div>
 
         <select
           v-model="filtreCategorie"
-          class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#fcd116]"
+          class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary"
         >
           <option value="">Toutes les catégories</option>
           <option value="actualites-ambassade">Actualités Ambassade</option>
@@ -40,17 +40,17 @@
 
         <select
           v-model="filtreStatut"
-          class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#fcd116]"
+          class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary"
         >
           <option value="">Tous les statuts</option>
           <option value="Publié">Publié</option>
           <option value="Brouillon">Brouillon</option>
-          <option value="En attente">En attente</option>
+          <option value="À valider">À valider</option>
         </select>
 
         <select
           v-model="tri"
-          class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#fcd116]"
+          class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary"
         >
           <option value="recent">Plus récent</option>
           <option value="ancien">Plus ancien</option>
@@ -63,7 +63,7 @@
     <!-- Statistiques -->
     <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
       <div class="bg-white rounded-xl shadow-md p-4 text-center">
-        <p class="text-2xl font-bold text-[#006633]">{{ articlesFiltres.length }}</p>
+        <p class="text-2xl font-bold text-primary">{{ articlesFiltres.length }}</p>
         <p class="text-sm text-gray-600">Total articles</p>
       </div>
       <div class="bg-white rounded-xl shadow-md p-4 text-center">
@@ -78,6 +78,17 @@
         <p class="text-2xl font-bold text-blue-600">{{ totalVues }}</p>
         <p class="text-sm text-gray-600">Total vues</p>
       </div>
+    </div>
+
+    <!-- État de chargement / erreur -->
+    <p v-if="chargement" class="text-gray-500 py-4">Chargement en cours...</p>
+
+    <div
+      v-else-if="erreurApi"
+      role="alert"
+      class="rounded-lg border border-accent bg-accent/10 px-4 py-3 text-sm text-accent-dark mb-4"
+    >
+      {{ erreurApi }}
     </div>
 
     <!-- Liste des articles -->
@@ -127,7 +138,7 @@
                   <button @click="viewArticle(article)" class="text-blue-600 hover:text-blue-800">
                     <i class='bx bx-show text-xl'></i>
                   </button>
-                  <button @click="editArticle(article)" class="text-[#fcd116] hover:text-[#e6b800]">
+                  <button @click="editArticle(article)" class="text-secondary hover:text-secondary-dark">
                     <i class='bx bx-edit-alt text-xl'></i>
                   </button>
                   <button @click="deleteArticle(article.id)" class="text-red-600 hover:text-red-800">
@@ -153,7 +164,7 @@
           >
             <i class='bx bx-chevron-left'></i>
           </button>
-          <span class="px-3 py-1 bg-[#006633] text-white rounded-lg">{{ pageCourante }}</span>
+          <span class="px-3 py-1 bg-primary text-white rounded-lg">{{ pageCourante }}</span>
           <button
             @click="pageCourante++"
             :disabled="pageCourante === totalPages"
@@ -184,7 +195,7 @@
                 v-model="formArticle.titre"
                 type="text"
                 required
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#fcd116]"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary"
                 placeholder="Entrez le titre de l'article"
               >
             </div>
@@ -195,7 +206,7 @@
               <select
                 v-model="formArticle.categorie"
                 required
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#fcd116]"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary"
               >
                 <option value="actualites-ambassade">Actualités de l'Ambassade</option>
                 <option value="actualites-diplomatique">Actualités diplomatiques</option>
@@ -209,7 +220,7 @@
               <textarea
                 v-model="formArticle.resume"
                 rows="2"
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#fcd116]"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary"
                 placeholder="Petite description de l'article..."
               ></textarea>
             </div>
@@ -221,7 +232,7 @@
                 v-model="formArticle.contenu"
                 rows="6"
                 required
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#fcd116]"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary"
                 placeholder="Contenu détaillé de l'article..."
               ></textarea>
             </div>
@@ -248,11 +259,11 @@
                 <label class="block text-sm font-medium text-gray-700 mb-1">Statut</label>
                 <select
                   v-model="formArticle.statut"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#fcd116]"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary"
                 >
                   <option value="Brouillon">Brouillon</option>
                   <option value="Publié">Publié</option>
-                  <option value="En attente">En attente</option>
+                  <option value="À valider">À valider</option>
                 </select>
               </div>
               <div>
@@ -260,7 +271,7 @@
                 <input
                   v-model="formArticle.date"
                   type="date"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#fcd116]"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary"
                 >
               </div>
             </div>
@@ -270,7 +281,7 @@
               <button type="button" @click="closeModal" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300">
                 Annuler
               </button>
-              <button type="submit" class="px-4 py-2 bg-[#006633] text-white rounded-lg hover:bg-[#004d26]">
+              <button type="submit" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark">
                 {{ modalButtonText }}
               </button>
             </div>
@@ -316,13 +327,19 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 
-// ==================== IMPORT DES IMAGES ====================
-import partenariatImage from '@/assets/images/partenariat.jpg'
-import infrastructureImage from '@/assets/images/infrastructure.jpg'
-import ambassadeurImage from '@/assets/images/ambassadeur.jpeg'
+import {
+  listerArticles,
+  creerArticle,
+  modifierArticle,
+  supprimerArticle,
+  libelleStatut,
+  statutDepuisLibelle,
+} from '@/api/articles'
 
 // Données des articles
 const articles = ref([])
+const chargement = ref(false)
+const erreurApi = ref(null)
 const searchQuery = ref('')
 const filtreCategorie = ref('')
 const filtreStatut = ref('')
@@ -479,28 +496,28 @@ const closeModal = () => {
 }
 
 const saveArticle = async () => {
-  const newArticle = {
-    id: modalMode.value === 'add' ? Date.now() : editId.value,
+  const brouillon = {
     titre: formArticle.value.titre,
-    categorie: formArticle.value.categorie,
     resume: formArticle.value.resume,
     contenu: formArticle.value.contenu,
-    statut: formArticle.value.statut,
-    date: formArticle.value.date,
-    image: formArticle.value.imagePreview || 'https://via.placeholder.com/100',
-    vues: modalMode.value === 'add' ? 0 : articles.value.find(a => a.id === editId.value)?.vues || 0
+    categorie_slug: formArticle.value.categorie,
+    statut: statutDepuisLibelle(formArticle.value.statut),
+    date_publication: formArticle.value.date,
+    image: formArticle.value.imagePreview || undefined,
   }
 
-  if (modalMode.value === 'add') {
-    articles.value.unshift(newArticle)
-  } else {
-    const index = articles.value.findIndex(a => a.id === editId.value)
-    if (index !== -1) {
-      articles.value[index] = newArticle
+  try {
+    if (modalMode.value === 'add') {
+      await creerArticle(brouillon)
+    } else {
+      await modifierArticle(editId.value, brouillon)
     }
+    closeModal()
+    await chargerArticles()
+  } catch (souleve) {
+    erreurApi.value = "Enregistrement impossible. Vérifiez les champs et réessayez."
+    console.error("Échec de l'enregistrement de l'article :", souleve)
   }
-
-  closeModal()
 }
 
 const viewArticle = (article) => {
@@ -517,53 +534,44 @@ const editArticle = (article) => {
   openModal('edit', article)
 }
 
-const deleteArticle = (id) => {
-  if (confirm('Êtes-vous sûr de vouloir supprimer cet article ?')) {
-    articles.value = articles.value.filter(a => a.id !== id)
+const deleteArticle = async (id) => {
+  if (!confirm('Êtes-vous sûr de vouloir supprimer cet article ?')) return
+
+  try {
+    await supprimerArticle(id)
+    await chargerArticles()
+  } catch (souleve) {
+    erreurApi.value = 'Suppression impossible.'
+    console.error("Échec de la suppression de l'article :", souleve)
   }
 }
 
-const loadArticles = () => {
-  articles.value = [
-    {
-      id: 1,
-      titre: 'Rencontre diplomatique à Washington',
-      categorie: 'actualites-diplomatique',
-      resume: 'L\'Ambassadeur a rencontré les autorités américaines...',
-      contenu: 'L\'Ambassadeur de Guinée aux États-Unis a rencontré aujourd\'hui les autorités américaines pour discuter des relations bilatérales...',
-      statut: 'Publié',
-      date: '2024-01-15',
-      image: partenariatImage,
-      vues: 245
-    },
-    {
-      id: 2,
-      titre: 'Nouveau partenariat avec le Costa Rica',
-      categorie: 'actualites-diplomatique',
-      resume: 'Signature d\'un accord de coopération...',
-      contenu: 'Un accord de coopération a été signé entre la Guinée et le Costa Rica...',
-      statut: 'Publié',
-      date: '2024-01-14',
-      image: infrastructureImage,
-      vues: 189
-    },
-    {
-      id: 3,
-      titre: 'Cérémonie à l\'ambassade',
-      categorie: 'actualites-ambassade',
-      resume: 'Célébration de la fête nationale...',
-      contenu: 'L\'ambassade a organisé une cérémonie pour célébrer la fête nationale...',
-      statut: 'Brouillon',
-      date: '2024-01-12',
-      image: ambassadeurImage,
-      vues: 56
-    }
-  ]
+/**
+ * L'API renvoie catégorie sous forme d'objet et statut en valeur technique.
+ * Le gabarit existant attend des chaînes plates : on adapte ici plutôt que de
+ * réécrire toute la vue.
+ */
+const versVue = (article) => ({
+  ...article,
+  categorie: article.categorie?.slug ?? '',
+  statut: libelleStatut(article.statut),
+  date: article.date_publication,
+})
+
+const chargerArticles = async () => {
+  chargement.value = true
+  erreurApi.value = null
+  try {
+    articles.value = (await listerArticles()).map(versVue)
+  } catch (souleve) {
+    erreurApi.value = "Impossible de charger les articles."
+    console.error('Échec du chargement des articles :', souleve)
+  } finally {
+    chargement.value = false
+  }
 }
 
-onMounted(() => {
-  loadArticles()
-})
+onMounted(chargerArticles)
 </script>
 
 <style scoped>

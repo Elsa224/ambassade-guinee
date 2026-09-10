@@ -1,0 +1,29 @@
+{
+  "embassy": {
+    "id": 1,
+    "slug": "guinee-usa",
+    "domain": "embassyofguineausa.org",
+    "country_name_official": "Republique de Guinee",
+    "country_name_short": "Guinee",
+    "demonym": "guineen",
+    "flag_image": "/fixtures/flag-guinee.png",
+    "logo_image": "/fixtures/logo-guinee.png",
+    "theme": {
+      "color_primary": "#006633",
+      "color_secondary": "#fcd116",
+      "color_accent": "#ce1126"
+    },
+    "contact": {
+      "address": "2112 Leroy Place NW, Washington, DC 20008",
+      "phone": "+1 202 986 4300",
+      "email": "contact@exemple-ambassade.test",
+      "hours": "Du lundi au vendredi, 9h - 17h"
+    },
+    "modules": {
+      "bilateral": true,
+      "galerie": true,
+      "secure_rdv": false,
+      "secure_events": false
+    }
+  }
+}

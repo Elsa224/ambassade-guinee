@@ -8,7 +8,7 @@
       </div>
       <button
         @click="openModal('add')"
-        class="bg-[#006633] text-white px-5 py-2.5 rounded-lg hover:bg-[#004d26] transition-colors flex items-center gap-2 shadow-md"
+        class="bg-primary text-white px-5 py-2.5 rounded-lg hover:bg-primary-dark transition-colors flex items-center gap-2 shadow-md"
       >
         <i class='bx bx-plus-circle text-xl'></i>
         Nouvelle actualité
@@ -25,14 +25,14 @@
             v-model="searchQuery"
             type="text"
             placeholder="Rechercher une actualité..."
-            class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#fcd116] focus:border-[#fcd116]"
+            class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary focus:border-secondary"
           >
         </div>
 
         <!-- Filtre type -->
         <select
           v-model="filtreType"
-          class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#fcd116]"
+          class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary"
         >
           <option value="">Tous les types</option>
           <option value="actualites-ambassade">Actualités Ambassade</option>
@@ -43,18 +43,18 @@
         <!-- Filtre statut -->
         <select
           v-model="filtreStatut"
-          class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#fcd116]"
+          class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary"
         >
           <option value="">Tous les statuts</option>
           <option value="Publié">Publié</option>
           <option value="Brouillon">Brouillon</option>
-          <option value="Programmé">Programmé</option>
+          <option value="À valider">À valider</option>
         </select>
 
         <!-- Trier par -->
         <select
           v-model="tri"
-          class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#fcd116]"
+          class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary"
         >
           <option value="recent">Plus récent</option>
           <option value="ancien">Plus ancien</option>
@@ -67,7 +67,7 @@
     <!-- Statistiques -->
     <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
       <div class="bg-white rounded-xl shadow-md p-4 text-center">
-        <p class="text-2xl font-bold text-[#006633]">{{ actualitesFiltrees.length }}</p>
+        <p class="text-2xl font-bold text-primary">{{ actualitesFiltrees.length }}</p>
         <p class="text-sm text-gray-600">Total actualités</p>
       </div>
       <div class="bg-white rounded-xl shadow-md p-4 text-center">
@@ -82,6 +82,17 @@
         <p class="text-2xl font-bold text-blue-600">{{ totalVues }}</p>
         <p class="text-sm text-gray-600">Total vues</p>
       </div>
+    </div>
+
+    <!-- État de chargement / erreur -->
+    <p v-if="chargement" class="text-gray-500 py-4">Chargement en cours...</p>
+
+    <div
+      v-else-if="erreurApi"
+      role="alert"
+      class="rounded-lg border border-accent bg-accent/10 px-4 py-3 text-sm text-accent-dark mb-4"
+    >
+      {{ erreurApi }}
     </div>
 
     <!-- Liste des actualités -->
@@ -137,7 +148,7 @@
                   <button @click="viewActualite(actualite)" class="text-blue-600 hover:text-blue-800">
                     <i class='bx bx-show text-xl'></i>
                   </button>
-                  <button @click="editActualite(actualite)" class="text-[#fcd116] hover:text-[#e6b800]">
+                  <button @click="editActualite(actualite)" class="text-secondary hover:text-secondary-dark">
                     <i class='bx bx-edit-alt text-xl'></i>
                   </button>
                   <button @click="deleteActualite(actualite.id)" class="text-red-600 hover:text-red-800">
@@ -164,7 +175,7 @@
           >
             <i class='bx bx-chevron-left'></i>
           </button>
-          <span class="px-3 py-1 bg-[#006633] text-white rounded-lg">{{ pageCourante }}</span>
+          <span class="px-3 py-1 bg-primary text-white rounded-lg">{{ pageCourante }}</span>
           <button
             @click="pageCourante++"
             :disabled="pageCourante === totalPages"
@@ -195,7 +206,7 @@
                 v-model="formActualite.titre"
                 type="text"
                 required
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#fcd116]"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary"
                 placeholder="Entrez le titre de l'actualité"
               >
             </div>
@@ -206,7 +217,7 @@
               <select
                 v-model="formActualite.type"
                 required
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#fcd116]"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary"
               >
                 <option value="actualites-ambassade">Actualités de l'Ambassade</option>
                 <option value="actualites-diplomatique">Actualités diplomatiques</option>
@@ -220,7 +231,7 @@
               <textarea
                 v-model="formActualite.resume"
                 rows="2"
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#fcd116]"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary"
                 placeholder="Petite description de l'actualité..."
               ></textarea>
             </div>
@@ -232,7 +243,7 @@
                 v-model="formActualite.contenu"
                 rows="6"
                 required
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#fcd116]"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary"
                 placeholder="Contenu détaillé de l'actualité..."
               ></textarea>
             </div>
@@ -259,11 +270,11 @@
                 <label class="block text-sm font-medium text-gray-700 mb-1">Statut</label>
                 <select
                   v-model="formActualite.statut"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#fcd116]"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary"
                 >
                   <option value="Brouillon">Brouillon</option>
                   <option value="Publié">Publié</option>
-                  <option value="Programmé">Programmé</option>
+                  <option value="À valider">À valider</option>
                 </select>
               </div>
               <div>
@@ -271,7 +282,7 @@
                 <input
                   v-model="formActualite.date"
                   type="date"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#fcd116]"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary"
                 >
               </div>
             </div>
@@ -282,7 +293,7 @@
               <input
                 v-model="formActualite.tags"
                 type="text"
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#fcd116]"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary"
                 placeholder="ex: diplomatie, coopération, économie"
               >
               <div v-if="formActualite.tags" class="flex gap-2 mt-2 flex-wrap">
@@ -297,7 +308,7 @@
               <button type="button" @click="closeModal" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300">
                 Annuler
               </button>
-              <button type="submit" class="px-4 py-2 bg-[#006633] text-white rounded-lg hover:bg-[#004d26]">
+              <button type="submit" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark">
                 {{ modalButtonText }}
               </button>
             </div>
@@ -357,15 +368,19 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 
-// ==================== IMPORT DES IMAGES ====================
-import rencontreWashingtonImage from '@/assets/images/hero4.jpg'
-import accordCostaRicaImage from '@/assets/images/hero6.jpg'
-import feteNationaleImage from '@/assets/images/hero2.jpg'
-import loiInvestissementImage from '@/assets/images/hero5.jpg'
-import visitePresidentImage from '@/assets/images/hero4.jpg'
+import {
+  listerArticles,
+  creerArticle,
+  modifierArticle,
+  supprimerArticle,
+  libelleStatut,
+  statutDepuisLibelle,
+} from '@/api/articles'
 
 // Données des actualités
 const actualites = ref([])
+const chargement = ref(false)
+const erreurApi = ref(null)
 const searchQuery = ref('')
 const filtreType = ref('')
 const filtreStatut = ref('')
@@ -519,29 +534,28 @@ const closeModal = () => {
 }
 
 const saveActualite = async () => {
-  const newActualite = {
-    id: modalMode.value === 'add' ? Date.now() : editId.value,
+  const brouillon = {
     titre: formActualite.value.titre,
-    type: formActualite.value.type,
     resume: formActualite.value.resume,
     contenu: formActualite.value.contenu,
-    statut: formActualite.value.statut,
-    date: formActualite.value.date,
-    tags: formActualite.value.tags,
-    image: formActualite.value.imagePreview || 'https://via.placeholder.com/100',
-    vues: modalMode.value === 'add' ? 0 : actualites.value.find(a => a.id === editId.value)?.vues || 0
+    categorie_slug: formActualite.value.type,
+    statut: statutDepuisLibelle(formActualite.value.statut),
+    date_publication: formActualite.value.date,
+    image: formActualite.value.imagePreview || undefined,
   }
 
-  if (modalMode.value === 'add') {
-    actualites.value.unshift(newActualite)
-  } else {
-    const index = actualites.value.findIndex(a => a.id === editId.value)
-    if (index !== -1) {
-      actualites.value[index] = newActualite
+  try {
+    if (modalMode.value === 'add') {
+      await creerArticle(brouillon)
+    } else {
+      await modifierArticle(editId.value, brouillon)
     }
+    closeModal()
+    await chargerActualites()
+  } catch (souleve) {
+    erreurApi.value = "Enregistrement impossible. Vérifiez les champs et réessayez."
+    console.error("Échec de l'enregistrement de l'actualité :", souleve)
   }
-
-  closeModal()
 }
 
 const viewActualite = (actualite) => {
@@ -558,81 +572,39 @@ const editActualite = (actualite) => {
   openModal('edit', actualite)
 }
 
-const deleteActualite = (id) => {
-  if (confirm('Êtes-vous sûr de vouloir supprimer cette actualité ?')) {
-    actualites.value = actualites.value.filter(a => a.id !== id)
+const deleteActualite = async (id) => {
+  if (!confirm('Êtes-vous sûr de vouloir supprimer cette actualité ?')) return
+
+  try {
+    await supprimerArticle(id)
+    await chargerActualites()
+  } catch (souleve) {
+    erreurApi.value = 'Suppression impossible.'
+    console.error("Échec de la suppression de l'actualité :", souleve)
   }
 }
 
-// Charger les données avec les images importées
-const loadActualites = () => {
-  actualites.value = [
-    {
-      id: 1,
-      titre: 'Rencontre diplomatique à Washington',
-      type: 'actualites-diplomatique',
-      resume: 'L\'Ambassadeur a rencontré les autorités américaines pour renforcer les relations bilatérales...',
-      contenu: 'L\'Ambassadeur de Guinée aux États-Unis a rencontré aujourd\'hui les autorités américaines pour discuter des relations bilatérales. Les deux parties ont exprimé leur volonté de renforcer la coopération dans les domaines de l\'économie, de l\'éducation et de la sécurité.',
-      statut: 'Publié',
-      date: '2024-01-15',
-      tags: 'diplomatie,USA,coopération',
-      image: rencontreWashingtonImage,
-      vues: 245
-    },
-    {
-      id: 2,
-      titre: 'Signature d\'un accord avec le Costa Rica',
-      type: 'actualites-diplomatique',
-      resume: 'Un accord de coopération économique a été signé entre la Guinée et le Costa Rica...',
-      contenu: 'La Guinée et le Costa Rica ont signé aujourd\'hui un accord de coopération économique visant à renforcer les échanges commerciaux et les investissements entre les deux pays.',
-      statut: 'Publié',
-      date: '2024-01-14',
-      tags: 'Costa Rica,économie,accord',
-      image: accordCostaRicaImage,
-      vues: 189
-    },
-    {
-      id: 3,
-      titre: 'Célébration de la fête nationale à l\'ambassade',
-      type: 'actualites-ambassade',
-      resume: 'L\'ambassade a organisé une cérémonie pour célébrer la fête nationale de la Guinée...',
-      contenu: 'L\'ambassade de Guinée a organisé une cérémonie officielle pour célébrer la fête nationale. De nombreux invités étaient présents, dont des représentants du gouvernement américain et du corps diplomatique.',
-      statut: 'Publié',
-      date: '2024-01-12',
-      tags: 'fête nationale,célébration,ambassade',
-      image: feteNationaleImage,
-      vues: 356
-    },
-    {
-      id: 4,
-      titre: 'Nouvelle loi sur l\'investissement en Guinée',
-      type: 'actualites-gouvernementale',
-      resume: 'Le gouvernement guinéen annonce une nouvelle loi pour attirer les investisseurs...',
-      contenu: 'Le gouvernement de la République de Guinée a adopté une nouvelle loi sur l\'investissement visant à créer un environnement favorable aux investisseurs nationaux et internationaux.',
-      statut: 'Brouillon',
-      date: '2024-01-10',
-      tags: 'investissement,loi,économie',
-      image: loiInvestissementImage,
-      vues: 78
-    },
-    {
-      id: 5,
-      titre: 'Le Président guinéen en visite aux États-Unis',
-      type: 'actualites-gouvernementale',
-      resume: 'Le Président de la République effectue une visite officielle aux États-Unis...',
-      contenu: 'Le Président de la République de Guinée est arrivé à Washington pour une visite officielle de trois jours. Il rencontrera le Président américain et des responsables du gouvernement.',
-      statut: 'Programmé',
-      date: '2024-01-20',
-      tags: 'président,visite,USA',
-      image: visitePresidentImage,
-      vues: 0
-    }
-  ]
+const versVue = (article) => ({
+  ...article,
+  type: article.categorie?.slug ?? '',
+  statut: libelleStatut(article.statut),
+  date: article.date_publication,
+})
+
+const chargerActualites = async () => {
+  chargement.value = true
+  erreurApi.value = null
+  try {
+    actualites.value = (await listerArticles()).map(versVue)
+  } catch (souleve) {
+    erreurApi.value = 'Impossible de charger les actualités.'
+    console.error('Échec du chargement des actualités :', souleve)
+  } finally {
+    chargement.value = false
+  }
 }
 
-onMounted(() => {
-  loadActualites()
-})
+onMounted(chargerActualites)
 </script>
 
 <style scoped>

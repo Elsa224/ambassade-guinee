@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
 
 // Layouts
 import Layout from '@/layouts/Layout.vue'
@@ -9,6 +10,7 @@ import Home from '@/views/Home.vue'
 
 // Actualités
 import Actualite from '@/views/Actualite.vue'
+import ActualiteDetail from '@/views/ActualiteDetail.vue'
 import ActualitesAmbassade from '@/components/actualites/ActualitesAmbassade.vue'
 import ActualitesDiplomatique from '@/components/actualites/ActualitesDiplomatique.vue'
 import ActualitesGouvernementale from '@/components/actualites/ActualitesGouvernementale.vue'
@@ -106,6 +108,7 @@ const router = createRouter({
       children: [
         { path: '', name: 'home', component: Home },
         { path: 'actualite', name: 'actualite', component: Actualite },
+        { path: 'actualites/:slug', name: 'actualite-detail', component: ActualiteDetail },
         { path: 'actualites-ambassade', name: 'actualites-ambassade', component: ActualitesAmbassade },
         { path: 'actualites-diplomatique', name: 'actualites-diplomatique', component: ActualitesDiplomatique },
         { path: 'actualites-gouvernementale', name: 'actualites-gouvernementale', component: ActualitesGouvernementale },
@@ -258,6 +261,28 @@ const router = createRouter({
     // Redirection 404 éventuelle (optionnelle)
     // { path: '/:pathMatch(.*)*', redirect: '/' }
   ]
+})
+
+/**
+ * Garde d acces au back-office.
+ * Le dashboard etait jusqu ici entierement ouvert : toute route sous
+ * /dashboard exige desormais une session. La destination demandee est
+ * conservee pour y revenir apres la connexion.
+ */
+router.beforeEach((destination) => {
+  const auth = useAuthStore()
+  const versDashboard =
+    destination.path === '/dashboard' || destination.path.startsWith('/dashboard/')
+
+  if (versDashboard && !auth.estAuthentifie) {
+    return { path: '/connexion', query: { redirect: destination.fullPath } }
+  }
+
+  if (destination.path === '/connexion' && auth.estAuthentifie) {
+    return { path: '/dashboard' }
+  }
+
+  return true
 })
 
 export default router

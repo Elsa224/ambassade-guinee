@@ -74,7 +74,7 @@ function goToList() {
 // Style des boutons
 function btnClass(tab: string) {
   return route.name === tab
-    ? 'bg-[#006633] text-white px-3 py-2 rounded-lg font-semibold hover:bg-[#006633] hover:text-white transition'
-    : 'border-2 border-[#006633] text-[#006633] px-3 py-2 rounded-lg font-semibold hover:bg-[#006633] hover:text-white transition';
+    ? 'bg-primary text-white px-3 py-2 rounded-lg font-semibold hover:bg-primary hover:text-white transition'
+    : 'border-2 border-primary text-primary px-3 py-2 rounded-lg font-semibold hover:bg-primary hover:text-white transition';
 }
 </script>

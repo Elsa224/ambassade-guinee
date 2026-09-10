@@ -28,7 +28,7 @@
             </label>
             <textarea
               rows="6"
-              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#006633] focus:border-transparent"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
               placeholder="Écrivez votre commentaire..."
               v-model="commentText"
             ></textarea>
@@ -70,7 +70,7 @@
               type="checkbox"
               id="notify"
               v-model="notifyUsers"
-              class="rounded border-gray-300 text-[#006633] focus:ring-[#006633]"
+              class="rounded border-gray-300 text-primary focus:ring-primary"
             >
             <label for="notify" class="text-sm text-gray-700">
               Notifier les utilisateurs assignés à cette tâche
@@ -88,7 +88,7 @@
             <button
               @click="submitComment"
               :disabled="!commentText.trim()"
-              class="px-6 py-2 bg-[#006633] text-white rounded-lg hover:bg-[#004c2a] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              class="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {{ isEditing ? 'Mettre à jour' : 'Publier' }}
             </button>

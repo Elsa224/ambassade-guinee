@@ -17,7 +17,7 @@
           </button>
           <!-- Bouton Télécharger -->
           <button
-            class="px-4 py-2 bg-[#006633] text-white rounded-lg hover:bg-[#004c2a] transition-colors"
+            class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
           >
             Télécharger
           </button>

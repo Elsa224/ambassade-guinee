@@ -1,8 +1,13 @@
 import { test, expect } from '@playwright/test'
 
-// See here how to get started:
-// https://playwright.dev/docs/intro
-test('visits the app root url', async ({ page }) => {
+test("la page d'accueil se charge sans erreur console", async ({ page }) => {
+  const erreurs: string[] = []
+  page.on('console', (message) => {
+    if (message.type() === 'error') erreurs.push(message.text())
+  })
+
   await page.goto('/')
-  await expect(page.locator('h1')).toHaveText('You did it!')
+
+  await expect(page.locator('#app')).toBeVisible()
+  expect(erreurs).toEqual([])
 })

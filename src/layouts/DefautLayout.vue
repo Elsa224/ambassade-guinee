@@ -11,7 +11,7 @@
           <div class="flex items-center justify-between">
             <!-- Titre de la page dynamique -->
             <div class="flex items-center gap-3">
-              <i :class="currentPageIcon" class="text-2xl text-[#006633]"></i>
+              <i :class="currentPageIcon" class="text-2xl text-primary"></i>
               <h1 class="text-xl font-semibold text-gray-800">{{ currentPageTitle }}</h1>
             </div>
 
@@ -23,14 +23,14 @@
                 <input
                   type="text"
                   placeholder="Rechercher..."
-                  class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#fcd116] focus:border-[#fcd116] w-64"
+                  class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary focus:border-secondary w-64"
                 >
               </div>
 
               <!-- Notifications -->
               <div class="relative">
                 <button @click="toggleNotifications" class="relative">
-                  <i class='bx bx-bell text-2xl text-gray-600 hover:text-[#006633] transition-colors'></i>
+                  <i class='bx bx-bell text-2xl text-gray-600 hover:text-primary transition-colors'></i>
                   <span class="absolute -top-1 -right-1 bg-red-600 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">3</span>
                 </button>
 
@@ -55,8 +55,8 @@
               <!-- Messages -->
               <div class="relative hidden sm:block">
                 <button @click="toggleMessages" class="relative">
-                  <i class='bx bx-envelope text-2xl text-gray-600 hover:text-[#006633] transition-colors'></i>
-                  <span class="absolute -top-1 -right-1 bg-[#fcd116] text-[#006633] text-xs rounded-full w-4 h-4 flex items-center justify-center">2</span>
+                  <i class='bx bx-envelope text-2xl text-gray-600 hover:text-primary transition-colors'></i>
+                  <span class="absolute -top-1 -right-1 bg-secondary text-primary text-xs rounded-full w-4 h-4 flex items-center justify-center">2</span>
                 </button>
 
                 <!-- Dropdown messages -->
@@ -122,9 +122,11 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import Sidebar from '@/components/Sidebar.vue'
+import { useAuthStore } from '@/stores/auth'
 
 const route = useRoute()
 const router = useRouter()
+const auth = useAuthStore()
 const isSidebarCollapsed = ref(false)
 const showNotifications = ref(false)
 const showMessages = ref(false)
@@ -186,9 +188,9 @@ const toggleProfile = () => {
   showMessages.value = false
 }
 
-const deconnexion = () => {
-  localStorage.removeItem('token')
-  router.push('/connexion')
+const deconnexion = async () => {
+  await auth.logout()
+  await router.push('/connexion')
 }
 
 // Fermer les dropdowns quand on clique ailleurs

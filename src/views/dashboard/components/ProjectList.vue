@@ -12,11 +12,11 @@
           <input
             type="text"
             placeholder="Rechercher..."
-            class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#006633] focus:border-transparent"
+            class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
             v-model="searchQuery"
           />
           <button
-            class="px-6 py-2 bg-[#006633] text-white rounded-lg hover:bg-[#004c2a] transition-colors"
+            class="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
           >
             Filtrer
           </button>
@@ -94,7 +94,7 @@
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                   {{ project.company }}
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-[#006633]">
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-primary">
                   {{ project.title }}
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
@@ -115,7 +115,7 @@
                   <div class="flex items-center">
                     <div class="w-16 bg-gray-200 rounded-full h-2 mr-2">
                       <div
-                        class="bg-[#006633] h-2 rounded-full"
+                        class="bg-primary h-2 rounded-full"
                         :style="{ width: project.progress }"
                       ></div>
                     </div>
@@ -126,7 +126,7 @@
                   {{ project.createdBy }}
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  <button class="text-[#006633] hover:text-[#004c2a] text-xl">
+                  <button class="text-primary hover:text-primary-dark text-xl">
                     <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                       <path
                         fill-rule="evenodd"
@@ -140,7 +140,7 @@
                   <!-- Bouton Éditer avec navigation -->
                   <button
                     @click="editProject(project.id)"
-                    class="text-[#006633] hover:text-[#004c2a] text-xl"
+                    class="text-primary hover:text-primary-dark text-xl"
                   >
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path
@@ -156,7 +156,7 @@
                   <!-- Bouton Document avec navigation -->
                   <button
                     @click="viewDocument(project.id)"
-                    class="text-[#006633] hover:text-[#004c2a] text-xl"
+                    class="text-primary hover:text-primary-dark text-xl"
                   >
                     <i class="bx bx-file"></i>
                   </button>

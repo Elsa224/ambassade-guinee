@@ -4,7 +4,7 @@
 
       <!-- Barre action -->
       <div class="flex justify-between items-center mb-6">
-        <h2 class="text-3xl font-semibold text-[#006633]">
+        <h2 class="text-3xl font-semibold text-primary">
           {{ activeTab === 'creer' ? 'Créer une Carte' : 'Liste des Cartes' }}
         </h2>
 
@@ -14,7 +14,7 @@
           <router-link
             v-if="activeTab === 'liste'"
             to="/dashboard/cartes/creer"
-            class="bg-[#006633] text-white px-4 py-2 rounded-lg hover:bg-[#004c2a] transition-colors"
+            class="bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary-dark transition-colors"
           >
             Créer une Carte
           </router-link>
@@ -23,7 +23,7 @@
           <router-link
             v-else
             to="/dashboard/cartes/liste"
-            class="border border-[#006633] text-[#006633] px-4 py-2 rounded-lg hover:bg-[#006633] hover:text-white transition-colors"
+            class="border border-primary text-primary px-4 py-2 rounded-lg hover:bg-primary hover:text-white transition-colors"
           >
             Retour à la Liste
           </router-link>

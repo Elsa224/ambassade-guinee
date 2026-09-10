@@ -1,7 +1,7 @@
 <template>
   <div class="p-6 min-h-screen bg-gray-100 flex items-center justify-center">
     <div class="bg-white rounded-lg shadow-lg p-6 max-w-sm text-center">
-      <h1 class="text-2xl font-bold text-[#346778] mb-4">Déconnexion</h1>
+      <h1 class="text-2xl font-bold text-ink mb-4">Déconnexion</h1>
       <p class="text-gray-600 mb-6">Êtes-vous sûr de vouloir vous déconnecter ?</p>
 
       <div class="flex justify-center gap-4">

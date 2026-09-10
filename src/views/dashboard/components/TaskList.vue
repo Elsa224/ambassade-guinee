@@ -7,7 +7,7 @@
           <h1 class="text-3xl font-bold text-gray-900">Liste des Tâches - SecureCheck</h1>
           <button
             @click="addTask"
-            class="px-6 py-2 bg-[#006633] text-white rounded-lg hover:bg-[#004c2a] transition-colors flex items-center gap-2"
+            class="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors flex items-center gap-2"
           >
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
@@ -23,15 +23,15 @@
           <input
             type="text"
             placeholder="Rechercher..."
-            class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#006633] focus:border-transparent"
+            class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
             v-model="searchQuery"
           >
           <input
             type="date"
-            class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#006633] focus:border-transparent"
+            class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
             v-model="dateFilter"
           >
-          <button class="px-6 py-2 bg-[#006633] text-white rounded-lg hover:bg-[#004c2a] transition-colors">
+          <button class="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors">
             Filtrer
           </button>
         </div>
@@ -61,7 +61,7 @@
               <tr v-for="task in filteredTasks" :key="task.id" class="hover:bg-gray-50">
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ task.creationDate }}</td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ task.parent }}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-[#006633]">{{ task.title }}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-primary">{{ task.title }}</td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ task.assignedTo }}</td>
                 <td class="px-6 py-4 whitespace-nowrap">
                   <span :class="getPriorityClass(task.priority)" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium">
@@ -77,7 +77,7 @@
                     <!-- Icône horloge cliquable -->
                     <button
                       @click="viewTimeEntries(task.id)"
-                      class="text-[#006633] hover:text-[#004c2a] p-1 rounded"
+                      class="text-primary hover:text-primary-dark p-1 rounded"
                       title="Voir le temps réel"
                     >
                       <i class="bx bx-time text-lg"></i>
@@ -95,7 +95,7 @@
                     <!-- Bouton Éditer -->
                     <button
                       @click="editTask(task.id)"
-                      class="text-[#006633] hover:text-[#004c2a] p-1 rounded"
+                      class="text-primary hover:text-primary-dark p-1 rounded"
                       title="Éditer"
                     >
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -106,7 +106,7 @@
                     <!-- Bouton Commentaire -->
                     <button
                       @click="viewComments(task.id)"
-                      class="text-[#006633] hover:text-[#004c2a] p-1 rounded"
+                      class="text-primary hover:text-primary-dark p-1 rounded"
                       title="Commentaire"
                     >
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -209,7 +209,7 @@ const filteredTasks = computed(() => {
   return filtered
 })
 
-const getPriorityClass = (priority) => {
+const getPriorityClass = () => {
   return 'bg-red-100 text-red-800'
 }
 

@@ -10,17 +10,17 @@
           <input
             type="text"
             placeholder="Rechercher par nom, objet ou email, t"
-            class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#006633] focus:border-transparent"
+            class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
             v-model="searchQuery"
           >
           <input
             type="date"
-            class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#006633] focus:border-transparent"
+            class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
             value="27/10/2025"
           >
           <button
             @click="addTimeEntry"
-            class="px-6 py-2 bg-[#006633] text-white rounded-lg hover:bg-[#004c2a] transition-colors flex items-center gap-2"
+            class="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors flex items-center gap-2"
           >
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
@@ -49,7 +49,7 @@
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ entry.createdBy }}</td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                   <div class="flex items-center gap-2">
-                    <button class="text-[#006633] hover:text-[#004c2a] p-1 rounded">
+                    <button class="text-primary hover:text-primary-dark p-1 rounded">
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                       </svg>

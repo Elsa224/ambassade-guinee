@@ -7,7 +7,7 @@
           <h1 class="text-3xl font-bold text-gray-900">Commentaires - Update liste</h1>
           <button
             @click="addComment"
-            class="px-6 py-2 bg-[#006633] text-white rounded-lg hover:bg-[#004c2a] transition-colors flex items-center gap-2"
+            class="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors flex items-center gap-2"
           >
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
@@ -23,10 +23,10 @@
           <input
             type="text"
             placeholder="Rechercher dans les commentaires..."
-            class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#006633] focus:border-transparent"
+            class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
             v-model="searchQuery"
           >
-          <button class="px-6 py-2 bg-[#006633] text-white rounded-lg hover:bg-[#004c2a] transition-colors">
+          <button class="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors">
             Filtrer
           </button>
         </div>
@@ -40,7 +40,7 @@
             <div class="flex gap-4">
               <!-- Avatar -->
               <div class="flex-shrink-0">
-                <div class="w-10 h-10 bg-[#006633] rounded-full flex items-center justify-center text-white font-semibold">
+                <div class="w-10 h-10 bg-primary rounded-full flex items-center justify-center text-white font-semibold">
                   {{ getInitials(comment.author) }}
                 </div>
               </div>
@@ -55,7 +55,7 @@
                   <div class="flex items-center gap-2">
                     <button
                       @click="editComment(comment.id)"
-                      class="text-[#006633] hover:text-[#004c2a] p-1 rounded transition-colors"
+                      class="text-primary hover:text-primary-dark p-1 rounded transition-colors"
                       title="Modifier"
                     >
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -80,8 +80,8 @@
                 <div class="flex items-center gap-4 text-sm text-gray-500">
                   <button
                     @click="toggleLike(comment.id)"
-                    class="flex items-center gap-1 hover:text-[#006633] transition-colors"
-                    :class="{ 'text-[#006633]': comment.isLiked }"
+                    class="flex items-center gap-1 hover:text-primary transition-colors"
+                    :class="{ 'text-primary': comment.isLiked }"
                   >
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"/>
@@ -91,7 +91,7 @@
 
                   <button
                     @click="toggleReply(comment.id)"
-                    class="flex items-center gap-1 hover:text-[#006633] transition-colors"
+                    class="flex items-center gap-1 hover:text-primary transition-colors"
                   >
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/>
@@ -105,7 +105,7 @@
                   <textarea
                     v-model="comment.replyText"
                     rows="2"
-                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#006633] focus:border-transparent mb-2"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent mb-2"
                     placeholder="Écrivez votre réponse..."
                   ></textarea>
                   <div class="flex justify-end gap-2">
@@ -117,7 +117,7 @@
                     </button>
                     <button
                       @click="submitReply(comment.id)"
-                      class="px-3 py-1 text-sm bg-[#006633] text-white rounded hover:bg-[#004c2a] transition-colors"
+                      class="px-3 py-1 text-sm bg-primary text-white rounded hover:bg-primary-dark transition-colors"
                     >
                       Répondre
                     </button>
@@ -133,7 +133,7 @@
                   >
                     <div class="flex gap-3">
                       <div class="flex-shrink-0">
-                        <div class="w-8 h-8 bg-[#006633] rounded-full flex items-center justify-center text-white text-xs font-semibold">
+                        <div class="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-white text-xs font-semibold">
                           {{ getInitials(reply.author) }}
                         </div>
                       </div>

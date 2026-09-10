@@ -8,7 +8,7 @@
           v-model="searchQuery"
           type="text"
           placeholder="Rechercher..."
-          class="border border-gray-300 rounded-lg px-10 py-2 w-full focus:outline-none focus:ring-2 focus:ring-[#006633] focus:border-[#006633] transition"
+          class="border border-gray-300 rounded-lg px-10 py-2 w-full focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition"
         />
         <i class="bx bx-search absolute left-3 top-2.5 text-gray-400 text-lg"></i>
       </div>
@@ -68,7 +68,7 @@
       <!-- === VUE DESKTOP : TABLEAU === -->
       <div class="hidden md:block overflow-x-auto w-full" style="max-height: 500px;">
         <table class="w-full text-left border-collapse min-w-max">
-          <thead class="bg-[#006633] text-white sticky top-0 z-10">
+          <thead class="bg-primary text-white sticky top-0 z-10">
             <tr>
               <th class="p-4 border-none whitespace-nowrap">Nom</th>
               <th class="p-4 border-none whitespace-nowrap">Prénoms</th>
@@ -166,7 +166,7 @@
           @click="goToPage(page)"
           :class="[
             'px-3 py-1 rounded-md border border-gray-300 hover:bg-gray-50',
-            currentPage === page ? 'bg-[#006633] text-white border-[#006633]' : '',
+            currentPage === page ? 'bg-primary text-white border-primary' : '',
           ]"
         >
           {{ page }}

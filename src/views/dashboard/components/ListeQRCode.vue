@@ -1,7 +1,7 @@
 <template>
   <div class="overflow-x-auto bg-white rounded-lg shadow-md">
     <table class="min-w-full divide-y divide-gray-200">
-      <thead class="bg-[#006633] text-white">
+      <thead class="bg-primary text-white">
         <tr>
           <th class="px-6 py-3 text-left text-sm font-semibold">Nom</th>
           <th class="px-6 py-3 text-left text-sm font-semibold">Prénom</th>
@@ -30,7 +30,7 @@
           </td>
           <td class="px-6 py-3 text-center relative">
             <button @click="item.showActions = !item.showActions" class="flex items-center justify-center w-full">
-              <i class="bx bx-dots-vertical text-xl text-gray-600 hover:text-[#006633]"></i>
+              <i class="bx bx-dots-vertical text-xl text-gray-600 hover:text-primary"></i>
             </button>
 
             <div
@@ -81,7 +81,7 @@
           @click="goToPage(page)"
           :class="[
             'px-3 py-1 rounded-md border border-gray-300 hover:bg-gray-50',
-            currentPage === page ? 'bg-[#006633] text-white border-[#006633]' : ''
+            currentPage === page ? 'bg-primary text-white border-primary' : ''
           ]"
         >
           {{ page }}
@@ -126,7 +126,7 @@ const pageNumbers = computed(() => {
   const total = totalPages.value
   const current = currentPage.value
   let start = Math.max(1, current - 1)
-  let end = Math.min(total, start + 2)
+  const end = Math.min(total, start + 2)
   if (end - start < 2) start = Math.max(1, end - 2)
   return Array.from({ length: end - start + 1 }, (_, i) => start + i)
 })
@@ -134,7 +134,9 @@ const pageNumbers = computed(() => {
 function goToPage(page: number) {
   if (page >= 1 && page <= totalPages.value) currentPage.value = page
 }
-function editItem(item: any) { alert(`Modifier ${item.nom}`) }
-function deleteItem(item: any) { alert(`Supprimer ${item.nom}`) }
-function addItem(item: any) { alert(`Ajouter ${item.nom}`) }
+type QrItem = (typeof qrList.value)[number]
+
+function editItem(item: QrItem) { alert(`Modifier ${item.nom}`) }
+function deleteItem(item: QrItem) { alert(`Supprimer ${item.nom}`) }
+function addItem(item: QrItem) { alert(`Ajouter ${item.nom}`) }
 </script>

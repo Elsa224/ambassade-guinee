@@ -13,7 +13,7 @@
             >
               Annuler
             </button>
-            <button class="px-4 py-2 bg-[#006633] text-white rounded-lg hover:bg-[#004c2a] transition-colors">
+            <button class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors">
               Sauvegarder
             </button>
           </div>
@@ -30,7 +30,7 @@
               <label class="block text-sm font-medium text-gray-700 mb-2">
                 Tâche parente
               </label>
-              <select class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#006633] focus:border-transparent">
+              <select class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
                 <option value="api-list">API List</option>
                 <option value="accune">Accune</option>
               </select>
@@ -41,7 +41,7 @@
               <label class="block text-sm font-medium text-gray-700 mb-2">
                 Assigné à <span class="text-red-500">*</span>
               </label>
-              <select class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#006633] focus:border-transparent">
+              <select class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
                 <option value="employee-admin">Employee Admin</option>
                 <option value="master-admin">Master Admin</option>
               </select>
@@ -54,7 +54,7 @@
               </label>
               <input
                 type="text"
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#006633] focus:border-transparent"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                 value="23/10/2025"
               >
             </div>
@@ -66,7 +66,7 @@
               </label>
               <input
                 type="number"
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#006633] focus:border-transparent"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                 value="4"
               >
             </div>
@@ -76,7 +76,7 @@
               <label class="block text-sm font-medium text-gray-700 mb-2">
                 Statut <span class="text-red-500">*</span>
               </label>
-              <select class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#006633] focus:border-transparent">
+              <select class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
                 <option value="termine">Terminé</option>
                 <option value="a-faire">A faire</option>
                 <option value="en-cours">En cours</option>
@@ -93,7 +93,7 @@
               </label>
               <input
                 type="text"
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#006633] focus:border-transparent"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                 value="Update liste"
               >
             </div>
@@ -103,7 +103,7 @@
               <label class="block text-sm font-medium text-gray-700 mb-2">
                 Priorité <span class="text-red-500">*</span>
               </label>
-              <select class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#006633] focus:border-transparent">
+              <select class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
                 <option value="urgente">Urgente</option>
                 <option value="normale">Normale</option>
                 <option value="basse">Basse</option>
@@ -117,7 +117,7 @@
               </label>
               <input
                 type="text"
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#006633] focus:border-transparent"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                 value="23/10/2025"
               >
             </div>
@@ -129,7 +129,7 @@
               </label>
               <input
                 type="number"
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#006633] focus:border-transparent"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                 value="15"
               >
               <p class="text-sm text-gray-500 mt-1">Veuillez compléter ce champ.</p>
@@ -144,7 +144,7 @@
           </label>
           <textarea
             rows="4"
-            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#006633] focus:border-transparent"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
           >Mise à jour des tâches</textarea>
         </div>
 
@@ -153,7 +153,7 @@
           <button class="px-6 py-2 border border-red-300 text-red-700 rounded-lg hover:bg-red-50 transition-colors">
             Supprimer
           </button>
-          <button class="px-6 py-2 bg-[#006633] text-white rounded-lg hover:bg-[#004c2a] transition-colors">
+          <button class="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors">
             Mettre à jour
           </button>
         </div>
