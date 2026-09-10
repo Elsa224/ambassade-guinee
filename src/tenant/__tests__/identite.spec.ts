@@ -65,4 +65,29 @@ describe("identite de l'ambassade courante", () => {
     expect(identite.adresse.value).toBe('')
     expect(identite.telephone.value).toBe('')
   })
+
+  it("prefere le libelle complet fourni par l'ambassade", () => {
+    // « Ambassade de la Republique Gabonaise » est juste mais incomplet : il
+    // ne dit pas ou l'ambassade est installee. Aucun accord ne peut deviner
+    // « en Guinee » plutot que « aux USA » ou « au Maroc » ; seul le back
+    // peut le transmettre.
+    useTenantStore().embassy = {
+      ...(gabonFixture.embassy as unknown as Embassy),
+      display_name: 'Ambassade de la République du Gabon en Guinée',
+    }
+
+    expect(useIdentite().nomDeLAmbassade.value).toBe(
+      'Ambassade de la République du Gabon en Guinée',
+    )
+  })
+
+  it('se rabat sur le nom du pays quand le libelle complet manque', () => {
+    useTenantStore().embassy = {
+      ...(gabonFixture.embassy as unknown as Embassy),
+      display_name: '   ',
+    }
+
+    // Un libelle vide ou blanc ne doit pas produire un titre vide.
+    expect(useIdentite().nomDeLAmbassade.value).toBe('Ambassade de la Republique Gabonaise')
+  })
 })

@@ -3,6 +3,7 @@ import { ref, computed } from 'vue'
 import { fetchBootstrap, type Embassy } from '@/api/bootstrap'
 import { applyTheme } from '@/theme/applyTheme'
 import { ApiError } from '@/api/client'
+import { rubriqueOuverte as rubriqueOuvertePour } from '@/tenant/rubriques'
 
 /**
  * Config du site courant, résolue par le nom de domaine.
@@ -20,15 +21,9 @@ export const useTenantStore = defineStore('tenant', () => {
     return embassy.value?.modules?.[nom] === true
   }
 
-  /**
-   * Une rubrique n'est fermee que si l'ambassade l'a explicitement mise a
-   * `false`. L'absence de declaration laisse la rubrique ouverte, et un
-   * bootstrap en echec n'en ferme aucune : sur un site d'ambassade, une panne
-   * de configuration ne doit pas eteindre le site entier.
-   */
+  /** La regle vit dans `tenant/rubriques.ts`, qui la documente. */
   function rubriqueOuverte(nom: string | null): boolean {
-    if (nom === null) return true
-    return embassy.value?.modules?.[nom] !== false
+    return rubriqueOuvertePour(nom, embassy.value)
   }
 
   /**
