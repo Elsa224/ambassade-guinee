@@ -1,0 +1,53 @@
+{
+  "data": [
+    {
+      "id": 1,
+      "slug": "rencontre-bilaterale-a-washington",
+      "titre": "Rencontre bilaterale a Washington",
+      "resume": "L ambassadeur a rencontre les representants du Departement d Etat.",
+      "contenu": "<p>Une rencontre de travail s est tenue a Washington.</p>",
+      "image": "/fixtures/article-1.jpg",
+      "categorie": { "id": 1, "nom": "Actualites Ambassade", "slug": "actualites-ambassade", "couleur": "#006633" },
+      "date_publication": "2026-08-14",
+      "statut": "publie",
+      "vues": 128,
+      "likes": 12,
+      "locale": "fr",
+      "source": "manuel",
+      "temps_lecture": 2
+    },
+    {
+      "id": 2,
+      "slug": "accord-de-cooperation-avec-le-costa-rica",
+      "titre": "Accord de cooperation avec le Costa Rica",
+      "resume": "Signature d un accord de cooperation economique.",
+      "contenu": "<p>Les deux pays ont signe un accord de cooperation.</p>",
+      "image": "/fixtures/article-2.jpg",
+      "categorie": { "id": 2, "nom": "Actualites Diplomatiques", "slug": "actualites-diplomatique", "couleur": "#ce1126" },
+      "date_publication": "2026-07-02",
+      "statut": "a_valider",
+      "vues": 41,
+      "likes": 3,
+      "locale": "fr",
+      "source": "facebook",
+      "temps_lecture": 1
+    },
+    {
+      "id": 3,
+      "slug": "brouillon-fete-nationale",
+      "titre": "Preparation de la fete nationale",
+      "resume": "Les preparatifs de la ceremonie sont engages.",
+      "contenu": "<p>La ceremonie se tiendra a la chancellerie.</p>",
+      "image": "/fixtures/article-3.jpg",
+      "categorie": { "id": 3, "nom": "Actualites Gouvernementales", "slug": "actualites-gouvernementale", "couleur": "#fcd116" },
+      "date_publication": "2026-09-01",
+      "statut": "brouillon",
+      "vues": 0,
+      "likes": 0,
+      "locale": "fr",
+      "source": "manuel",
+      "temps_lecture": 1
+    }
+  ],
+  "meta": { "total": 3, "page": 1, "par_page": 10 }
+}
