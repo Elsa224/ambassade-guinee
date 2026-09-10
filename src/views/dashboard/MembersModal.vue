@@ -31,7 +31,7 @@
           >
             <td class="p-3">{{ Number(index) + 1 }}</td>
             <td class="p-3">
-              <img src="https://via.placeholder.com/40" class="h-10 w-10 rounded-full" />
+              <img :src="avatarDefaut" alt="" class="h-10 w-10 rounded-full" />
             </td>
             <td class="p-3">{{ member }}</td>
             <td class="p-3">0123456789</td>
@@ -54,6 +54,7 @@
 </template>
 
 <script setup lang="ts">
+import avatarDefaut from '@/assets/avatar-defaut.svg'
 // Définir une interface pour l'entreprise
 interface Company {
   id: number
@@ -77,7 +78,3 @@ defineEmits<{
   (e: 'openBadge', member: string): void
 }>()
 </script>
-
-<style scoped>
-@import url('https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css');
-</style>

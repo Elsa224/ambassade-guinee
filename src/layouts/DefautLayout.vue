@@ -95,7 +95,7 @@
               <div class="relative">
                 <button @click="toggleProfile" class="flex items-center gap-2">
                   <img
-                    src="https://via.placeholder.com/40"
+                    :src="avatarDefaut"
                     alt="Avatar"
                     class="w-10 h-10 rounded-full object-cover"
                   />
@@ -150,6 +150,7 @@
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
+import avatarDefaut from '@/assets/avatar-defaut.svg'
 import { useRoute, useRouter } from 'vue-router'
 import Sidebar from '@/components/Sidebar.vue'
 import { useAuthStore } from '@/stores/auth'

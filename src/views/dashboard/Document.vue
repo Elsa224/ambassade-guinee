@@ -110,11 +110,10 @@
           <div class="text-center mb-8">
             <div class="flex justify-center mb-4">
               <div class="bg-primary p-3 rounded-lg">
-                <img
-                  src="https://upload.wikimedia.org/wikipedia/commons/5/5b/Orange_logo.svg"
-                  alt="Orange"
-                  class="h-8 filter brightness-0 invert"
-                />
+                <!-- Maquette de bulletin : l'entete portait le logo Orange
+                     charge depuis Wikimedia. Le texte evite cette requete
+                     externe en attendant le logo fourni par l'ambassade. -->
+                <span class="text-white font-bold text-xl tracking-wide">Orange</span>
               </div>
             </div>
             <h1 class="text-3xl font-bold text-gray-800 mb-2">PAIEMENT DE SALAIRE</h1>

@@ -3,9 +3,7 @@
     <!-- Hero Section avec image de fond et dégradé -->
     <div
       class="relative h-[500px] bg-cover bg-center"
-      :style="{
-        backgroundImage: 'url(https://images.unsplash.com/photo-1574457545171-cb9a5e4f3b7a?w=1400)',
-      }"
+      :style="{ backgroundImage: `url(${banniere})` }"
     >
       <div class="absolute inset-0 bg-gradient-to-r from-accent/90 to-primary-light/80"></div>
       <div class="absolute inset-0 bg-black/30"></div>
@@ -399,6 +397,7 @@
 <script setup>
 import logo1 from '@/assets/images/logo.webp'
 import logoSimandou from '@/assets/images/masque.webp'
+import banniere from '@/assets/images/hero3.webp'
 </script>
 
 <style scoped>

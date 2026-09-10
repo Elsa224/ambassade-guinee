@@ -129,7 +129,3 @@ interface Company {
 
 defineProps<{ company: Company }>()
 </script>
-
-<style scoped>
-@import url('https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css');
-</style>

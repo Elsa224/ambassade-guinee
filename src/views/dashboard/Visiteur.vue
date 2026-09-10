@@ -10,11 +10,7 @@
           >
             <i class="bx bx-bell text-2xl text-gray-600"></i>
           </button>
-          <img
-            src="https://randomuser.me/api/portraits/women/68.jpg"
-            class="w-10 h-10 rounded-full object-cover"
-            alt="profile"
-          />
+          <img :src="avatarDefaut" class="w-10 h-10 rounded-full object-cover" alt="profile" />
         </div>
       </div>
 
@@ -287,6 +283,7 @@
 </template>
 
 <script setup lang="ts">
+import avatarDefaut from '@/assets/avatar-defaut.svg'
 import { ref, computed } from 'vue'
 
 // Interface pour un employé

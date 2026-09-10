@@ -349,8 +349,6 @@ function generateQrCard(request: Request): void {
 </script>
 
 <style scoped>
-@import url('https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css');
-
 .overflow-x-auto::-webkit-scrollbar {
   height: 8px;
 }

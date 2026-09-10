@@ -154,6 +154,7 @@
           >
             <div class="relative h-56 overflow-hidden">
               <img
+                loading="lazy"
                 :src="actualite.image"
                 :alt="actualite.titre"
                 class="w-full h-full object-cover hover:scale-110 transition-transform duration-500"

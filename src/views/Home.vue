@@ -66,6 +66,7 @@
             >
               <div class="h-80 lg:h-[520px] overflow-hidden flex-shrink-0 bg-gray-100">
                 <img
+                  loading="lazy"
                   :src="presidentImage"
                   alt="Président Mamadi DOUMBOUYA"
                   class="w-full h-full object-cover object-[center_20%] hover:scale-110 transition-transform duration-500"
@@ -90,6 +91,7 @@
             >
               <div class="h-80 lg:h-[520px] overflow-hidden flex-shrink-0 bg-gray-100">
                 <img
+                  loading="lazy"
                   :src="ministreImage"
                   alt="Dr. Morissanda KOUYATE"
                   class="w-full h-full object-cover object-[center_20%] hover:scale-110 transition-transform duration-500"
@@ -115,6 +117,7 @@
             >
               <div class="h-80 lg:h-[520px] overflow-hidden flex-shrink-0 bg-gray-100">
                 <img
+                  loading="lazy"
                   :src="ambassadeurImage"
                   alt="Ibrahima N'Daïry Diallo"
                   class="w-full h-full object-cover object-[center_20%] hover:scale-110 transition-transform duration-500"
@@ -418,6 +421,7 @@
                 {{ actu.categorie?.nom }}
               </div>
               <img
+                loading="lazy"
                 :src="actu.image"
                 :alt="actu.titre"
                 class="w-full h-full object-cover hover:scale-110 transition-transform duration-500"

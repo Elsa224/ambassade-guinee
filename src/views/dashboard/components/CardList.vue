@@ -277,8 +277,6 @@ function deleteCard(card: Card) {
 </script>
 
 <style scoped>
-@import url('https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css');
-
 /* Styles de la scrollbar (tableau) */
 .overflow-x-auto::-webkit-scrollbar {
   height: 12px;
