@@ -316,13 +316,19 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 
-// ==================== IMPORT DES IMAGES ====================
-import partenariatImage from '@/assets/images/partenariat.jpg'
-import infrastructureImage from '@/assets/images/infrastructure.jpg'
-import ambassadeurImage from '@/assets/images/ambassadeur.jpeg'
+import {
+  listerArticles,
+  creerArticle,
+  modifierArticle,
+  supprimerArticle,
+  libelleStatut,
+  statutDepuisLibelle,
+} from '@/api/articles'
 
 // Données des articles
 const articles = ref([])
+const chargement = ref(false)
+const erreurApi = ref(null)
 const searchQuery = ref('')
 const filtreCategorie = ref('')
 const filtreStatut = ref('')
@@ -479,28 +485,28 @@ const closeModal = () => {
 }
 
 const saveArticle = async () => {
-  const newArticle = {
-    id: modalMode.value === 'add' ? Date.now() : editId.value,
+  const brouillon = {
     titre: formArticle.value.titre,
-    categorie: formArticle.value.categorie,
     resume: formArticle.value.resume,
     contenu: formArticle.value.contenu,
-    statut: formArticle.value.statut,
-    date: formArticle.value.date,
-    image: formArticle.value.imagePreview || 'https://via.placeholder.com/100',
-    vues: modalMode.value === 'add' ? 0 : articles.value.find(a => a.id === editId.value)?.vues || 0
+    categorie_slug: formArticle.value.categorie,
+    statut: statutDepuisLibelle(formArticle.value.statut),
+    date_publication: formArticle.value.date,
+    image: formArticle.value.imagePreview || undefined,
   }
 
-  if (modalMode.value === 'add') {
-    articles.value.unshift(newArticle)
-  } else {
-    const index = articles.value.findIndex(a => a.id === editId.value)
-    if (index !== -1) {
-      articles.value[index] = newArticle
+  try {
+    if (modalMode.value === 'add') {
+      await creerArticle(brouillon)
+    } else {
+      await modifierArticle(editId.value, brouillon)
     }
+    closeModal()
+    await chargerArticles()
+  } catch (souleve) {
+    erreurApi.value = "Enregistrement impossible. Verifiez les champs et reessayez."
+    console.error("Echec de l enregistrement de l article :", souleve)
   }
-
-  closeModal()
 }
 
 const viewArticle = (article) => {
@@ -517,53 +523,44 @@ const editArticle = (article) => {
   openModal('edit', article)
 }
 
-const deleteArticle = (id) => {
-  if (confirm('Êtes-vous sûr de vouloir supprimer cet article ?')) {
-    articles.value = articles.value.filter(a => a.id !== id)
+const deleteArticle = async (id) => {
+  if (!confirm('Etes-vous sur de vouloir supprimer cet article ?')) return
+
+  try {
+    await supprimerArticle(id)
+    await chargerArticles()
+  } catch (souleve) {
+    erreurApi.value = 'Suppression impossible.'
+    console.error("Echec de la suppression de l article :", souleve)
   }
 }
 
-const loadArticles = () => {
-  articles.value = [
-    {
-      id: 1,
-      titre: 'Rencontre diplomatique à Washington',
-      categorie: 'actualites-diplomatique',
-      resume: 'L\'Ambassadeur a rencontré les autorités américaines...',
-      contenu: 'L\'Ambassadeur de Guinée aux États-Unis a rencontré aujourd\'hui les autorités américaines pour discuter des relations bilatérales...',
-      statut: 'Publié',
-      date: '2024-01-15',
-      image: partenariatImage,
-      vues: 245
-    },
-    {
-      id: 2,
-      titre: 'Nouveau partenariat avec le Costa Rica',
-      categorie: 'actualites-diplomatique',
-      resume: 'Signature d\'un accord de coopération...',
-      contenu: 'Un accord de coopération a été signé entre la Guinée et le Costa Rica...',
-      statut: 'Publié',
-      date: '2024-01-14',
-      image: infrastructureImage,
-      vues: 189
-    },
-    {
-      id: 3,
-      titre: 'Cérémonie à l\'ambassade',
-      categorie: 'actualites-ambassade',
-      resume: 'Célébration de la fête nationale...',
-      contenu: 'L\'ambassade a organisé une cérémonie pour célébrer la fête nationale...',
-      statut: 'Brouillon',
-      date: '2024-01-12',
-      image: ambassadeurImage,
-      vues: 56
-    }
-  ]
+/**
+ * L API renvoie categorie sous forme d objet et statut en valeur technique.
+ * Le gabarit existant attend des chaines plates : on adapte ici plutot que de
+ * reecrire toute la vue.
+ */
+const versVue = (article) => ({
+  ...article,
+  categorie: article.categorie?.slug ?? '',
+  statut: libelleStatut(article.statut),
+  date: article.date_publication,
+})
+
+const chargerArticles = async () => {
+  chargement.value = true
+  erreurApi.value = null
+  try {
+    articles.value = (await listerArticles()).map(versVue)
+  } catch (souleve) {
+    erreurApi.value = "Impossible de charger les articles."
+    console.error('Echec du chargement des articles :', souleve)
+  } finally {
+    chargement.value = false
+  }
 }
 
-onMounted(() => {
-  loadArticles()
-})
+onMounted(chargerArticles)
 </script>
 
 <style scoped>
