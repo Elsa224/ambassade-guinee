@@ -146,22 +146,34 @@ export function mockApi(): Plugin {
           })
         }
 
-        const correspondance = chemin.match(/^\/articles\/(\d+)$/)
+        // Le site public adresse un article par son slug, le back-office par son id :
+        // le simulateur doit resoudre les deux, comme le fera l'API reelle.
+        const trouverArticle = (segment: string) => {
+          const identifiant = decodeURIComponent(segment)
+          return /^\d+$/.test(identifiant)
+            ? articles.find((a) => a.id === Number(identifiant))
+            : articles.find((a) => a.slug === identifiant)
+        }
+
+        const correspondance = chemin.match(/^\/articles\/([^/]+)$/)
         if (correspondance) {
-          const id = Number(correspondance[1])
+          const segment = correspondance[1]!
 
           if (methode === 'GET') {
-            const trouve = articles.find((a) => a.id === id)
+            const trouve = trouverArticle(segment)
             return trouve ? repondre(200, { data: trouve }) : repondre(404, { message: 'Introuvable.' })
           }
 
           if (methode === 'PUT') {
             return void lireCorps().then((corps) => {
               if (corps === null) return repondre(422, { message: 'Corps de requete illisible.' })
-              const index = articles.findIndex((a) => a.id === id)
-              if (index === -1) return repondre(404, { message: 'Introuvable.' })
+              const existant = trouverArticle(segment)
+              if (!existant) return repondre(404, { message: 'Introuvable.' })
+              // Retrouve par reference, jamais par index recalcule : l'article
+              // a pu etre localise par slug ou par id, la mutation doit viser
+              // exactement l'entree resolue plus haut.
+              const index = articles.indexOf(existant)
               const { categorie_slug: categorieSlug, ...reste } = corps
-              const existant = articles[index]!
               articles[index] = {
                 ...existant,
                 ...reste,
@@ -169,14 +181,15 @@ export function mockApi(): Plugin {
                   typeof categorieSlug === 'string'
                     ? categorieDepuisSlug(categorieSlug)
                     : existant.categorie,
-                id,
+                id: existant.id,
               }
               return repondre(200, { data: articles[index] })
             })
           }
 
           if (methode === 'DELETE') {
-            articles = articles.filter((a) => a.id !== id)
+            const existant = trouverArticle(segment)
+            articles = existant ? articles.filter((a) => a !== existant) : articles
             return repondre(204, null)
           }
         }
