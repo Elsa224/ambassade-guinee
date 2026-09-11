@@ -4,7 +4,9 @@
       <h2 class="text-2xl font-bold text-gray-800">Contenu de l'accueil</h2>
       <p class="text-gray-600 mt-1">
         Le mot de bienvenue, les dirigeants et les photos de la page d'accueil.
-        <span class="font-medium">Tant qu'une section est vide, elle n'apparaît pas sur le site.</span>
+        <span class="font-medium"
+          >Tant qu'une section est vide, elle n'apparaît pas sur le site.</span
+        >
       </p>
     </header>
 
@@ -125,7 +127,11 @@
     </div>
 
     <!-- Formulaire d'un dirigeant -->
-    <Boite v-if="dirigeantOuvert" :titre="dirigeantEdite ? 'Modifier le dirigeant' : 'Ajouter un dirigeant'" @fermer="dirigeantOuvert = false">
+    <Boite
+      v-if="dirigeantOuvert"
+      :titre="dirigeantEdite ? 'Modifier le dirigeant' : 'Ajouter un dirigeant'"
+      @fermer="dirigeantOuvert = false"
+    >
       <form class="space-y-5" @submit.prevent="enregistrerDirigeant">
         <ChampImage v-model="saisieDirigeant.image_url" libelle="Portrait" requis />
 
@@ -174,7 +180,11 @@
         </p>
 
         <div class="flex justify-end gap-3 pt-2">
-          <button type="button" class="px-4 py-2.5 text-gray-700 font-semibold" @click="dirigeantOuvert = false">
+          <button
+            type="button"
+            class="px-4 py-2.5 text-gray-700 font-semibold"
+            @click="dirigeantOuvert = false"
+          >
             Annuler
           </button>
           <button
@@ -189,7 +199,11 @@
     </Boite>
 
     <!-- Formulaire d'une photo -->
-    <Boite v-if="photoOuverte" :titre="photoEditee ? 'Modifier la photo' : 'Ajouter une photo'" @fermer="photoOuverte = false">
+    <Boite
+      v-if="photoOuverte"
+      :titre="photoEditee ? 'Modifier la photo' : 'Ajouter une photo'"
+      @fermer="photoOuverte = false"
+    >
       <form class="space-y-5" @submit.prevent="enregistrerPhoto">
         <ChampImage v-model="saisiePhoto.image_url" libelle="Photo" requis />
 
@@ -214,7 +228,11 @@
         </p>
 
         <div class="flex justify-end gap-3 pt-2">
-          <button type="button" class="px-4 py-2.5 text-gray-700 font-semibold" @click="photoOuverte = false">
+          <button
+            type="button"
+            class="px-4 py-2.5 text-gray-700 font-semibold"
+            @click="photoOuverte = false"
+          >
             Annuler
           </button>
           <button

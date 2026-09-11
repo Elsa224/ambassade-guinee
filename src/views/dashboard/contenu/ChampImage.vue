@@ -18,7 +18,9 @@
           :class="{ 'opacity-60 pointer-events-none': envoiEnCours }"
         >
           <i class="bx bx-upload" aria-hidden="true"></i>
-          {{ envoiEnCours ? 'Envoi en cours…' : modelValue ? "Changer l'image" : 'Choisir une image' }}
+          {{
+            envoiEnCours ? 'Envoi en cours…' : modelValue ? "Changer l'image" : 'Choisir une image'
+          }}
           <input type="file" class="sr-only" :accept="accept" @change="choisir" />
         </label>
 

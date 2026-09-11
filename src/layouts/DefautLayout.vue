@@ -99,9 +99,17 @@
                     alt="Avatar"
                     class="w-10 h-10 rounded-full object-cover"
                   />
+                  <!-- Le nom et l'adresse de la personne connectee, jamais
+                       ceux d'un compte ecrit en dur : l'adresse placee ici
+                       etait celle d'un administrateur guineen, affichee a
+                       toutes les ambassades. -->
                   <div class="hidden lg:block text-left">
-                    <p class="text-sm font-medium text-gray-800">Administrateur</p>
-                    <p class="text-xs text-gray-500">admin@ambaguinee.org</p>
+                    <p class="text-sm font-medium text-gray-800">
+                      {{ auth.utilisateur?.nom || 'Administrateur' }}
+                    </p>
+                    <p v-if="auth.utilisateur?.email" class="text-xs text-gray-500">
+                      {{ auth.utilisateur.email }}
+                    </p>
                   </div>
                   <i class="bx bx-chevron-down text-gray-600"></i>
                 </button>

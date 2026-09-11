@@ -18,7 +18,7 @@ function reponse(corps: unknown, statut = 200) {
 }
 
 describe("normalisation du contenu d'accueil", () => {
-  it("ne remplace jamais un bloc absent par du contenu", () => {
+  it('ne remplace jamais un bloc absent par du contenu', () => {
     // C'est la garantie qui empeche la fuite de revenir : ce que le CMS ne
     // sert pas n'existe pas, et le repli n'est surtout pas le contenu compile
     // dans le gabarit, qui est celui d'une autre ambassade.

@@ -78,7 +78,7 @@ describe("contenu d'accueil servi par le CMS", () => {
     expect(wrapper.text()).toContain("Président de la République, Chef de l'État")
   })
 
-  it("affiche les photos de vitrine avec leur texte alternatif", async () => {
+  it('affiche les photos de vitrine avec leur texte alternatif', async () => {
     servir(contenuGabon)
 
     const wrapper = await monter()

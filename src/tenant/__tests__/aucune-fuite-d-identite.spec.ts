@@ -201,8 +201,22 @@ describe("etancheite de l'identite entre ambassades", () => {
       data: {
         welcome: null,
         leaders: [
-          { id: 2, name: 'Deuxieme', role: 'Ministre', subtitle: null, image_url: '/b.webp', position: 2 },
-          { id: 1, name: 'Premier', role: 'President', subtitle: 'Gabon', image_url: '/a.webp', position: 1 },
+          {
+            id: 2,
+            name: 'Deuxieme',
+            role: 'Ministre',
+            subtitle: null,
+            image_url: '/b.webp',
+            position: 2,
+          },
+          {
+            id: 1,
+            name: 'Premier',
+            role: 'President',
+            subtitle: 'Gabon',
+            image_url: '/a.webp',
+            position: 1,
+          },
         ],
         showcase: [],
       },

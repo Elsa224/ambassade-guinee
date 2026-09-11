@@ -61,7 +61,9 @@ function ordonner<T extends { position: number }>(elements: readonly T[]): T[] {
  * Un bloc absent vaut vide, jamais le contenu du gabarit : c'est la seule
  * garantie qui empeche la fuite d'identite de revenir.
  */
-export function normaliserContenu(servi: Partial<ContenuAccueil> | null | undefined): ContenuAccueil {
+export function normaliserContenu(
+  servi: Partial<ContenuAccueil> | null | undefined,
+): ContenuAccueil {
   return {
     welcome: servi?.welcome ?? null,
     leaders: ordonner(servi?.leaders ?? []),

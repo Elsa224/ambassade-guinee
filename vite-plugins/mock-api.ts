@@ -137,8 +137,7 @@ export function mockApi(): Plugin {
 
     // --- Contenu d'accueil : mot de bienvenue, dirigeants, vitrine ---------
     const contenu = () => contenus[estGabon ? 'gabon' : 'guinee']!
-    const liste = (bloc: 'leaders' | 'showcase') =>
-      contenu()[bloc] as Record<string, unknown>[]
+    const liste = (bloc: 'leaders' | 'showcase') => contenu()[bloc] as Record<string, unknown>[]
 
     /** Renumerote les positions pour qu'elles restent 1, 2, 3... sans trou. */
     const renumeroter = (bloc: 'leaders' | 'showcase') => {
@@ -180,7 +179,11 @@ export function mockApi(): Plugin {
         if (bloc === 'leaders' && (typeof corps.name !== 'string' || corps.name.trim() === '')) {
           return repondre(422, { message: 'Le nom est obligatoire.' })
         }
-        const element = { ...corps, id: (prochainIdentifiant += 1), position: liste(bloc).length + 1 }
+        const element = {
+          ...corps,
+          id: (prochainIdentifiant += 1),
+          position: liste(bloc).length + 1,
+        }
         liste(bloc).push(element)
         repondre(201, { data: element })
       })
@@ -206,9 +209,7 @@ export function mockApi(): Plugin {
     const elementVise = Object.entries(BLOC_PAR_CHEMIN)
       .map(([prefixe, nom]) => {
         const reste = chemin.startsWith(`${prefixe}/`) ? chemin.slice(prefixe.length + 1) : null
-        return reste !== null && /^\d+$/.test(reste)
-          ? { bloc: nom, id: Number(reste) }
-          : null
+        return reste !== null && /^\d+$/.test(reste) ? { bloc: nom, id: Number(reste) } : null
       })
       .find((v) => v !== null)
 
