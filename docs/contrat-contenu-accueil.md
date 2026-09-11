@@ -116,3 +116,10 @@ borne. Chaque reponse porte un `message` en francais directement affichable.
 - Il n'ecrit jamais `image_url` a la main : elle vient toujours de `POST media`
   ou d'une entree existante.
 - Il ordonne par `position` et non par `id`.
+
+## Voir aussi
+
+`docs/contrat-parametres-ambassade.md` couvre les trois surfaces qui manquent
+encore : l'identite et les coordonnees de l'ambassade, l'annuaire du personnel
+et des consuls honoraires, et le calendrier des fetes. Il reprend les regles
+ci-dessus et reutilise `POST /api/admin/content/media` pour les images.
