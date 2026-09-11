@@ -53,6 +53,7 @@ import Evenement from '@/views/dashboard/Evenement.vue'
 import ListeEvenementsAdmin from '@/views/dashboard/evenements/ListeEvenements.vue'
 import FicheEvenementAdmin from '@/views/dashboard/evenements/FicheEvenement.vue'
 import RacineEvenementsAdmin from '@/views/dashboard/evenements/RacineEvenements.vue'
+import FormulaireEvenementAdmin from '@/views/dashboard/evenements/FormulaireEvenement.vue'
 import Visiteur from '@/views/dashboard/Visiteur.vue'
 import Demande from '@/views/dashboard/Demande.vue'
 import Presence from '@/views/dashboard/Presence.vue'
@@ -195,7 +196,21 @@ const router = createRouter({
           component: RacineEvenementsAdmin,
           children: [
             { path: '', name: 'evenements-admin', component: ListeEvenementsAdmin },
+            // `nouveau` est declare avant `:slug` : l'ordre n'est pas ce qui
+            // tranche — vue-router classe le segment fixe au-dessus du
+            // parametre — mais le lire dans cet ordre evite de croire le
+            // contraire en relisant.
+            {
+              path: 'nouveau',
+              name: 'evenement-admin-nouveau',
+              component: FormulaireEvenementAdmin,
+            },
             { path: ':slug', name: 'evenement-admin', component: FicheEvenementAdmin },
+            {
+              path: ':slug/modifier',
+              name: 'evenement-admin-modifier',
+              component: FormulaireEvenementAdmin,
+            },
           ],
         },
         { path: 'actualites', name: 'actualites', component: Actualites },

@@ -36,12 +36,26 @@ function evenement(partiel: Partial<EvenementAdmin> = {}): EvenementAdmin {
 /** URL demandees au back pendant le test. */
 let demandes: string[] = []
 
+/** Ce que la fiche a ecrit : methode, chemin et corps deserialise. */
+interface Envoi {
+  methode: string
+  url: string
+  corps: Record<string, unknown>
+}
+
+let envois: Envoi[] = []
+
 function servir(reponse: EvenementAdmin | null, statut = 200) {
   demandes = []
+  envois = []
   vi.stubGlobal(
     'fetch',
-    vi.fn((url: string) => {
+    vi.fn((url: string, options: RequestInit = {}) => {
       demandes.push(String(url))
+      const methode = options.method ?? 'GET'
+      if (options.body) {
+        envois.push({ methode, url: String(url), corps: JSON.parse(String(options.body)) })
+      }
       const corps = reponse ? { data: reponse } : { message: "Cet évènement n'existe pas." }
       return Promise.resolve(
         new Response(JSON.stringify(corps), {
@@ -51,6 +65,11 @@ function servir(reponse: EvenementAdmin | null, statut = 200) {
       )
     }),
   )
+}
+
+/** Le bouton dont le libelle contient ce fragment, s'il existe. */
+function bouton(wrapper: Awaited<ReturnType<typeof rendre>>, fragment: string) {
+  return wrapper.findAll('button').find((b) => b.text().includes(fragment))
 }
 
 /**
@@ -75,7 +94,9 @@ async function rendre(slug = 'fete-nationale') {
             component: defineComponent({ render: () => h('div') }),
             children: [
               { path: '', name: 'evenements-admin', component: ListeEvenements },
+              { path: 'nouveau', name: 'evenement-admin-nouveau', component: Vide },
               { path: ':slug', name: 'evenement-admin', component: FicheEvenement },
+              { path: ':slug/modifier', name: 'evenement-admin-modifier', component: Vide },
             ],
           },
         ],
@@ -163,5 +184,66 @@ describe('fiche d un evenement', () => {
     const wrapper = await rendre('inconnu')
 
     expect(wrapper.text()).toContain("Cet évènement n'existe pas.")
+  })
+
+  it("n'annule qu'apres confirmation, et envoie l'etat annule", async () => {
+    // L'annulation est visible des inscrits et du site public, et rien dans
+    // l'ecran ne permet de revenir en arriere d'un clic.
+    servir(evenement())
+    vi.stubGlobal(
+      'confirm',
+      vi.fn(() => true),
+    )
+    const wrapper = await rendre()
+    await bouton(wrapper, "Annuler l'évènement")!.trigger('click')
+    await flushPromises()
+
+    expect(envois[envois.length - 1]!.methode).toBe('PATCH')
+    expect(envois[envois.length - 1]!.corps.status).toBe('CANCELLED')
+  })
+
+  it("n'envoie rien si la confirmation est refusee", async () => {
+    servir(evenement())
+    vi.stubGlobal(
+      'confirm',
+      vi.fn(() => false),
+    )
+    const wrapper = await rendre()
+    await bouton(wrapper, "Annuler l'évènement")!.trigger('click')
+    await flushPromises()
+
+    expect(envois).toHaveLength(0)
+  })
+
+  it("ne propose pas d'annuler un evenement deja annule", async () => {
+    servir(evenement({ status: 'CANCELLED' }))
+    const wrapper = await rendre()
+
+    expect(bouton(wrapper, "Annuler l'évènement")).toBeUndefined()
+  })
+
+  it('ne propose la publication que si le back la sert', async () => {
+    // Proposer « Publier » a un back qui ne sait pas stocker la publication
+    // promettrait une action sans effet.
+    const sansPublication = evenement()
+    delete sansPublication.isPublished
+    servir(sansPublication)
+    const wrapper = await rendre()
+
+    expect(bouton(wrapper, 'Publier sur le site')).toBeUndefined()
+  })
+
+  it('publie sur une route a part, et non par une modification', async () => {
+    // La publication n'existe pas dans Ambassade Secure : elle vit cote CMS
+    // et n'est pas relayee.
+    servir(evenement({ isPublished: false }))
+    const wrapper = await rendre()
+    await bouton(wrapper, 'Publier sur le site')!.trigger('click')
+    await flushPromises()
+
+    const envoi = envois[envois.length - 1]!
+    expect(envoi.methode).toBe('PUT')
+    expect(envoi.url).toBe('/api/admin/secure/events/fete-nationale/publication')
+    expect(envoi.corps.isPublished).toBe(true)
   })
 })

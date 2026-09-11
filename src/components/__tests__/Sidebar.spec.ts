@@ -35,7 +35,9 @@ async function monter(chemin: string) {
             component: Vide,
             children: [
               { path: '', component: Vide },
+              { path: 'nouveau', component: Vide },
               { path: ':slug', component: Vide },
+              { path: ':slug/modifier', component: Vide },
             ],
           },
           { path: 'galerie', component: Vide },
@@ -76,6 +78,13 @@ describe('barre laterale du tableau de bord', () => {
     // sur toutes les pages, `/dashboard` etant prefixe de chacune.
     const wrapper = await monter('/dashboard/evenements')
 
+    expect(liensAllumes(wrapper)).toEqual(['/dashboard/evenements'])
+  })
+
+  it('laisse la rubrique allumee sur le formulaire de creation', async () => {
+    // `nouveau` est un enfant de `evenements`, pas une route soeur : la
+    // rubrique doit rester allumee pendant qu'on cree un evenement.
+    const wrapper = await monter('/dashboard/evenements/nouveau')
     expect(liensAllumes(wrapper)).toEqual(['/dashboard/evenements'])
   })
 
