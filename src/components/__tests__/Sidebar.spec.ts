@@ -30,7 +30,14 @@ async function monter(chemin: string) {
           { path: 'courriers/liste', component: Vide },
           { path: 'demande', component: Vide },
           { path: 'documents', component: Vide },
-          { path: 'evenements', component: Vide },
+          {
+            path: 'evenements',
+            component: Vide,
+            children: [
+              { path: '', component: Vide },
+              { path: ':slug', component: Vide },
+            ],
+          },
           { path: 'galerie', component: Vide },
           { path: 'nouvelles', component: Vide },
           { path: 'presence', component: Vide },
@@ -68,6 +75,15 @@ describe('barre laterale du tableau de bord', () => {
     // `active-class` colle par PREFIXE : « Tableau de bord » restait allume
     // sur toutes les pages, `/dashboard` etant prefixe de chacune.
     const wrapper = await monter('/dashboard/evenements')
+
+    expect(liensAllumes(wrapper)).toEqual(['/dashboard/evenements'])
+  })
+
+  it('laisse la rubrique allumee sur la fiche d un evenement', async () => {
+    // La fiche est imbriquee sous `/dashboard/evenements` : la rubrique reste
+    // donc allumee, sans quoi la barre laterale s'eteindrait entierement des
+    // qu'on ouvre un evenement.
+    const wrapper = await monter('/dashboard/evenements/fete-nationale')
 
     expect(liensAllumes(wrapper)).toEqual(['/dashboard/evenements'])
   })

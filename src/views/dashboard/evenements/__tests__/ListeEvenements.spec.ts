@@ -1,5 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { mount, flushPromises } from '@vue/test-utils'
+import { createRouter, createMemoryHistory } from 'vue-router'
+import { defineComponent, h } from 'vue'
 import ListeEvenements from '../ListeEvenements.vue'
 import type { EvenementAdmin, Pagination } from '@/api/evenements-admin'
 
@@ -57,8 +59,22 @@ function servir(evenements: EvenementAdmin[], pagination: Partial<Pagination> = 
   )
 }
 
+const Vide = defineComponent({ render: () => h('div') })
+
 async function rendre() {
-  const wrapper = mount(ListeEvenements)
+  // Le nom de chaque evenement mene a sa fiche : la liste a besoin d'un
+  // routeur qui connaisse cette route, sinon `RouterLink` echoue a la
+  // resoudre.
+  const routeur = createRouter({
+    history: createMemoryHistory(),
+    routes: [
+      { path: '/dashboard/evenements', name: 'evenements-admin', component: Vide },
+      { path: '/dashboard/evenements/:slug', name: 'evenement-admin', component: Vide },
+    ],
+  })
+  routeur.push('/dashboard/evenements')
+  await routeur.isReady()
+  const wrapper = mount(ListeEvenements, { global: { plugins: [routeur] } })
   await flushPromises()
   return wrapper
 }

@@ -16,12 +16,11 @@ import { apiGet } from './client'
  */
 
 /**
- * Chemin de la liste d'administration.
+ * Chemin de l'administration des evenements, confirme par le back le
+ * 2026-09-11.
  *
- * Choisi par symetrie : la surface visiteur est `/api/secure/events` et
- * l'administration du contenu `/api/admin/content/*`. Le back ne l'a pas
- * encore confirme ; c'est la seule valeur a corriger s'il en a retenu une
- * autre, et elle est isolee ici pour cela.
+ * La fiche d'un evenement suit la convention de la surface visiteur, ou le
+ * detail est `/api/secure/events/{token}` : ici `{CHEMIN}/{slug}`.
  */
 export const CHEMIN_LISTE_ADMIN = '/api/admin/secure/events'
 
@@ -125,4 +124,20 @@ export async function listerEvenementsAdmin(
   })
   const reponse = await apiGet<EnveloppePaginee>(`${CHEMIN_LISTE_ADMIN}?${parametres}`)
   return { evenements: reponse.data, pagination: reponse.pagination }
+}
+
+/**
+ * Fiche d'un evenement.
+ *
+ * La liste porte deja tous les champs, participants compris : cet appel
+ * n'existe donc pas pour completer la ligne, mais pour qu'une fiche ouverte
+ * par son adresse — un lien partage, un rechargement — se charge seule, sans
+ * exiger d'avoir traverse la liste ni de savoir sur quelle page elle se
+ * trouvait.
+ */
+export async function recupererEvenementAdmin(slug: string): Promise<EvenementAdmin> {
+  const reponse = await apiGet<{ data: EvenementAdmin }>(
+    `${CHEMIN_LISTE_ADMIN}/${encodeURIComponent(slug)}`,
+  )
+  return reponse.data
 }
