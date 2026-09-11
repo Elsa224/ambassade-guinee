@@ -54,6 +54,15 @@
           </router-link>
 
           <router-link
+            to="/dashboard/contenu-accueil"
+            class="flex items-center gap-3 px-4 py-2 rounded-xl text-white no-underline transition-all duration-300 text-sm font-medium hover:bg-yellow-500/20 hover:text-secondary hover:translate-x-1"
+            active-class="!bg-secondary !text-primary"
+          >
+            <i class="bx bxs-home-heart text-xl flex-shrink-0"></i>
+            <span v-if="!isCollapsed">Contenu de l'accueil</span>
+          </router-link>
+
+          <router-link
             to="/dashboard/articles"
             class="flex items-center gap-3 px-4 py-2 rounded-xl text-white no-underline transition-all duration-300 text-sm font-medium hover:bg-yellow-500/20 hover:text-secondary hover:translate-x-1"
             active-class="!bg-secondary !text-primary"

@@ -42,6 +42,7 @@ import Evenements from '@/views/evenements/Evenements.vue'
 // Pages principales (conteneurs avec <router-view>)
 import Dashboard from '@/views/dashboard/Dashboard.vue'
 import Articles from '@/views/dashboard/Articles.vue'
+import AccueilContenu from '@/views/dashboard/contenu/AccueilContenu.vue'
 import Actualites from '@/views/dashboard/Actualites.vue'
 import Galerie from '@/views/dashboard/Galerie.vue'
 import Nouvelles from '@/views/dashboard/Nouvelles.vue'
@@ -185,6 +186,7 @@ const router = createRouter({
         // --- GROUPE ADMIN ---
         { path: '', name: 'dashboard', component: Dashboard },
         { path: 'articles', name: 'articles', component: Articles },
+        { path: 'contenu-accueil', name: 'contenu-accueil', component: AccueilContenu },
         { path: 'actualites', name: 'actualites', component: Actualites },
         { path: 'galerie', name: 'galerie', component: Galerie },
         { path: 'nouvelles', name: 'nouvelles', component: Nouvelles },

@@ -93,6 +93,19 @@ export function apiPut<T>(chemin: string, corps: unknown): Promise<T> {
   return requete<T>(chemin, { method: 'PUT', body: JSON.stringify(corps) }, true)
 }
 
+export function apiPatch<T>(chemin: string, corps: unknown): Promise<T> {
+  return requete<T>(chemin, { method: 'PATCH', body: JSON.stringify(corps) }, true)
+}
+
+/**
+ * Televerse un fichier. Le `Content-Type` est volontairement absent : le
+ * navigateur doit poser lui-meme le `multipart/form-data` avec sa frontiere,
+ * qu'on ne sait pas ecrire a la main.
+ */
+export function apiUpload<T>(chemin: string, formulaire: FormData): Promise<T> {
+  return requete<T>(chemin, { method: 'POST', body: formulaire }, false)
+}
+
 export function apiDelete(chemin: string): Promise<void> {
   return requete<void>(chemin, { method: 'DELETE' }, false)
 }

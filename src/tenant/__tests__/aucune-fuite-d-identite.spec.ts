@@ -40,6 +40,9 @@ const IDENTITE_ETRANGERE =
 
 const Vide = defineComponent({ render: () => h('div') })
 
+/** Ce que le CMS sert pour le contenu d'accueil pendant un test donne. */
+let contenuServi: unknown
+
 function reponse(corps: unknown) {
   return new Response(JSON.stringify(corps), {
     status: 200,
@@ -79,7 +82,20 @@ describe("etancheite de l'identite entre ambassades", () => {
     // Le test sert de vrais articles gabonais : avec une liste vide, il ne
     // prouverait rien du contenu rendu, seulement du gabarit. C'est cet angle
     // mort qui avait d'abord laisse passer une fuite.
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(reponse({ data: articlesGabon.data })))
+    // Les articles et le contenu d'accueil passent par le meme `fetch` : on
+    // repond selon le chemin demande, sinon la page d'accueil recevrait la
+    // liste d'articles a la place de son contenu.
+    vi.stubGlobal(
+      'fetch',
+      vi.fn((url: string) =>
+        Promise.resolve(
+          String(url).includes('/api/content/home')
+            ? reponse(contenuServi)
+            : reponse({ data: articlesGabon.data }),
+        ),
+      ),
+    )
+    contenuServi = { data: { welcome: null, leaders: [], showcase: [] } }
   })
 
   afterEach(() => {
@@ -148,8 +164,53 @@ describe("etancheite de l'identite entre ambassades", () => {
     const wrapper = await rendre('/', GUINEE)
 
     expect(wrapper.text()).toContain('Ambassade de Guinee aux Etats-Unis')
-    // Ses rubriques editoriales restent ouvertes : rien ne disparait.
-    expect(wrapper.text()).toContain('Chers compatriotes')
+  })
+
+  it("n'affiche le mot de bienvenue que si le CMS le sert", async () => {
+    // Le texte n'est plus compile dans le gabarit : sans contenu servi, la
+    // section n'existe pas, quelle que soit l'ambassade.
+    const sansContenu = await rendre('/', GUINEE)
+    expect(sansContenu.text()).not.toContain('Chers compatriotes')
+
+    contenuServi = {
+      data: {
+        welcome: { title: 'Mot de bienvenue', body_html: '<p>Chers compatriotes</p>' },
+        leaders: [],
+        showcase: [],
+      },
+    }
+    const avecContenu = await rendre('/', GUINEE)
+    expect(avecContenu.text()).toContain('Chers compatriotes')
+  })
+
+  it('ne compile plus aucun dirigeant dans le gabarit', async () => {
+    // C'est le garde decisif : meme sur le site d'origine, et meme rubriques
+    // ouvertes, aucun nom de dirigeant ne peut apparaitre sans que le CMS
+    // l'ait servi. C'est ce qui rend la fuite impossible par construction.
+    //
+    // Le motif se limite ici aux noms des responsables : « Etats-Unis » est
+    // l'identite legitime du site guineen, pas une fuite.
+    const NOMS_EN_DUR = /doumbouya|kouyat[ée]|n'da[ïi]ry/i
+    const wrapper = await rendre('/', GUINEE)
+
+    expect(wrapper.text().match(NOMS_EN_DUR)).toBeNull()
+  })
+
+  it('affiche les dirigeants servis par le CMS, dans leur ordre', async () => {
+    contenuServi = {
+      data: {
+        welcome: null,
+        leaders: [
+          { id: 2, name: 'Deuxieme', role: 'Ministre', subtitle: null, image_url: '/b.webp', position: 2 },
+          { id: 1, name: 'Premier', role: 'President', subtitle: 'Gabon', image_url: '/a.webp', position: 1 },
+        ],
+        showcase: [],
+      },
+    }
+    const wrapper = await rendre('/', GABON)
+    const noms = wrapper.findAll('h3').map((n) => n.text())
+
+    expect(noms.indexOf('Premier')).toBeLessThan(noms.indexOf('Deuxieme'))
   })
 
   /**
