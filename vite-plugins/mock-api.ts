@@ -288,6 +288,16 @@ export function mockApi(): Plugin {
       })
     }
 
+    // La fiche d'un evenement. Un slug inconnu rend 404 avec un message
+    // francais, comme le back : c'est ce que la fiche affiche telle quelle.
+    const fiche = /^\/admin\/secure\/events\/(.+)$/.exec(chemin)
+    if (fiche && methode === 'GET') {
+      const slug = decodeURIComponent(fiche[1]!)
+      const trouve = evenementsAdmin().find((evenement) => evenement.slug === slug)
+      if (!trouve) return repondre(404, { message: "Cet evenement n'existe pas." })
+      return repondre(200, { data: trouve })
+    }
+
     // --- Module Evenements, surface visiteur ---------------------------
     // Le back rend 404 aussi bien pour un module inactif que pour un
     // evenement non publie : le simulateur ne distingue pas davantage.

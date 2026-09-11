@@ -51,6 +51,8 @@ import Utilisateur from '@/views/dashboard/Utilisateur.vue'
 import Scanner from '@/views/dashboard/Scanner.vue'
 import Evenement from '@/views/dashboard/Evenement.vue'
 import ListeEvenementsAdmin from '@/views/dashboard/evenements/ListeEvenements.vue'
+import FicheEvenementAdmin from '@/views/dashboard/evenements/FicheEvenement.vue'
+import RacineEvenementsAdmin from '@/views/dashboard/evenements/RacineEvenements.vue'
 import Visiteur from '@/views/dashboard/Visiteur.vue'
 import Demande from '@/views/dashboard/Demande.vue'
 import Presence from '@/views/dashboard/Presence.vue'
@@ -190,8 +192,11 @@ const router = createRouter({
         { path: 'contenu-accueil', name: 'contenu-accueil', component: AccueilContenu },
         {
           path: 'evenements',
-          name: 'evenements-admin',
-          component: ListeEvenementsAdmin,
+          component: RacineEvenementsAdmin,
+          children: [
+            { path: '', name: 'evenements-admin', component: ListeEvenementsAdmin },
+            { path: ':slug', name: 'evenement-admin', component: FicheEvenementAdmin },
+          ],
         },
         { path: 'actualites', name: 'actualites', component: Actualites },
         { path: 'galerie', name: 'galerie', component: Galerie },

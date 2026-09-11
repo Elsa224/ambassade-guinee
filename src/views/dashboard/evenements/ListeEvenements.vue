@@ -7,6 +7,7 @@ import {
   type Pagination as FormePagination,
 } from '@/api/evenements-admin'
 import { messageErreur } from '@/api/evenements'
+import { dateLisible, etatDe, remplissage } from './presentation'
 import PastilleEtat from './PastilleEtat.vue'
 import Pagination from './Pagination.vue'
 
@@ -33,57 +34,6 @@ const erreur = ref('')
  * monde, ce qui serait faux et inquietant.
  */
 const publicationConnue = computed(() => evenements.value.some((e) => e.isPublished !== undefined))
-
-const MOIS = [
-  'janvier',
-  'février',
-  'mars',
-  'avril',
-  'mai',
-  'juin',
-  'juillet',
-  'août',
-  'septembre',
-  'octobre',
-  'novembre',
-  'décembre',
-] as const
-
-/** « 17 août 2026 », ou la valeur brute si la date n'est pas exploitable. */
-function dateLisible(valeur: string): string {
-  const trouve = /^(\d{4})-(\d{2})-(\d{2})/.exec(valeur)
-  if (!trouve) return valeur
-  const mois = MOIS[Number(trouve[2]) - 1]
-  return mois ? `${Number(trouve[3])} ${mois} ${trouve[1]}` : valeur
-}
-
-interface Etat {
-  libelle: string
-  ton: 'positif' | 'neutre' | 'attention' | 'eteint'
-}
-
-/**
- * Etat rapporte par Ambassade Secure.
- *
- * Le libelle est traduit pour l'affichage, mais toute valeur inconnue est
- * rendue telle quelle : mieux vaut montrer un mot anglais que masquer un etat
- * que le front ne connaissait pas encore.
- */
-const ETATS: Record<string, Etat> = {
-  ACTIVE: { libelle: 'En cours', ton: 'positif' },
-  CANCELLED: { libelle: 'Annulé', ton: 'attention' },
-  COMPLETED: { libelle: 'Terminé', ton: 'eteint' },
-}
-
-function etatDe(evenement: EvenementAdmin): Etat {
-  return ETATS[evenement.status] ?? { libelle: evenement.status, ton: 'neutre' }
-}
-
-/** Part de la capacite deja prise, bornee a 100 pour que la jauge ne deborde pas. */
-function remplissage(evenement: EvenementAdmin): number {
-  if (!evenement.capacity) return 0
-  return Math.min(100, Math.round((evenement.registeredCount / evenement.capacity) * 100))
-}
 
 async function charger(page = pagination.value.page, limite = pagination.value.limit) {
   chargement.value = true
@@ -202,7 +152,12 @@ onMounted(() => charger(1))
               class="border-b border-gray-100 last:border-0 hover:bg-gray-50/70 transition-colors"
             >
               <td class="px-5 py-4">
-                <p class="font-semibold text-gray-800">{{ evenement.name }}</p>
+                <RouterLink
+                  :to="{ name: 'evenement-admin', params: { slug: evenement.slug } }"
+                  class="font-semibold text-gray-800 hover:text-primary hover:underline underline-offset-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary rounded-sm"
+                >
+                  {{ evenement.name }}
+                </RouterLink>
                 <p v-if="evenement.typeLabel" class="text-xs text-gray-500 mt-0.5">
                   {{ evenement.typeLabel }}
                 </p>
