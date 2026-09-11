@@ -50,6 +50,7 @@ import Nouvelles from '@/views/dashboard/Nouvelles.vue'
 import Utilisateur from '@/views/dashboard/Utilisateur.vue'
 import Scanner from '@/views/dashboard/Scanner.vue'
 import Evenement from '@/views/dashboard/Evenement.vue'
+import ListeEvenementsAdmin from '@/views/dashboard/evenements/ListeEvenements.vue'
 import Visiteur from '@/views/dashboard/Visiteur.vue'
 import Demande from '@/views/dashboard/Demande.vue'
 import Presence from '@/views/dashboard/Presence.vue'
@@ -187,6 +188,11 @@ const router = createRouter({
         { path: '', name: 'dashboard', component: Dashboard },
         { path: 'articles', name: 'articles', component: Articles },
         { path: 'contenu-accueil', name: 'contenu-accueil', component: AccueilContenu },
+        {
+          path: 'evenements',
+          name: 'evenements-admin',
+          component: ListeEvenementsAdmin,
+        },
         { path: 'actualites', name: 'actualites', component: Actualites },
         { path: 'galerie', name: 'galerie', component: Galerie },
         { path: 'nouvelles', name: 'nouvelles', component: Nouvelles },

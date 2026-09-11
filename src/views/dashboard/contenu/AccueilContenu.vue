@@ -1,5 +1,5 @@
 <template>
-  <div class="p-6 bg-gray-100 min-h-screen">
+  <div>
     <header class="mb-6">
       <h2 class="text-2xl font-bold text-gray-800">Contenu de l'accueil</h2>
       <p class="text-gray-600 mt-1">
