@@ -1,0 +1,45 @@
+# Deploiement automatique du front sur shared-prod a chaque push sur main.
+#
+# Le template front est unifie : ce meme build sert tous les tenants, resolu au
+# runtime par hostname via /api/bootstrap. main est la branche de production
+# (promotion develop -> main = barriere dev -> prod). Build sur la box (SSH).
+name: Deploiement prod (shared-prod)
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - 'docs/**'
+      - '**/*.md'
+      - 'LICENSE'
+      - '.editorconfig'
+      - '.gitignore'
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-prod-ambassade-guinee
+  cancel-in-progress: false
+
+jobs:
+  deployer:
+    name: Livrer le front sur shared-prod
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Deploiement via SSH
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SHARED_PROD_HOST }}
+          username: ${{ secrets.SHARED_PROD_USER }}
+          key: ${{ secrets.SHARED_PROD_SSH_KEY }}
+          command_timeout: 15m
+          script: |
+            set -euo pipefail
+            cd /var/www/ambassade-guinee
+
+            git fetch origin --quiet
+            git reset --hard origin/main
+
+            export PATH=/home/ubuntu/.nvm/versions/node/v24.16.0/bin:$PATH
+            npm ci
+            npm run build
