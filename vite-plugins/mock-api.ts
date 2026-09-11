@@ -60,6 +60,10 @@ export function mockApi(): Plugin {
   /** Rechargee a chaque appel pour que l'edition de la fixture soit visible sans redemarrage. */
   const evenementsPublics = (): EvenementSimule[] =>
     (fixture('evenements') as { data: EvenementSimule[] }).data
+
+  /** Meme rechargement pour la liste d'administration, paginee ci-dessous. */
+  const evenementsAdmin = (): Record<string, unknown>[] =>
+    (fixture('evenements-admin') as { data: Record<string, unknown>[] }).data
   let prochainId = 100
   let prochainIdCategorie = 100
 
@@ -266,6 +270,22 @@ export function mockApi(): Plugin {
 
     if (chemin === '/auth/logout' && methode === 'POST') {
       return repondre(204, null)
+    }
+
+    // --- Module Evenements, administration ------------------------------
+    // Le plafond de 100 est celui du serveur : il rabat SILENCIEUSEMENT une
+    // limite plus grande. Le simuler ici evite de decouvrir cet ecart en
+    // production, ou une page reglee sur 500 lignes en rendrait 100.
+
+    if (chemin === '/admin/secure/events' && methode === 'GET') {
+      const tous = evenementsAdmin()
+      const limite = Math.min(100, Math.max(1, Number(url.searchParams.get('limit')) || 20))
+      const totalPages = Math.max(1, Math.ceil(tous.length / limite))
+      const page = Math.min(totalPages, Math.max(1, Number(url.searchParams.get('page')) || 1))
+      return repondre(200, {
+        data: tous.slice((page - 1) * limite, page * limite),
+        pagination: { page, limit: limite, total: tous.length, totalPages },
+      })
     }
 
     // --- Module Evenements, surface visiteur ---------------------------

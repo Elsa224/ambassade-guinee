@@ -1,13 +1,27 @@
 <template>
-  <div class="min-h-screen bg-gray-100">
+  <!-- Coquille de tableau de bord : la fenetre ne defile pas, seul le panneau
+       de contenu le fait. La barre laterale garde ainsi toute la hauteur et la
+       barre de titre reste visible, quelle que soit la longueur de la page. -->
+  <div class="h-screen overflow-hidden bg-gray-100">
     <!-- Sidebar -->
     <Sidebar @toggle="handleSidebarToggle" />
 
     <!-- Contenu principal avec navbar -->
-    <div :class="['transition-all duration-300', isSidebarCollapsed ? 'ml-20' : 'ml-72']">
+    <div
+      style="--hauteur-barre: 66px"
+      :class="[
+        'h-screen overflow-y-auto transition-all duration-300',
+        isSidebarCollapsed ? 'ml-20' : 'ml-72',
+      ]"
+    >
       <!-- Navbar -->
-      <nav class="bg-white shadow-md sticky top-0 z-[999]">
-        <div class="px-6 py-3">
+      <!-- Hauteur fixe et assumee : les en-tetes de tableau collants s'y
+           alignent (`top-[var(--hauteur-barre)]`). Sans hauteur connue, ils se
+           calent derriere cette barre et disparaissent au defilement. -->
+      <nav
+        class="bg-white shadow-md sticky top-0 z-[999] h-[var(--hauteur-barre)] flex items-center"
+      >
+        <div class="w-full px-6">
           <div class="flex items-center justify-between">
             <!-- Titre de la page dynamique -->
             <div class="flex items-center gap-3">

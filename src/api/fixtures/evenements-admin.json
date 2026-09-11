@@ -1,0 +1,858 @@
+{
+  "data": [
+    {
+      "slug": "fête-nationale-du-gabon",
+      "name": "Fête nationale du Gabon",
+      "date": "2026-08-17",
+      "time": "18:30",
+      "location": "Palais du Peuple, Conakry",
+      "description": "Évènement organisé par l'ambassade. Le programme détaillé est communiqué aux inscrits.",
+      "status": "COMPLETED",
+      "createdAt": "2026-06-12T09:14:00.000Z",
+      "logoUrl": null,
+      "registrationOpen": false,
+      "registrationDeadline": null,
+      "capacity": 250,
+      "registeredCount": 115,
+      "spotsRemaining": 135,
+      "typeLabel": "Fête nationale",
+      "participants": [
+        {
+          "fullName": "Ibrahima Moussavou",
+          "email": "inscrit0@exemple.test",
+          "uidn": "GA100000"
+        },
+        {
+          "fullName": "Jean-Pierre Mbadinga",
+          "email": "inscrit1@exemple.test",
+          "uidn": "GA100001"
+        },
+        {
+          "fullName": "Ibrahima Mbadinga",
+          "email": "inscrit2@exemple.test",
+          "uidn": "GA100002"
+        }
+      ],
+      "isPublished": false,
+      "publishedAt": null
+    },
+    {
+      "slug": "commémoration-du-17-août",
+      "name": "Commémoration du 17 août",
+      "date": "2026-08-17",
+      "time": "09:00",
+      "location": "Chancellerie, Conakry",
+      "description": "Évènement organisé par l'ambassade. Le programme détaillé est communiqué aux inscrits.",
+      "status": "COMPLETED",
+      "createdAt": "2026-06-12T09:14:00.000Z",
+      "logoUrl": null,
+      "registrationOpen": false,
+      "registrationDeadline": null,
+      "capacity": 120,
+      "registeredCount": 38,
+      "spotsRemaining": 82,
+      "typeLabel": "Cérémonie officielle",
+      "participants": [
+        {
+          "fullName": "Chantal Obame",
+          "email": "inscrit0@exemple.test",
+          "uidn": "GA100037"
+        },
+        {
+          "fullName": "Awa Camara",
+          "email": "inscrit1@exemple.test",
+          "uidn": "GA100038"
+        },
+        {
+          "fullName": "Ibrahima Mbadinga",
+          "email": "inscrit2@exemple.test",
+          "uidn": "GA100039"
+        }
+      ],
+      "isPublished": true,
+      "publishedAt": "2026-06-20T11:02:00.000Z"
+    },
+    {
+      "slug": "réception-du-corps-diplomatique",
+      "name": "Réception du corps diplomatique",
+      "date": "2026-09-04",
+      "time": "19:00",
+      "location": "Résidence de l'Ambassadeur",
+      "description": "Évènement organisé par l'ambassade. Le programme détaillé est communiqué aux inscrits.",
+      "status": "COMPLETED",
+      "createdAt": "2026-06-12T09:14:00.000Z",
+      "logoUrl": null,
+      "registrationOpen": false,
+      "registrationDeadline": null,
+      "capacity": 80,
+      "registeredCount": 67,
+      "spotsRemaining": 13,
+      "typeLabel": "Cérémonie officielle",
+      "participants": [
+        {
+          "fullName": "Moussa Ndong",
+          "email": "inscrit0@exemple.test",
+          "uidn": "GA100074"
+        },
+        {
+          "fullName": "Awa Diallo",
+          "email": "inscrit1@exemple.test",
+          "uidn": "GA100075"
+        },
+        {
+          "fullName": "Jean-Pierre Ndong",
+          "email": "inscrit2@exemple.test",
+          "uidn": "GA100076"
+        }
+      ],
+      "isPublished": true,
+      "publishedAt": "2026-06-20T11:02:00.000Z"
+    },
+    {
+      "slug": "permanence-consulaire-mensuelle",
+      "name": "Permanence consulaire mensuelle",
+      "date": "2026-09-15",
+      "time": "09:00",
+      "location": "Chancellerie, Conakry",
+      "description": "Évènement organisé par l'ambassade. Le programme détaillé est communiqué aux inscrits.",
+      "status": "ACTIVE",
+      "createdAt": "2026-06-12T09:14:00.000Z",
+      "logoUrl": null,
+      "registrationOpen": true,
+      "registrationDeadline": "2026-09-15",
+      "capacity": 40,
+      "registeredCount": 37,
+      "spotsRemaining": 3,
+      "typeLabel": "Session consulaire",
+      "participants": [
+        {
+          "fullName": "Jean-Pierre Diallo",
+          "email": "inscrit0@exemple.test",
+          "uidn": "GA100111"
+        },
+        {
+          "fullName": "Fatoumata Moussavou",
+          "email": "inscrit1@exemple.test",
+          "uidn": "GA100112"
+        },
+        {
+          "fullName": "Awa Obame",
+          "email": "inscrit2@exemple.test",
+          "uidn": "GA100113"
+        }
+      ],
+      "isPublished": true,
+      "publishedAt": "2026-06-20T11:02:00.000Z"
+    },
+    {
+      "slug": "rencontre-avec-la-diaspora-gabonaise",
+      "name": "Rencontre avec la diaspora gabonaise",
+      "date": "2026-09-26",
+      "time": "18:00",
+      "location": "Hôtel Noom, Conakry",
+      "description": "Évènement organisé par l'ambassade. Le programme détaillé est communiqué aux inscrits.",
+      "status": "ACTIVE",
+      "createdAt": "2026-06-12T09:14:00.000Z",
+      "logoUrl": null,
+      "registrationOpen": true,
+      "registrationDeadline": "2026-09-26",
+      "capacity": null,
+      "registeredCount": 75,
+      "spotsRemaining": null,
+      "typeLabel": "Rencontre communautaire",
+      "participants": [
+        {
+          "fullName": "Moussa Nzue",
+          "email": "inscrit0@exemple.test",
+          "uidn": "GA100148"
+        },
+        {
+          "fullName": "Serge Diallo",
+          "email": "inscrit1@exemple.test",
+          "uidn": "GA100149"
+        },
+        {
+          "fullName": "Fatoumata Ndong",
+          "email": "inscrit2@exemple.test",
+          "uidn": "GA100150"
+        }
+      ],
+      "isPublished": false,
+      "publishedAt": null
+    },
+    {
+      "slug": "journée-portes-ouvertes-de-la-chanceller",
+      "name": "Journée portes ouvertes de la chancellerie",
+      "date": "2026-10-03",
+      "time": "10:00",
+      "location": "Chancellerie, Conakry",
+      "description": "Évènement organisé par l'ambassade. Le programme détaillé est communiqué aux inscrits.",
+      "status": "ACTIVE",
+      "createdAt": "2026-06-12T09:14:00.000Z",
+      "logoUrl": null,
+      "registrationOpen": true,
+      "registrationDeadline": "2026-10-03",
+      "capacity": 200,
+      "registeredCount": 102,
+      "spotsRemaining": 98,
+      "typeLabel": "Rencontre communautaire",
+      "participants": [
+        {
+          "fullName": "Moussa Nzue",
+          "email": "inscrit0@exemple.test",
+          "uidn": "GA100185"
+        },
+        {
+          "fullName": "Nadège Obame",
+          "email": "inscrit1@exemple.test",
+          "uidn": "GA100186"
+        },
+        {
+          "fullName": "Awa Ndong",
+          "email": "inscrit2@exemple.test",
+          "uidn": "GA100187"
+        }
+      ],
+      "isPublished": false,
+      "publishedAt": null
+    },
+    {
+      "slug": "forum-des-étudiants-gabonais",
+      "name": "Forum des étudiants gabonais",
+      "date": "2026-10-17",
+      "time": "14:00",
+      "location": "Centre culturel franco-guinéen",
+      "description": "Évènement organisé par l'ambassade. Le programme détaillé est communiqué aux inscrits.",
+      "status": "ACTIVE",
+      "createdAt": "2026-06-12T09:14:00.000Z",
+      "logoUrl": null,
+      "registrationOpen": true,
+      "registrationDeadline": "2026-10-17",
+      "capacity": 150,
+      "registeredCount": 13,
+      "spotsRemaining": 137,
+      "typeLabel": "Conférence",
+      "participants": [
+        {
+          "fullName": "Ibrahima Camara",
+          "email": "inscrit0@exemple.test",
+          "uidn": "GA100222"
+        },
+        {
+          "fullName": "Nadège Camara",
+          "email": "inscrit1@exemple.test",
+          "uidn": "GA100223"
+        },
+        {
+          "fullName": "Moussa Diallo",
+          "email": "inscrit2@exemple.test",
+          "uidn": "GA100224"
+        }
+      ],
+      "isPublished": true,
+      "publishedAt": "2026-06-20T11:02:00.000Z"
+    },
+    {
+      "slug": "atelier-sur-létat-civil",
+      "name": "Atelier sur l'état civil",
+      "date": "2026-10-24",
+      "time": "09:30",
+      "location": "Chancellerie, Conakry",
+      "description": "Évènement organisé par l'ambassade. Le programme détaillé est communiqué aux inscrits.",
+      "status": "ACTIVE",
+      "createdAt": "2026-06-12T09:14:00.000Z",
+      "logoUrl": null,
+      "registrationOpen": true,
+      "registrationDeadline": "2026-10-24",
+      "capacity": 40,
+      "registeredCount": 5,
+      "spotsRemaining": 35,
+      "typeLabel": "Session consulaire",
+      "participants": [
+        {
+          "fullName": "Fatoumata Bivigou",
+          "email": "inscrit0@exemple.test",
+          "uidn": "GA100259"
+        },
+        {
+          "fullName": "Awa Camara",
+          "email": "inscrit1@exemple.test",
+          "uidn": "GA100260"
+        },
+        {
+          "fullName": "Moussa Mbadinga",
+          "email": "inscrit2@exemple.test",
+          "uidn": "GA100261"
+        }
+      ],
+      "isPublished": false,
+      "publishedAt": null
+    },
+    {
+      "slug": "conférence-économique-gabon-guinée",
+      "name": "Conférence économique Gabon-Guinée",
+      "date": "2026-11-06",
+      "time": "09:00",
+      "location": "Hôtel Noom, Conakry",
+      "description": "Évènement organisé par l'ambassade. Le programme détaillé est communiqué aux inscrits.",
+      "status": "ACTIVE",
+      "createdAt": "2026-06-12T09:14:00.000Z",
+      "logoUrl": null,
+      "registrationOpen": false,
+      "registrationDeadline": null,
+      "capacity": 180,
+      "registeredCount": 15,
+      "spotsRemaining": 165,
+      "typeLabel": "Conférence",
+      "participants": [
+        {
+          "fullName": "Ibrahima Moussavou",
+          "email": "inscrit0@exemple.test",
+          "uidn": "GA100296"
+        },
+        {
+          "fullName": "Chantal Diallo",
+          "email": "inscrit1@exemple.test",
+          "uidn": "GA100297"
+        },
+        {
+          "fullName": "Ibrahima Diallo",
+          "email": "inscrit2@exemple.test",
+          "uidn": "GA100298"
+        }
+      ],
+      "isPublished": true,
+      "publishedAt": "2026-06-20T11:02:00.000Z"
+    },
+    {
+      "slug": "permanence-consulaire-à-kindia",
+      "name": "Permanence consulaire à Kindia",
+      "date": "2026-11-13",
+      "time": "09:00",
+      "location": "Consulat, Kindia",
+      "description": "Évènement organisé par l'ambassade. Le programme détaillé est communiqué aux inscrits.",
+      "status": "ACTIVE",
+      "createdAt": "2026-06-12T09:14:00.000Z",
+      "logoUrl": null,
+      "registrationOpen": true,
+      "registrationDeadline": "2026-11-13",
+      "capacity": 60,
+      "registeredCount": 26,
+      "spotsRemaining": 34,
+      "typeLabel": "Session consulaire",
+      "participants": [
+        {
+          "fullName": "Nadège Obame",
+          "email": "inscrit0@exemple.test",
+          "uidn": "GA100333"
+        },
+        {
+          "fullName": "Nadège Camara",
+          "email": "inscrit1@exemple.test",
+          "uidn": "GA100334"
+        },
+        {
+          "fullName": "Jean-Pierre Ndong",
+          "email": "inscrit2@exemple.test",
+          "uidn": "GA100335"
+        }
+      ],
+      "isPublished": false,
+      "publishedAt": null
+    },
+    {
+      "slug": "cérémonie-de-remise-de-passeports",
+      "name": "Cérémonie de remise de passeports",
+      "date": "2026-11-20",
+      "time": "11:00",
+      "location": "Chancellerie, Conakry",
+      "description": "Évènement organisé par l'ambassade. Le programme détaillé est communiqué aux inscrits.",
+      "status": "ACTIVE",
+      "createdAt": "2026-06-12T09:14:00.000Z",
+      "logoUrl": null,
+      "registrationOpen": true,
+      "registrationDeadline": "2026-11-20",
+      "capacity": 120,
+      "registeredCount": 102,
+      "spotsRemaining": 18,
+      "typeLabel": "Cérémonie officielle",
+      "participants": [
+        {
+          "fullName": "Fatoumata Ndong",
+          "email": "inscrit0@exemple.test",
+          "uidn": "GA100370"
+        },
+        {
+          "fullName": "Jean-Pierre Mbadinga",
+          "email": "inscrit1@exemple.test",
+          "uidn": "GA100371"
+        },
+        {
+          "fullName": "Nadège Obame",
+          "email": "inscrit2@exemple.test",
+          "uidn": "GA100372"
+        }
+      ],
+      "isPublished": false,
+      "publishedAt": null
+    },
+    {
+      "slug": "exposition-dart-gabonais",
+      "name": "Exposition d'art gabonais",
+      "date": "2026-11-28",
+      "time": "17:00",
+      "location": "Centre culturel franco-guinéen",
+      "description": "Évènement organisé par l'ambassade. Le programme détaillé est communiqué aux inscrits.",
+      "status": "CANCELLED",
+      "createdAt": "2026-06-12T09:14:00.000Z",
+      "logoUrl": null,
+      "registrationOpen": false,
+      "registrationDeadline": null,
+      "capacity": 200,
+      "registeredCount": 37,
+      "spotsRemaining": 163,
+      "typeLabel": "Conférence",
+      "participants": [
+        {
+          "fullName": "Jean-Pierre Moussavou",
+          "email": "inscrit0@exemple.test",
+          "uidn": "GA100407"
+        },
+        {
+          "fullName": "Fatoumata Ndong",
+          "email": "inscrit1@exemple.test",
+          "uidn": "GA100408"
+        },
+        {
+          "fullName": "Serge Nzue",
+          "email": "inscrit2@exemple.test",
+          "uidn": "GA100409"
+        }
+      ],
+      "isPublished": false,
+      "publishedAt": null
+    },
+    {
+      "slug": "table-ronde-sur-les-investissements",
+      "name": "Table ronde sur les investissements",
+      "date": "2026-12-04",
+      "time": "10:00",
+      "location": "Hôtel Noom, Conakry",
+      "description": "Évènement organisé par l'ambassade. Le programme détaillé est communiqué aux inscrits.",
+      "status": "ACTIVE",
+      "createdAt": "2026-06-12T09:14:00.000Z",
+      "logoUrl": null,
+      "registrationOpen": true,
+      "registrationDeadline": "2026-12-04",
+      "capacity": 80,
+      "registeredCount": 9,
+      "spotsRemaining": 71,
+      "typeLabel": "Conférence",
+      "participants": [
+        {
+          "fullName": "Moussa Diallo",
+          "email": "inscrit0@exemple.test",
+          "uidn": "GA100444"
+        },
+        {
+          "fullName": "Jean-Pierre Ndong",
+          "email": "inscrit1@exemple.test",
+          "uidn": "GA100445"
+        },
+        {
+          "fullName": "Serge Bivigou",
+          "email": "inscrit2@exemple.test",
+          "uidn": "GA100446"
+        }
+      ],
+      "isPublished": true,
+      "publishedAt": "2026-06-20T11:02:00.000Z"
+    },
+    {
+      "slug": "accueil-des-nouveaux-arrivants",
+      "name": "Accueil des nouveaux arrivants",
+      "date": "2026-12-11",
+      "time": "16:00",
+      "location": "Chancellerie, Conakry",
+      "description": "Évènement organisé par l'ambassade. Le programme détaillé est communiqué aux inscrits.",
+      "status": "ACTIVE",
+      "createdAt": "2026-06-12T09:14:00.000Z",
+      "logoUrl": null,
+      "registrationOpen": false,
+      "registrationDeadline": null,
+      "capacity": 50,
+      "registeredCount": 37,
+      "spotsRemaining": 13,
+      "typeLabel": "Rencontre communautaire",
+      "participants": [
+        {
+          "fullName": "Ibrahima Mbadinga",
+          "email": "inscrit0@exemple.test",
+          "uidn": "GA100481"
+        },
+        {
+          "fullName": "Nadège Mbadinga",
+          "email": "inscrit1@exemple.test",
+          "uidn": "GA100482"
+        },
+        {
+          "fullName": "Chantal Nzue",
+          "email": "inscrit2@exemple.test",
+          "uidn": "GA100483"
+        }
+      ],
+      "isPublished": true,
+      "publishedAt": "2026-06-20T11:02:00.000Z"
+    },
+    {
+      "slug": "dîner-de-gala-de-lambassade",
+      "name": "Dîner de gala de l'ambassade",
+      "date": "2026-12-19",
+      "time": "20:00",
+      "location": "Hôtel Noom, Conakry",
+      "description": "Évènement organisé par l'ambassade. Le programme détaillé est communiqué aux inscrits.",
+      "status": "ACTIVE",
+      "createdAt": "2026-06-12T09:14:00.000Z",
+      "logoUrl": null,
+      "registrationOpen": true,
+      "registrationDeadline": "2026-12-19",
+      "capacity": 250,
+      "registeredCount": 63,
+      "spotsRemaining": 187,
+      "typeLabel": "Cérémonie officielle",
+      "participants": [
+        {
+          "fullName": "Jean-Pierre Mbadinga",
+          "email": "inscrit0@exemple.test",
+          "uidn": "GA100518"
+        },
+        {
+          "fullName": "Jean-Pierre Camara",
+          "email": "inscrit1@exemple.test",
+          "uidn": "GA100519"
+        },
+        {
+          "fullName": "Ibrahima Obame",
+          "email": "inscrit2@exemple.test",
+          "uidn": "GA100520"
+        }
+      ],
+      "isPublished": true,
+      "publishedAt": "2026-06-20T11:02:00.000Z"
+    },
+    {
+      "slug": "consultation-juridique-gratuite",
+      "name": "Consultation juridique gratuite",
+      "date": "2027-01-15",
+      "time": "09:00",
+      "location": "Chancellerie, Conakry",
+      "description": "Évènement organisé par l'ambassade. Le programme détaillé est communiqué aux inscrits.",
+      "status": "ACTIVE",
+      "createdAt": "2026-06-12T09:14:00.000Z",
+      "logoUrl": null,
+      "registrationOpen": false,
+      "registrationDeadline": null,
+      "capacity": 30,
+      "registeredCount": 1,
+      "spotsRemaining": 29,
+      "typeLabel": "Session consulaire",
+      "participants": [
+        {
+          "fullName": "Fatoumata Diallo",
+          "email": "inscrit0@exemple.test",
+          "uidn": "GA100555"
+        }
+      ],
+      "isPublished": true,
+      "publishedAt": "2026-06-20T11:02:00.000Z"
+    },
+    {
+      "slug": "réunion-du-conseil-des-gabonais-de-létra",
+      "name": "Réunion du conseil des Gabonais de l'étranger",
+      "date": "2027-01-29",
+      "time": "17:30",
+      "location": "Chancellerie, Conakry",
+      "description": "Évènement organisé par l'ambassade. Le programme détaillé est communiqué aux inscrits.",
+      "status": "ACTIVE",
+      "createdAt": "2026-06-12T09:14:00.000Z",
+      "logoUrl": null,
+      "registrationOpen": true,
+      "registrationDeadline": "2027-01-29",
+      "capacity": null,
+      "registeredCount": 58,
+      "spotsRemaining": null,
+      "typeLabel": "Rencontre communautaire",
+      "participants": [
+        {
+          "fullName": "Ibrahima Nzue",
+          "email": "inscrit0@exemple.test",
+          "uidn": "GA100592"
+        },
+        {
+          "fullName": "Chantal Obame",
+          "email": "inscrit1@exemple.test",
+          "uidn": "GA100593"
+        },
+        {
+          "fullName": "Chantal Diallo",
+          "email": "inscrit2@exemple.test",
+          "uidn": "GA100594"
+        }
+      ],
+      "isPublished": true,
+      "publishedAt": "2026-06-20T11:02:00.000Z"
+    },
+    {
+      "slug": "séance-de-renouvellement-des-cartes-cons",
+      "name": "Séance de renouvellement des cartes consulaires",
+      "date": "2027-02-12",
+      "time": "09:00",
+      "location": "Chancellerie, Conakry",
+      "description": "Évènement organisé par l'ambassade. Le programme détaillé est communiqué aux inscrits.",
+      "status": "ACTIVE",
+      "createdAt": "2026-06-12T09:14:00.000Z",
+      "logoUrl": null,
+      "registrationOpen": true,
+      "registrationDeadline": "2027-02-12",
+      "capacity": 60,
+      "registeredCount": 39,
+      "spotsRemaining": 21,
+      "typeLabel": "Session consulaire",
+      "participants": [
+        {
+          "fullName": "Moussa Nzue",
+          "email": "inscrit0@exemple.test",
+          "uidn": "GA100629"
+        },
+        {
+          "fullName": "Jean-Pierre Diallo",
+          "email": "inscrit1@exemple.test",
+          "uidn": "GA100630"
+        },
+        {
+          "fullName": "Awa Obame",
+          "email": "inscrit2@exemple.test",
+          "uidn": "GA100631"
+        }
+      ],
+      "isPublished": false,
+      "publishedAt": null
+    },
+    {
+      "slug": "rencontre-avec-les-opérateurs-économique",
+      "name": "Rencontre avec les opérateurs économiques",
+      "date": "2027-02-26",
+      "time": "18:00",
+      "location": "Hôtel Noom, Conakry",
+      "description": "Évènement organisé par l'ambassade. Le programme détaillé est communiqué aux inscrits.",
+      "status": "ACTIVE",
+      "createdAt": "2026-06-12T09:14:00.000Z",
+      "logoUrl": null,
+      "registrationOpen": true,
+      "registrationDeadline": "2027-02-26",
+      "capacity": 90,
+      "registeredCount": 7,
+      "spotsRemaining": 83,
+      "typeLabel": "Rencontre communautaire",
+      "participants": [
+        {
+          "fullName": "Awa Mbadinga",
+          "email": "inscrit0@exemple.test",
+          "uidn": "GA100666"
+        },
+        {
+          "fullName": "Fatoumata Bivigou",
+          "email": "inscrit1@exemple.test",
+          "uidn": "GA100667"
+        },
+        {
+          "fullName": "Chantal Obame",
+          "email": "inscrit2@exemple.test",
+          "uidn": "GA100668"
+        }
+      ],
+      "isPublished": true,
+      "publishedAt": "2026-06-20T11:02:00.000Z"
+    },
+    {
+      "slug": "cérémonie-de-décoration",
+      "name": "Cérémonie de décoration",
+      "date": "2027-03-12",
+      "time": "11:00",
+      "location": "Résidence de l'Ambassadeur",
+      "description": "Évènement organisé par l'ambassade. Le programme détaillé est communiqué aux inscrits.",
+      "status": "ACTIVE",
+      "createdAt": "2026-06-12T09:14:00.000Z",
+      "logoUrl": null,
+      "registrationOpen": true,
+      "registrationDeadline": "2027-03-12",
+      "capacity": 70,
+      "registeredCount": 42,
+      "spotsRemaining": 28,
+      "typeLabel": "Cérémonie officielle",
+      "participants": [
+        {
+          "fullName": "Chantal Ndong",
+          "email": "inscrit0@exemple.test",
+          "uidn": "GA100703"
+        },
+        {
+          "fullName": "Awa Moussavou",
+          "email": "inscrit1@exemple.test",
+          "uidn": "GA100704"
+        },
+        {
+          "fullName": "Serge Nzue",
+          "email": "inscrit2@exemple.test",
+          "uidn": "GA100705"
+        }
+      ],
+      "isPublished": true,
+      "publishedAt": "2026-06-20T11:02:00.000Z"
+    },
+    {
+      "slug": "signature-de-laccord-bilatéral",
+      "name": "Signature de l'accord bilatéral",
+      "date": "2027-03-25",
+      "time": "10:30",
+      "location": "Palais du Peuple, Conakry",
+      "description": "Évènement organisé par l'ambassade. Le programme détaillé est communiqué aux inscrits.",
+      "status": "ACTIVE",
+      "createdAt": "2026-06-12T09:14:00.000Z",
+      "logoUrl": null,
+      "registrationOpen": false,
+      "registrationDeadline": null,
+      "capacity": 100,
+      "registeredCount": 81,
+      "spotsRemaining": 19,
+      "typeLabel": "Cérémonie officielle",
+      "participants": [
+        {
+          "fullName": "Moussa Moussavou",
+          "email": "inscrit0@exemple.test",
+          "uidn": "GA100740"
+        },
+        {
+          "fullName": "Moussa Nzue",
+          "email": "inscrit1@exemple.test",
+          "uidn": "GA100741"
+        },
+        {
+          "fullName": "Serge Mbadinga",
+          "email": "inscrit2@exemple.test",
+          "uidn": "GA100742"
+        }
+      ],
+      "isPublished": true,
+      "publishedAt": "2026-06-20T11:02:00.000Z"
+    },
+    {
+      "slug": "célébration-de-la-journée-de-lafrique",
+      "name": "Célébration de la Journée de l'Afrique",
+      "date": "2027-05-25",
+      "time": "18:00",
+      "location": "Palais du Peuple, Conakry",
+      "description": "Évènement organisé par l'ambassade. Le programme détaillé est communiqué aux inscrits.",
+      "status": "ACTIVE",
+      "createdAt": "2026-06-12T09:14:00.000Z",
+      "logoUrl": null,
+      "registrationOpen": false,
+      "registrationDeadline": null,
+      "capacity": 300,
+      "registeredCount": 279,
+      "spotsRemaining": 21,
+      "typeLabel": "Fête nationale",
+      "participants": [
+        {
+          "fullName": "Serge Ndong",
+          "email": "inscrit0@exemple.test",
+          "uidn": "GA100777"
+        },
+        {
+          "fullName": "Chantal Bivigou",
+          "email": "inscrit1@exemple.test",
+          "uidn": "GA100778"
+        },
+        {
+          "fullName": "Serge Obame",
+          "email": "inscrit2@exemple.test",
+          "uidn": "GA100779"
+        }
+      ],
+      "isPublished": true,
+      "publishedAt": "2026-06-20T11:02:00.000Z"
+    },
+    {
+      "slug": "concert-de-la-fête-de-lindépendance",
+      "name": "Concert de la fête de l'indépendance",
+      "date": "2027-08-16",
+      "time": "20:00",
+      "location": "Palais du Peuple, Conakry",
+      "description": "Évènement organisé par l'ambassade. Le programme détaillé est communiqué aux inscrits.",
+      "status": "ACTIVE",
+      "createdAt": "2026-06-12T09:14:00.000Z",
+      "logoUrl": null,
+      "registrationOpen": true,
+      "registrationDeadline": "2027-08-16",
+      "capacity": 400,
+      "registeredCount": 213,
+      "spotsRemaining": 187,
+      "typeLabel": "Fête nationale",
+      "participants": [
+        {
+          "fullName": "Awa Moussavou",
+          "email": "inscrit0@exemple.test",
+          "uidn": "GA100814"
+        },
+        {
+          "fullName": "Awa Camara",
+          "email": "inscrit1@exemple.test",
+          "uidn": "GA100815"
+        },
+        {
+          "fullName": "Nadège Ndong",
+          "email": "inscrit2@exemple.test",
+          "uidn": "GA100816"
+        }
+      ],
+      "isPublished": true,
+      "publishedAt": "2026-06-20T11:02:00.000Z"
+    },
+    {
+      "slug": "session-dinscription-consulaire",
+      "name": "Session d'inscription consulaire",
+      "date": "2027-09-10",
+      "time": "09:00",
+      "location": "Chancellerie, Conakry",
+      "description": "Évènement organisé par l'ambassade. Le programme détaillé est communiqué aux inscrits.",
+      "status": "ACTIVE",
+      "createdAt": "2026-06-12T09:14:00.000Z",
+      "logoUrl": null,
+      "registrationOpen": false,
+      "registrationDeadline": null,
+      "capacity": 40,
+      "registeredCount": 40,
+      "spotsRemaining": 0,
+      "typeLabel": null,
+      "participants": [
+        {
+          "fullName": "Moussa Nzue",
+          "email": "inscrit0@exemple.test",
+          "uidn": "GA100851"
+        },
+        {
+          "fullName": "Nadège Bivigou",
+          "email": "inscrit1@exemple.test",
+          "uidn": "GA100852"
+        },
+        {
+          "fullName": "Nadège Moussavou",
+          "email": "inscrit2@exemple.test",
+          "uidn": "GA100853"
+        }
+      ],
+      "isPublished": true,
+      "publishedAt": "2026-06-20T11:02:00.000Z"
+    }
+  ]
+}
