@@ -29,7 +29,7 @@
             class="absolute right-0 mt-3 w-48 bg-white rounded-lg shadow-lg overflow-hidden z-50 animate-fadeIn"
           >
             <router-link
-              to="/app/mon-profil"
+              to="/dashboard/profile"
               class="block w-full text-left px-4 py-3 hover:bg-gray-50"
               @click="menuOpen = false"
             >
@@ -37,7 +37,7 @@
             </router-link>
 
             <router-link
-              to="/app/change-password"
+              to="/dashboard/profile"
               class="block w-full text-left px-4 py-3 hover:bg-gray-50"
               @click="menuOpen = false"
             >
@@ -45,7 +45,7 @@
             </router-link>
 
             <router-link
-              to="/app/deconnexion"
+              to="/connexion"
               class="block w-full text-left px-4 py-3 text-red-600 hover:bg-gray-50"
               @click="menuOpen = false"
             >

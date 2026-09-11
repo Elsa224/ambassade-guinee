@@ -369,7 +369,7 @@
         <p class="text-xl mb-8 text-gray-300">Notre équipe diplomatique est à votre disposition</p>
         <div class="flex flex-col sm:flex-row gap-4 justify-center">
           <router-link
-            to="/contact"
+            to="/construction"
             class="bg-accent text-white px-8 py-3 rounded-full font-semibold hover:bg-accent-dark transition-colors inline-flex items-center gap-2"
           >
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -383,7 +383,7 @@
             Nous contacter
           </router-link>
           <router-link
-            to="/services"
+            to="/construction"
             class="bg-transparent border-2 border-white text-white px-8 py-3 rounded-full font-semibold hover:bg-white hover:text-gray-900 transition-colors"
           >
             Nos services consulaires

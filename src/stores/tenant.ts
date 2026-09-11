@@ -3,6 +3,7 @@ import { ref, computed } from 'vue'
 import { fetchBootstrap, type Embassy } from '@/api/bootstrap'
 import { applyTheme } from '@/theme/applyTheme'
 import { ApiError } from '@/api/client'
+import { rubriqueOuverte as rubriqueOuvertePour } from '@/tenant/rubriques'
 
 /**
  * Config du site courant, résolue par le nom de domaine.
@@ -18,6 +19,11 @@ export const useTenantStore = defineStore('tenant', () => {
 
   function moduleActif(nom: string): boolean {
     return embassy.value?.modules?.[nom] === true
+  }
+
+  /** La regle vit dans `tenant/rubriques.ts`, qui la documente. */
+  function rubriqueOuverte(nom: string | null): boolean {
+    return rubriqueOuvertePour(nom, embassy.value)
   }
 
   /**
@@ -41,5 +47,5 @@ export const useTenantStore = defineStore('tenant', () => {
     }
   }
 
-  return { embassy, chargement, erreur, nomCourt, moduleActif, charger }
+  return { embassy, chargement, erreur, nomCourt, moduleActif, rubriqueOuverte, charger }
 })

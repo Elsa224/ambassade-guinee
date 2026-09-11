@@ -1,0 +1,48 @@
+{
+  "data": {
+    "welcome": {
+      "title": "Mot de bienvenue",
+      "body_html": "<p>Chers compatriotes,<br />Chers amis et partenaires de la République Gabonaise,</p><p>C'est avec un réel plaisir que nous vous ouvrons les portes de l'Ambassade du Gabon en Guinée via ce site.</p>"
+    },
+    "leaders": [
+      {
+        "id": 1,
+        "name": "Brice Clotaire Oligui Nguema",
+        "role": "Président de la République, Chef de l'État",
+        "subtitle": "République Gabonaise",
+        "image_url": "/fixtures/dirigeant-president.webp",
+        "position": 1
+      },
+      {
+        "id": 2,
+        "name": "Dr Marie-Édith Tassyla-Ye-Doumbeneny",
+        "role": "Ministre des Affaires étrangères",
+        "subtitle": "République Gabonaise",
+        "image_url": "/fixtures/dirigeant-ministre.webp",
+        "position": 2
+      },
+      {
+        "id": 3,
+        "name": "Persis Lionel Essono Ondo",
+        "role": "Ambassadeur Extraordinaire et Plénipotentiaire",
+        "subtitle": null,
+        "image_url": "/fixtures/dirigeant-ambassadeur.webp",
+        "position": 3
+      }
+    ],
+    "showcase": [
+      {
+        "id": 7,
+        "image_url": "/fixtures/vitrine-drapeau.webp",
+        "alt": "Drapeau de la République Gabonaise",
+        "position": 1
+      },
+      {
+        "id": 8,
+        "image_url": "/fixtures/vitrine-cascade.webp",
+        "alt": null,
+        "position": 2
+      }
+    ]
+  }
+}

@@ -5,6 +5,8 @@ import { createPinia, setActivePinia } from 'pinia'
 import { defineComponent, h } from 'vue'
 import Connexion from '../Connexion.vue'
 import { useAuthStore } from '@/stores/auth'
+import { useTenantStore } from '@/stores/tenant'
+import { GABON } from '@/api/fixtures/tenants'
 
 const Vide = defineComponent({ render: () => h('div') })
 
@@ -30,6 +32,26 @@ describe('page de connexion', () => {
   beforeEach(() => {
     setActivePinia(createPinia())
     localStorage.clear()
+  })
+
+  it("n'affiche aucune image compilee dans le gabarit", async () => {
+    // Le fond de cette page etait le drapeau guineen et le repli du logo
+    // l'embleme guineen : les deux s'affichaient sur tous les domaines, y
+    // compris le gabonais.
+    const wrapper = await monter(creerRouteur())
+    const sources = wrapper.findAll('img').map((i) => i.attributes('src') ?? '')
+
+    expect(sources).toEqual([])
+  })
+
+  it("reprend le logo et le drapeau de l'ambassade courante", async () => {
+    useTenantStore().embassy = GABON
+
+    const wrapper = await monter(creerRouteur())
+    const sources = wrapper.findAll('img').map((i) => i.attributes('src') ?? '')
+
+    expect(sources).toContain(GABON.logo_image)
+    expect(sources).toContain(GABON.flag_image)
   })
 
   it('ne contient plus le texte recycle de Secure Check ni de Maposte', async () => {

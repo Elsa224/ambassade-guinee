@@ -34,12 +34,15 @@ import Consulat from '@/components/services/Consulat.vue'
 import RendezVous from '@/components/services/RendezVous.vue'
 import DemarcheLigne from '@/components/services/DemarcheLigne.vue'
 
-import Construction from '@/views/Construction.vue'
+import BientotDisponible from '@/components/BientotDisponible.vue'
+import InscriptionEvenement from '@/views/evenements/InscriptionEvenement.vue'
+import Evenements from '@/views/evenements/Evenements.vue'
 
 // ===================== DASHBOARD =====================
 // Pages principales (conteneurs avec <router-view>)
 import Dashboard from '@/views/dashboard/Dashboard.vue'
 import Articles from '@/views/dashboard/Articles.vue'
+import AccueilContenu from '@/views/dashboard/contenu/AccueilContenu.vue'
 import Actualites from '@/views/dashboard/Actualites.vue'
 import Galerie from '@/views/dashboard/Galerie.vue'
 import Nouvelles from '@/views/dashboard/Nouvelles.vue'
@@ -105,6 +108,21 @@ const router = createRouter({
         { path: '', name: 'home', component: Home },
         { path: 'actualite', name: 'actualite', component: Actualite },
         { path: 'actualites/:slug', name: 'actualite-detail', component: ActualiteDetail },
+        { path: 'evenements', name: 'evenements', component: Evenements },
+        // La carte d'un evenement porte deja son formulaire d'inscription :
+        // plutot que deux URL au contenu identique, celle-ci renvoie vers
+        // celle que le QR imprime, qui fait autorite.
+        {
+          path: 'evenements/:token',
+          redirect: (destination) => `/evenements/inscription/${destination.params.token}`,
+        },
+        // Chemin impose par le QR d'inscription genere par le CMS
+        // (SECURECHECK_REGISTRATION_PATH) : il doit correspondre exactement.
+        {
+          path: 'evenements/inscription/:token',
+          name: 'inscription-evenement',
+          component: InscriptionEvenement,
+        },
         // Les trois rubriques partagent le meme composant : seules la categorie
         // filtree et le sous-titre changent. Le slug passe ici doit exister
         // dans la taxonomie du CMS, c'est lui qui filtre la requete.
@@ -156,7 +174,7 @@ const router = createRouter({
         { path: 'rendez-vous', name: 'rendez-vous', component: RendezVous },
         { path: 'demarche-ligne', name: 'demarche-ligne', component: DemarcheLigne },
 
-        { path: 'construction', name: 'construction', component: Construction },
+        { path: 'construction', name: 'construction', component: BientotDisponible },
       ],
     },
 
@@ -168,6 +186,7 @@ const router = createRouter({
         // --- GROUPE ADMIN ---
         { path: '', name: 'dashboard', component: Dashboard },
         { path: 'articles', name: 'articles', component: Articles },
+        { path: 'contenu-accueil', name: 'contenu-accueil', component: AccueilContenu },
         { path: 'actualites', name: 'actualites', component: Actualites },
         { path: 'galerie', name: 'galerie', component: Galerie },
         { path: 'nouvelles', name: 'nouvelles', component: Nouvelles },

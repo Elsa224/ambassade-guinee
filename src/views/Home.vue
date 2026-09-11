@@ -6,157 +6,113 @@
         <!-- TEXTE GAUCHE -->
         <div>
           <!-- Logo -->
-          <img :src="logoAmbassade" class="w-20 mb-6" alt="Logo Guinée" />
+          <img v-if="logo" :src="logo" class="w-20 mb-6" :alt="nomDeLAmbassade" />
 
           <!-- Titre -->
           <h1 class="text-4xl lg:text-5xl font-bold text-gray-900 leading-tight mb-6">
-            Ambassade de la République de Guinée près les Etats-Unis d'Amérique Washington DC
+            {{ nomDeLAmbassade }}
           </h1>
 
-          <!-- Texte -->
-          <p class="text-gray-600 mb-8 max-w-xl">
-            Ut velit mauris, egestas sed, gravida nec, ornare ut, mi. Aenean ut orci vel massa
-            suscipit pulvinar. Nulla sollicitudin.
-          </p>
+          <!-- Le paragraphe qui suivait etait du faux texte de maquette
+               (« Ut velit mauris, egestas sed... »), reste en production. Il
+               attend un vrai texte d'accroche, que l'API ne transmet pas
+               encore. -->
 
-          <!-- Boutons -->
+          <!-- Boutons : le premier menait a `/services`, qui n'est pas une
+               route, sous le libelle de maquette « Button 1 ». Les deux
+               destinations retenues sont ouvertes pour toutes les ambassades. -->
           <div class="flex items-center gap-6">
             <router-link
-              to="/services"
-              class="bg-red-600 text-white px-8 py-4 rounded-xl font-semibold shadow-lg hover:bg-red-700 transition"
+              to="/actualite"
+              class="bg-primary hover:bg-primary-dark text-white px-8 py-4 rounded-xl font-semibold shadow-lg transition-colors"
             >
-              Button 1
+              Consulter les actualités
             </router-link>
 
-            <a
-              href="#"
-              class="text-gray-700 font-semibold flex items-center gap-2 hover:text-red-600"
+            <router-link
+              v-if="servicesOuverts"
+              to="/demarche-ligne"
+              class="text-gray-700 font-semibold flex items-center gap-2 hover:text-primary transition-colors"
             >
-              Voir plus →
-            </a>
+              Vos démarches en ligne
+              <i class="bx bx-right-arrow-alt text-xl" aria-hidden="true"></i>
+            </router-link>
           </div>
         </div>
 
         <!-- IMAGES DROITE -->
         <div class="grid grid-cols-2 gap-6">
-          <img :src="heroPhoto1" class="rounded-2xl shadow-lg object-cover h-48 w-full" />
+          <img
+            v-if="drapeau"
+            :src="drapeau"
+            :alt="`Drapeau ${articleDuPays(nomOfficiel)} ${nomOfficiel}`"
+            class="rounded-2xl shadow-lg object-cover h-48 w-full"
+          />
 
-          <img :src="heroPhoto2" class="rounded-2xl shadow-lg object-cover h-64 w-full mt-10" />
-
-          <img :src="heroPhoto3" class="rounded-2xl shadow-lg object-cover h-64 w-full" />
-
-          <img :src="heroPhoto4" class="rounded-2xl shadow-lg object-cover h-48 w-full" />
+          <img
+            v-for="(photo, rang) in photosVitrine"
+            :key="photo.id"
+            loading="lazy"
+            :src="photo.image_url"
+            :alt="photo.alt ?? ''"
+            class="rounded-2xl shadow-lg object-cover w-full"
+            :class="rang === 0 ? 'h-64 mt-10' : rang === 1 ? 'h-64' : 'h-48'"
+          />
         </div>
       </div>
     </section>
-    <!-- Message de bienvenue - 3 photos avec visages bien visibles -->
-    <section class="py-20 bg-white">
+    <!-- Mot de bienvenue et dirigeants : contenu servi par le CMS, propre a
+         chaque ambassade. Rien n'est ecrit en dur ici, et une ambassade qui
+         n'a rien saisi ne voit pas la section : le repli n'est pas le contenu
+         d'une autre ambassade, c'est l'absence. -->
+    <section v-if="sectionBienvenue" data-bloc="bienvenue" class="py-20 bg-white">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center mb-16">
-          <h2 class="text-4xl font-bold text-primary mb-4">MOT DE BIENVENUE</h2>
+        <div v-if="motDeBienvenue" class="text-center mb-16">
+          <h2 class="text-4xl font-bold text-primary mb-4">{{ motDeBienvenue.title }}</h2>
           <div class="w-24 h-1 bg-secondary mx-auto"></div>
         </div>
 
-        <!-- Trois photos alignées : Président, Ministre, Ambassadeur -->
-        <div class="flex flex-col lg:flex-row items-stretch gap-8">
-          <!-- Photo du Président (gauche) -->
-          <div class="lg:w-1/3">
+        <div v-if="dirigeants.length" class="flex flex-col lg:flex-row items-stretch gap-8">
+          <div v-for="(dirigeant, rang) in dirigeants" :key="dirigeant.id" class="lg:w-1/3">
             <div
               class="bg-white rounded-2xl shadow-xl overflow-hidden transform hover:-translate-y-2 transition-all duration-300 h-full flex flex-col"
             >
               <div class="h-80 lg:h-[520px] overflow-hidden flex-shrink-0 bg-gray-100">
                 <img
                   loading="lazy"
-                  :src="presidentImage"
-                  alt="Président Mamadi DOUMBOUYA"
+                  :src="dirigeant.image_url"
+                  :alt="dirigeant.name"
                   class="w-full h-full object-cover object-[center_20%] hover:scale-110 transition-transform duration-500"
                 />
               </div>
               <div
-                class="p-8 text-center bg-gradient-to-b from-accent to-accent-dark text-white flex-grow min-h-[150px] flex flex-col justify-center"
+                class="p-8 text-center flex-grow min-h-[150px] flex flex-col justify-center"
+                :class="habillageDuRang(rang)"
               >
-                <h3 class="text-xl font-bold mb-2">S.E. Monsieur Mamadi DOUMBOUYA</h3>
-                <p class="text-secondary font-medium text-sm">
-                  Président de la République, Chef de l'État
+                <h3 class="text-xl font-bold mb-2">{{ dirigeant.name }}</h3>
+                <p class="font-medium text-sm" :class="accentDuRang(rang)">{{ dirigeant.role }}</p>
+                <p v-if="dirigeant.subtitle" class="text-xs mt-1 opacity-80">
+                  {{ dirigeant.subtitle }}
                 </p>
-                <p class="text-white/80 text-xs mt-1">République de Guinée</p>
-              </div>
-            </div>
-          </div>
-
-          <!-- Photo du Ministre (centre) -->
-          <div class="lg:w-1/3">
-            <div
-              class="bg-white rounded-2xl shadow-xl overflow-hidden transform hover:-translate-y-2 transition-all duration-300 h-full flex flex-col"
-            >
-              <div class="h-80 lg:h-[520px] overflow-hidden flex-shrink-0 bg-gray-100">
-                <img
-                  loading="lazy"
-                  :src="ministreImage"
-                  alt="Dr. Morissanda KOUYATE"
-                  class="w-full h-full object-cover object-[center_20%] hover:scale-110 transition-transform duration-500"
-                />
-              </div>
-              <div
-                class="p-8 text-center bg-gradient-to-b from-secondary to-secondary-dark text-gray-800 flex-grow min-h-[150px] flex flex-col justify-center"
-              >
-                <h3 class="text-xl font-bold mb-2">Dr. Morissanda KOUYATE</h3>
-                <p class="text-primary font-medium text-sm">
-                  Ministre des Affaires Étrangères,<br />de l'Intégration Africaine et des Guinéens
-                  établis à l'Étranger
-                </p>
-                <p class="text-gray-700/80 text-xs mt-1">République de Guinée</p>
-              </div>
-            </div>
-          </div>
-
-          <!-- Photo de l'Ambassadeur (droite) -->
-          <div class="lg:w-1/3">
-            <div
-              class="bg-white rounded-2xl shadow-xl overflow-hidden transform hover:-translate-y-2 transition-all duration-300 h-full flex flex-col"
-            >
-              <div class="h-80 lg:h-[520px] overflow-hidden flex-shrink-0 bg-gray-100">
-                <img
-                  loading="lazy"
-                  :src="ambassadeurImage"
-                  alt="Ibrahima N'Daïry Diallo"
-                  class="w-full h-full object-cover object-[center_20%] hover:scale-110 transition-transform duration-500"
-                />
-              </div>
-              <div
-                class="p-8 text-center bg-gradient-to-b from-primary to-primary-dark text-white flex-grow min-h-[150px] flex flex-col justify-center"
-              >
-                <h3 class="text-xl font-bold mb-2">M. Ibrahima N'Daïry Diallo</h3>
-                <p class="text-secondary font-medium text-sm">Chargé d'affaires a.i.</p>
-                <p class="text-white/80 text-xs mt-1">Ambassade de Guinée aux États-Unis</p>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Texte de bienvenue (en dessous des 3 photos) -->
-        <div class="mt-12 bg-gray-50 p-8 rounded-2xl shadow-lg border-l-8 border-secondary">
-          <p class="text-lg text-gray-700 leading-relaxed mb-6 italic">
-            "Chers compatriotes,<br />
-            Chers amis et partenaires de la République de Guinée,"
-          </p>
-          <p class="text-gray-700 leading-relaxed mb-6">
-            C'est avec un réel plaisir que nous vous ouvrons les portes d'entrée de l'Ambassade de
-            Guinée à Washington DC et celles de la Guinée toute entière via ce site web.
-          </p>
-          <p class="text-gray-700 leading-relaxed">
-            En effet, la coopération entre les États-Unis et la République de Guinée date des
-            premières années de l'indépendance de la Guinée. Mais, c'est en 1979 que les relations
-            diplomatiques proprement dites ont été établies entre les deux pays. Cet élan de
-            coopération connaîtra un second souffle en 1982 avec la signature de l'Accord général de
-            coopération et de développement, suivi de l'ouverture de l'ambassade de Guinée aux
-            États-Unis en 1980 et celle des États-Unis en Guinée en 1982.
-          </p>
-        </div>
+        <!-- Le corps du mot de bienvenue est assaini par le serveur : le
+             contrat l'exige, le front ne peut pas etre la derniere defense. -->
+        <div
+          v-if="motDeBienvenue && motDeBienvenue.body_html"
+          class="mt-12 bg-gray-50 p-8 rounded-2xl shadow-lg border-l-8 border-secondary prose max-w-none text-gray-700"
+          v-html="motDeBienvenue.body_html"
+        ></div>
       </div>
     </section>
-    <!-- Section Services -->
-    <section class="py-20 bg-gray-50">
+
+    <!-- Section Services : le texte des cartes nomme le pays d'accueil de
+         l'ambassade d'origine (« visa pour les Etats-Unis »). Tant qu'il
+         n'est pas servi par l'API, il suit la rubrique des services. -->
+    <section v-if="servicesOuverts" class="py-20 bg-gray-50">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-16">
           <h2 class="text-4xl font-bold text-primary mb-4">NOS SERVICES</h2>
@@ -180,7 +136,7 @@
               Demande de visa pour les États-Unis et informations sur les procédures.
             </p>
             <router-link
-              to="/services/visa"
+              to="/construction"
               class="text-accent font-semibold inline-flex items-center gap-2 hover:gap-3 transition-all"
             >
               En savoir plus <i class="bx bx-right-arrow-alt"></i>
@@ -199,7 +155,7 @@
               Inscription et renouvellement de votre carte consulaire.
             </p>
             <router-link
-              to="/services/inscription"
+              to="/construction"
               class="text-accent font-semibold inline-flex items-center gap-2 hover:gap-3 transition-all"
             >
               En savoir plus <i class="bx bx-right-arrow-alt"></i>
@@ -218,7 +174,7 @@
               Demande d'actes d'état civil, certificats et autres documents.
             </p>
             <router-link
-              to="/services/documents"
+              to="/construction"
               class="text-accent font-semibold inline-flex items-center gap-2 hover:gap-3 transition-all"
             >
               En savoir plus <i class="bx bx-right-arrow-alt"></i>
@@ -237,7 +193,7 @@
               Légalisation, certification et authentification de documents.
             </p>
             <router-link
-              to="/services/legalisation"
+              to="/construction"
               class="text-accent font-semibold inline-flex items-center gap-2 hover:gap-3 transition-all"
             >
               En savoir plus <i class="bx bx-right-arrow-alt"></i>
@@ -256,7 +212,7 @@
               Demande et renouvellement de passeport et titres de voyage.
             </p>
             <router-link
-              to="/services/passeport"
+              to="/construction"
               class="text-accent font-semibold inline-flex items-center gap-2 hover:gap-3 transition-all"
             >
               En savoir plus <i class="bx bx-right-arrow-alt"></i>
@@ -275,7 +231,7 @@
               Service d'envoi et de réception de documents en express.
             </p>
             <router-link
-              to="/services/express"
+              to="/construction"
               class="text-accent font-semibold inline-flex items-center gap-2 hover:gap-3 transition-all"
             >
               En savoir plus <i class="bx bx-right-arrow-alt"></i>
@@ -297,7 +253,7 @@
             </h2>
             <div class="space-y-4">
               <router-link
-                to="/services/visa"
+                to="/construction"
                 class="block bg-gray-50 p-5 rounded-xl hover:bg-primary hover:text-white group transition-all"
               >
                 <div class="flex items-center justify-between">
@@ -308,7 +264,7 @@
                 </div>
               </router-link>
               <router-link
-                to="/services/passeport"
+                to="/construction"
                 class="block bg-gray-50 p-5 rounded-xl hover:bg-primary hover:text-white group transition-all"
               >
                 <div class="flex items-center justify-between">
@@ -319,7 +275,7 @@
                 </div>
               </router-link>
               <router-link
-                to="/services/legalisation"
+                to="/construction"
                 class="block bg-gray-50 p-5 rounded-xl hover:bg-primary hover:text-white group transition-all"
               >
                 <div class="flex items-center justify-between">
@@ -330,7 +286,7 @@
                 </div>
               </router-link>
               <router-link
-                to="/services/inscription"
+                to="/construction"
                 class="block bg-gray-50 p-5 rounded-xl hover:bg-primary hover:text-white group transition-all"
               >
                 <div class="flex items-center justify-between">
@@ -387,7 +343,7 @@
           <h2 class="text-4xl font-bold text-primary mb-4">ACTUALITÉS RÉCENTES</h2>
           <div class="w-24 h-1 bg-secondary mx-auto mb-4"></div>
           <p class="text-gray-600 text-lg max-w-2xl mx-auto">
-            Restez informé des dernières nouvelles de l'ambassade et de la Guinée
+            Restez informé des dernières nouvelles de l'ambassade
           </p>
         </div>
 
@@ -459,24 +415,73 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useActualites, formaterDate, formaterDateCourte } from '@/composables/useActualites'
+import { useTenantStore } from '@/stores/tenant'
+import { useIdentite, articleDuPays } from '@/tenant/identite'
+import { recupererContenuAccueil, CONTENU_VIDE, type ContenuAccueil } from '@/api/contenu'
+
+const tenant = useTenantStore()
+const { nomOfficiel, nomDeLAmbassade, logo, drapeau } = useIdentite()
+
+// Rubriques de contenu : ouvertes tant que l'ambassade ne les ferme pas.
+const servicesOuverts = computed(() => tenant.rubriqueOuverte('services'))
+
+/**
+ * Contenu d'accueil servi par le CMS : mot de bienvenue, dirigeants, vitrine.
+ *
+ * L'echec est silencieux et laisse le contenu vide. Sur une page d'accueil
+ * d'ambassade, une section absente vaut mieux qu'un message d'erreur ; et
+ * surtout, le repli ne doit jamais etre le contenu compile dans le gabarit,
+ * qui est celui d'une autre ambassade.
+ */
+const contenu = ref<ContenuAccueil>({ ...CONTENU_VIDE })
+
+/**
+ * Le contenu est son propre interrupteur.
+ *
+ * Les drapeaux `dirigeants` et `vitrine` servaient a masquer du contenu ecrit
+ * en dur dans le gabarit. Ce contenu n'existe plus : ce que le CMS ne sert pas
+ * ne s'affiche pas, et une ambassade qui veut retirer une section la vide
+ * depuis son administration. Garder les deux mecanismes ferait remplir un
+ * formulaire sans rien voir apparaitre.
+ */
+const motDeBienvenue = computed(() => contenu.value.welcome)
+const dirigeants = computed(() => contenu.value.leaders)
+const photosVitrine = computed(() => contenu.value.showcase)
+const sectionBienvenue = computed(
+  () => motDeBienvenue.value !== null || dirigeants.value.length > 0,
+)
+
+/** Les trois fiches alternent les couleurs de l'ambassade, dans son ordre. */
+const HABILLAGES = [
+  'bg-gradient-to-b from-accent to-accent-dark text-white',
+  'bg-gradient-to-b from-secondary to-secondary-dark text-ink-dark',
+  'bg-gradient-to-b from-primary to-primary-dark text-white',
+] as const
+const ACCENTS = ['text-secondary', 'text-primary', 'text-secondary'] as const
+
+const habillageDuRang = (rang: number) => HABILLAGES[rang % HABILLAGES.length]
+const accentDuRang = (rang: number) => ACCENTS[rang % ACCENTS.length]
+
+onMounted(async () => {
+  try {
+    contenu.value = await recupererContenuAccueil()
+  } catch {
+    // Le contenu reste vide, donc les sections restent masquees. Sur une page
+    // d'accueil d'ambassade, une section absente vaut mieux qu'un message
+    // d'erreur — et surtout, le repli n'est jamais le contenu compile dans le
+    // gabarit, qui est celui d'une autre ambassade.
+  }
+})
 
 // Import des 4 photos de fond pour le hero
-import heroPhoto1 from '@/assets/images/hero3.webp' // Logo avec bouclier
-import heroPhoto2 from '@/assets/images/hero4.webp' // Gare
-import heroPhoto3 from '@/assets/images/hero5.webp' // Paysage orange
-import heroPhoto4 from '@/assets/images/hero6.webp' // Cascade
 import bgHero from '@/assets/images/bghero.webp'
 
 // Import du logo de l'ambassade
-import logoAmbassade from '@/assets/images/logo.webp'
 
 // Import des photos du président et de l'ambassadeur
-import presidentImage from '@/assets/images/president.webp'
-import ambassadeurImage from '@/assets/images/ambassadeur.webp'
 // Import de la photo du Ministre
-import ministreImage from '@/assets/images/ministre.webp'
 
 // Actualites de la page d'accueil : l'API renvoie la liste deja triee du plus
 // recent au plus ancien, les deux sections en prennent simplement le debut.

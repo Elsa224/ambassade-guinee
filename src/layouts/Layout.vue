@@ -6,8 +6,18 @@
         <div class="flex items-center justify-between">
           <div class="flex flex-col gap-1">
             <div class="flex items-center gap-4">
-              <img :src="logo1" alt="Logo 1" class="h-12 w-auto object-contain" />
-              <img :src="logoSimandou" alt="Simandou" class="h-12 w-auto object-contain" />
+              <img
+                v-if="logo"
+                :src="logo"
+                :alt="nomDeLAmbassade"
+                class="h-12 w-auto object-contain"
+              />
+              <img
+                v-if="drapeau"
+                :src="drapeau"
+                :alt="`Drapeau ${articleDuPays(nomOfficiel)} ${nomOfficiel}`"
+                class="h-12 w-auto object-contain"
+              />
             </div>
           </div>
 
@@ -125,21 +135,25 @@
                   >L'Ambassadeur</router-link
                 >
                 <router-link
+                  v-if="rubriqueOuverte('/chancellerie')"
                   to="/chancellerie"
                   class="block px-4 py-2 text-sm text-gray-800 hover:bg-secondary hover:text-primary transition-all border-b border-gray-100"
                   >La chancellerie diplomatique</router-link
                 >
                 <router-link
+                  v-if="rubriqueOuverte('/services-ambassadeur')"
                   to="/services-ambassadeur"
                   class="block px-4 py-2 text-sm text-gray-800 hover:bg-secondary hover:text-primary transition-all border-b border-gray-100"
                   >Les Services</router-link
                 >
                 <router-link
+                  v-if="rubriqueOuverte('/consuls-honoraires')"
                   to="/consuls-honoraires"
                   class="block px-4 py-2 text-sm text-gray-800 hover:bg-secondary hover:text-primary transition-all border-b border-gray-100"
                   >Les consuls Honoraires</router-link
                 >
                 <router-link
+                  v-if="rubriqueOuverte('/calendrier')"
                   to="/calendrier"
                   class="block px-4 py-2 text-sm text-gray-800 hover:bg-secondary hover:text-primary transition-all"
                   >Calendrier des fêtes légales</router-link
@@ -148,7 +162,7 @@
             </div>
 
             <!-- Relations - Menu cliquable avec chevron -->
-            <div class="relative group">
+            <div v-if="rubriqueOuverte('/relations-bilaterales')" class="relative group">
               <div class="flex items-center">
                 <router-link
                   to="/relations-bilaterales"
@@ -211,10 +225,16 @@
             </div>
 
             <!-- Services - Menu cliquable avec chevron -->
-            <div class="relative group">
+            <!-- L'intitule menait autrefois a `/demarche-ligne` quand le
+                 consulat etait ferme. Ce repli n'en est plus un : ce
+                 formulaire nomme le pays d'accueil de l'ambassade d'origine et
+                 suit desormais la rubrique. Le menu entier disparait donc
+                 quand aucune de ses pages n'est ouverte, plutot que de mener a
+                 une page d'attente. -->
+            <div v-if="premierServiceOuvert" class="relative group">
               <div class="flex items-center">
                 <router-link
-                  to="/consulat"
+                  :to="premierServiceOuvert"
                   class="nav-item px-3 py-2 rounded-l hover:bg-secondary hover:text-primary transition text-primary"
                   active-class="hover-active"
                 >
@@ -246,11 +266,13 @@
                 class="absolute top-full left-0 min-w-[220px] bg-white rounded-lg shadow-lg z-50 py-1 mt-1"
               >
                 <router-link
+                  v-if="rubriqueOuverte('/consulat')"
                   to="/consulat"
                   class="block px-4 py-2 text-sm text-gray-800 hover:bg-secondary hover:text-primary transition-all border-b border-gray-100"
                   >Le consulat</router-link
                 >
                 <router-link
+                  v-if="rubriqueOuverte('/rendez-vous')"
                   to="/rendez-vous"
                   class="block px-4 py-2 text-sm text-gray-800 hover:bg-secondary hover:text-primary transition-all border-b border-gray-100"
                   >Prise de rendez-vous</router-link
@@ -262,6 +284,16 @@
                 >
               </div>
             </div>
+
+            <!-- Le module Evenements n'est pas provisionne pour toutes les
+                 ambassades : l'entree disparait quand il ne l'est pas. -->
+            <router-link
+              v-if="rubriqueOuverte('/evenements')"
+              to="/evenements"
+              class="nav-item px-3 py-2 rounded hover:bg-secondary hover:text-primary transition text-primary"
+              active-class="hover-active"
+              >Évènements</router-link
+            >
 
             <!-- Bouton de connexion -->
             <router-link
@@ -284,7 +316,7 @@
             >
 
             <!-- Version mobile avec accordéon -->
-            <div v-for="menu in mobileMenus" :key="menu.key">
+            <div v-for="menu in menusMobilesOuverts" :key="menu.key">
               <div
                 class="flex items-center justify-between px-3 py-2 rounded hover:bg-secondary hover:text-primary text-primary"
               >
@@ -319,7 +351,13 @@
             </div>
 
             <router-link
-              to="/videos"
+              v-if="rubriqueOuverte('/evenements')"
+              to="/evenements"
+              class="block px-3 py-2 rounded hover:bg-secondary hover:text-primary text-primary"
+              >Évènements</router-link
+            >
+            <router-link
+              to="/construction"
               class="block px-3 py-2 rounded hover:bg-secondary hover:text-primary text-primary"
               >Vidéos</router-link
             >
@@ -336,7 +374,12 @@
     <!-- Main content -->
     <main class="flex-1 pt-10">
       <div class="flex-1">
-        <router-view></router-view>
+        <!-- Masquer le lien au menu ne suffit pas : une URL tapee a la main
+             atteindrait quand meme la page. La rubrique fermee n'instancie
+             donc jamais son composant. -->
+        <router-view v-slot="{ Component, route }">
+          <component :is="rubriqueOuverte(route.path) ? Component : BientotDisponible" />
+        </router-view>
       </div>
 
       <!-- Footer amélioré avec vagues -->
@@ -374,24 +417,26 @@
             <div class="sm:col-span-2 lg:col-span-1">
               <div class="flex gap-4 mb-4">
                 <img
+                  v-if="logo"
                   loading="lazy"
-                  :src="logo1"
-                  alt="Logo Guinée"
+                  :src="logo"
+                  :alt="`Armoiries ${articleDuPays(nomOfficiel)} ${nomOfficiel}`"
                   class="h-14 w-auto bg-white/10 p-2 rounded-lg backdrop-blur-sm"
                 />
                 <img
+                  v-if="drapeau"
                   loading="lazy"
-                  :src="logoSimandou"
-                  alt="Simandou"
+                  :src="drapeau"
+                  :alt="`Drapeau ${articleDuPays(nomOfficiel)} ${nomOfficiel}`"
                   class="h-14 w-auto bg-white/10 p-2 rounded-lg backdrop-blur-sm"
                 />
               </div>
               <h3 class="text-secondary font-semibold text-lg mb-2">
-                Ambassade de la République de Guinée
+                {{ nomDeLAmbassade }}
               </h3>
-              <p class="text-white/80 text-sm leading-relaxed">
-                Représentation diplomatique de la Guinée aux États-Unis, au service de la communauté
-                guinéenne et du renforcement des relations bilatérales.
+              <p v-if="gentile" class="text-white/80 text-sm leading-relaxed">
+                Représentation diplomatique, au service de la communauté {{ gentile }}e et du
+                renforcement des relations bilatérales.
               </p>
 
               <!-- Réseaux sociaux -->
@@ -432,7 +477,7 @@
               <ul class="space-y-3">
                 <li>
                   <router-link
-                    to="/ambassade/mot"
+                    to="/construction"
                     class="text-white/80 hover:text-white transition-all duration-200 flex items-center gap-2 group"
                   >
                     <i
@@ -443,7 +488,7 @@
                 </li>
                 <li>
                   <router-link
-                    to="/ambassade/equipe"
+                    to="/construction"
                     class="text-white/80 hover:text-white transition-all duration-200 flex items-center gap-2 group"
                   >
                     <i
@@ -454,7 +499,7 @@
                 </li>
                 <li>
                   <router-link
-                    to="/ambassade/coordonnees"
+                    to="/construction"
                     class="text-white/80 hover:text-white transition-all duration-200 flex items-center gap-2 group"
                   >
                     <i
@@ -475,7 +520,7 @@
               <ul class="space-y-3">
                 <li>
                   <router-link
-                    to="/services/visa"
+                    to="/construction"
                     class="text-white/80 hover:text-white transition-all duration-200 flex items-center gap-2 group"
                   >
                     <i
@@ -486,7 +531,7 @@
                 </li>
                 <li>
                   <router-link
-                    to="/services/passeport"
+                    to="/construction"
                     class="text-white/80 hover:text-white transition-all duration-200 flex items-center gap-2 group"
                   >
                     <i
@@ -497,7 +542,7 @@
                 </li>
                 <li>
                   <router-link
-                    to="/services/legalisation"
+                    to="/construction"
                     class="text-white/80 hover:text-white transition-all duration-200 flex items-center gap-2 group"
                   >
                     <i
@@ -508,7 +553,7 @@
                 </li>
                 <li>
                   <router-link
-                    to="/services/inscription"
+                    to="/construction"
                     class="text-white/80 hover:text-white transition-all duration-200 flex items-center gap-2 group"
                   >
                     <i
@@ -528,24 +573,26 @@
               </h4>
 
               <div class="space-y-4">
-                <div class="flex items-start gap-3">
+                <!-- Chaque ligne disparait si l'ambassade ne l'a pas fournie :
+                     une coordonnee vide vaut mieux que celle d'une autre. -->
+                <div v-if="adresse" class="flex items-start gap-3">
                   <i class="bx bx-map text-secondary text-xl mt-1"></i>
-                  <p class="text-white/80 text-sm">2112 Leroy Place NW, Washington, DC 20008</p>
+                  <p class="text-white/80 text-sm">{{ adresse }}</p>
                 </div>
 
-                <div class="flex items-center gap-3">
+                <div v-if="telephone" class="flex items-center gap-3">
                   <i class="bx bx-phone text-secondary text-xl"></i>
-                  <p class="text-white/80">+1 (202) 483 9420</p>
+                  <p class="text-white/80">{{ telephone }}</p>
                 </div>
 
-                <div class="flex items-center gap-3">
+                <div v-if="courriel" class="flex items-center gap-3">
                   <i class="bx bx-envelope text-secondary text-xl"></i>
-                  <p class="text-white/80">info@ambaguinee-us.org</p>
+                  <p class="text-white/80">{{ courriel }}</p>
                 </div>
 
-                <div class="flex items-center gap-3">
+                <div v-if="horaires" class="flex items-center gap-3">
                   <i class="bx bx-time text-secondary text-xl"></i>
-                  <p class="text-white/80">Lun-Ven: 9h - 17h</p>
+                  <p class="text-white/80">{{ horaires }}</p>
                 </div>
               </div>
             </div>
@@ -556,35 +603,35 @@
             class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 py-6 border-t border-white/20"
           >
             <router-link
-              to="/actualites"
+              to="/actualite"
               class="text-white/70 hover:text-secondary text-sm transition-colors flex items-center gap-1"
             >
               <i class="bx bx-chevron-right text-secondary text-xs"></i>
               Actualités
             </router-link>
             <router-link
-              to="/relations/bilaterales"
+              to="/construction"
               class="text-white/70 hover:text-secondary text-sm transition-colors flex items-center gap-1"
             >
               <i class="bx bx-chevron-right text-secondary text-xs"></i>
               Relations
             </router-link>
             <router-link
-              to="/guinee/histoire"
+              to="/construction"
               class="text-white/70 hover:text-secondary text-sm transition-colors flex items-center gap-1"
             >
               <i class="bx bx-chevron-right text-secondary text-xs"></i>
-              La Guinée
+              {{ nomCourt }}
             </router-link>
             <router-link
-              to="/services/visa"
+              to="/construction"
               class="text-white/70 hover:text-secondary text-sm transition-colors flex items-center gap-1"
             >
               <i class="bx bx-chevron-right text-secondary text-xs"></i>
               Services
             </router-link>
             <router-link
-              to="/videos"
+              to="/construction"
               class="text-white/70 hover:text-secondary text-sm transition-colors flex items-center gap-1"
             >
               <i class="bx bx-chevron-right text-secondary text-xs"></i>
@@ -598,8 +645,7 @@
               class="flex flex-col sm:flex-row justify-between items-start sm:items-center text-white/70 text-xs sm:text-sm gap-4"
             >
               <div>
-                <p>© 2024 Ambassade de la République de Guinée. Tous droits réservés.</p>
-                <p class="mt-1 text-xs">près les Etats-Unis d'Amérique - Washington DC</p>
+                <p>© {{ anneeCourante }} {{ nomDeLAmbassade }}. Tous droits réservés.</p>
               </div>
 
               <div class="flex items-center gap-2">
@@ -609,13 +655,13 @@
 
               <div class="flex flex-col sm:flex-row gap-2 sm:gap-4">
                 <router-link
-                  to="/mentions-legales"
+                  to="/construction"
                   class="hover:text-secondary transition-colors duration-200"
                 >
                   Mentions légales
                 </router-link>
                 <router-link
-                  to="/confidentialite"
+                  to="/construction"
                   class="hover:text-secondary transition-colors duration-200"
                 >
                   Confidentialité
@@ -630,9 +676,37 @@
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue'
-import logo1 from '@/assets/images/logo.webp'
-import logoSimandou from '@/assets/images/masque.webp'
+import { ref, reactive, computed } from 'vue'
+import BientotDisponible from '@/components/BientotDisponible.vue'
+import { useTenantStore } from '@/stores/tenant'
+import { cheminOuvert } from '@/tenant/rubriques'
+import { useIdentite, articleDuPays } from '@/tenant/identite'
+
+const tenant = useTenantStore()
+
+const {
+  nomOfficiel,
+  nomCourt,
+  gentile,
+  nomDeLAmbassade,
+  logo,
+  drapeau,
+  adresse,
+  telephone,
+  courriel,
+  horaires,
+} = useIdentite()
+
+const anneeCourante = new Date().getFullYear()
+
+/**
+ * Accessibilite d'un chemin du site public. La regle vit dans `rubriques.ts`,
+ * qui applique a chaque cas son defaut : ferme pour un module a provisionner,
+ * ouvert pour une rubrique de contenu.
+ */
+function rubriqueOuverte(chemin) {
+  return cheminOuvert(chemin, tenant.embassy)
+}
 
 const isMobileMenuOpen = ref(false)
 
@@ -642,7 +716,7 @@ const openDropdowns = reactive({
   ambassade: false,
   relations: false,
   services: false,
-  guinee: false,
+  pays: false,
   venir: false,
 })
 
@@ -652,7 +726,7 @@ const openSubmenus = reactive({
   ambassade: false,
   relations: false,
   services: false,
-  guinee: false,
+  pays: false,
   venir: false,
 })
 
@@ -700,15 +774,15 @@ const mobileMenus = ref([
     items: [
       { label: 'Le consulat', path: '/consulat' },
       { label: 'Prise de rendez-vous', path: '/rendez-vous' },
-      { label: 'Vos démarches en ligne', path: '/construction' },
+      { label: 'Vos démarches en ligne', path: '/demarche-ligne' },
     ],
   },
   {
-    key: 'guinee',
-    label: 'La Guinée',
+    key: 'pays',
+    label: nomCourt.value,
     path: '/construction',
     items: [
-      { label: 'Présentation de la Guinée', path: '/construction' },
+      { label: 'Présentation du pays', path: '/construction' },
       { label: 'Le Président de la République', path: '/construction' },
       { label: 'Le Gouvernement', path: '/construction' },
       { label: "Les institutions de l'Etat", path: '/construction' },
@@ -721,11 +795,31 @@ const mobileMenus = ref([
     path: '/construction',
     items: [
       { label: 'Visas', path: '/construction' },
-      { label: 'Visiter la Guinée', path: '/construction' },
-      { label: 'Investir en Guinée', path: '/construction' },
+      { label: 'Visiter le pays', path: '/construction' },
+      { label: 'Investir sur place', path: '/construction' },
     ],
   },
 ])
+
+/**
+ * Menu mobile filtre : chaque rubrique fermee disparait, et une section dont
+ * tous les liens sont fermes disparait avec eux plutot que de laisser un
+ * intitule qui n'ouvre rien.
+ */
+/**
+ * Premiere page ouverte de la section Services, ou `null` si l'ambassade n'en
+ * publie aucune. Sert a la fois de destination de l'intitule et de condition
+ * d'affichage du menu.
+ */
+const premierServiceOuvert = computed(
+  () => ['/consulat', '/rendez-vous', '/demarche-ligne'].find(rubriqueOuverte) ?? null,
+)
+
+const menusMobilesOuverts = computed(() =>
+  mobileMenus.value
+    .map((menu) => ({ ...menu, items: menu.items.filter((item) => rubriqueOuverte(item.path)) }))
+    .filter((menu) => menu.items.length > 0),
+)
 
 // Fonctions
 const toggleMobileMenu = () => {
