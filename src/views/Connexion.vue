@@ -85,9 +85,19 @@
       </div>
     </div>
 
-    <!-- Illustration -->
-    <div class="hidden md:flex md:w-1/2 relative overflow-hidden order-1 md:order-2 bg-primary/10">
-      <img :src="illustration" alt="" aria-hidden="true" class="w-full h-full object-cover" />
+    <!-- Illustration : le drapeau de l'ambassade courante, ou, a defaut, un
+         aplat de ses couleurs. L'image compilee ici etait le drapeau guineen,
+         affiche sur tous les domaines — y compris le gabonais. -->
+    <div
+      class="hidden md:flex md:w-1/2 relative overflow-hidden order-1 md:order-2 bg-gradient-to-br from-primary to-primary-dark"
+    >
+      <img
+        v-if="drapeau"
+        :src="drapeau"
+        alt=""
+        aria-hidden="true"
+        class="w-full h-full object-cover"
+      />
       <div class="absolute inset-0 bg-primary/30"></div>
     </div>
   </div>
@@ -98,8 +108,6 @@ import { ref, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useTenantStore } from '@/stores/tenant'
-import illustration from '@/assets/images/hero3.webp'
-import logoParDefaut from '@/assets/images/logo.webp'
 
 const router = useRouter()
 const route = useRoute()
@@ -110,8 +118,11 @@ const email = ref('')
 const password = ref('')
 const motDePasseVisible = ref(false)
 
-// Le logo vient du tenant ; l'image compilée sert de repli si le bootstrap a échoué.
-const logo = computed(() => tenant.embassy?.logo_image || logoParDefaut)
+// Le logo et le drapeau viennent du tenant, et de nulle part ailleurs. Le
+// repli compilé était l'emblème guinéen : sur un autre domaine, il affichait
+// l'identité d'une autre ambassade plutôt que rien.
+const logo = computed(() => tenant.embassy?.logo_image ?? '')
+const drapeau = computed(() => tenant.embassy?.flag_image ?? '')
 const nomCourt = computed(() => tenant.nomCourt || "l'ambassade")
 
 /**
