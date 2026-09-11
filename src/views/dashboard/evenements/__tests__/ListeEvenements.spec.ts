@@ -20,9 +20,7 @@ function evenement(partiel: Partial<EvenementAdmin> = {}): EvenementAdmin {
     registeredCount: 120,
     spotsRemaining: 80,
     typeLabel: 'Fête nationale',
-    participants: [
-      { fullName: 'Awa Ndong', email: 'awa.ndong@exemple.test', uidn: 'GA100001' },
-    ],
+    participants: [{ fullName: 'Awa Ndong', email: 'awa.ndong@exemple.test', uidn: 'GA100001' }],
     ...partiel,
   }
 }
@@ -82,7 +80,7 @@ describe('liste d administration des evenements', () => {
     expect(wrapper.text()).toContain('17 août 2026')
   })
 
-  it("n expose aucune donnee personnelle d inscrit", async () => {
+  it('n expose aucune donnee personnelle d inscrit', async () => {
     // Le back sert `participants[]` avec nom, courriel et identifiant DANS la
     // reponse de liste. Un tableau d'administration n'est pas l'endroit ou les
     // deverser : seul leur nombre doit apparaitre.
@@ -114,7 +112,7 @@ describe('liste d administration des evenements', () => {
     expect(wrapper.text()).toContain('Non publié')
   })
 
-  it("rend le type sans jamais attendre de slug", async () => {
+  it('rend le type sans jamais attendre de slug', async () => {
     // `typeEventSlug` n'existe pas dans la reponse ; `typeLabel` peut etre nul.
     servir([evenement({ typeLabel: null })])
     const wrapper = await rendre()
@@ -155,7 +153,10 @@ describe('liste d administration des evenements', () => {
   })
 
   it('propose de reessayer quand le back est en panne', async () => {
-    vi.stubGlobal('fetch', vi.fn(() => Promise.reject(new Error('reseau'))))
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(() => Promise.reject(new Error('reseau'))),
+    )
     const wrapper = await rendre()
 
     expect(wrapper.text()).toContain('Réessayer')
