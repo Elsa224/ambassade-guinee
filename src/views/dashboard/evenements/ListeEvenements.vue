@@ -66,9 +66,17 @@ onMounted(() => charger(1))
           Les évènements de l'ambassade et l'état de leurs inscriptions.
         </p>
       </div>
-      <p v-if="!chargement && !erreur" class="text-sm text-gray-500 tabular-nums">
-        {{ pagination.total }} évènement{{ pagination.total > 1 ? 's' : '' }}
-      </p>
+      <div class="flex items-center gap-4">
+        <p v-if="!chargement && !erreur" class="text-sm text-gray-500 tabular-nums">
+          {{ pagination.total }} évènement{{ pagination.total > 1 ? 's' : '' }}
+        </p>
+        <RouterLink
+          :to="{ name: 'evenement-admin-nouveau' }"
+          class="bg-primary text-white font-medium px-4 py-2 rounded-lg hover:opacity-90"
+        >
+          Nouvel évènement
+        </RouterLink>
+      </div>
     </header>
 
     <p

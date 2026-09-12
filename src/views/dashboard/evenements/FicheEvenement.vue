@@ -1,7 +1,12 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
-import { recupererEvenementAdmin, type EvenementAdmin } from '@/api/evenements-admin'
+import {
+  recupererEvenementAdmin,
+  annulerEvenement,
+  basculerPublication,
+  type EvenementAdmin,
+} from '@/api/evenements-admin'
 import { messageErreur } from '@/api/evenements'
 import { dateLisible, etatDe, remplissage } from './presentation'
 import PastilleEtat from './PastilleEtat.vue'
@@ -68,6 +73,50 @@ async function charger() {
   }
 }
 
+/**
+ * Une action est en cours.
+ *
+ * Un seul verrou pour les deux boutons : annuler et publier touchent le meme
+ * evenement, et les laisser partir ensemble ferait arriver deux reponses dont
+ * la derniere ecraserait la premiere.
+ */
+const action = ref(false)
+const erreurAction = ref('')
+
+async function agir(operation: () => Promise<EvenementAdmin>) {
+  action.value = true
+  erreurAction.value = ''
+  try {
+    evenement.value = await operation()
+  } catch (souleve) {
+    erreurAction.value = messageErreur(souleve)
+  } finally {
+    action.value = false
+  }
+}
+
+/**
+ * Annule l'evenement.
+ *
+ * Confirmation demandee : l'annulation est visible des inscrits et du site
+ * public, et rien dans l'ecran ne permet de revenir en arriere d'un clic.
+ */
+function annuler() {
+  if (!evenement.value) return
+  const nom = evenement.value.name
+  if (!window.confirm(`Annuler « ${nom} » ? Les inscrits pourront en être informés.`)) return
+  void agir(() => annulerEvenement(slug.value))
+}
+
+function basculerSurLeSite() {
+  if (!evenement.value) return
+  const publie = evenement.value.isPublished === true
+  void agir(() => basculerPublication(slug.value, !publie))
+}
+
+/** Un evenement deja annule ou termine ne s'annule pas une seconde fois. */
+const annulable = computed(() => evenement.value?.status === 'ACTIVE')
+
 onMounted(charger)
 </script>
 
@@ -92,25 +141,65 @@ onMounted(charger)
     </p>
 
     <template v-else-if="evenement">
-      <header class="mb-6">
-        <h2 class="text-2xl font-bold text-gray-800">{{ evenement.name }}</h2>
-        <div class="flex flex-wrap items-center gap-1.5 mt-2">
-          <PastilleEtat :libelle="etatDe(evenement).libelle" :ton="etatDe(evenement).ton" />
-          <PastilleEtat
-            v-if="evenement.registrationOpen"
-            libelle="Inscriptions ouvertes"
-            ton="neutre"
-          />
-          <PastilleEtat
+      <header class="mb-6 flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <h2 class="text-2xl font-bold text-gray-800">{{ evenement.name }}</h2>
+          <div class="flex flex-wrap items-center gap-1.5 mt-2">
+            <PastilleEtat :libelle="etatDe(evenement).libelle" :ton="etatDe(evenement).ton" />
+            <PastilleEtat
+              v-if="evenement.registrationOpen"
+              libelle="Inscriptions ouvertes"
+              ton="neutre"
+            />
+            <PastilleEtat
+              v-if="publicationConnue"
+              :libelle="evenement.isPublished ? 'Publié sur le site' : 'Non publié'"
+              :ton="evenement.isPublished ? 'positif' : 'eteint'"
+            />
+            <span v-if="evenement.typeLabel" class="text-sm text-gray-500">
+              {{ evenement.typeLabel }}
+            </span>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <RouterLink
+            :to="{ name: 'evenement-admin-modifier', params: { slug } }"
+            class="bg-primary text-white font-medium px-4 py-2 rounded-lg hover:opacity-90"
+          >
+            Modifier
+          </RouterLink>
+          <!-- La bascule ne s'affiche que si le back sert la publication :
+               proposer « Publier » a un back qui ne sait pas la stocker
+               promettrait une action sans effet. -->
+          <button
             v-if="publicationConnue"
-            :libelle="evenement.isPublished ? 'Publié sur le site' : 'Non publié'"
-            :ton="evenement.isPublished ? 'positif' : 'eteint'"
-          />
-          <span v-if="evenement.typeLabel" class="text-sm text-gray-500">
-            {{ evenement.typeLabel }}
-          </span>
+            type="button"
+            :disabled="action"
+            class="border border-gray-300 text-gray-700 font-medium px-4 py-2 rounded-lg disabled:opacity-60"
+            @click="basculerSurLeSite"
+          >
+            {{ evenement.isPublished ? 'Retirer du site' : 'Publier sur le site' }}
+          </button>
+          <button
+            v-if="annulable"
+            type="button"
+            :disabled="action"
+            class="border border-red-200 text-red-700 font-medium px-4 py-2 rounded-lg disabled:opacity-60"
+            @click="annuler"
+          >
+            Annuler l'évènement
+          </button>
         </div>
       </header>
+
+      <p
+        v-if="erreurAction"
+        class="bg-red-50 border border-red-200 text-red-800 rounded-xl px-4 py-3 mb-4"
+        role="alert"
+      >
+        {{ erreurAction }}
+      </p>
 
       <!-- `content-start` n'est pas cosmetique : la grille occupe la hauteur
            restante, et `align-content` vaut `stretch` par defaut. Sans lui,

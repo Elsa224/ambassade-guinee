@@ -69,6 +69,7 @@ async function rendre() {
     history: createMemoryHistory(),
     routes: [
       { path: '/dashboard/evenements', name: 'evenements-admin', component: Vide },
+      { path: '/dashboard/evenements/nouveau', name: 'evenement-admin-nouveau', component: Vide },
       { path: '/dashboard/evenements/:slug', name: 'evenement-admin', component: Vide },
     ],
   })

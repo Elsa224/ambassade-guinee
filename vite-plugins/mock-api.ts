@@ -61,9 +61,46 @@ export function mockApi(): Plugin {
   const evenementsPublics = (): EvenementSimule[] =>
     (fixture('evenements') as { data: EvenementSimule[] }).data
 
+  /**
+   * Ecritures d'administration, gardees en memoire.
+   *
+   * La fixture est relue a chaque appel pour qu'on puisse l'editer sans
+   * redemarrer : ecrire dedans annulerait cet avantage, et salirait un fichier
+   * versionne. Les creations et les retouches vivent donc a cote, et sont
+   * fusionnees a la lecture. Elles disparaissent au redemarrage du serveur de
+   * developpement, ce qui est le comportement voulu d'un simulateur.
+   */
+  const creationsAdmin: Record<string, unknown>[] = []
+  const retouchesAdmin = new Map<string, Record<string, unknown>>()
+
   /** Meme rechargement pour la liste d'administration, paginee ci-dessous. */
-  const evenementsAdmin = (): Record<string, unknown>[] =>
-    (fixture('evenements-admin') as { data: Record<string, unknown>[] }).data
+  const evenementsAdmin = (): Record<string, unknown>[] => {
+    const base = (fixture('evenements-admin') as { data: Record<string, unknown>[] }).data
+    return [...creationsAdmin, ...base].map((evenement) => {
+      const retouche = retouchesAdmin.get(String(evenement.slug))
+      return retouche ? { ...evenement, ...retouche } : evenement
+    })
+  }
+
+  /** Les types proposes a la creation : ceux que portent deja les evenements. */
+  const typesEvenement = (): { slug: string; label: string }[] => {
+    const vus = new Map<string, string>()
+    for (const evenement of evenementsAdmin()) {
+      const label = evenement.typeLabel
+      if (typeof label !== 'string' || label === '') continue
+      if (!vus.has(label)) vus.set(label, slugifier(label))
+    }
+    return [...vus].map(([label, slug]) => ({ slug, label }))
+  }
+
+  /** Slug a la maniere du back : minuscules, accents retires, tirets. */
+  const slugifier = (valeur: string): string =>
+    valeur
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-|-$/g, '')
   let prochainId = 100
   let prochainIdCategorie = 100
 
@@ -288,9 +325,94 @@ export function mockApi(): Plugin {
       })
     }
 
+    if (chemin === '/admin/secure/event-types' && methode === 'GET') {
+      return repondre(200, { data: typesEvenement() })
+    }
+
+    if (chemin === '/admin/secure/events' && methode === 'POST') {
+      return void lireCorps().then((corps) => {
+        const brouillon = corps ?? {}
+        const nom = String(brouillon.name ?? '')
+        // Le simulateur valide le minimum que le back valide, pour que l'ecran
+        // rencontre un 422 en developpement plutot qu'en production.
+        const manquants: Record<string, string[]> = {}
+        for (const champ of ['name', 'date', 'time', 'location']) {
+          if (!brouillon[champ]) manquants[champ] = ['Ce champ est obligatoire.']
+        }
+        if (Object.keys(manquants).length > 0) {
+          return repondre(422, {
+            message: 'Les donnees fournies sont invalides.',
+            errors: manquants,
+          })
+        }
+
+        const slug = `${slugifier(nom)}-${creationsAdmin.length + 1}`
+        const capacite = brouillon.capacity == null ? null : Number(brouillon.capacity)
+        const type = typesEvenement().find((t) => t.slug === brouillon.typeEventSlug)
+        const cree: Record<string, unknown> = {
+          slug,
+          name: nom,
+          date: brouillon.date,
+          time: brouillon.time,
+          location: brouillon.location,
+          description: brouillon.description ?? '',
+          status: 'ACTIVE',
+          createdAt: new Date().toISOString(),
+          logoUrl: null,
+          registrationOpen: brouillon.registrationOpen !== false,
+          registrationDeadline: brouillon.registrationDeadline ?? null,
+          capacity: capacite,
+          registeredCount: 0,
+          spotsRemaining: capacite,
+          // On rend `typeLabel`, jamais le slug recu : la reponse suit la forme
+          // de lecture, sans quoi le front lirait a la creation une forme qu'il
+          // ne reverra plus jamais ensuite.
+          typeLabel: type?.label ?? null,
+          participants: [],
+        }
+        creationsAdmin.unshift(cree)
+        return repondre(201, { data: cree })
+      })
+    }
+
+    const publication = /^\/admin\/secure\/events\/(.+)\/publication$/.exec(chemin)
+    if (publication && methode === 'PUT') {
+      const slug = decodeURIComponent(publication[1]!)
+      const trouve = evenementsAdmin().find((evenement) => evenement.slug === slug)
+      if (!trouve) return repondre(404, { message: "Cet evenement n'existe pas." })
+      return void lireCorps().then((corps) => {
+        const publie = (corps ?? {}).isPublished === true
+        const retouche = {
+          ...retouchesAdmin.get(slug),
+          isPublished: publie,
+          publishedAt: publie ? new Date().toISOString() : null,
+        }
+        retouchesAdmin.set(slug, retouche)
+        return repondre(200, { data: { ...trouve, ...retouche } })
+      })
+    }
+
     // La fiche d'un evenement. Un slug inconnu rend 404 avec un message
     // francais, comme le back : c'est ce que la fiche affiche telle quelle.
-    const fiche = /^\/admin\/secure\/events\/(.+)$/.exec(chemin)
+    const fiche = /^\/admin\/secure\/events\/([^/]+)$/.exec(chemin)
+    if (fiche && methode === 'PATCH') {
+      const slug = decodeURIComponent(fiche[1]!)
+      const trouve = evenementsAdmin().find((evenement) => evenement.slug === slug)
+      if (!trouve) return repondre(404, { message: "Cet evenement n'existe pas." })
+      return void lireCorps().then((corps) => {
+        const brouillon = { ...corps }
+        // `typeEventSlug` s'ecrit mais ne se relit pas : on le traduit en
+        // `typeLabel`, comme le fait le back.
+        if ('typeEventSlug' in brouillon) {
+          const type = typesEvenement().find((t) => t.slug === brouillon.typeEventSlug)
+          brouillon.typeLabel = type?.label ?? null
+          delete brouillon.typeEventSlug
+        }
+        const retouche = { ...retouchesAdmin.get(slug), ...brouillon }
+        retouchesAdmin.set(slug, retouche)
+        return repondre(200, { data: { ...trouve, ...retouche } })
+      })
+    }
     if (fiche && methode === 'GET') {
       const slug = decodeURIComponent(fiche[1]!)
       const trouve = evenementsAdmin().find((evenement) => evenement.slug === slug)
