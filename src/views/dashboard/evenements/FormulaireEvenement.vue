@@ -132,7 +132,7 @@ async function chargerEvenement() {
       // La lecture rend `typeLabel`, jamais le slug : on ne peut pas
       // pre-selectionner le type sans une correspondance par libelle, faite
       // ici plutot que devinee cote serveur.
-      typeEventSlug: types.value.find((t) => t.label === evenement.typeLabel)?.slug ?? null,
+      typeEventSlug: types.value.find((t) => t.name === evenement.typeLabel)?.slug ?? null,
     }
     sansLimite.value = evenement.capacity === null
     initial.value = JSON.stringify(brouillon.value)
@@ -281,7 +281,7 @@ onMounted(async () => {
           >
             <option :value="null">Sans type</option>
             <option v-for="type in types" :key="type.slug" :value="type.slug">
-              {{ type.label }}
+              {{ type.name }}
             </option>
           </select>
         </div>

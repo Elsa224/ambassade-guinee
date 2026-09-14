@@ -82,15 +82,20 @@ export function mockApi(): Plugin {
     })
   }
 
-  /** Les types proposes a la creation : ceux que portent deja les evenements. */
-  const typesEvenement = (): { slug: string; label: string }[] => {
+  /**
+   * Les types proposes a la creation : ceux que portent deja les evenements.
+   *
+   * Forme du back (releve brut de SecureCheck) : le libelle s'appelle
+   * `name`, pas `label`, et chaque type porte `isActive`.
+   */
+  const typesEvenement = (): { slug: string; name: string; isActive: boolean }[] => {
     const vus = new Map<string, string>()
     for (const evenement of evenementsAdmin()) {
-      const label = evenement.typeLabel
-      if (typeof label !== 'string' || label === '') continue
-      if (!vus.has(label)) vus.set(label, slugifier(label))
+      const nom = evenement.typeLabel
+      if (typeof nom !== 'string' || nom === '') continue
+      if (!vus.has(nom)) vus.set(nom, slugifier(nom))
     }
-    return [...vus].map(([label, slug]) => ({ slug, label }))
+    return [...vus].map(([nom, slug]) => ({ slug, name: nom, isActive: true }))
   }
 
   /** Slug a la maniere du back : minuscules, accents retires, tirets. */
@@ -367,7 +372,7 @@ export function mockApi(): Plugin {
           // On rend `typeLabel`, jamais le slug recu : la reponse suit la forme
           // de lecture, sans quoi le front lirait a la creation une forme qu'il
           // ne reverra plus jamais ensuite.
-          typeLabel: type?.label ?? null,
+          typeLabel: type?.name ?? null,
           participants: [],
         }
         creationsAdmin.unshift(cree)
@@ -375,21 +380,23 @@ export function mockApi(): Plugin {
       })
     }
 
+    // Publication : POST publie, DELETE retire, sans corps. La reponse du
+    // POST ne porte pas l'evenement — le front recharge la fiche derriere,
+    // et le simulateur l'y oblige en rendant la meme forme que le back.
     const publication = /^\/admin\/secure\/events\/(.+)\/publication$/.exec(chemin)
-    if (publication && methode === 'PUT') {
+    if (publication && (methode === 'POST' || methode === 'DELETE')) {
       const slug = decodeURIComponent(publication[1]!)
       const trouve = evenementsAdmin().find((evenement) => evenement.slug === slug)
       if (!trouve) return repondre(404, { message: "Cet evenement n'existe pas." })
-      return void lireCorps().then((corps) => {
-        const publie = (corps ?? {}).isPublished === true
-        const retouche = {
-          ...retouchesAdmin.get(slug),
-          isPublished: publie,
-          publishedAt: publie ? new Date().toISOString() : null,
-        }
-        retouchesAdmin.set(slug, retouche)
-        return repondre(200, { data: { ...trouve, ...retouche } })
-      })
+      const publie = methode === 'POST'
+      const retouche = {
+        ...retouchesAdmin.get(slug),
+        isPublished: publie,
+        publishedAt: publie ? new Date().toISOString() : null,
+      }
+      retouchesAdmin.set(slug, retouche)
+      if (!publie) return repondre(204, null)
+      return repondre(200, { data: { event_slug: slug, published: true } })
     }
 
     // La fiche d'un evenement. Un slug inconnu rend 404 avec un message
@@ -401,11 +408,35 @@ export function mockApi(): Plugin {
       if (!trouve) return repondre(404, { message: "Cet evenement n'existe pas." })
       return void lireCorps().then((corps) => {
         const brouillon = { ...corps }
+        // L'annulation suit le contrat du 2026-09-14 : `status` s'envoie
+        // SEUL, la seule valeur acceptee est `cancelled` (majuscules
+        // tolerees en entree), un evenement deja annule rend 422 avec un
+        // message seul, et l'annulation depublie.
+        if ('status' in brouillon) {
+          const valeur = String(brouillon.status ?? '').toLowerCase()
+          if (valeur !== 'cancelled' || Object.keys(brouillon).length > 1) {
+            return repondre(422, {
+              message: 'Les donnees fournies sont invalides.',
+              errors: { status: ["Seule l'annulation est acceptee, et elle s'envoie seule."] },
+            })
+          }
+          if (String(trouve.status).toLowerCase() === 'cancelled') {
+            return repondre(422, { message: 'Cet evenement est deja annule.' })
+          }
+          const retouche = {
+            ...retouchesAdmin.get(slug),
+            status: 'cancelled',
+            isPublished: false,
+            publishedAt: null,
+          }
+          retouchesAdmin.set(slug, retouche)
+          return repondre(200, { data: { ...trouve, ...retouche } })
+        }
         // `typeEventSlug` s'ecrit mais ne se relit pas : on le traduit en
         // `typeLabel`, comme le fait le back.
         if ('typeEventSlug' in brouillon) {
           const type = typesEvenement().find((t) => t.slug === brouillon.typeEventSlug)
-          brouillon.typeLabel = type?.label ?? null
+          brouillon.typeLabel = type?.name ?? null
           delete brouillon.typeEventSlug
         }
         const retouche = { ...retouchesAdmin.get(slug), ...brouillon }

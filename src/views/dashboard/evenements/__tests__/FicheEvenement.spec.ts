@@ -53,8 +53,9 @@ function servir(reponse: EvenementAdmin | null, statut = 200) {
     vi.fn((url: string, options: RequestInit = {}) => {
       demandes.push(String(url))
       const methode = options.method ?? 'GET'
-      if (options.body) {
-        envois.push({ methode, url: String(url), corps: JSON.parse(String(options.body)) })
+      if (methode !== 'GET') {
+        const corps = options.body ? JSON.parse(String(options.body)) : {}
+        envois.push({ methode, url: String(url), corps })
       }
       const corps = reponse ? { data: reponse } : { message: "Cet évènement n'existe pas." }
       return Promise.resolve(
@@ -186,9 +187,10 @@ describe('fiche d un evenement', () => {
     expect(wrapper.text()).toContain("Cet évènement n'existe pas.")
   })
 
-  it("n'annule qu'apres confirmation, et envoie l'etat annule", async () => {
+  it("n'annule qu'apres confirmation, et envoie l'etat annule seul", async () => {
     // L'annulation est visible des inscrits et du site public, et rien dans
-    // l'ecran ne permet de revenir en arriere d'un clic.
+    // l'ecran ne permet de revenir en arriere d'un clic. Le contrat exige
+    // que `status` parte SEUL : tout autre champ a ses cotes vaut 422.
     servir(evenement())
     vi.stubGlobal(
       'confirm',
@@ -199,7 +201,7 @@ describe('fiche d un evenement', () => {
     await flushPromises()
 
     expect(envois[envois.length - 1]!.methode).toBe('PATCH')
-    expect(envois[envois.length - 1]!.corps.status).toBe('CANCELLED')
+    expect(envois[envois.length - 1]!.corps).toEqual({ status: 'cancelled' })
   })
 
   it("n'envoie rien si la confirmation est refusee", async () => {
@@ -216,10 +218,13 @@ describe('fiche d un evenement', () => {
   })
 
   it("ne propose pas d'annuler un evenement deja annule", async () => {
-    servir(evenement({ status: 'CANCELLED' }))
+    // Le back rend `cancelled` en minuscules : la fiche doit le reconnaitre
+    // et le traduire, pas seulement la forme majuscule des fixtures.
+    servir(evenement({ status: 'cancelled' }))
     const wrapper = await rendre()
 
     expect(bouton(wrapper, "Annuler l'évènement")).toBeUndefined()
+    expect(wrapper.text()).toContain('Annulé')
   })
 
   it('ne propose la publication que si le back la sert', async () => {
@@ -233,17 +238,31 @@ describe('fiche d un evenement', () => {
     expect(bouton(wrapper, 'Publier sur le site')).toBeUndefined()
   })
 
-  it('publie sur une route a part, et non par une modification', async () => {
+  it('publie par POST sans corps, puis recharge la fiche', async () => {
     // La publication n'existe pas dans Ambassade Secure : elle vit cote CMS
-    // et n'est pas relayee.
+    // et n'est pas relayee. La reponse du POST ne porte pas l'evenement :
+    // l'etat reel se lit en rechargeant la fiche.
     servir(evenement({ isPublished: false }))
     const wrapper = await rendre()
     await bouton(wrapper, 'Publier sur le site')!.trigger('click')
     await flushPromises()
 
     const envoi = envois[envois.length - 1]!
-    expect(envoi.methode).toBe('PUT')
+    expect(envoi.methode).toBe('POST')
     expect(envoi.url).toBe('/api/admin/secure/events/fete-nationale/publication')
-    expect(envoi.corps.isPublished).toBe(true)
+    expect(envoi.corps).toEqual({})
+    expect(demandes[demandes.length - 1]).toBe('/api/admin/secure/events/fete-nationale')
+  })
+
+  it('retire du site par DELETE, puis recharge la fiche', async () => {
+    servir(evenement({ isPublished: true }))
+    const wrapper = await rendre()
+    await bouton(wrapper, 'Retirer du site')!.trigger('click')
+    await flushPromises()
+
+    const envoi = envois[envois.length - 1]!
+    expect(envoi.methode).toBe('DELETE')
+    expect(envoi.url).toBe('/api/admin/secure/events/fete-nationale/publication')
+    expect(demandes[demandes.length - 1]).toBe('/api/admin/secure/events/fete-nationale')
   })
 })
