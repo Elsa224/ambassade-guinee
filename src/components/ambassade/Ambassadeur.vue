@@ -12,14 +12,14 @@
             >
               <img
                 :src="ambassadeurPhoto"
-                :alt="`Chargé d'affaires ${ambassadeur.nom}`"
+                :alt="`${ambassadeur.titre} ${ambassadeur.nom}`"
                 class="w-full h-full object-cover object-center hover:scale-110 transition-transform duration-500"
               />
             </div>
             <div
               class="absolute -bottom-2 -right-2 bg-secondary text-gray-800 px-4 py-2 rounded-full font-bold shadow-lg text-sm"
             >
-              Chargé d'affaires a.i.
+              Ambassadeur
             </div>
           </div>
 
@@ -32,7 +32,7 @@
               {{ ambassadeur.nom }}
             </h1>
             <p class="text-2xl md:text-3xl mb-4 text-secondary font-semibold">
-              Chargé d'affaires a.i.
+              Ambassadeur Extraordinaire et Plénipotentiaire
             </p>
             <p class="text-xl opacity-90">près les États-Unis d'Amérique</p>
             <div class="flex flex-wrap gap-4 mt-6 justify-center md:justify-start">
@@ -56,7 +56,7 @@
                     d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
                   ></path>
                 </svg>
-                En poste depuis 2024
+                Ambassadeur depuis le 5 septembre 2026
               </span>
             </div>
           </div>
@@ -93,7 +93,7 @@
             </svg>
           </div>
           <p class="text-lg md:text-xl font-semibold">
-            🎯 Un diplomate de haut rang, fort d'une double compétence d'ingénieur et de manager, au
+            Un diplomate de haut rang, fort d'une double compétence d'ingénieur et de manager, au
             service de la Guinée aux États-Unis.
           </p>
         </div>
@@ -111,65 +111,110 @@
             </h2>
 
             <div class="prose prose-lg max-w-none">
-              <div class="flex items-center gap-3 bg-gray-50 p-4 rounded-xl mb-6">
-                <span class="text-2xl">📍</span>
-                <span class="text-gray-700"
-                  ><strong>Né à Mamou</strong>, en République de Guinée</span
-                >
-              </div>
+              <p class="text-gray-700 mb-6">
+                Son Excellence Monsieur Ibrahima N'Daïry Diallo est un haut fonctionnaire, diplomate
+                et ingénieur, fort de plus de vingt années d'expérience à la croisée du management
+                stratégique, des relations internationales, du développement économique et des
+                technologies de pointe. Depuis le 5 septembre 2026, il exerce les fonctions
+                d'Ambassadeur Extraordinaire et Plénipotentiaire de la République de Guinée près les
+                États-Unis d'Amérique.
+              </p>
 
               <h3 class="text-xl font-bold text-accent mb-3">Formation</h3>
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                <div class="bg-gray-50 p-4 rounded-lg border-l-4 border-secondary">
-                  <p class="font-semibold">📚 Ingénieur d'État</p>
+                <div class="bg-gray-50 p-4 rounded-lg border-l-4 border-accent">
+                  <p class="font-semibold">Diplôme Universitaire</p>
                   <p class="text-gray-600">
-                    Génie Électrique – École Mohammedia d'Ingénieurs (EMI), Rabat, Maroc (2004)
+                    Mathématiques-Physique – Université Cadi Ayyad, Marrakech (2001), major de
+                    promotion avec les félicitations du jury
+                  </p>
+                </div>
+                <div class="bg-gray-50 p-4 rounded-lg border-l-4 border-secondary">
+                  <p class="font-semibold">Ingénieur d'État</p>
+                  <p class="text-gray-600">
+                    Génie Électrique – École Mohammadia d'Ingénieurs (EMI), Rabat (2004)
                   </p>
                 </div>
                 <div class="bg-gray-50 p-4 rounded-lg border-l-4 border-primary-light">
-                  <p class="font-semibold">📊 Master</p>
+                  <p class="font-semibold">Master</p>
                   <p class="text-gray-600">
-                    Management et Administration des Entreprises – Université Pierre Mendes de
-                    Grenoble, France
+                    Management et Administration des Entreprises – Université Pierre Mendès-France
+                    (2012)
+                  </p>
+                </div>
+                <div class="bg-gray-50 p-4 rounded-lg border-l-4 border-accent">
+                  <p class="font-semibold">Master Exécutif</p>
+                  <p class="text-gray-600">
+                    Affaires Internationales et Management – Thunderbird School of Global
+                    Management, Université d'Arizona (2025)
                   </p>
                 </div>
               </div>
+              <p class="text-gray-600 mb-6">
+                Formations complétées par plusieurs certifications d'institutions internationales et
+                académiques de renom, notamment la Harvard Business School Online, le Fonds
+                monétaire international (FMI), la Banque mondiale et la Société financière
+                internationale (SFI).
+              </p>
 
               <h3 class="text-xl font-bold text-accent mb-3">Carrière diplomatique</h3>
               <p class="text-gray-700 mb-4">
-                Fort d'une solide expérience dans les secteurs public et privé, M. Ibrahima N'Daïry
-                Diallo a été nommé
-                <span class="font-bold text-accent">Conseiller Ministre</span> puis
-                <span class="font-bold text-primary-light">Chargé d'affaires a.i.</span> à
-                l'Ambassade de Guinée à Washington D.C.[reference:4]. C'est à ce titre qu'il
-                représente aujourd'hui la Guinée aux États-Unis.
+                En novembre 2024, il rejoint l'Ambassade de la République de Guinée aux États-Unis
+                en qualité de
+                <span class="font-bold text-accent"
+                  >Ministre Conseiller chargé des Affaires politiques</span
+                >, puis exerce les fonctions de
+                <span class="font-bold text-primary-light">Chargé d'Affaires a.i.</span>
+                jusqu'à sa nomination comme
+                <span class="font-bold text-accent"
+                  >Ambassadeur Extraordinaire et Plénipotentiaire</span
+                >
+                le 5 septembre 2026. Il met son expérience, son leadership et sa vision au service
+                du rayonnement international de la Guinée, du renforcement des relations bilatérales
+                avec les États-Unis, de la promotion de la coopération économique et du
+                développement des liens entre la Guinée et sa diaspora.
               </p>
 
               <h3 class="text-xl font-bold text-accent mb-3">Parcours professionnel</h3>
               <div class="space-y-3">
                 <div class="flex items-start gap-3">
-                  <span class="text-accent font-bold">2024</span>
-                  <span>Nomination en tant que Chargé d'affaires a.i. près les États-Unis</span>
-                </div>
-                <div class="flex items-start gap-3">
-                  <span class="text-secondary font-bold">2022-2024</span>
+                  <span class="text-accent font-bold">2026</span>
                   <span
-                    >Directeur Général de la SNCFG (Société Nationale des Chemins de Fer de
-                    Guinée)</span
+                    >Ambassadeur Extraordinaire et Plénipotentiaire de la République de Guinée près
+                    les États-Unis d'Amérique (5 septembre)</span
                   >
                 </div>
                 <div class="flex items-start gap-3">
-                  <span class="text-primary-light font-bold">2015-2022</span>
+                  <span class="text-secondary font-bold">2024</span>
                   <span
-                    >Directeur des Systèmes d'Information d'EDG S.A, Assistant du Ministre du
-                    Budget, Conseiller Économique et Financier</span
+                    >Ministre Conseiller chargé des Affaires politiques, puis Chargé d'Affaires
+                    a.i., Ambassade de Guinée aux États-Unis (novembre)</span
                   >
                 </div>
                 <div class="flex items-start gap-3">
-                  <span class="text-accent font-bold">2004-2015</span>
+                  <span class="text-primary-light font-bold">2022</span>
                   <span
-                    >Ingénieur en conception de circuits intégrés chez STMicroelectronics et Texas
-                    Instruments (Maroc, France)</span
+                    >Directeur Général de la Société Nationale des Chemins de Fer de Guinée (SNCFG)
+                    ; membre du Comité Technique du projet stratégique Simandou</span
+                  >
+                </div>
+                <div class="flex items-start gap-3">
+                  <span class="text-accent font-bold">2018</span>
+                  <span
+                    >Haute administration guinéenne : Directeur des Systèmes d'Information
+                    d'Électricité de Guinée (EDG), puis Conseiller Économique et Financier au
+                    Ministère des Investissements et des Partenariats Public-Privé</span
+                  >
+                </div>
+                <div class="flex items-start gap-3">
+                  <span class="text-secondary font-bold">2015-2018</span>
+                  <span>Directeur de la Stratégie et du Business Development du Groupe SONOCO</span>
+                </div>
+                <div class="flex items-start gap-3">
+                  <span class="text-primary-light font-bold">2004-2015</span>
+                  <span
+                    >Pilotage de programmes et projets chez STMicroelectronics et Texas
+                    Instruments</span
                   >
                 </div>
               </div>
@@ -204,9 +249,7 @@
                 </div>
                 <div>
                   <p class="font-semibold">Médaille d'Or</p>
-                  <p class="text-sm text-gray-300">
-                    Festival du Mérite du Ministère Marocain de l'Enseignement Supérieur
-                  </p>
+                  <p class="text-sm text-gray-300">Festival National du Mérite (Maroc)</p>
                 </div>
               </div>
 
@@ -227,8 +270,11 @@
                   </svg>
                 </div>
                 <div>
-                  <p class="font-semibold">Félicitations Royales</p>
-                  <p class="text-sm text-gray-300">Du Roi Mohammed VI du Maroc (2004)</p>
+                  <p class="font-semibold">Prix du Major de Promotion</p>
+                  <p class="text-sm text-gray-300">
+                    École Mohammadia d'Ingénieurs (EMI), Rabat — distinctions couronnées par une
+                    réception par le Roi Mohammed VI
+                  </p>
                 </div>
               </div>
             </div>
@@ -250,8 +296,8 @@
               </div>
 
               <div>
-                <p class="text-sm text-gray-500">Lieu de naissance</p>
-                <p class="font-semibold">Mamou, République de Guinée</p>
+                <p class="text-sm text-gray-500">Situation familiale</p>
+                <p class="font-semibold">Marié, père de famille</p>
               </div>
 
               <div>
@@ -266,7 +312,7 @@
                   >
                   <span
                     class="bg-secondary/20 text-gray-800 px-3 py-1 rounded-full text-sm font-medium"
-                    >Arabe</span
+                    >Arabe (notions)</span
                   >
                 </div>
               </div>
@@ -299,31 +345,22 @@
             </div>
           </div>
 
-          <!-- Organisations internationales -->
+          <!-- Enseignement et publications -->
           <div
             class="bg-gradient-to-br from-accent to-accent-deep text-white rounded-2xl shadow-lg p-6"
           >
-            <h3 class="text-xl font-bold mb-4">Représentations</h3>
+            <h3 class="text-xl font-bold mb-4">Enseignement et publications</h3>
 
             <div class="space-y-4">
-              <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-                  <span class="text-lg">🇺🇳</span>
-                </div>
-                <div>
-                  <p class="font-semibold">Nations Unies</p>
-                  <p class="text-sm opacity-90">Représentant de la Guinée</p>
-                </div>
+              <div>
+                <p class="font-semibold">Enseignant universitaire</p>
+                <p class="text-sm opacity-90">Partage son expertise en management et en économie</p>
               </div>
-
-              <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-                  <span class="text-lg">🌍</span>
-                </div>
-                <div>
-                  <p class="font-semibold">Union Africaine</p>
-                  <p class="text-sm opacity-90">Participation active aux sommets</p>
-                </div>
+              <div>
+                <p class="font-semibold">Auteur d'analyses économiques</p>
+                <p class="text-sm opacity-90">
+                  Contributions régulières sur le développement de la Guinée
+                </p>
               </div>
             </div>
           </div>
@@ -367,7 +404,7 @@ import ambassadeurPhoto from '@/assets/images/ambassadeur.webp' // Assurez-vous 
 // Données de l'ambassadeur
 const ambassadeur = ref({
   nom: "Ibrahima N'Daïry Diallo",
-  titre: "Chargé d'affaires a.i.",
+  titre: 'Ambassadeur Extraordinaire et Plénipotentiaire',
 })
 </script>
 

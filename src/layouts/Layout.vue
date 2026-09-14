@@ -477,7 +477,7 @@
               <ul class="space-y-3">
                 <li>
                   <router-link
-                    to="/construction"
+                    to="/ambassadeur"
                     class="text-white/80 hover:text-white transition-all duration-200 flex items-center gap-2 group"
                   >
                     <i
