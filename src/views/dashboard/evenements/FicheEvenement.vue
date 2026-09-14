@@ -5,7 +5,9 @@ import {
   recupererEvenementAdmin,
   annulerEvenement,
   basculerPublication,
+  recupererQrInscription,
   type EvenementAdmin,
+  type QrInscription,
 } from '@/api/evenements-admin'
 import { messageErreur } from '@/api/evenements'
 import { dateLisible, etatDe, remplissage } from './presentation'
@@ -88,6 +90,10 @@ async function agir(operation: () => Promise<EvenementAdmin>) {
   erreurAction.value = ''
   try {
     evenement.value = await operation()
+    // Depublier retire la page d'inscription : le QR affiche pointerait
+    // vers une page morte. On le retire, il se redemande en un clic.
+    qr.value = null
+    erreurQr.value = ''
   } catch (souleve) {
     erreurAction.value = messageErreur(souleve)
   } finally {
@@ -116,6 +122,79 @@ function basculerSurLeSite() {
 
 /** Un evenement deja annule ou termine ne s'annule pas une seconde fois. */
 const annulable = computed(() => evenement.value?.status.toUpperCase() === 'ACTIVE')
+
+/**
+ * Le QR d'inscription, charge a la demande.
+ *
+ * Pas au montage : la plupart des visites de la fiche n'en ont pas besoin,
+ * et la route rend 409 tant que l'evenement n'est pas publie. L'ecran ne
+ * propose le geste que sur un evenement publie, mais le 409 reste traite :
+ * la fiche peut etre depassee par une depublication faite ailleurs.
+ */
+const qr = ref<QrInscription | null>(null)
+const qrChargement = ref(false)
+const erreurQr = ref('')
+
+async function chargerQr() {
+  qrChargement.value = true
+  erreurQr.value = ''
+  try {
+    qr.value = await recupererQrInscription(slug.value)
+  } catch (souleve) {
+    erreurQr.value = messageErreur(souleve)
+  } finally {
+    qrChargement.value = false
+  }
+}
+
+/** Vrai un instant apres la copie, le temps de le dire. */
+const adresseCopiee = ref(false)
+
+async function copierAdresse() {
+  if (!qr.value) return
+  try {
+    await navigator.clipboard.writeText(qr.value.registrationUrl)
+    adresseCopiee.value = true
+    setTimeout(() => (adresseCopiee.value = false), 2000)
+  } catch {
+    // Refus du navigateur (page non focalisee, permission) : l'adresse est
+    // affichee en clair juste au-dessus, elle reste copiable a la main.
+  }
+}
+
+/**
+ * Ouvre une page reduite au QR et lance l'impression.
+ *
+ * Le document est construit par le DOM, jamais par concatenation : le nom de
+ * l'evenement vient d'Ambassade Secure et ne doit pas etre interprete comme
+ * du HTML.
+ */
+function imprimerQr() {
+  const donnees = qr.value
+  const actuel = evenement.value
+  if (!donnees || !actuel) return
+  const fenetre = window.open('', '_blank', 'width=640,height=800')
+  if (!fenetre) return
+  const doc = fenetre.document
+  doc.title = "QR d'inscription"
+  const style = doc.createElement('style')
+  style.textContent =
+    'body{font-family:sans-serif;text-align:center;padding:3rem}' +
+    'img{width:70%;max-width:420px}h1{font-size:1.5rem}p{color:#444}'
+  doc.head.appendChild(style)
+  const titre = doc.createElement('h1')
+  titre.textContent = actuel.name
+  const sousTitre = doc.createElement('p')
+  sousTitre.textContent = `Inscription — ${dateLisible(actuel.date)} à ${actuel.time}`
+  const image = doc.createElement('img')
+  image.alt = "QR d'inscription"
+  image.addEventListener('load', () => {
+    fenetre.focus()
+    fenetre.print()
+  })
+  image.src = donnees.qr
+  doc.body.append(titre, sousTitre, image)
+}
 
 onMounted(charger)
 </script>
@@ -280,6 +359,77 @@ onMounted(charger)
             </template>
             <template v-else>Capacité non limitée</template>
           </p>
+        </section>
+
+        <!-- Le QR d'inscription : la seule source de l'URL publique -->
+        <section v-if="publicationConnue" class="bg-white shadow-sm rounded-xl p-5 lg:col-span-3">
+          <h3 class="text-sm font-semibold uppercase tracking-wide text-gray-500">
+            QR d'inscription
+          </h3>
+
+          <p v-if="!evenement.isPublished" class="mt-3 text-sm text-gray-500">
+            Publiez l'évènement pour obtenir son QR d'inscription : avant publication, la page
+            d'inscription n'existe pas.
+          </p>
+
+          <template v-else>
+            <p v-if="qrChargement" class="mt-3 text-sm text-gray-500">Préparation du QR…</p>
+
+            <p
+              v-else-if="erreurQr"
+              class="mt-3 bg-red-50 border border-red-200 text-red-800 rounded-xl px-4 py-3 text-sm"
+              role="alert"
+            >
+              {{ erreurQr }}
+              <button type="button" class="ml-2 font-medium underline" @click="chargerQr">
+                Réessayer
+              </button>
+            </p>
+
+            <div v-else-if="qr" class="mt-4 flex flex-wrap items-start gap-6">
+              <img
+                :src="qr.qr"
+                alt="QR d'inscription"
+                class="w-40 h-40 border border-gray-200 rounded-lg p-2 bg-white"
+              />
+              <div class="min-w-0 flex-1 space-y-3">
+                <div>
+                  <p class="text-xs text-gray-500">Adresse d'inscription</p>
+                  <p class="text-sm text-gray-800 break-all select-all">
+                    {{ qr.registrationUrl }}
+                  </p>
+                </div>
+                <div class="flex flex-wrap items-center gap-2">
+                  <button
+                    type="button"
+                    class="border border-gray-300 text-gray-700 text-sm font-medium px-3 py-1.5 rounded-lg"
+                    @click="copierAdresse"
+                  >
+                    {{ adresseCopiee ? 'Adresse copiée' : "Copier l'adresse" }}
+                  </button>
+                  <button
+                    type="button"
+                    class="border border-gray-300 text-gray-700 text-sm font-medium px-3 py-1.5 rounded-lg"
+                    @click="imprimerQr"
+                  >
+                    Imprimer le QR
+                  </button>
+                </div>
+                <p class="text-xs text-gray-500">
+                  Le QR est un SVG : il s'imprime proprement à n'importe quelle taille.
+                </p>
+              </div>
+            </div>
+
+            <button
+              v-else
+              type="button"
+              class="mt-3 border border-gray-300 text-gray-700 text-sm font-medium px-3 py-1.5 rounded-lg"
+              @click="chargerQr"
+            >
+              Afficher le QR d'inscription
+            </button>
+          </template>
         </section>
 
         <!-- Les inscrits : des donnees personnelles, nommees seulement ici -->

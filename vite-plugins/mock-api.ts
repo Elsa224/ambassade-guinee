@@ -429,6 +429,32 @@ export function mockApi(): Plugin {
       return repondre(200, { data: { event_slug: slug, published: true } })
     }
 
+    // Le QR d'inscription. 409 tant que l'evenement n'est pas publie,
+    // comme le back : avant publication, il n'existe aucune page
+    // d'inscription vers laquelle pointer. Le SVG rendu est un motif
+    // factice : le simulateur eprouve l'enchainement de l'ecran, pas la
+    // lisibilite du QR.
+    const qrInscription = /^\/admin\/secure\/events\/(.+)\/registration-qr$/.exec(chemin)
+    if (qrInscription && methode === 'GET') {
+      const slug = decodeURIComponent(qrInscription[1]!)
+      const trouve = evenementsAdmin().find((evenement) => evenement.slug === slug)
+      if (!trouve) return repondre(404, { message: "Cet evenement n'existe pas." })
+      if (trouve.isPublished !== true) {
+        return repondre(409, { message: "Publiez l'evenement avant de demander son QR." })
+      }
+      const svg =
+        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 8 8">' +
+        '<rect width="8" height="8" fill="#fff"/>' +
+        '<path fill="#000" d="M0 0h3v3H0zM5 0h3v3H5zM0 5h3v3H0zM4 4h1v1H4zM6 5h1v1H6zM5 6h1v2H5z"/>' +
+        '</svg>'
+      return repondre(200, {
+        data: {
+          registrationUrl: `http://${requete.headers.host ?? 'localhost:5173'}/evenements/inscription/dev-${encodeURIComponent(slug)}`,
+          qr: `data:image/svg+xml;base64,${Buffer.from(svg).toString('base64')}`,
+        },
+      })
+    }
+
     // La fiche d'un evenement. Un slug inconnu rend 404 avec un message
     // francais, comme le back : c'est ce que la fiche affiche telle quelle.
     const fiche = /^\/admin\/secure\/events\/([^/]+)$/.exec(chemin)

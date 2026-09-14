@@ -45,7 +45,22 @@ interface Envoi {
 
 let envois: Envoi[] = []
 
-function servir(reponse: EvenementAdmin | null, statut = 200) {
+/** Ce que la route du QR d'inscription doit rendre pendant le test. */
+interface SimulationQr {
+  statut: number
+  corps: unknown
+}
+
+const QR_SERVI = {
+  registrationUrl: 'https://gabon.exemple/evenements/inscription/AbC123',
+  qr: 'data:image/svg+xml;base64,UEFTLVVOLVZSQUktUVI=',
+}
+
+function servir(
+  reponse: EvenementAdmin | null,
+  statut = 200,
+  qr: SimulationQr = { statut: 200, corps: { data: QR_SERVI } },
+) {
   demandes = []
   envois = []
   vi.stubGlobal(
@@ -57,13 +72,18 @@ function servir(reponse: EvenementAdmin | null, statut = 200) {
         const corps = options.body ? JSON.parse(String(options.body)) : {}
         envois.push({ methode, url: String(url), corps })
       }
+      const json = (code: number, contenu: unknown) =>
+        Promise.resolve(
+          new Response(JSON.stringify(contenu), {
+            status: code,
+            headers: { 'Content-Type': 'application/json' },
+          }),
+        )
+      if (String(url).includes('registration-qr')) {
+        return json(qr.statut, qr.corps)
+      }
       const corps = reponse ? { data: reponse } : { message: "Cet évènement n'existe pas." }
-      return Promise.resolve(
-        new Response(JSON.stringify(corps), {
-          status: statut,
-          headers: { 'Content-Type': 'application/json' },
-        }),
-      )
+      return json(statut, corps)
     }),
   )
 }
@@ -252,6 +272,78 @@ describe('fiche d un evenement', () => {
     expect(envoi.url).toBe('/api/admin/secure/events/fete-nationale/publication')
     expect(envoi.corps).toEqual({})
     expect(demandes[demandes.length - 1]).toBe('/api/admin/secure/events/fete-nationale')
+  })
+
+  it("n'affiche le QR qu'apres le geste, et par la route registration-qr", async () => {
+    // L'URL d'inscription n'existe nulle part ailleurs dans les reponses
+    // admin (`registrationUrl` en est retire volontairement) : la seule
+    // source est cette route, et on ne l'appelle pas au montage — la
+    // plupart des visites de la fiche n'en ont pas besoin.
+    servir(evenement({ isPublished: true }))
+    const wrapper = await rendre()
+
+    expect(demandes.filter((d) => d.includes('registration-qr'))).toHaveLength(0)
+
+    await bouton(wrapper, "Afficher le QR d'inscription")!.trigger('click')
+    await flushPromises()
+
+    expect(demandes[demandes.length - 1]).toBe(
+      '/api/admin/secure/events/fete-nationale/registration-qr',
+    )
+    const image = wrapper.findAll('img').find((i) => i.attributes('alt') === "QR d'inscription")
+    expect(image?.attributes('src')).toBe(QR_SERVI.qr)
+    expect(wrapper.text()).toContain(QR_SERVI.registrationUrl)
+  })
+
+  it('invite a publier plutot que de proposer un QR sans page derriere', async () => {
+    // La route rend 409 tant que l'evenement n'est pas publie : avant
+    // publication, il n'existe aucune page d'inscription vers laquelle
+    // pointer. L'ecran n'offre pas un geste voue a l'echec.
+    servir(evenement({ isPublished: false }))
+    const wrapper = await rendre()
+
+    expect(bouton(wrapper, "Afficher le QR d'inscription")).toBeUndefined()
+    expect(wrapper.text()).toContain("Publiez l'évènement pour obtenir son QR d'inscription")
+  })
+
+  it('masque toute la section QR quand le back ne sert pas la publication', async () => {
+    // Sans `isPublished`, on ne sait pas si la page d'inscription existe :
+    // meme discipline que la bascule de publication, la section disparait.
+    const sansPublication = evenement()
+    delete sansPublication.isPublished
+    servir(sansPublication)
+    const wrapper = await rendre()
+
+    expect(wrapper.text()).not.toContain("QR d'inscription")
+  })
+
+  it('affiche le message du back quand le QR est refuse', async () => {
+    // La fiche peut etre depassee par une depublication faite ailleurs : le
+    // 409 revient avec un message en francais, affiche tel quel.
+    servir(evenement({ isPublished: true }), 200, {
+      statut: 409,
+      corps: { message: "Publiez l'evenement avant de demander son QR." },
+    })
+    const wrapper = await rendre()
+    await bouton(wrapper, "Afficher le QR d'inscription")!.trigger('click')
+    await flushPromises()
+
+    expect(wrapper.text()).toContain("Publiez l'evenement avant de demander son QR.")
+  })
+
+  it('retire le QR affiche quand l evenement est retire du site', async () => {
+    // Depublier retire la page d'inscription : garder le QR a l'ecran
+    // laisserait imprimer un lien mort.
+    servir(evenement({ isPublished: true }))
+    const wrapper = await rendre()
+    await bouton(wrapper, "Afficher le QR d'inscription")!.trigger('click')
+    await flushPromises()
+    expect(wrapper.text()).toContain(QR_SERVI.registrationUrl)
+
+    await bouton(wrapper, 'Retirer du site')!.trigger('click')
+    await flushPromises()
+
+    expect(wrapper.text()).not.toContain(QR_SERVI.registrationUrl)
   })
 
   it('retire du site par DELETE, puis recharge la fiche', async () => {

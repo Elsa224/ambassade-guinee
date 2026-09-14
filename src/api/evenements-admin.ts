@@ -254,6 +254,33 @@ export async function basculerPublication(slug: string, publie: boolean): Promis
 }
 
 /**
+ * L'URL publique d'inscription d'un evenement et son QR.
+ *
+ * `qr` est une URI de donnees SVG : elle se pose telle quelle dans un
+ * `<img src>` et s'imprime proprement a n'importe quelle taille.
+ */
+export interface QrInscription {
+  registrationUrl: string
+  qr: string
+}
+
+/**
+ * Recupere l'URL d'inscription et le QR qui l'encode.
+ *
+ * C'est la SEULE source de l'URL publique d'inscription : les reponses admin
+ * ne portent pas `registrationUrl` (il exposait l'hote SecureCheck), et la
+ * reconstruire a la main depuis un token est interdit par le contrat. La
+ * route rend 409 tant que l'evenement n'est pas publie : avant publication,
+ * il n'existe aucune page d'inscription vers laquelle pointer.
+ */
+export async function recupererQrInscription(slug: string): Promise<QrInscription> {
+  const reponse = await apiGet<{ data: QrInscription }>(
+    `${CHEMIN_LISTE_ADMIN}/${encodeURIComponent(slug)}/registration-qr`,
+  )
+  return reponse.data
+}
+
+/**
  * Messages de validation, ranges par champ.
  *
  * Un bandeau general disant « Les donnees fournies sont invalides » oblige
