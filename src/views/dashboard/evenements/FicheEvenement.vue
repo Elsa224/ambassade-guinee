@@ -115,7 +115,7 @@ function basculerSurLeSite() {
 }
 
 /** Un evenement deja annule ou termine ne s'annule pas une seconde fois. */
-const annulable = computed(() => evenement.value?.status === 'ACTIVE')
+const annulable = computed(() => evenement.value?.status.toUpperCase() === 'ACTIVE')
 
 onMounted(charger)
 </script>

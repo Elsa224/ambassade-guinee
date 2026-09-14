@@ -1,4 +1,4 @@
-import { apiGet, apiPost, apiPatch, apiPut, ApiError } from './client'
+import { apiGet, apiPost, apiPatch, apiDelete, ApiError } from './client'
 
 /**
  * Surface d'administration du module Evenements.
@@ -145,21 +145,29 @@ export async function recupererEvenementAdmin(slug: string): Promise<EvenementAd
 /**
  * Un type d'evenement, tel que le formulaire le propose.
  *
- * C'est `slug` qui s'envoie et `label` qui s'affiche. Cette route existe pour
+ * C'est `slug` qui s'envoie et `name` qui s'affiche. Cette route existe pour
  * cette seule raison : sans elle, le formulaire n'aurait qu'un champ libre ou
  * l'agent taperait un slug a la main, c'est-a-dire une faute de frappe a
  * chaque creation.
+ *
+ * La reponse est le releve BRUT de SecureCheck, confirme par le back le
+ * 2026-09-14 : le libelle s'appelle `name`, pas `label`, et chaque type porte
+ * un `isActive`. Les autres champs releves (`description`, `createdAt`) ne
+ * servent pas au formulaire et ne sont pas types ici.
  */
 export interface TypeEvenement {
   slug: string
-  label: string
+  name: string
+  isActive: boolean
 }
 
 export const CHEMIN_TYPES = '/api/admin/secure/event-types'
 
 export async function listerTypesEvenement(): Promise<TypeEvenement[]> {
   const reponse = await apiGet<{ data: TypeEvenement[] }>(CHEMIN_TYPES)
-  return reponse.data
+  // Un type desactive cote SecureCheck serait refuse a la creation : le
+  // proposer, c'est promettre un 422.
+  return reponse.data.filter((type) => type.isActive !== false)
 }
 
 /**
@@ -216,23 +224,33 @@ export async function modifierEvenement(
  * Il n'y a volontairement pas de suppression. Un evenement auquel des gens se
  * sont inscrits porte leurs inscriptions : l'effacer les effacerait avec lui.
  * L'annulation garde la trace et permet de prevenir les inscrits.
+ *
+ * Contrat arrete le 2026-09-14 : `status` s'envoie SEUL (tout autre champ a
+ * ses cotes vaut 422), la seule valeur acceptee est `cancelled`. Le back
+ * relaie a SecureCheck puis DEPUBLIE l'evenement : la reponse revient avec
+ * `status: "cancelled"` en minuscules et `isPublished: false`.
  */
 export async function annulerEvenement(slug: string): Promise<EvenementAdmin> {
-  return modifierEvenement(slug, { status: 'CANCELLED' })
+  return modifierEvenement(slug, { status: 'cancelled' })
 }
 
 /**
  * Publie ou retire l'evenement du site de l'ambassade.
  *
  * Route a part, et non un champ de `PATCH` : la publication n'existe pas dans
- * Ambassade Secure, elle vit uniquement cote CMS. Elle n'est donc pas relayee.
+ * Ambassade Secure, elle vit uniquement cote CMS. Contrat confirme le
+ * 2026-09-13 : `POST .../publication` publie (201/200), `DELETE` retire
+ * (204), sans corps ni dans un sens ni dans l'autre. La reponse du POST ne
+ * porte pas l'evenement — on recharge la fiche pour lire l'etat reel.
  */
 export async function basculerPublication(slug: string, publie: boolean): Promise<EvenementAdmin> {
-  const reponse = await apiPut<{ data: EvenementAdmin }>(
-    `${CHEMIN_LISTE_ADMIN}/${encodeURIComponent(slug)}/publication`,
-    { isPublished: publie },
-  )
-  return reponse.data
+  const chemin = `${CHEMIN_LISTE_ADMIN}/${encodeURIComponent(slug)}/publication`
+  if (publie) {
+    await apiPost(chemin, undefined)
+  } else {
+    await apiDelete(chemin)
+  }
+  return recupererEvenementAdmin(slug)
 }
 
 /**

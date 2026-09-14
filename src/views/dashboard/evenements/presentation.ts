@@ -47,12 +47,14 @@ const ETATS: Record<string, Etat> = {
 /**
  * Etat rapporte par Ambassade Secure.
  *
- * Le libelle est traduit pour l'affichage, mais toute valeur inconnue est
- * rendue telle quelle : mieux vaut montrer un mot anglais que masquer un etat
- * que le front ne connaissait pas encore.
+ * La casse n'est pas garantie : la liste sert `ACTIVE` mais la reponse
+ * d'annulation rend `cancelled` en minuscules (contrat du 2026-09-14). On
+ * normalise avant de traduire. Toute valeur inconnue est rendue telle
+ * quelle : mieux vaut montrer un mot anglais que masquer un etat que le
+ * front ne connaissait pas encore.
  */
 export function etatDe(evenement: EvenementAdmin): Etat {
-  return ETATS[evenement.status] ?? { libelle: evenement.status, ton: 'neutre' }
+  return ETATS[evenement.status.toUpperCase()] ?? { libelle: evenement.status, ton: 'neutre' }
 }
 
 /** Part de la capacite deja prise, bornee a 100 pour que la jauge ne deborde pas. */

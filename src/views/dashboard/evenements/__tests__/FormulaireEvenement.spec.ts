@@ -39,7 +39,7 @@ interface Envoi {
 let envois: Envoi[] = []
 
 interface Simulation {
-  types?: { slug: string; label: string }[] | 'panne'
+  types?: { slug: string; name: string; isActive: boolean }[] | 'panne'
   charge?: EvenementAdmin
   reponse?: EvenementAdmin
   statut?: number
@@ -158,7 +158,7 @@ describe('formulaire d un evenement', () => {
     // C'est l'asymetrie du contrat : on ecrit `typeEventSlug`, on lit
     // `typeLabel`. Envoyer « Fête nationale » la ou le back attend
     // « fete-nationale » echouerait a chaque creation typee.
-    servir({ types: [{ slug: 'fete-nationale', label: 'Fête nationale' }] })
+    servir({ types: [{ slug: 'fete-nationale', name: 'Fête nationale', isActive: true }] })
     const { wrapper } = await rendre()
     await remplirMinimum(wrapper)
     await wrapper.find('#champ-type').setValue('fete-nationale')
@@ -219,6 +219,21 @@ describe('formulaire d un evenement', () => {
     expect(bloc?.textContent).toContain('Le lieu est obligatoire.')
   })
 
+  it('affiche en bandeau un 422 sans erreurs de champ', async () => {
+    // Un refus metier d'Ambassade Secure revient avec `message` SEUL, sans
+    // cle `errors` (contrat du 2026-09-13) : rien a placer sous un champ,
+    // le message doit se voir quand meme.
+    servir({
+      statut: 422,
+      corpsErreur: { message: 'Donnees refusees par le service Ambassade Secure.' },
+    })
+    const { wrapper } = await rendre()
+    await remplirMinimum(wrapper)
+    await envoyer(wrapper)
+
+    expect(wrapper.text()).toContain('Donnees refusees par le service Ambassade Secure.')
+  })
+
   it('retire le champ Type quand le back ne sert aucun type', async () => {
     // Meme discipline que la colonne de publication : un menu deroulant vide
     // ferait chercher a l'agent ce qui n'y est pas.
@@ -241,7 +256,7 @@ describe('formulaire d un evenement', () => {
     // un evenement type et l'enregistrer sans y toucher lui retirerait son
     // type.
     servir({
-      types: [{ slug: 'fete-nationale', label: 'Fête nationale' }],
+      types: [{ slug: 'fete-nationale', name: 'Fête nationale', isActive: true }],
       charge: evenement(),
     })
     const { wrapper } = await rendre('/dashboard/evenements/fete-nationale/modifier')
