@@ -80,7 +80,6 @@ describe('ouverture des rubriques selon l ambassade', () => {
 
       expect(fermes.sort()).toEqual(
         [
-          '/ambassadeur',
           '/bahamas',
           '/calendrier',
           '/chancellerie',
@@ -103,8 +102,10 @@ describe('ouverture des rubriques selon l ambassade', () => {
       useTenantStore().embassy = GABON
 
       // `/demarche-ligne` n'en fait plus partie : son formulaire exige des
-      // pieces propres a un seul pays d'accueil.
-      const publiees = ['/', '/actualite', '/actualites-ambassade']
+      // pieces propres a un seul pays d'accueil. `/ambassadeur` en fait
+      // desormais partie : la page est servie par le CMS et se retracte
+      // d'elle-meme, la garde de rubrique n'a plus d'objet.
+      const publiees = ['/', '/actualite', '/actualites-ambassade', '/ambassadeur']
 
       expect(publiees.filter((chemin) => !ouvert(chemin))).toEqual([])
     })

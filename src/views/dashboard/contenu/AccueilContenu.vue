@@ -3,7 +3,8 @@
     <header class="mb-6">
       <h2 class="text-2xl font-bold text-gray-800">Contenu de l'accueil</h2>
       <p class="text-gray-600 mt-1">
-        Le mot de bienvenue, les dirigeants et les photos de la page d'accueil.
+        Le mot de bienvenue, la biographie de l'ambassadeur, les dirigeants et les photos de la page
+        d'accueil.
         <span class="font-medium"
           >Tant qu'une section est vide, elle n'apparaît pas sur le site.</span
         >
@@ -61,6 +62,10 @@
             </p>
           </div>
 
+          <p v-if="erreurFormulaire" class="text-sm text-red-700" role="alert">
+            {{ erreurFormulaire }}
+          </p>
+
           <div class="flex items-center gap-3">
             <button
               type="submit"
@@ -74,6 +79,87 @@
               type="button"
               class="text-sm text-red-700 hover:underline"
               @click="retirerBienvenue"
+            >
+              Retirer du site
+            </button>
+          </div>
+        </form>
+      </section>
+
+      <!-- Biographie de l'ambassadeur -->
+      <section class="bg-white shadow-sm rounded-xl p-6">
+        <div class="flex items-start justify-between gap-4 mb-5">
+          <div>
+            <h3 class="text-lg font-semibold text-primary">Biographie de l'ambassadeur</h3>
+            <p class="text-sm text-gray-500 mt-0.5">
+              La page « Mot de l'ambassadeur » et le bouton Biographie de l'accueil.
+            </p>
+          </div>
+          <EtatSection :rempli="contenu.ambassador !== null" />
+        </div>
+
+        <form class="space-y-4" @submit.prevent="enregistrerAmbassadeur">
+          <ChampImage v-model="ambassadeur.image_url" libelle="Portrait" />
+
+          <div>
+            <label for="nom-ambassadeur" class="block text-sm font-medium text-gray-700 mb-1.5">
+              Nom <span class="text-red-600" aria-hidden="true">*</span>
+            </label>
+            <input
+              id="nom-ambassadeur"
+              v-model.trim="ambassadeur.name"
+              type="text"
+              maxlength="191"
+              class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary"
+            />
+          </div>
+
+          <div>
+            <label for="titre-ambassadeur" class="block text-sm font-medium text-gray-700 mb-1.5">
+              Fonction <span class="text-red-600" aria-hidden="true">*</span>
+            </label>
+            <input
+              id="titre-ambassadeur"
+              v-model.trim="ambassadeur.title"
+              type="text"
+              maxlength="191"
+              class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary"
+            />
+          </div>
+
+          <div>
+            <label for="corps-ambassadeur" class="block text-sm font-medium text-gray-700 mb-1.5">
+              Biographie <span class="text-red-600" aria-hidden="true">*</span>
+            </label>
+            <textarea
+              id="corps-ambassadeur"
+              v-model="ambassadeur.body_html"
+              rows="12"
+              class="w-full border border-gray-300 rounded-lg px-4 py-2.5 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary"
+            ></textarea>
+            <p class="text-xs text-gray-500 mt-1.5">
+              Les balises simples sont acceptées&nbsp;: paragraphes, titres, gras, italique, listes.
+              16&nbsp;000 caractères au plus.
+            </p>
+          </div>
+
+          <p v-if="erreurFormulaire" class="text-sm text-red-700" role="alert">
+            {{ erreurFormulaire }}
+          </p>
+
+          <div class="flex items-center gap-3">
+            <button
+              type="submit"
+              :disabled="enregistrement"
+              class="bg-primary hover:bg-primary-dark disabled:opacity-60 text-white font-semibold px-5 py-2.5 rounded-lg transition-colors"
+            >
+              {{ enregistrement ? 'Enregistrement…' : 'Enregistrer' }}
+            </button>
+            <button
+              v-if="contenu.ambassador !== null"
+              type="button"
+              class="text-sm text-red-700 hover:underline"
+              @click="retirerAmbassadeur"
             >
               Retirer du site
             </button>
@@ -266,6 +352,8 @@ import {
   recupererContenuAdmin,
   enregistrerMotDeBienvenue,
   supprimerMotDeBienvenue,
+  enregistrerBiographieAmbassadeur,
+  supprimerBiographieAmbassadeur,
   ajouterDirigeant,
   modifierDirigeant,
   supprimerDirigeant,
@@ -290,6 +378,8 @@ const message = ref('')
 
 const bienvenue = reactive({ title: '', body_html: '' })
 
+const ambassadeur = reactive({ name: '', title: '', image_url: '', body_html: '' })
+
 const dirigeantOuvert = ref(false)
 const dirigeantEdite = ref<Dirigeant | null>(null)
 const saisieDirigeant = reactive({ name: '', role: '', image_url: '' })
@@ -312,6 +402,10 @@ async function charger(): Promise<void> {
     contenu.value = await recupererContenuAdmin()
     bienvenue.title = contenu.value.welcome?.title ?? 'Mot de bienvenue'
     bienvenue.body_html = contenu.value.welcome?.body_html ?? ''
+    ambassadeur.name = contenu.value.ambassador?.name ?? ''
+    ambassadeur.title = contenu.value.ambassador?.title ?? ''
+    ambassadeur.image_url = contenu.value.ambassador?.image_url ?? ''
+    ambassadeur.body_html = contenu.value.ambassador?.body_html ?? ''
   } catch (souleve) {
     erreurChargement.value = messageErreurContenu(souleve)
   } finally {
@@ -355,6 +449,33 @@ async function enregistrerBienvenue(): Promise<void> {
 
 async function retirerBienvenue(): Promise<void> {
   await agir(supprimerMotDeBienvenue, 'Mot de bienvenue retiré du site.')
+}
+
+async function enregistrerAmbassadeur(): Promise<void> {
+  if (ambassadeur.name.trim() === '' || ambassadeur.title.trim() === '') {
+    erreurFormulaire.value = 'Le nom et la fonction sont obligatoires.'
+    return
+  }
+  if (ambassadeur.body_html.trim() === '') {
+    erreurFormulaire.value = 'La biographie est obligatoire.'
+    return
+  }
+  // Le PUT remplace le bloc entier : un portrait vide est envoye `null`,
+  // ce qui le retire du site.
+  await agir(
+    () =>
+      enregistrerBiographieAmbassadeur({
+        name: ambassadeur.name,
+        title: ambassadeur.title,
+        image_url: ambassadeur.image_url === '' ? null : ambassadeur.image_url,
+        body_html: ambassadeur.body_html,
+      }),
+    'Biographie enregistrée.',
+  )
+}
+
+async function retirerAmbassadeur(): Promise<void> {
+  await agir(supprimerBiographieAmbassadeur, 'Biographie retirée du site.')
 }
 
 function ouvrirDirigeant(id: number | null): void {

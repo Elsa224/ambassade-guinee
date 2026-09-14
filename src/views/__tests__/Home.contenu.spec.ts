@@ -93,6 +93,19 @@ describe("contenu d'accueil servi par le CMS", () => {
     expect(liens).toEqual(['/ambassadeur'])
   })
 
+  it('masque le bouton Biographie tant que la biographie n est pas publiee', async () => {
+    // Le bouton promet la page /ambassadeur : si le CMS ne sert pas le bloc
+    // `ambassador`, la page se retracte, et le bouton doit disparaitre avec
+    // elle plutot que de mener a « Rubrique en preparation ».
+    const donnees = contenuGabon as { data: Record<string, unknown> }
+    servir({ data: { ...donnees.data, ambassador: null } })
+
+    const wrapper = await monter()
+    const liens = wrapper.findAll('a').filter((a) => a.text() === 'Biographie')
+
+    expect(liens).toEqual([])
+  })
+
   it('affiche les photos de vitrine avec leur texte alternatif', async () => {
     servir(contenuGabon)
 

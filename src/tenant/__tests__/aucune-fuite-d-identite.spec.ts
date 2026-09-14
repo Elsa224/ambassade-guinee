@@ -6,6 +6,7 @@ import { defineComponent, h } from 'vue'
 import Layout from '@/layouts/Layout.vue'
 import Home from '@/views/Home.vue'
 import Actualite from '@/views/Actualite.vue'
+import Ambassadeur from '@/components/ambassade/Ambassadeur.vue'
 import { useTenantStore } from '@/stores/tenant'
 import type { Embassy } from '@/api/bootstrap'
 import { GUINEE, GABON, GABON_AVANT_COLONNES } from '@/api/fixtures/tenants'
@@ -57,7 +58,7 @@ function routeur(chemin: string) {
       { path: '/', component: Home },
       { path: '/actualite', component: Actualite },
       { path: '/presentation', component: Vide },
-      { path: '/ambassadeur', component: Vide },
+      { path: '/ambassadeur', component: Ambassadeur },
       { path: '/demarche-ligne', component: Vide },
       { path: '/construction', component: Vide },
       { path: '/actualites/:slug', component: Vide },
@@ -107,6 +108,29 @@ describe("etancheite de l'identite entre ambassades", () => {
     const traces = wrapper.text().match(IDENTITE_ETRANGERE)
 
     expect(traces).toBeNull()
+  })
+
+  it("ne laisse aucune trace guineenne sur la page de l'ambassadeur", async () => {
+    // Cette page etait entierement ecrite en dur avec la biographie de
+    // l'ambassadeur de Guinee aux Etats-Unis : c'etait l'une des trois
+    // fuites arrivees en production. Elle est desormais servie par le CMS ;
+    // vide comme remplie du contenu gabonais, rien de guineen ne doit rester.
+    const vide = await rendre('/ambassadeur', GABON)
+    expect(vide.text().match(IDENTITE_ETRANGERE)).toBeNull()
+
+    contenuServi = {
+      data: {
+        ambassador: {
+          name: 'Persis Lionel Essono Ondo',
+          title: 'Ambassadeur Extraordinaire et Plenipotentiaire',
+          image_url: null,
+          body_html: '<p>Diplomate de carriere au service de la Republique Gabonaise.</p>',
+        },
+      },
+    }
+    const remplie = await rendre('/ambassadeur', GABON)
+    expect(remplie.text()).toContain('Persis Lionel Essono Ondo')
+    expect(remplie.text().match(IDENTITE_ETRANGERE)).toBeNull()
   })
 
   it('ne laisse aucune trace guineenne sur la page des actualites', async () => {
