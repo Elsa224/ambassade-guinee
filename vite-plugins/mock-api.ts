@@ -71,6 +71,8 @@ export function mockApi(): Plugin {
    * developpement, ce qui est le comportement voulu d'un simulateur.
    */
   const creationsAdmin: Record<string, unknown>[] = []
+  /** Logos deposes pendant la session de dev : octets et type, par slug. */
+  const logosDev = new Map<string, { octets: Buffer; type: string }>()
   const retouchesAdmin = new Map<string, Record<string, unknown>>()
 
   /** Meme rechargement pour la liste d'administration, paginee ci-dessous. */
@@ -453,6 +455,60 @@ export function mockApi(): Plugin {
           qr: `data:image/svg+xml;base64,${Buffer.from(svg).toString('base64')}`,
         },
       })
+    }
+
+    // Le logo, en trois temps comme en production : POST presigne, PUT
+    // direct vers le "stockage" (ici une route locale /dev-stockage), GET
+    // des octets. Le PUT ne doit porter aucun jeton : l'URL presignee se
+    // suffit.
+    const logoEvenement = /^\/admin\/secure\/events\/(.+?)\/logo$/.exec(chemin)
+    if (logoEvenement && methode === 'POST') {
+      const slug = decodeURIComponent(logoEvenement[1]!)
+      const trouve = evenementsAdmin().find((evenement) => evenement.slug === slug)
+      if (!trouve) return repondre(404, { message: "Cet evenement n'existe pas." })
+      return void lireCorps().then((corps) => {
+        const mime = corps?.mimeType
+        if (mime !== 'image/png' && mime !== 'image/jpeg' && mime !== 'image/webp') {
+          return repondre(422, {
+            message: 'Les donnees fournies sont invalides.',
+            errors: { mimeType: ['Formats acceptes : PNG, JPEG ou WebP.'] },
+          })
+        }
+        if (typeof corps?.size === 'number' && corps.size > 2 * 1024 * 1024) {
+          return repondre(422, {
+            message: 'Les donnees fournies sont invalides.',
+            errors: { size: ['Le logo ne doit pas depasser 2 Mo.'] },
+          })
+        }
+        return repondre(200, {
+          success: true,
+          data: {
+            uploadUrl: `http://${requete.headers.host ?? 'localhost:5173'}/api/dev-stockage/${encodeURIComponent(slug)}?type=${encodeURIComponent(String(mime))}`,
+            key: `dev/events/${slug}/logo`,
+          },
+        })
+      })
+    }
+    if (logoEvenement && methode === 'GET') {
+      const slug = decodeURIComponent(logoEvenement[1]!)
+      const depose = logosDev.get(slug)
+      if (!depose) return repondre(404, { message: "Cet evenement n'a pas de logo." })
+      reponse.statusCode = 200
+      reponse.setHeader('Content-Type', depose.type)
+      return void reponse.end(depose.octets)
+    }
+
+    const depotLogo = /^\/dev-stockage\/(.+)$/.exec(chemin)
+    if (depotLogo && methode === 'PUT') {
+      const slug = decodeURIComponent(depotLogo[1]!)
+      const type = url.searchParams.get('type') ?? 'application/octet-stream'
+      const morceaux: Buffer[] = []
+      requete.on('data', (morceau) => morceaux.push(morceau))
+      requete.on('end', () => {
+        logosDev.set(slug, { octets: Buffer.concat(morceaux), type })
+        repondre(200, null)
+      })
+      return
     }
 
     // L'ajout d'invites. Un pass par invite, dans l'ordre du tableau ; le
