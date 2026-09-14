@@ -455,6 +455,77 @@ export function mockApi(): Plugin {
       })
     }
 
+    // L'ajout d'invites. Un pass par invite, dans l'ordre du tableau ; le
+    // QR est un PNG factice, le simulateur eprouve l'enchainement de
+    // l'ecran, pas la lisibilite du code. Le lot est tout ou rien, comme
+    // chez SecureCheck.
+    const ajoutInvites = /^\/admin\/secure\/events\/(.+?)\/guests$/.exec(chemin)
+    if (ajoutInvites && methode === 'POST') {
+      const slug = decodeURIComponent(ajoutInvites[1]!)
+      const trouve = evenementsAdmin().find((evenement) => evenement.slug === slug)
+      if (!trouve) return repondre(404, { message: "Cet evenement n'existe pas." })
+      if (String(trouve.status).toUpperCase() === 'CANCELLED') {
+        return repondre(422, {
+          message: "L'evenement est annule : aucun pass ne peut etre emis.",
+        })
+      }
+      return void lireCorps().then((corps) => {
+        const invites = corps?.guests
+        if (!Array.isArray(invites) || invites.length === 0 || invites.length > 500) {
+          return repondre(422, {
+            message: 'Les donnees fournies sont invalides.',
+            errors: { guests: ['Le lot doit compter de 1 a 500 invites.'] },
+          })
+        }
+        const erreurs: Record<string, string[]> = {}
+        invites.forEach((invite: Record<string, unknown>, rang: number) => {
+          for (const champ of ['firstName', 'lastName'] as const) {
+            if (typeof invite?.[champ] !== 'string' || invite[champ] === '') {
+              erreurs[`guests.${rang}.${champ}`] = ['Ce champ est obligatoire.']
+            }
+          }
+          if (invite?.email !== undefined && !/^[^@\s]+@[^@\s]+$/.test(String(invite.email))) {
+            erreurs[`guests.${rang}.email`] = ['Ce courriel est invalide.']
+          }
+        })
+        if (Object.keys(erreurs).length > 0) {
+          return repondre(422, {
+            message: 'Les donnees fournies sont invalides.',
+            errors: erreurs,
+          })
+        }
+        // Un pixel PNG : ce qui compte est la forme (data URL PNG), pas le motif.
+        const pixel =
+          'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAAAAAA6fptVAAAACklEQVR4nGNiAAAABgADNjd8qAAAAABJRU5ErkJggg=='
+        const passes = invites.map((invite: Record<string, unknown>, rang: number) => ({
+          credential: {
+            uidn: `GA9${String(rang + 1).padStart(5, '0')}`,
+            type: 'event',
+            holderName: `${invite.firstName} ${invite.lastName}`,
+            holderEmail: invite.email ?? null,
+            status: 'active',
+            validFrom: null,
+            validUntil: null,
+            maxScans: null,
+            scansUsed: 0,
+            currentlyInside: false,
+            rfidTag: null,
+            eventId: slug,
+            createdAt: new Date().toISOString(),
+          },
+          qr: pixel,
+        }))
+        const compte = Number(trouve.registeredCount ?? 0) + invites.length
+        const retouche = { ...retouchesAdmin.get(slug), registeredCount: compte }
+        retouchesAdmin.set(slug, retouche)
+        return repondre(201, {
+          success: true,
+          message: `${invites.length} pass emis.`,
+          data: { event: { ...trouve, registeredCount: compte }, passes },
+        })
+      })
+    }
+
     // La feuille de presence et son export. L'etat de pointage est derive
     // deterministiquement des participants de la fixture : le simulateur
     // eprouve les filtres, la pagination et le telechargement, pas la

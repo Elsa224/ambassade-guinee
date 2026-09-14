@@ -248,6 +248,12 @@ onMounted(charger)
           >
             Modifier
           </RouterLink>
+          <RouterLink
+            :to="{ name: 'evenement-admin-invites', params: { slug } }"
+            class="border border-gray-300 text-gray-700 font-medium px-4 py-2 rounded-lg"
+          >
+            Ajouter des invités
+          </RouterLink>
           <!-- La bascule ne s'affiche que si le back sert la publication :
                proposer « Publier » a un back qui ne sait pas la stocker
                promettrait une action sans effet. -->

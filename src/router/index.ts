@@ -55,6 +55,7 @@ import FicheEvenementAdmin from '@/views/dashboard/evenements/FicheEvenement.vue
 import RacineEvenementsAdmin from '@/views/dashboard/evenements/RacineEvenements.vue'
 import FormulaireEvenementAdmin from '@/views/dashboard/evenements/FormulaireEvenement.vue'
 import FeuillePresenceAdmin from '@/views/dashboard/evenements/FeuillePresence.vue'
+import AjoutInvitesAdmin from '@/views/dashboard/evenements/AjoutInvites.vue'
 import Visiteur from '@/views/dashboard/Visiteur.vue'
 import Demande from '@/views/dashboard/Demande.vue'
 import Presence from '@/views/dashboard/Presence.vue'
@@ -216,6 +217,11 @@ const router = createRouter({
               path: ':slug/presence',
               name: 'evenement-admin-presence',
               component: FeuillePresenceAdmin,
+            },
+            {
+              path: ':slug/invites',
+              name: 'evenement-admin-invites',
+              component: AjoutInvitesAdmin,
             },
           ],
         },
