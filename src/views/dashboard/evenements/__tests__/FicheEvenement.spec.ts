@@ -41,9 +41,12 @@ interface Envoi {
   methode: string
   url: string
   corps: Record<string, unknown>
+  entetes: Record<string, string>
 }
 
 let envois: Envoi[] = []
+
+const DEPOT_LOGO = 'https://stockage.exemple/depot?signature=abc'
 
 /** Ce que la route du QR d'inscription doit rendre pendant le test. */
 interface SimulationQr {
@@ -60,6 +63,7 @@ function servir(
   reponse: EvenementAdmin | null,
   statut = 200,
   qr: SimulationQr = { statut: 200, corps: { data: QR_SERVI } },
+  logo: { statut: number } = { statut: 404 },
 ) {
   demandes = []
   envois = []
@@ -69,8 +73,14 @@ function servir(
       demandes.push(String(url))
       const methode = options.method ?? 'GET'
       if (methode !== 'GET') {
-        const corps = options.body ? JSON.parse(String(options.body)) : {}
-        envois.push({ methode, url: String(url), corps })
+        let corps: Record<string, unknown> = {}
+        if (typeof options.body === 'string') corps = JSON.parse(options.body)
+        envois.push({
+          methode,
+          url: String(url),
+          corps,
+          entetes: (options.headers ?? {}) as Record<string, string>,
+        })
       }
       const json = (code: number, contenu: unknown) =>
         Promise.resolve(
@@ -81,6 +91,23 @@ function servir(
         )
       if (String(url).includes('registration-qr')) {
         return json(qr.statut, qr.corps)
+      }
+      if (String(url).includes('stockage.exemple')) {
+        return Promise.resolve(new Response('', { status: 200 }))
+      }
+      if (String(url).endsWith('/logo')) {
+        if (methode === 'POST') {
+          return json(200, { data: { uploadUrl: DEPOT_LOGO, key: 'dev/logo' } })
+        }
+        if (logo.statut === 200) {
+          return Promise.resolve(
+            new Response('octets-png', {
+              status: 200,
+              headers: { 'Content-Type': 'image/png' },
+            }),
+          )
+        }
+        return json(logo.statut, { message: "Cet evenement n'a pas de logo." })
       }
       const corps = reponse ? { data: reponse } : { message: "Cet évènement n'existe pas." }
       return json(statut, corps)
@@ -358,5 +385,76 @@ describe('fiche d un evenement', () => {
     expect(envoi.methode).toBe('DELETE')
     expect(envoi.url).toBe('/api/admin/secure/events/fete-nationale/publication')
     expect(demandes[demandes.length - 1]).toBe('/api/admin/secure/events/fete-nationale')
+  })
+
+  it('recupere le logo avec le jeton, jamais par un img src direct', async () => {
+    servir(evenement(), 200, { statut: 200, corps: { data: QR_SERVI } }, { statut: 200 })
+    vi.stubGlobal(
+      'URL',
+      Object.assign(URL, {
+        createObjectURL: vi.fn(() => 'blob:logo'),
+        revokeObjectURL: vi.fn(),
+      }),
+    )
+    const wrapper = await rendre()
+
+    expect(demandes.some((url) => url.endsWith('/logo'))).toBe(true)
+    const sources = wrapper.findAll('img').map((image) => image.attributes('src'))
+    expect(sources).toContain('blob:logo')
+    expect(sources).not.toContain('/api/admin/secure/events/fete-nationale/logo')
+  })
+
+  it('ne va pas chercher le logo quand la fiche dit qu il n y en a pas', async () => {
+    // `logoUrl` nul signale l'absence : payer un 404 sur chaque fiche serait
+    // un aller-retour pour rien.
+    servir(evenement({ logoUrl: null }))
+    await rendre()
+
+    expect(demandes.some((url) => url.endsWith('/logo'))).toBe(false)
+  })
+
+  it('televerse en deux temps : presignation au CMS puis PUT sans jeton vers le stockage', async () => {
+    servir(evenement({ logoUrl: null }))
+    vi.stubGlobal(
+      'URL',
+      Object.assign(URL, {
+        createObjectURL: vi.fn(() => 'blob:logo'),
+        revokeObjectURL: vi.fn(),
+      }),
+    )
+    const wrapper = await rendre()
+
+    const champ = wrapper.find('input[type="file"]')
+    Object.defineProperty(champ.element, 'files', {
+      value: [new File(['x'], 'logo.png', { type: 'image/png' })],
+    })
+    await champ.trigger('change')
+    await flushPromises()
+
+    const presignation = envois.find((envoi) => envoi.methode === 'POST')
+    expect(presignation?.url).toContain('/api/admin/secure/events/fete-nationale/logo')
+    expect(presignation?.corps).toEqual({ mimeType: 'image/png', size: 1 })
+
+    // Le PUT part vers l'URL presignee, et SANS jeton : l'URL porte deja sa
+    // propre signature, le jeton ne doit jamais atteindre l'hote de stockage.
+    const depot = envois.find((envoi) => envoi.methode === 'PUT')
+    expect(depot?.url).toBe(DEPOT_LOGO)
+    expect(Object.keys(depot?.entetes ?? {})).not.toContain('Authorization')
+  })
+
+  it('refuse localement un logo trop lourd, sans aucun aller-retour', async () => {
+    servir(evenement({ logoUrl: null }))
+    const wrapper = await rendre()
+
+    const lourd = new File([new Uint8Array(2 * 1024 * 1024 + 1)], 'logo.png', {
+      type: 'image/png',
+    })
+    const champ = wrapper.find('input[type="file"]')
+    Object.defineProperty(champ.element, 'files', { value: [lourd] })
+    await champ.trigger('change')
+    await flushPromises()
+
+    expect(envois).toHaveLength(0)
+    expect(wrapper.text()).toContain('Le logo ne doit pas dépasser 2 Mo.')
   })
 })

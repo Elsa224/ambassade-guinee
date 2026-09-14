@@ -1,11 +1,14 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { useRoute } from 'vue-router'
 import {
   recupererEvenementAdmin,
   annulerEvenement,
   basculerPublication,
   recupererQrInscription,
+  televerserLogo,
+  recupererLogo,
+  refusDuLogo,
   type EvenementAdmin,
   type QrInscription,
 } from '@/api/evenements-admin'
@@ -22,9 +25,9 @@ import PastilleEtat from './PastilleEtat.vue'
  * tout autre motif les expose sans qu'on l'ait voulu. Les ouvrir depuis la
  * fiche est un geste delibere.
  *
- * Le logo n'est volontairement pas affiche : `logoUrl` est une route locale
- * qui exige le jeton porteur, qu'un `<img src>` n'envoie pas. L'image
- * reviendrait en 401 et se rendrait en icone cassee.
+ * Le logo n'est jamais pose dans un `<img src>` direct : `logoUrl` est une
+ * route locale qui exige le jeton porteur, qu'une image n'envoie pas.
+ * L'apercu passe par `recupererLogo` puis une URL d'objet.
  */
 const route = useRoute()
 
@@ -67,6 +70,9 @@ async function charger() {
   erreur.value = ''
   try {
     evenement.value = await recupererEvenementAdmin(slug.value)
+    // `logoUrl` non nul signale qu'un logo existe : on ne part chercher les
+    // octets que dans ce cas, pour ne pas payer un 404 sur chaque fiche.
+    if (evenement.value.logoUrl !== null) void chargerLogo()
   } catch (souleve) {
     erreur.value = messageErreur(souleve)
     evenement.value = null
@@ -195,6 +201,61 @@ function imprimerQr() {
   image.src = donnees.qr
   doc.body.append(titre, sousTitre, image)
 }
+
+/**
+ * L'apercu du logo, en URL d'objet.
+ *
+ * La route admin du logo exige le jeton porteur : les octets arrivent par
+ * `recupererLogo`, jamais par un `<img src>` direct. L'URL d'objet est
+ * revoquee a chaque remplacement et au demontage.
+ */
+const logoObjet = ref<string | null>(null)
+const logoEnvoi = ref(false)
+const erreurLogo = ref('')
+const selecteurLogo = ref<HTMLInputElement | null>(null)
+
+async function chargerLogo() {
+  try {
+    const octets = await recupererLogo(slug.value)
+    if (logoObjet.value) URL.revokeObjectURL(logoObjet.value)
+    logoObjet.value = octets ? URL.createObjectURL(octets) : null
+  } catch (souleve) {
+    erreurLogo.value = messageErreur(souleve)
+  }
+}
+
+function choisirLogo() {
+  selecteurLogo.value?.click()
+}
+
+async function envoyerLogo(evenementDom: Event) {
+  const champ = evenementDom.target as HTMLInputElement
+  const fichier = champ.files?.[0]
+  // Vide pour que rechoisir le meme fichier redeclenche `change`.
+  champ.value = ''
+  if (!fichier) return
+  erreurLogo.value = ''
+  const refus = refusDuLogo(fichier)
+  if (refus) {
+    erreurLogo.value = refus
+    return
+  }
+  logoEnvoi.value = true
+  try {
+    await televerserLogo(slug.value, fichier)
+    // L'apercu se relit depuis le serveur, pas depuis le fichier local :
+    // c'est ce que le stockage sert reellement qui fait foi.
+    await chargerLogo()
+  } catch (souleve) {
+    erreurLogo.value = messageErreur(souleve)
+  } finally {
+    logoEnvoi.value = false
+  }
+}
+
+onBeforeUnmount(() => {
+  if (logoObjet.value) URL.revokeObjectURL(logoObjet.value)
+})
 
 onMounted(charger)
 </script>
@@ -364,6 +425,56 @@ onMounted(charger)
               restante{{ evenement.spotsRemaining > 1 ? 's' : '' }}
             </template>
             <template v-else>Capacité non limitée</template>
+          </p>
+        </section>
+
+        <!-- Le logo : les octets exigent le jeton, l'apercu passe par une URL d'objet -->
+        <section class="bg-white shadow-sm rounded-xl p-5 lg:col-span-3">
+          <h3 class="text-sm font-semibold uppercase tracking-wide text-gray-500">Logo</h3>
+
+          <div class="mt-4 flex flex-wrap items-center gap-6">
+            <img
+              v-if="logoObjet"
+              :src="logoObjet"
+              alt="Logo de l'évènement"
+              class="w-24 h-24 object-contain border border-gray-200 rounded-lg p-1 bg-white"
+            />
+            <p v-else class="text-sm text-gray-500">Aucun logo pour le moment.</p>
+
+            <div class="space-y-2">
+              <input
+                ref="selecteurLogo"
+                type="file"
+                accept="image/png,image/jpeg,image/webp"
+                class="hidden"
+                @change="envoyerLogo"
+              />
+              <button
+                type="button"
+                :disabled="logoEnvoi"
+                class="border border-gray-300 text-gray-700 text-sm font-medium px-3 py-1.5 rounded-lg disabled:opacity-60"
+                @click="choisirLogo"
+              >
+                {{
+                  logoEnvoi
+                    ? 'Envoi du logo…'
+                    : logoObjet
+                      ? 'Remplacer le logo'
+                      : 'Téléverser un logo'
+                }}
+              </button>
+              <p class="text-xs text-gray-500">
+                PNG, JPEG ou WebP, 2 Mo au maximum. Visible sur la carte publique de l'évènement.
+              </p>
+            </div>
+          </div>
+
+          <p
+            v-if="erreurLogo"
+            class="mt-3 bg-red-50 border border-red-200 text-red-800 rounded-xl px-4 py-3 text-sm"
+            role="alert"
+          >
+            {{ erreurLogo }}
           </p>
         </section>
 

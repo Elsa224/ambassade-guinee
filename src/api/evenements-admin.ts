@@ -428,6 +428,82 @@ export async function ajouterInvites(slug: string, invites: InviteSaisi[]): Prom
   return reponse.data
 }
 
+/** Bornes du logo, celles du contrat, verifiees avant tout aller-retour. */
+export const TYPES_LOGO_ACCEPTES = ['image/png', 'image/jpeg', 'image/webp'] as const
+export const TAILLE_LOGO_MAX = 2 * 1024 * 1024
+
+/** Message d'un refus previsible du logo, ou `null` si le fichier passe. */
+export function refusDuLogo(fichier: File): string | null {
+  if (!TYPES_LOGO_ACCEPTES.includes(fichier.type as (typeof TYPES_LOGO_ACCEPTES)[number])) {
+    return 'Formats acceptés : PNG, JPEG ou WebP.'
+  }
+  if (fichier.size > TAILLE_LOGO_MAX) {
+    return 'Le logo ne doit pas dépasser 2 Mo.'
+  }
+  return null
+}
+
+interface PresignationLogo {
+  uploadUrl: string
+  key: string
+}
+
+/**
+ * Televerse le logo d'un evenement, en deux temps.
+ *
+ * Le CMS ne recoit jamais les octets : `POST .../logo` presigne une URL de
+ * televersement vers le stockage objet, et le navigateur y fait un `PUT`
+ * direct. Ce `PUT` part SANS jeton porteur — l'URL presignee porte deja sa
+ * propre signature, et le jeton ne doit jamais atteindre l'hote de stockage.
+ *
+ * Ce `PUT` direct exige que le domaine de l'ambassade figure dans le CORS du
+ * seau (`docs/s3-cors.json` cote back) : une origine absente echoue dans le
+ * navigateur alors que la meme requete passe en curl. D'ou le message dedie
+ * sur l'echec reseau, qui distingue ce cas d'une panne du CMS.
+ */
+export async function televerserLogo(slug: string, fichier: File): Promise<void> {
+  const reponse = await apiPost<{ data: PresignationLogo }>(
+    `${CHEMIN_LISTE_ADMIN}/${encodeURIComponent(slug)}/logo`,
+    { mimeType: fichier.type, size: fichier.size },
+  )
+
+  let depot: Response
+  try {
+    depot = await fetch(reponse.data.uploadUrl, {
+      method: 'PUT',
+      body: fichier,
+      headers: { 'Content-Type': fichier.type },
+    })
+  } catch {
+    throw new ApiError(
+      "L'envoi vers le stockage a échoué : vérifiez la connexion, ou que le domaine de l'ambassade est autorisé sur le stockage.",
+      0,
+      null,
+    )
+  }
+  if (!depot.ok) {
+    throw new ApiError(`Le stockage a refusé l'image (erreur ${depot.status}).`, depot.status, null)
+  }
+}
+
+/**
+ * Recupere les octets du logo d'administration.
+ *
+ * `logoUrl` des reponses admin pointe vers une route protegee par le jeton
+ * porteur : un `<img src>` direct reviendrait en 401. On passe donc par
+ * `apiFichier` puis une URL d'objet. Un 404 signifie simplement « pas de
+ * logo » et se rend `null`, pas en erreur.
+ */
+export async function recupererLogo(slug: string): Promise<Blob | null> {
+  try {
+    const fichier = await apiFichier(`${CHEMIN_LISTE_ADMIN}/${encodeURIComponent(slug)}/logo`)
+    return fichier.blob
+  } catch (souleve) {
+    if (souleve instanceof ApiError && souleve.statut === 404) return null
+    throw souleve
+  }
+}
+
 /**
  * Messages de validation, ranges par champ.
  *
