@@ -378,6 +378,56 @@ export function exporterPresence(
   )
 }
 
+/** Un invite tel que le formulaire l'envoie. `email` est facultatif. */
+export interface InviteSaisi {
+  firstName: string
+  lastName: string
+  email?: string
+}
+
+/** Bornes du lot, celles du back : de 1 a 500 invites par envoi. */
+export const INVITES_MAX = 500
+
+/**
+ * Le pass emis pour un invite.
+ *
+ * Le credential releve par le back porte davantage de champs (status,
+ * maxScans, rfidTag...) ; seuls ceux que l'ecran montre sont types ici.
+ * `qr` est une data URL PNG, posable telle quelle dans un `<img src>`.
+ */
+export interface PassInvite {
+  credential: {
+    uidn: string
+    holderName: string
+    holderEmail: string | null
+  }
+  qr: string
+}
+
+export interface LotInvites {
+  /** La fiche complete, rechargee par le back apres l'ajout. */
+  event: EvenementAdmin
+  /** Un pass par invite, dans l'ordre du tableau envoye. */
+  passes: PassInvite[]
+}
+
+/**
+ * Ajoute un lot d'invites et rend leurs pass.
+ *
+ * Cote SecureCheck le lot est tout ou rien : aucun invite n'est cree si le
+ * lot est refuse (422 avec `message` seul). La validation locale du CMS rend
+ * un 422 avec `errors` indexe par chemin d'entree (`guests.2.lastName`) : on
+ * le range sous la ligne fautive avec `erreursDeChamp`. Un evenement annule
+ * rend 422 de la meme facon.
+ */
+export async function ajouterInvites(slug: string, invites: InviteSaisi[]): Promise<LotInvites> {
+  const reponse = await apiPost<{ data: LotInvites }>(
+    `${CHEMIN_LISTE_ADMIN}/${encodeURIComponent(slug)}/guests`,
+    { guests: invites },
+  )
+  return reponse.data
+}
+
 /**
  * Messages de validation, ranges par champ.
  *
