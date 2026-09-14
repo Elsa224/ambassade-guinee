@@ -441,6 +441,15 @@ onMounted(charger)
                 Données personnelles : à ne pas diffuser hors de l'ambassade.
               </p>
             </div>
+            <!-- La feuille de presence vit sur sa propre page : pagination,
+                 filtres et export y demandent plus de place que la fiche
+                 n'en offre. -->
+            <RouterLink
+              :to="{ name: 'evenement-admin-presence', params: { slug } }"
+              class="border border-gray-300 text-gray-700 text-sm font-medium px-3 py-1.5 rounded-lg"
+            >
+              Feuille de présence
+            </RouterLink>
             <label v-if="evenement.participants.length > 0" class="text-sm">
               <span class="sr-only">Rechercher un inscrit</span>
               <input

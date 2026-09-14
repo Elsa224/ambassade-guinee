@@ -118,6 +118,7 @@ async function rendre(slug = 'fete-nationale') {
               { path: 'nouveau', name: 'evenement-admin-nouveau', component: Vide },
               { path: ':slug', name: 'evenement-admin', component: FicheEvenement },
               { path: ':slug/modifier', name: 'evenement-admin-modifier', component: Vide },
+              { path: ':slug/presence', name: 'evenement-admin-presence', component: Vide },
             ],
           },
         ],

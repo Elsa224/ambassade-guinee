@@ -54,6 +54,7 @@ import ListeEvenementsAdmin from '@/views/dashboard/evenements/ListeEvenements.v
 import FicheEvenementAdmin from '@/views/dashboard/evenements/FicheEvenement.vue'
 import RacineEvenementsAdmin from '@/views/dashboard/evenements/RacineEvenements.vue'
 import FormulaireEvenementAdmin from '@/views/dashboard/evenements/FormulaireEvenement.vue'
+import FeuillePresenceAdmin from '@/views/dashboard/evenements/FeuillePresence.vue'
 import Visiteur from '@/views/dashboard/Visiteur.vue'
 import Demande from '@/views/dashboard/Demande.vue'
 import Presence from '@/views/dashboard/Presence.vue'
@@ -210,6 +211,11 @@ const router = createRouter({
               path: ':slug/modifier',
               name: 'evenement-admin-modifier',
               component: FormulaireEvenementAdmin,
+            },
+            {
+              path: ':slug/presence',
+              name: 'evenement-admin-presence',
+              component: FeuillePresenceAdmin,
             },
           ],
         },
