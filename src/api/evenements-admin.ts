@@ -1,4 +1,5 @@
-import { apiGet, apiPost, apiPatch, apiDelete, ApiError } from './client'
+import { apiGet, apiPost, apiPatch, apiDelete, apiFichier, ApiError } from './client'
+import type { FichierServi } from './client'
 
 /**
  * Surface d'administration du module Evenements.
@@ -278,6 +279,103 @@ export async function recupererQrInscription(slug: string): Promise<QrInscriptio
     `${CHEMIN_LISTE_ADMIN}/${encodeURIComponent(slug)}/registration-qr`,
   )
   return reponse.data
+}
+
+/**
+ * Une ligne de la feuille de presence.
+ *
+ * `hasCheckedIn` dit si le porteur a pointe au moins une fois ;
+ * `currentlyInside` s'il est sur place a l'instant de la lecture. Les deux
+ * ne se deduisent pas l'un de l'autre : on peut avoir pointe puis etre
+ * ressorti.
+ */
+export interface LignePresence {
+  uidn: string
+  fullName: string
+  email: string | null
+  hasCheckedIn: boolean
+  /** Dernier pointage, ISO 8601, `null` si le porteur n'a jamais pointe. */
+  checkInAt: string | null
+  currentlyInside: boolean
+  scansUsed: number
+}
+
+/**
+ * Decompte servi avec chaque page de la feuille de presence.
+ *
+ * Calcule par le back sur TOUT le roster : il tient compte de `search` mais
+ * pas de `present`, si bien que les cartes ne bougent pas quand on bascule
+ * entre presents et absents. Ne pas le recalculer depuis la page affichee.
+ */
+export interface ResumePresence {
+  totalPasses: number
+  present: number
+  currentlyInside: number
+  absent: number
+}
+
+/**
+ * Filtres partages par la feuille de presence et son export : l'export rend
+ * exactement ce que l'ecran montre, filtres compris, sans la pagination.
+ */
+export interface FiltresPresence {
+  search?: string
+  /** `true` = a pointe au moins une fois, `false` = jamais ; absent = tous. */
+  present?: boolean
+}
+
+function parametresPresence(filtres: FiltresPresence): URLSearchParams {
+  const parametres = new URLSearchParams()
+  const terme = filtres.search?.trim() ?? ''
+  if (terme !== '') parametres.set('search', terme)
+  if (filtres.present !== undefined) parametres.set('present', String(filtres.present))
+  return parametres
+}
+
+export interface PagePresence {
+  lignes: LignePresence[]
+  pagination: Pagination
+  resume: ResumePresence
+}
+
+export async function recupererPresence(
+  slug: string,
+  filtres: FiltresPresence = {},
+  page = 1,
+  limite = LIMITE_DEFAUT,
+): Promise<PagePresence> {
+  const parametres = parametresPresence(filtres)
+  parametres.set('page', String(Math.max(1, Math.trunc(page))))
+  parametres.set('limit', String(Math.min(LIMITE_MAX, Math.max(1, Math.trunc(limite)))))
+  const reponse = await apiGet<{
+    data: LignePresence[]
+    pagination: Pagination
+    summary: ResumePresence
+  }>(`${CHEMIN_LISTE_ADMIN}/${encodeURIComponent(slug)}/attendance?${parametres}`)
+  return { lignes: reponse.data, pagination: reponse.pagination, resume: reponse.summary }
+}
+
+export type FormatExport = 'csv' | 'xlsx'
+
+/**
+ * Telecharge la feuille de presence en fichier.
+ *
+ * Le jeton porteur est obligatoire sur cette route : pas de lien direct dans
+ * un `<a href>`, on recupere les octets puis on les tend au navigateur par
+ * une URL d'objet. Le nom de fichier fait autorite cote back, lu dans
+ * `Content-Disposition` ; le jeu est complet (sans pagination), borne a
+ * 10 000 lignes par le serveur.
+ */
+export function exporterPresence(
+  slug: string,
+  format: FormatExport,
+  filtres: FiltresPresence = {},
+): Promise<FichierServi> {
+  const parametres = parametresPresence(filtres)
+  parametres.set('format', format)
+  return apiFichier(
+    `${CHEMIN_LISTE_ADMIN}/${encodeURIComponent(slug)}/attendance/export?${parametres}`,
+  )
 }
 
 /**

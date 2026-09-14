@@ -455,6 +455,106 @@ export function mockApi(): Plugin {
       })
     }
 
+    // La feuille de presence et son export. L'etat de pointage est derive
+    // deterministiquement des participants de la fixture : le simulateur
+    // eprouve les filtres, la pagination et le telechargement, pas la
+    // realite des passages. Le decompte suit le contrat : calcule apres
+    // `search`, AVANT le filtre `present`.
+    const feuillePresence = /^\/admin\/secure\/events\/(.+?)\/attendance(\/export)?$/.exec(chemin)
+    if (feuillePresence && methode === 'GET') {
+      const slug = decodeURIComponent(feuillePresence[1]!)
+      const trouve = evenementsAdmin().find((evenement) => evenement.slug === slug)
+      if (!trouve) return repondre(404, { message: "Cet evenement n'existe pas." })
+
+      const participants = (trouve.participants ?? []) as {
+        fullName: string
+        email: string
+        uidn: string
+      }[]
+      const lignes = participants
+        .map((participant, rang) => {
+          const aPointe = rang % 3 !== 2
+          return {
+            uidn: participant.uidn,
+            fullName: participant.fullName,
+            email: rang % 7 === 5 ? null : participant.email,
+            hasCheckedIn: aPointe,
+            checkInAt: aPointe ? new Date(Date.now() - rang * 90_000).toISOString() : null,
+            currentlyInside: aPointe && rang % 6 === 0,
+            scansUsed: aPointe ? 1 + (rang % 3) : 0,
+          }
+        })
+        .sort((a, b) => a.fullName.localeCompare(b.fullName, 'fr'))
+
+      const terme = (url.searchParams.get('search') ?? '').trim().toLowerCase()
+      const cherchees =
+        terme === ''
+          ? lignes
+          : lignes.filter((ligne) =>
+              [ligne.fullName, ligne.email ?? '', ligne.uidn].some((champ) =>
+                champ.toLowerCase().includes(terme),
+              ),
+            )
+
+      const summary = {
+        totalPasses: cherchees.length,
+        present: cherchees.filter((ligne) => ligne.hasCheckedIn).length,
+        currentlyInside: cherchees.filter((ligne) => ligne.currentlyInside).length,
+        absent: cherchees.filter((ligne) => !ligne.hasCheckedIn).length,
+      }
+
+      const present = url.searchParams.get('present')
+      const retenues =
+        present === 'true' || present === 'false'
+          ? cherchees.filter((ligne) => ligne.hasCheckedIn === (present === 'true'))
+          : cherchees
+
+      if (feuillePresence[2]) {
+        const format = url.searchParams.get('format') ?? 'csv'
+        if (format !== 'csv' && format !== 'xlsx') {
+          return repondre(422, { message: "Format d'export inconnu : csv ou xlsx." })
+        }
+        // Meme en xlsx le simulateur sert du CSV : l'ecran n'ouvre pas le
+        // fichier, il eprouve le telechargement et le nom propose.
+        const champsCsv = (ligne: (typeof retenues)[number]) =>
+          [
+            ligne.uidn,
+            ligne.fullName,
+            ligne.email ?? '',
+            ligne.hasCheckedIn ? 'Oui' : 'Non',
+            ligne.checkInAt ?? '',
+            ligne.currentlyInside ? 'Oui' : 'Non',
+            String(ligne.scansUsed),
+          ].join(',')
+        const csv = [
+          'uidn,fullName,email,hasCheckedIn,checkInAt,currentlyInside,scansUsed',
+          ...retenues.slice(0, 10_000).map(champsCsv),
+        ].join('\n')
+        const jour = new Date().toISOString().slice(0, 10)
+        reponse.statusCode = 200
+        reponse.setHeader(
+          'Content-Type',
+          format === 'csv'
+            ? 'text/csv; charset=utf-8'
+            : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        )
+        reponse.setHeader(
+          'Content-Disposition',
+          `attachment; filename="presence-${slugifier(slug)}-${jour}.${format}"`,
+        )
+        return void reponse.end(csv)
+      }
+
+      const limite = Math.min(100, Math.max(1, Number(url.searchParams.get('limit')) || 20))
+      const totalPages = Math.max(1, Math.ceil(retenues.length / limite))
+      const page = Math.min(totalPages, Math.max(1, Number(url.searchParams.get('page')) || 1))
+      return repondre(200, {
+        data: retenues.slice((page - 1) * limite, page * limite),
+        pagination: { page, limit: limite, total: retenues.length, totalPages },
+        summary,
+      })
+    }
+
     // La fiche d'un evenement. Un slug inconnu rend 404 avec un message
     // francais, comme le back : c'est ce que la fiche affiche telle quelle.
     const fiche = /^\/admin\/secure\/events\/([^/]+)$/.exec(chemin)
