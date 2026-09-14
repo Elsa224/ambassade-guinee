@@ -23,6 +23,7 @@ async function monter() {
     history: createMemoryHistory(),
     routes: [
       { path: '/', component: Home },
+      { path: '/ambassadeur', component: Vide },
       { path: '/actualite', component: Vide },
       { path: '/demarche-ligne', component: Vide },
       { path: '/actualites/:slug', component: Vide },
@@ -76,6 +77,20 @@ describe("contenu d'accueil servi par le CMS", () => {
     expect(wrapper.text()).toContain('Mot de bienvenue')
     expect(wrapper.text()).toContain('Brice Clotaire Oligui Nguema')
     expect(wrapper.text()).toContain("Président de la République, Chef de l'État")
+  })
+
+  it("n'offre la biographie que sur la carte de l'ambassadeur", async () => {
+    // Le bouton mene a la page /ambassadeur, qui n'existe que pour lui : sur
+    // la carte du president ou du ministre, il promettrait une autre page.
+    servir(contenuGabon)
+
+    const wrapper = await monter()
+    const liens = wrapper
+      .findAll('a')
+      .filter((a) => a.text() === 'Biographie')
+      .map((a) => a.attributes('href'))
+
+    expect(liens).toEqual(['/ambassadeur'])
   })
 
   it('affiche les photos de vitrine avec leur texte alternatif', async () => {
