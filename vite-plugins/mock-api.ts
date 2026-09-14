@@ -210,6 +210,36 @@ export function mockApi(): Plugin {
       return repondre(204, null)
     }
 
+    if (chemin === '/admin/content/ambassador' && methode === 'PUT') {
+      return void lireCorps().then((corps) => {
+        if (corps === null) return repondre(422, { message: 'Corps de requete illisible.' })
+        if (typeof corps.name !== 'string' || corps.name.trim() === '') {
+          return repondre(422, { message: 'Le nom est obligatoire.' })
+        }
+        if (typeof corps.title !== 'string' || corps.title.trim() === '') {
+          return repondre(422, { message: 'La fonction est obligatoire.' })
+        }
+        if (typeof corps.body_html !== 'string' || corps.body_html.trim() === '') {
+          return repondre(422, { message: 'La biographie est obligatoire.' })
+        }
+        // Le PUT remplace le bloc entier : `image_url` absente vaut null,
+        // comme au contrat.
+        contenu().ambassador = {
+          name: corps.name,
+          title: corps.title,
+          image_url:
+            typeof corps.image_url === 'string' && corps.image_url !== '' ? corps.image_url : null,
+          body_html: corps.body_html,
+        }
+        repondre(200, { data: contenu().ambassador })
+      })
+    }
+
+    if (chemin === '/admin/content/ambassador' && methode === 'DELETE') {
+      contenu().ambassador = null
+      return repondre(204, null)
+    }
+
     const BLOC_PAR_CHEMIN: Record<string, 'leaders' | 'showcase'> = {
       '/admin/content/leaders': 'leaders',
       '/admin/content/showcase': 'showcase',

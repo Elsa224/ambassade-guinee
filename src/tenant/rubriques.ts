@@ -18,7 +18,9 @@ export const RUBRIQUE_PAR_CHEMIN: Readonly<Record<string, string>> = {
   '/consulat': 'consulat',
   '/rendez-vous': 'rendez_vous',
   '/presentation': 'presentation',
-  '/ambassadeur': 'ambassadeur',
+  // `/ambassadeur` ne figure plus ici : la page est servie par le bloc
+  // `ambassador` du CMS et se retracte d'elle-meme quand il est vide. La
+  // garde n'existait que parce que la biographie etait ecrite en dur.
   '/relations-bilaterales': 'bilateral',
   '/usa': 'bilateral',
   '/costa-rica': 'bilateral',

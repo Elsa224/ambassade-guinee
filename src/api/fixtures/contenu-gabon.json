@@ -4,6 +4,12 @@
       "title": "Mot de bienvenue",
       "body_html": "<p>Chers compatriotes,<br />Chers amis et partenaires de la République Gabonaise,</p><p>C'est avec un réel plaisir que nous vous ouvrons les portes de l'Ambassade du Gabon en Guinée via ce site.</p>"
     },
+    "ambassador": {
+      "name": "Persis Lionel Essono Ondo",
+      "title": "Ambassadeur Extraordinaire et Plénipotentiaire",
+      "image_url": "/fixtures/dirigeant-ambassadeur.webp",
+      "body_html": "<p>Diplomate de carrière, Persis Lionel Essono Ondo représente la République Gabonaise en Guinée depuis l'ouverture de l'ambassade à Conakry, en juin 2026.</p>"
+    },
     "leaders": [
       {
         "id": 1,

@@ -96,9 +96,11 @@
                 </p>
                 <!-- Seule la carte de l'ambassadeur mene a sa biographie : les
                      autres dirigeants n'ont pas de page sur ce site. La carte
-                     vient du CMS, on reconnait donc l'ambassadeur a son role. -->
+                     vient du CMS, on reconnait donc l'ambassadeur a son role.
+                     Et le bouton ne promet la page que si le CMS sert la
+                     biographie : sinon il menerait a une rubrique vide. -->
                 <router-link
-                  v-if="estAmbassadeur(dirigeant)"
+                  v-if="biographieDisponible && estAmbassadeur(dirigeant)"
                   to="/ambassadeur"
                   class="inline-block mt-4 bg-white/20 hover:bg-white/30 border border-white/40 px-5 py-2 rounded-full text-sm font-semibold transition-colors"
                 >
@@ -481,6 +483,9 @@ const accentDuRang = (rang: number) => ACCENTS[rang % ACCENTS.length]
  * On le compare sans accents ni casse pour que « ambassadeur » saisi
  * autrement dans le dashboard garde le bouton.
  */
+/** Le bouton Biographie n'apparait que si le CMS sert le bloc `ambassador`. */
+const biographieDisponible = computed(() => contenu.value.ambassador !== null)
+
 const estAmbassadeur = (dirigeant: { role: string }) =>
   dirigeant.role
     .normalize('NFD')

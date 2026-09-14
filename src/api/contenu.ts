@@ -16,6 +16,20 @@ export interface MotDeBienvenue {
   body_html: string
 }
 
+/**
+ * La biographie de l'ambassadeur, servie par le CMS.
+ *
+ * `body_html` est assaini cote serveur, avec la meme liste blanche que le
+ * mot de bienvenue : le front l'insere avec `v-html`. `image_url` reste
+ * `null` tant que le portrait n'a pas ete televerse.
+ */
+export interface BiographieAmbassadeur {
+  name: string
+  title: string
+  image_url: string | null
+  body_html: string
+}
+
 export interface Dirigeant {
   id: number
   name: string
@@ -34,6 +48,7 @@ export interface ImageVitrine {
 
 export interface ContenuAccueil {
   welcome: MotDeBienvenue | null
+  ambassador: BiographieAmbassadeur | null
   leaders: Dirigeant[]
   showcase: ImageVitrine[]
 }
@@ -43,7 +58,12 @@ interface Enveloppe<T> {
 }
 
 /** Le contenu vide : ce que le gabarit affiche tant que l'API ne sert rien. */
-export const CONTENU_VIDE: ContenuAccueil = { welcome: null, leaders: [], showcase: [] }
+export const CONTENU_VIDE: ContenuAccueil = {
+  welcome: null,
+  ambassador: null,
+  leaders: [],
+  showcase: [],
+}
 
 /**
  * Ordonne par `position`, pas par `id`.
@@ -66,6 +86,7 @@ export function normaliserContenu(
 ): ContenuAccueil {
   return {
     welcome: servi?.welcome ?? null,
+    ambassador: servi?.ambassador ?? null,
     leaders: ordonner(servi?.leaders ?? []),
     showcase: ordonner(servi?.showcase ?? []),
   }
@@ -92,6 +113,23 @@ export async function enregistrerMotDeBienvenue(mot: MotDeBienvenue): Promise<Mo
 
 export function supprimerMotDeBienvenue(): Promise<void> {
   return apiDelete(`${ADMIN}/welcome`)
+}
+
+/**
+ * Enregistre la biographie de l'ambassadeur.
+ *
+ * Le PUT remplace le bloc entier : envoyer `image_url` a `null` retire le
+ * portrait, il n'y a pas de mise a jour partielle.
+ */
+export async function enregistrerBiographieAmbassadeur(
+  biographie: BiographieAmbassadeur,
+): Promise<BiographieAmbassadeur> {
+  const reponse = await apiPut<Enveloppe<BiographieAmbassadeur>>(`${ADMIN}/ambassador`, biographie)
+  return reponse.data
+}
+
+export function supprimerBiographieAmbassadeur(): Promise<void> {
+  return apiDelete(`${ADMIN}/ambassador`)
 }
 
 export type DirigeantSaisi = Omit<Dirigeant, 'id' | 'position'>

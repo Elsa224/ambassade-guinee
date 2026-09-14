@@ -27,6 +27,18 @@ describe("normalisation du contenu d'accueil", () => {
     expect(normaliserContenu(undefined).welcome).toBeNull()
   })
 
+  it("laisse passer la biographie de l'ambassadeur telle que servie", () => {
+    const biographie = {
+      name: 'Persis Lionel Essono Ondo',
+      title: 'Ambassadeur Extraordinaire et Plenipotentiaire',
+      image_url: null,
+      body_html: '<p>Bio</p>',
+    }
+
+    expect(normaliserContenu({ ambassador: biographie }).ambassador).toEqual(biographie)
+    expect(normaliserContenu({}).ambassador).toBeNull()
+  })
+
   it('ordonne par position et non par identifiant', () => {
     // Un element insere en tete porte l'identifiant le plus grand : trier par
     // identifiant le renverrait en fin de liste.
