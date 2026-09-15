@@ -7,13 +7,15 @@
  * rattachee ici a un drapeau que le tenant declare dans `modules`.
  */
 export const RUBRIQUE_PAR_CHEMIN: Readonly<Record<string, string>> = {
-  '/chancellerie': 'chancellerie',
+  // `/chancellerie` et `/consuls-honoraires` n'y figurent plus : les deux
+  // pages sont servies par `GET /api/content/directory` et se retractent
+  // d'elles-memes quand il ne sert personne, comme `/ambassadeur`. Leur garde
+  // n'existait que parce que leur contenu etait ecrit en dur.
   '/services-ambassadeur': 'services',
   // Le formulaire porte les pieces exigees par un seul pays d'accueil
   // (« preuve de residence aux USA ») : il suit la rubrique des services et
   // n'est pas un chemin neutre, contrairement a ce qu'on avait suppose.
   '/demarche-ligne': 'services',
-  '/consuls-honoraires': 'consuls_honoraires',
   '/calendrier': 'calendrier',
   '/consulat': 'consulat',
   '/rendez-vous': 'rendez_vous',
