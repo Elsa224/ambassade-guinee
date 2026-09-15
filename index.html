@@ -2,9 +2,29 @@
 <html lang="fr">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" href="/logo.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Ambassade de la Guinée</title>
+
+    <!--
+      Un seul build sert tous les domaines : rien dans ce fichier ne peut
+      nommer une ambassade en particulier. Le titre et la favicone sont
+      remplaces au chargement par ceux du tenant (src/tenant/onglet.ts) ;
+      ce qui suit est le repli neutre, visible le temps du bootstrap.
+    -->
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <title>Ambassade</title>
+    <meta name="description" content="Site officiel de l'ambassade." />
+
+    <!--
+      Aperçu de partage (WhatsApp, Facebook, LinkedIn). Ces robots n'executent
+      pas le JavaScript : ils lisent ce HTML tel quel, avant tout bootstrap.
+      Ces balises ne peuvent donc pas etre personnalisees par le gabarit, et
+      restent volontairement neutres plutot que fausses. Leur version par
+      ambassade doit etre injectee par le serveur qui repond au domaine, a
+      l'emplacement exact de ce bloc.
+    -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Ambassade" />
+    <meta property="og:description" content="Site officiel de l'ambassade." />
   </head>
   <body>
     <div id="app"></div>
