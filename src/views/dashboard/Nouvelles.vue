@@ -63,37 +63,11 @@
           />
         </div>
 
-        <select
-          v-model="filtreType"
-          class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary"
-        >
-          <option value="">Tous les types</option>
-          <option value="visa">Demande de visa</option>
-          <option value="passeport">Demande de passeport</option>
-          <option value="legalisation">Légalisation</option>
-          <option value="inscription">Inscription consulaire</option>
-          <option value="autre">Autre</option>
-        </select>
+        <ChampSelect v-model="filtreType" :options="OPTIONS_FILTRETYPE" />
 
-        <select
-          v-model="filtreStatut"
-          class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary"
-        >
-          <option value="">Tous les statuts</option>
-          <option value="en_attente">En attente</option>
-          <option value="en_cours">En cours</option>
-          <option value="traitee">Traitée</option>
-          <option value="refusee">Refusée</option>
-        </select>
+        <ChampSelect v-model="filtreStatut" :options="OPTIONS_FILTRESTATUT" />
 
-        <select
-          v-model="tri"
-          class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary"
-        >
-          <option value="recent">Plus récentes</option>
-          <option value="ancien">Plus anciennes</option>
-          <option value="urgent">Plus urgentes</option>
-        </select>
+        <ChampSelect v-model="tri" :options="OPTIONS_TRI" />
       </div>
     </div>
 
@@ -165,25 +139,11 @@
               </td>
               <td class="px-6 py-4">
                 <div class="relative">
-                  <select
+                  <ChampSelect
                     v-model="demande.statut"
-                    @change="updateStatut(demande)"
-                    :class="[
-                      'px-2 py-1 text-xs rounded-full border-none cursor-pointer',
-                      demande.statut === 'traitee'
-                        ? 'bg-green-100 text-green-600'
-                        : demande.statut === 'en_cours'
-                          ? 'bg-blue-100 text-blue-600'
-                          : demande.statut === 'refusee'
-                            ? 'bg-red-100 text-red-600'
-                            : 'bg-yellow-100 text-yellow-600',
-                    ]"
-                  >
-                    <option value="en_attente">En attente</option>
-                    <option value="en_cours">En cours</option>
-                    <option value="traitee">Traitée</option>
-                    <option value="refusee">Refusée</option>
-                  </select>
+                    :options="OPTIONS_DEMANDE_STATUT"
+                    @update:model-value="updateStatut(demande)"
+                  />
                 </div>
               </td>
               <td class="px-6 py-4">
@@ -326,21 +286,14 @@
             <div class="grid grid-cols-2 gap-4">
               <div class="form-group">
                 <label class="form-label">Type de demande *</label>
-                <select v-model="formDemande.type" required class="form-input">
-                  <option value="visa">Demande de visa</option>
-                  <option value="passeport">Demande de passeport</option>
-                  <option value="legalisation">Légalisation de documents</option>
-                  <option value="inscription">Inscription consulaire</option>
-                  <option value="autre">Autre</option>
-                </select>
+                <ChampSelect v-model="formDemande.type" :options="OPTIONS_FORMDEMANDE_TYPE" />
               </div>
               <div class="form-group">
                 <label class="form-label">Priorité</label>
-                <select v-model="formDemande.priorite" class="form-input">
-                  <option value="basse">Basse</option>
-                  <option value="moyenne">Moyenne</option>
-                  <option value="haute">Haute</option>
-                </select>
+                <ChampSelect
+                  v-model="formDemande.priorite"
+                  :options="OPTIONS_FORMDEMANDE_PRIORITE"
+                />
               </div>
             </div>
 
@@ -596,6 +549,51 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
+import ChampSelect from '@/components/ui/ChampSelect.vue'
+
+const OPTIONS_FILTRETYPE = [
+  { valeur: '', libelle: 'Tous les types' },
+  { valeur: 'visa', libelle: 'Demande de visa' },
+  { valeur: 'passeport', libelle: 'Demande de passeport' },
+  { valeur: 'legalisation', libelle: 'Légalisation' },
+  { valeur: 'inscription', libelle: 'Inscription consulaire' },
+  { valeur: 'autre', libelle: 'Autre' },
+]
+
+const OPTIONS_FILTRESTATUT = [
+  { valeur: '', libelle: 'Tous les statuts' },
+  { valeur: 'en_attente', libelle: 'En attente' },
+  { valeur: 'en_cours', libelle: 'En cours' },
+  { valeur: 'traitee', libelle: 'Traitée' },
+  { valeur: 'refusee', libelle: 'Refusée' },
+]
+
+const OPTIONS_TRI = [
+  { valeur: 'recent', libelle: 'Plus récentes' },
+  { valeur: 'ancien', libelle: 'Plus anciennes' },
+  { valeur: 'urgent', libelle: 'Plus urgentes' },
+]
+
+const OPTIONS_DEMANDE_STATUT = [
+  { valeur: 'en_attente', libelle: 'En attente' },
+  { valeur: 'en_cours', libelle: 'En cours' },
+  { valeur: 'traitee', libelle: 'Traitée' },
+  { valeur: 'refusee', libelle: 'Refusée' },
+]
+
+const OPTIONS_FORMDEMANDE_TYPE = [
+  { valeur: 'visa', libelle: 'Demande de visa' },
+  { valeur: 'passeport', libelle: 'Demande de passeport' },
+  { valeur: 'legalisation', libelle: 'Légalisation de documents' },
+  { valeur: 'inscription', libelle: 'Inscription consulaire' },
+  { valeur: 'autre', libelle: 'Autre' },
+]
+
+const OPTIONS_FORMDEMANDE_PRIORITE = [
+  { valeur: 'basse', libelle: 'Basse' },
+  { valeur: 'moyenne', libelle: 'Moyenne' },
+  { valeur: 'haute', libelle: 'Haute' },
+]
 
 // Données
 const demandes = ref([])

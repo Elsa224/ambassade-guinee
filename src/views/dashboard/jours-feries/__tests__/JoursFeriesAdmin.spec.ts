@@ -1,5 +1,10 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { mount, flushPromises, type VueWrapper } from '@vue/test-utils'
+import {
+  choisirDansLaListe,
+  optionsDeLaListe,
+  saisirLaDate,
+} from '@/components/ui/__tests__/pilotage'
 import JoursFeriesAdmin from '../JoursFeriesAdmin.vue'
 
 /** Requetes d'ecriture recues, pour verifier methode, chemin et corps. */
@@ -108,7 +113,7 @@ describe("l'ecran des jours feries", () => {
 
     await boutonPar(ecran, 'Ajouter une fête').trigger('click')
     await ecran.find('#nom-fete').setValue('Fête du Travail')
-    await ecran.find('#date-fete').setValue('2026-05-01')
+    await saisirLaDate(ecran, '#date-fete', '2026-05-01')
     await formulaireModal(ecran).trigger('submit')
     await flushPromises()
 
@@ -125,7 +130,7 @@ describe("l'ecran des jours feries", () => {
     const ecran = await rendre()
 
     await boutonPar(ecran, 'Ajouter une fête').trigger('click')
-    await ecran.find('#date-fete').setValue('2026-05-01')
+    await saisirLaDate(ecran, '#date-fete', '2026-05-01')
     await formulaireModal(ecran).trigger('submit')
     await flushPromises()
 
@@ -176,7 +181,7 @@ describe("l'ecran des jours feries", () => {
     })
     const ecran = await rendre()
 
-    await ecran.find('#annee-admin').setValue(2027)
+    await choisirDansLaListe(ecran, '#annee-admin', '2027')
     await flushPromises()
 
     expect(lectures).toContain('/api/admin/holidays?year=2027')
@@ -194,10 +199,7 @@ describe("l'ecran des jours feries", () => {
     await formulaireModal(ecran).trigger('submit')
     await flushPromises()
 
-    const options = ecran
-      .find('#annee-admin')
-      .findAll('option')
-      .map((o) => o.text())
+    const options = await optionsDeLaListe(ecran, '#annee-admin')
     expect(options).toContain('2028')
     expect(lectures).toContain('/api/admin/holidays?year=2028')
   })
@@ -233,7 +235,7 @@ describe("l'ecran des jours feries", () => {
 
     await boutonPar(ecran, 'Ajouter une fête').trigger('click')
     await ecran.find('#nom-fete').setValue('Une fête')
-    await ecran.find('#date-fete').setValue('2026-05-01')
+    await saisirLaDate(ecran, '#date-fete', '2026-05-01')
     await formulaireModal(ecran).trigger('submit')
     await flushPromises()
 

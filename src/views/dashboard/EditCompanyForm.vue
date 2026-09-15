@@ -89,15 +89,11 @@
                 <label class="block mb-2 text-sm font-medium text-gray-700"
                   >Nombre d'employés</label
                 >
-                <select
+                <ChampSelect
                   v-model="editedCompany.numEmployees"
-                  class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-ink focus:border-transparent"
-                >
-                  <option value="" disabled>Sélectionnez</option>
-                  <option v-for="n in 100" :key="n" :value="n">
-                    {{ n }} employé{{ n > 1 ? 's' : '' }}
-                  </option>
-                </select>
+                  :options="OPTIONS_EFFECTIF"
+                  placeholder="Sélectionnez"
+                />
               </div>
             </div>
           </div>
@@ -141,14 +137,10 @@
 
                 <div>
                   <label class="block mb-2 text-sm font-medium text-gray-700">Pays</label>
-                  <select
+                  <ChampSelect
                     v-model="editedCompany.country"
-                    class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-ink focus:border-transparent"
-                  >
-                    <option>USA</option>
-                    <option>France</option>
-                    <option>Côte d'Ivoire</option>
-                  </select>
+                    :options="OPTIONS_EDITEDCOMPANY_COUNTRY"
+                  />
                 </div>
 
                 <div>
@@ -237,6 +229,18 @@
 
 <script setup lang="ts">
 import { reactive, watch } from 'vue'
+import ChampSelect from '@/components/ui/ChampSelect.vue'
+
+const OPTIONS_EFFECTIF = Array.from({ length: 100 }, (_, rang) => ({
+  valeur: rang + 1,
+  libelle: `${rang + 1} employé${rang > 0 ? 's' : ''}`,
+}))
+
+const OPTIONS_EDITEDCOMPANY_COUNTRY = [
+  { valeur: 'USA', libelle: 'USA' },
+  { valeur: 'France', libelle: 'France' },
+  { valeur: "Côte d'Ivoire", libelle: "Côte d'Ivoire" },
+] as const
 
 interface Company {
   nom?: string

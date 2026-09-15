@@ -68,12 +68,7 @@
       </div>
       <div>
         <label class="block mb-2 text-gray-700">Date d'expiration *</label>
-        <input
-          v-model="newCard.dateExpiration"
-          type="date"
-          required
-          class="w-full border rounded-lg p-2 bg-gray-100"
-        />
+        <ChampDate v-model="newCard.dateExpiration" requis />
       </div>
       <div>
         <label class="block mb-2 text-gray-700">Entreprise *</label>
@@ -106,6 +101,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import ChampDate from '@/components/ui/ChampDate.vue'
 
 interface NewCard {
   prenoms: string

@@ -26,14 +26,13 @@
             <label for="annee-admin" class="block text-sm font-medium text-gray-700 mb-1.5">
               Année
             </label>
-            <select
+            <ChampSelect
               id="annee-admin"
-              v-model.number="anneeChoisie"
-              class="border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary"
-              @change="charger(anneeChoisie)"
-            >
-              <option v-for="annee in annees" :key="annee" :value="annee">{{ annee }}</option>
-            </select>
+              v-model="anneeChoisie"
+              :options="optionsDAnnee"
+              class="w-32"
+              @update:model-value="charger(Number($event))"
+            />
           </div>
 
           <!-- Chaque annee se saisit en entier : le back ne reporte rien
@@ -239,26 +238,13 @@
             <label for="date-fete" class="block text-sm font-medium text-gray-700 mb-1.5">
               Date <span class="text-red-600" aria-hidden="true">*</span>
             </label>
-            <input
-              id="date-fete"
-              v-model="saisieFete.date"
-              type="date"
-              class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary"
-            />
+            <ChampDate id="date-fete" v-model="saisieFete.date" />
           </div>
           <div>
             <label for="type-fete" class="block text-sm font-medium text-gray-700 mb-1.5">
               Type <span class="text-red-600" aria-hidden="true">*</span>
             </label>
-            <select
-              id="type-fete"
-              v-model="saisieFete.type"
-              class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary"
-            >
-              <option v-for="type in TYPES" :key="type" :value="type">
-                {{ libelleDuType(type) }}
-              </option>
-            </select>
+            <ChampSelect id="type-fete" v-model="saisieFete.type" :options="optionsDeType" />
           </div>
         </div>
 
@@ -351,6 +337,8 @@
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted } from 'vue'
 import Boite from '../contenu/Boite.vue'
+import ChampDate from '@/components/ui/ChampDate.vue'
+import ChampSelect from '@/components/ui/ChampSelect.vue'
 import EtatSection from '../contenu/EtatSection.vue'
 import { messageErreurContenu } from '@/api/contenu'
 import {
@@ -403,6 +391,14 @@ const annees = computed(() =>
     (a, b) => a - b,
   ),
 )
+
+/** Les memes annees, dans la forme que la liste deroulante consomme. */
+const optionsDAnnee = computed(() =>
+  annees.value.map((annee) => ({ valeur: annee, libelle: String(annee) })),
+)
+
+/** Les trois types du contrat, avec le libelle que lit la redaction. */
+const optionsDeType = TYPES.map((type) => ({ valeur: type, libelle: libelleDuType(type) }))
 
 const reglagesRemplis = computed(
   () => saisieReglages.intro.trim() !== '' || saisieReglages.document_url !== '',

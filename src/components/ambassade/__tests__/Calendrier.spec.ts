@@ -5,6 +5,7 @@ import { createPinia, setActivePinia } from 'pinia'
 import { defineComponent, h } from 'vue'
 import Calendrier from '../Calendrier.vue'
 import { useTenantStore } from '@/stores/tenant'
+import { choisirDansLaListe } from '@/components/ui/__tests__/pilotage'
 import { GABON } from '@/api/fixtures/tenants'
 
 const Vide = defineComponent({ render: () => h('div') })
@@ -138,7 +139,7 @@ describe('page du calendrier des jours feries', () => {
     )
 
     const wrapper = await monter()
-    await wrapper.find('select').setValue(2027)
+    await choisirDansLaListe(wrapper, '#annee-feries', '2027')
     await flushPromises()
 
     expect(appels).toContain('/api/content/holidays?year=2027')
@@ -152,7 +153,7 @@ describe('page du calendrier des jours feries', () => {
 
     const wrapper = await monter()
 
-    expect(wrapper.find('select').exists()).toBe(true)
+    expect(wrapper.find('#annee-feries').exists()).toBe(true)
     expect(wrapper.text()).toContain("Aucune fête n'est publiée pour cette année.")
     expect(wrapper.text()).not.toContain('Rubrique en préparation')
   })

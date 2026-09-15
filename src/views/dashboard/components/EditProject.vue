@@ -77,14 +77,7 @@
               <label class="block text-sm font-medium text-gray-700 mb-2">
                 Statut <span class="text-red-500">*</span>
               </label>
-              <select
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-info focus:border-transparent"
-                v-model="status"
-              >
-                <option value="Planifié">Planifié</option>
-                <option value="En cours">En cours</option>
-                <option value="Terminé">Terminé</option>
-              </select>
+              <ChampSelect v-model="status" :options="OPTIONS_STATUS" />
             </div>
 
             <!-- Document -->
@@ -177,6 +170,13 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import ChampSelect from '@/components/ui/ChampSelect.vue'
+
+const OPTIONS_STATUS = [
+  { valeur: 'Planifié', libelle: 'Planifié' },
+  { valeur: 'En cours', libelle: 'En cours' },
+  { valeur: 'Terminé', libelle: 'Terminé' },
+]
 
 const router = useRouter()
 

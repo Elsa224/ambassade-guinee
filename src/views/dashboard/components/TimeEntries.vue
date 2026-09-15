@@ -15,11 +15,7 @@
             class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
             v-model="searchQuery"
           />
-          <input
-            type="date"
-            class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-            value="27/10/2025"
-          />
+          <ChampDate v-model="dateFiltre" class="w-52" />
           <button
             @click="addTimeEntry"
             class="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors flex items-center gap-2"
@@ -106,11 +102,13 @@
 </template>
 
 <script setup>
+import ChampDate from '@/components/ui/ChampDate.vue'
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
 const searchQuery = ref('')
+const dateFiltre = ref('2025-10-27')
 
 const timeEntries = ref([
   {

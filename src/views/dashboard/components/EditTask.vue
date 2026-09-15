@@ -30,12 +30,7 @@
             <!-- Tâche parente -->
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2"> Tâche parente </label>
-              <select
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-              >
-                <option value="api-list">API List</option>
-                <option value="accune">Accune</option>
-              </select>
+              <ChampSelect v-model="tacheParente" :options="OPTIONS_TACHEPARENTE" />
             </div>
 
             <!-- Assigné à -->
@@ -43,12 +38,7 @@
               <label class="block text-sm font-medium text-gray-700 mb-2">
                 Assigné à <span class="text-red-500">*</span>
               </label>
-              <select
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-              >
-                <option value="employee-admin">Employee Admin</option>
-                <option value="master-admin">Master Admin</option>
-              </select>
+              <ChampSelect v-model="assigneA" :options="OPTIONS_ASSIGNEA" />
             </div>
 
             <!-- Date début -->
@@ -80,13 +70,7 @@
               <label class="block text-sm font-medium text-gray-700 mb-2">
                 Statut <span class="text-red-500">*</span>
               </label>
-              <select
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-              >
-                <option value="termine">Terminé</option>
-                <option value="a-faire">A faire</option>
-                <option value="en-cours">En cours</option>
-              </select>
+              <ChampSelect v-model="statut" :options="OPTIONS_STATUT" />
             </div>
           </div>
 
@@ -109,13 +93,7 @@
               <label class="block text-sm font-medium text-gray-700 mb-2">
                 Priorité <span class="text-red-500">*</span>
               </label>
-              <select
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-              >
-                <option value="urgente">Urgente</option>
-                <option value="normale">Normale</option>
-                <option value="basse">Basse</option>
-              </select>
+              <ChampSelect v-model="priorite" :options="OPTIONS_PRIORITE" />
             </div>
 
             <!-- Date fin -->
@@ -175,6 +153,34 @@ Mise à jour des tâches</textarea
 </template>
 
 <script setup>
+import { ref } from 'vue'
+import ChampSelect from '@/components/ui/ChampSelect.vue'
+
+const OPTIONS_TACHEPARENTE = [
+  { valeur: 'api-list', libelle: 'API List' },
+  { valeur: 'accune', libelle: 'Accune' },
+]
+const tacheParente = ref('api-list')
+
+const OPTIONS_ASSIGNEA = [
+  { valeur: 'employee-admin', libelle: 'Employee Admin' },
+  { valeur: 'master-admin', libelle: 'Master Admin' },
+]
+const assigneA = ref('employee-admin')
+
+const OPTIONS_STATUT = [
+  { valeur: 'termine', libelle: 'Terminé' },
+  { valeur: 'a-faire', libelle: 'A faire' },
+  { valeur: 'en-cours', libelle: 'En cours' },
+]
+const statut = ref('termine')
+
+const OPTIONS_PRIORITE = [
+  { valeur: 'urgente', libelle: 'Urgente' },
+  { valeur: 'normale', libelle: 'Normale' },
+  { valeur: 'basse', libelle: 'Basse' },
+]
+const priorite = ref('urgente')
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
