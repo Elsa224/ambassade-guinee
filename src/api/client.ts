@@ -18,6 +18,23 @@ export class ApiError extends Error {
     this.statut = statut
     this.corps = corps
   }
+
+  /**
+   * Vrai si le serveur a lui-meme fourni un message, faux si le notre est
+   * fabrique faute de JSON exploitable.
+   *
+   * La distinction compte des qu'un intermediaire repond a la place de
+   * l'application — un 413 du serveur frontal rendu en HTML, par exemple :
+   * « Erreur 413 » est exact, et illisible pour la personne qui televerse.
+   */
+  get corpsPorteUnMessage(): boolean {
+    return (
+      this.corps !== null &&
+      typeof this.corps === 'object' &&
+      'message' in this.corps &&
+      typeof (this.corps as { message: unknown }).message === 'string'
+    )
+  }
 }
 
 let jeton: string | null = null

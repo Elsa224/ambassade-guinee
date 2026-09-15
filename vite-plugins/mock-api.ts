@@ -64,6 +64,18 @@ export function mockApi(): Plugin {
     guinee: { staff: [], consuls: [] },
   }
 
+  /**
+   * Jours feries par tenant : les fetes datees et le bloc de reglages unique.
+   * Vide au depart, comme le vrai back pour une ambassade neuve.
+   */
+  const calendriers: Record<
+    string,
+    { holidays: Record<string, unknown>[]; intro: string | null; document_url: string | null }
+  > = {
+    gabon: { holidays: [], intro: null, document_url: null },
+    guinee: { holidays: [], intro: null, document_url: null },
+  }
+
   interface EvenementSimule {
     publicToken: string
     isRegistrationClosed: boolean
@@ -471,6 +483,125 @@ export function mockApi(): Plugin {
 
     if (chemin === '/auth/logout' && methode === 'POST') {
       return repondre(204, null)
+    }
+
+    // --- Jours feries : calendrier et bloc de reglages ---------------------
+    // Fidele a `docs/contrat-jours-feries.md` du back : 200 systematique,
+    // listes vides plutot qu'absences, tri par date puis identifiant, PUT des
+    // reglages en REMPLACEMENT complet.
+    const calendrier = () => calendriers[estGabon ? 'gabon' : 'guinee']!
+
+    const TYPES_DE_FETE = ['legale', 'nationale', 'religieuse']
+
+    /** Annees pourvues, croissantes et sans doublon. L'annee servie n'y est pas ajoutee. */
+    const anneesPourvues = () =>
+      [...new Set(calendrier().holidays.map((fete) => Number(String(fete.date).slice(0, 4))))].sort(
+        (a, b) => a - b,
+      )
+
+    const feriesDeLAnnee = (annee: number) =>
+      calendrier()
+        .holidays.filter((fete) => String(fete.date).startsWith(String(annee)))
+        .sort((a, b) =>
+          String(a.date) === String(b.date)
+            ? Number(a.id) - Number(b.id)
+            : String(a.date).localeCompare(String(b.date)),
+        )
+
+    if ((chemin === '/content/holidays' || chemin === '/admin/holidays') && methode === 'GET') {
+      const brut = url.searchParams.get('year')
+      const annee = brut === null ? new Date().getFullYear() : Number(brut)
+      if (!Number.isInteger(annee) || annee < 1900 || annee > 2100) {
+        return repondre(422, { message: "L'annee doit etre comprise entre 1900 et 2100." })
+      }
+      return repondre(200, {
+        data: {
+          year: annee,
+          available_years: anneesPourvues(),
+          intro: calendrier().intro,
+          document_url: calendrier().document_url,
+          holidays: feriesDeLAnnee(annee),
+        },
+      })
+    }
+
+    if (chemin === '/admin/holidays' && methode === 'POST') {
+      return void lireCorps().then((corps) => {
+        if (corps === null) return repondre(422, { message: 'Corps de requete illisible.' })
+        const manquant = ['name', 'date', 'type'].find(
+          (champ) => typeof corps[champ] !== 'string' || String(corps[champ]).trim() === '',
+        )
+        if (manquant !== undefined) {
+          return repondre(422, { message: 'Le nom, la date et le type sont obligatoires.' })
+        }
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(String(corps.date))) {
+          return repondre(422, { message: 'La date doit etre au format AAAA-MM-JJ.' })
+        }
+        if (!TYPES_DE_FETE.includes(String(corps.type))) {
+          return repondre(422, { message: 'Le type de fete est inconnu.' })
+        }
+        const fete = {
+          id: (prochainIdentifiant += 1),
+          name: corps.name,
+          date: corps.date,
+          type: corps.type,
+          note: corps.note ?? null,
+        }
+        calendrier().holidays.push(fete)
+        repondre(201, { data: fete })
+      })
+    }
+
+    const feriePar = (id: number) => calendrier().holidays.find((fete) => fete.id === id)
+
+    if (/^\/admin\/holidays\/\d+$/.test(chemin)) {
+      const id = Number(chemin.split('/').pop())
+      const fete = feriePar(id)
+      // Une fete d'une autre ambassade n'existe pas du point de vue de
+      // l'appelante : 404, jamais 403.
+      if (fete === undefined) return repondre(404, { message: 'Fete introuvable.' })
+
+      if (methode === 'DELETE') {
+        const liste = calendrier().holidays
+        liste.splice(liste.indexOf(fete), 1)
+        return repondre(204, null)
+      }
+
+      if (methode === 'PATCH') {
+        return void lireCorps().then((corps) => {
+          if (corps === null) return repondre(422, { message: 'Corps de requete illisible.' })
+          for (const champ of ['name', 'date', 'type']) {
+            if (champ in corps && (corps[champ] === null || String(corps[champ]).trim() === '')) {
+              return repondre(422, { message: 'Le nom, la date et le type ne peuvent etre vides.' })
+            }
+          }
+          if ('type' in corps && !TYPES_DE_FETE.includes(String(corps.type))) {
+            return repondre(422, { message: 'Le type de fete est inconnu.' })
+          }
+          Object.assign(fete, corps)
+          repondre(200, { data: fete })
+        })
+      }
+    }
+
+    if (chemin === '/admin/holidays/settings') {
+      if (methode === 'DELETE') {
+        calendrier().intro = null
+        calendrier().document_url = null
+        return repondre(204, null)
+      }
+      if (methode === 'PUT') {
+        return void lireCorps().then((corps) => {
+          if (corps === null) return repondre(422, { message: 'Corps de requete illisible.' })
+          // Remplacement complet : un champ absent vaut null, comme au
+          // contrat. C'est le piege a reproduire ici, pas a adoucir.
+          calendrier().intro = (corps.intro as string | null) ?? null
+          calendrier().document_url = (corps.document_url as string | null) ?? null
+          repondre(200, {
+            data: { intro: calendrier().intro, document_url: calendrier().document_url },
+          })
+        })
+      }
     }
 
     // --- Module Evenements, administration ------------------------------

@@ -51,6 +51,7 @@ describe('ouverture des rubriques selon l ambassade', () => {
     expect(ouvert('/ambassadeur')).toBe(true)
     expect(ouvert('/chancellerie')).toBe(true)
     expect(ouvert('/consuls-honoraires')).toBe(true)
+    expect(ouvert('/calendrier')).toBe(true)
   })
 
   it('ferme les six pages de relations bilaterales d un seul drapeau', () => {
@@ -85,7 +86,6 @@ describe('ouverture des rubriques selon l ambassade', () => {
       expect(fermes.sort()).toEqual(
         [
           '/bahamas',
-          '/calendrier',
           '/consulat',
           '/costa-rica',
           '/fond-monetaire',

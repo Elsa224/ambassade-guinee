@@ -22,6 +22,7 @@ function routeur() {
       { path: '/actualite', component: Vide },
       { path: '/chancellerie', component: Chancellerie },
       { path: '/consuls-honoraires', component: Chancellerie },
+      { path: '/calendrier', component: Chancellerie },
       { path: '/usa', component: Chancellerie },
       { path: '/demarche-ligne', component: Chancellerie },
       { path: '/actualites-ambassade', component: Chancellerie },
@@ -78,7 +79,7 @@ describe('rubriques fermees dans le gabarit public', () => {
     // rubrique : leur contenu vient de l'annuaire et elles se retractent
     // d'elles-memes quand il est vide. Les fermer d'avance empecherait
     // l'ambassade de voir ce qu'elle vient de saisir.
-    for (const chemin of ['/chancellerie', '/consuls-honoraires']) {
+    for (const chemin of ['/chancellerie', '/consuls-honoraires', '/calendrier']) {
       const wrapper = await visiter(chemin, GABON)
       expect(wrapper.text()).toContain(TEMOIN)
     }
@@ -90,7 +91,7 @@ describe('rubriques fermees dans le gabarit public', () => {
       .findAllComponents({ name: 'RouterLink' })
       .map((l) => String(l.props('to')))
 
-    const fermes = ['/calendrier', '/usa']
+    const fermes = ['/usa']
 
     expect(fermes.filter((chemin) => liens.includes(chemin))).toEqual([])
   })

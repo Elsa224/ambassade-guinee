@@ -212,13 +212,21 @@ export function refusDuFichier(fichier: File): string | null {
  * Le CMS renvoie un `message` en francais directement presentable ; le repli
  * ne sert qu'aux pannes reseau, ou aucune reponse n'est parvenue. Une panne
  * n'est jamais presentee comme une faute de saisie.
+ *
+ * Le cas du 413 passe AVANT le message du serveur, et c'est voulu : un envoi
+ * trop volumineux peut etre refuse par le serveur frontal avant d'atteindre
+ * l'application, qui rend alors une page HTML sans cle `message`. Le client
+ * fabrique dans ce cas « Erreur 413 », un texte techniquement exact et
+ * inutilisable pour la personne qui televerse. Le contrat back le dit
+ * explicitement : le message soigne n'est garanti que si la requete atteint
+ * l'application.
  */
 export function messageErreurContenu(souleve: unknown): string {
+  if (souleve instanceof ApiError && souleve.statut === 413) {
+    return souleve.corpsPorteUnMessage ? souleve.message : 'Le fichier dépasse la taille acceptée.'
+  }
   if (souleve instanceof ApiError && souleve.statut !== 0 && souleve.message.trim() !== '') {
     return souleve.message
-  }
-  if (souleve instanceof ApiError && souleve.statut === 413) {
-    return "L'image dépasse la taille acceptée."
   }
   return 'Le service est momentanément indisponible. Réessayez dans un instant.'
 }
