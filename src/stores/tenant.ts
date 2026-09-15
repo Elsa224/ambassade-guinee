@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { fetchBootstrap, type Embassy } from '@/api/bootstrap'
 import { applyTheme } from '@/theme/applyTheme'
+import { appliquerIdentiteDeLOnglet } from '@/tenant/onglet'
 import { ApiError } from '@/api/client'
 import { rubriqueOuverte as rubriqueOuvertePour } from '@/tenant/rubriques'
 
@@ -39,6 +40,7 @@ export const useTenantStore = defineStore('tenant', () => {
       const resultat = await fetchBootstrap(domain)
       embassy.value = resultat
       applyTheme(resultat.theme)
+      appliquerIdentiteDeLOnglet(resultat)
     } catch (souleve) {
       erreur.value = souleve instanceof ApiError ? souleve.message : 'Configuration indisponible.'
       console.error('Échec du bootstrap du tenant :', souleve)
