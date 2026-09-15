@@ -15,12 +15,7 @@
       <!-- Entreprise avec menu déroulant -->
       <div>
         <label class="block font-medium mb-1">Entreprise</label>
-        <select v-model="form.entreprise" class="w-full border rounded-lg p-2 bg-gray-200">
-          <option disabled value="">Sélectionner une entreprise</option>
-          <option>Entreprise A</option>
-          <option>Entreprise B</option>
-          <option>Entreprise C</option>
-        </select>
+        <ChampSelect v-model="form.entreprise" :options="OPTIONS_FORM_ENTREPRISE" />
       </div>
 
       <div>
@@ -68,17 +63,12 @@
 
       <div>
         <label class="block font-medium mb-1">Date</label>
-        <input v-model="form.date" type="date" class="w-full border rounded-lg p-2 bg-gray-200" />
+        <ChampDate v-model="form.date" />
       </div>
 
       <div>
         <label class="block font-medium mb-1">Civilité du destinataire</label>
-        <select v-model="form.civilite" class="w-full border rounded-lg p-2 bg-gray-200">
-          <option disabled value="">Sélectionner</option>
-          <option>Monsieur</option>
-          <option>Madame</option>
-          <option>Mademoiselle</option>
-        </select>
+        <ChampSelect v-model="form.civilite" :options="OPTIONS_FORM_CIVILITE" />
       </div>
 
       <div>
@@ -126,6 +116,22 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import ChampSelect from '@/components/ui/ChampSelect.vue'
+import ChampDate from '@/components/ui/ChampDate.vue'
+
+const OPTIONS_FORM_ENTREPRISE = [
+  { valeur: '', libelle: 'Sélectionner une entreprise' },
+  { valeur: 'Entreprise A', libelle: 'Entreprise A' },
+  { valeur: 'Entreprise B', libelle: 'Entreprise B' },
+  { valeur: 'Entreprise C', libelle: 'Entreprise C' },
+] as const
+
+const OPTIONS_FORM_CIVILITE = [
+  { valeur: '', libelle: 'Sélectionner' },
+  { valeur: 'Monsieur', libelle: 'Monsieur' },
+  { valeur: 'Madame', libelle: 'Madame' },
+  { valeur: 'Mademoiselle', libelle: 'Mademoiselle' },
+] as const
 
 const form = ref({
   entreprise: '',

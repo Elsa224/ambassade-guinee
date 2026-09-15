@@ -3,6 +3,7 @@ import { mount, flushPromises } from '@vue/test-utils'
 import { createRouter, createMemoryHistory } from 'vue-router'
 import { defineComponent, h } from 'vue'
 import FeuillePresence from '../FeuillePresence.vue'
+import { choisirDansLaListe } from '@/components/ui/__tests__/pilotage'
 import type { LignePresence, ResumePresence } from '@/api/evenements-admin'
 
 const Vide = defineComponent({ render: () => h('div') })
@@ -149,7 +150,7 @@ describe('feuille de presence', () => {
     servir()
     const wrapper = await rendre()
 
-    await wrapper.find('select').setValue('false')
+    await choisirDansLaListe(wrapper, '[role="combobox"]', "N'ont pas pointé")
     await flushPromises()
 
     const derniere = demandes.filter((url) => url.includes('/attendance?')).pop()
@@ -208,7 +209,7 @@ describe('feuille de presence', () => {
     )
     const wrapper = await rendre()
 
-    await wrapper.find('select').setValue('true')
+    await choisirDansLaListe(wrapper, '[role="combobox"]', 'Ont pointé')
     await flushPromises()
     await bouton(wrapper, 'Exporter en XLSX')!.trigger('click')
     await flushPromises()

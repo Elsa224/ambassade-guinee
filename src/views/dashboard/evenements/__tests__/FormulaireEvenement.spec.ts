@@ -3,6 +3,7 @@ import { mount, flushPromises } from '@vue/test-utils'
 import { createRouter, createMemoryHistory, RouterView } from 'vue-router'
 import { defineComponent, h } from 'vue'
 import FormulaireEvenement from '../FormulaireEvenement.vue'
+import { choisirDansLaListe, saisirLaDate } from '@/components/ui/__tests__/pilotage'
 import type { EvenementAdmin } from '@/api/evenements-admin'
 
 const Vide = defineComponent({ render: () => h('div') })
@@ -134,7 +135,7 @@ async function rendre(adresse = '/dashboard/evenements/nouveau') {
 /** Remplit les quatre champs requis pour que l'envoi ne soit pas refuse. */
 async function remplirMinimum(wrapper: Awaited<ReturnType<typeof rendre>>['wrapper']) {
   await wrapper.find('#champ-nom').setValue('Journée portes ouvertes')
-  await wrapper.find('#champ-date').setValue('2026-10-02')
+  await saisirLaDate(wrapper, '#champ-date', '2026-10-02')
   await wrapper.find('#champ-heure').setValue('09:00')
   await wrapper.find('#champ-lieu').setValue('Chancellerie, Conakry')
 }
@@ -161,7 +162,7 @@ describe('formulaire d un evenement', () => {
     servir({ types: [{ slug: 'fete-nationale', name: 'Fête nationale', isActive: true }] })
     const { wrapper } = await rendre()
     await remplirMinimum(wrapper)
-    await wrapper.find('#champ-type').setValue('fete-nationale')
+    await choisirDansLaListe(wrapper, '#champ-type', 'Fête nationale')
     await envoyer(wrapper)
 
     expect(dernierEnvoi().corps.typeEventSlug).toBe('fete-nationale')

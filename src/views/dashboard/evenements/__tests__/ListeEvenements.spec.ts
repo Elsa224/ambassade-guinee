@@ -3,6 +3,7 @@ import { mount, flushPromises } from '@vue/test-utils'
 import { createRouter, createMemoryHistory } from 'vue-router'
 import { defineComponent, h } from 'vue'
 import ListeEvenements from '../ListeEvenements.vue'
+import { choisirDansLaListe } from '@/components/ui/__tests__/pilotage'
 import type { EvenementAdmin, Pagination } from '@/api/evenements-admin'
 
 function evenement(partiel: Partial<EvenementAdmin> = {}): EvenementAdmin {
@@ -162,7 +163,7 @@ describe('liste d administration des evenements', () => {
     servir([evenement()], { page: 11, limit: 20, total: 204, totalPages: 11 })
     const wrapper = await rendre()
 
-    await wrapper.find('select').setValue('100')
+    await choisirDansLaListe(wrapper, '[role="combobox"]', '100')
     await flushPromises()
 
     expect(derniereDemande()).toContain('page=1')

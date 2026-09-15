@@ -14,6 +14,14 @@ import {
 } from '@/api/evenements-admin'
 import { messageErreur } from '@/api/evenements'
 import Pagination from './Pagination.vue'
+import ChampSelect from '@/components/ui/ChampSelect.vue'
+
+/** Les trois etats du filtre de pointage, dans l'ordre d'usage. */
+const OPTIONS_DE_POINTAGE = [
+  { valeur: '', libelle: 'Tous' },
+  { valeur: 'true', libelle: 'Ont pointé' },
+  { valeur: 'false', libelle: "N'ont pas pointé" },
+] as const
 
 /**
  * Feuille de presence d'un evenement.
@@ -237,17 +245,12 @@ onMounted(() => {
 
         <label class="ml-auto flex items-center gap-2 text-sm text-gray-600">
           <span>Pointage</span>
-          <select
-            class="border border-gray-300 rounded-lg py-1.5 pl-2.5 pr-8 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary"
-            :value="filtrePresent"
-            @change="
-              changerPresent(($event.target as HTMLSelectElement).value as '' | 'true' | 'false')
-            "
-          >
-            <option value="">Tous</option>
-            <option value="true">Ont pointé</option>
-            <option value="false">N'ont pas pointé</option>
-          </select>
+          <ChampSelect
+            :model-value="filtrePresent"
+            :options="OPTIONS_DE_POINTAGE"
+            class="w-44"
+            @update:model-value="changerPresent($event as '' | 'true' | 'false')"
+          />
         </label>
       </div>
 

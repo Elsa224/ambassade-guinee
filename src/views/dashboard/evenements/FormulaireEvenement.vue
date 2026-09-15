@@ -11,6 +11,8 @@ import {
   type TypeEvenement,
 } from '@/api/evenements-admin'
 import { messageErreur } from '@/api/evenements'
+import ChampDate from '@/components/ui/ChampDate.vue'
+import ChampSelect from '@/components/ui/ChampSelect.vue'
 
 /**
  * Creation et modification d'un evenement.
@@ -77,6 +79,16 @@ function basculerLimite() {
 }
 
 const types = ref<TypeEvenement[]>([])
+
+/**
+ * Les types servis, precedes du choix explicite de n'en donner aucun.
+ * `null` n'est pas une absence de saisie ici : c'est ce que le CMS attend
+ * pour un evenement sans type.
+ */
+const optionsDeType = computed(() => [
+  { valeur: null, libelle: 'Sans type' },
+  ...types.value.map((type) => ({ valeur: type.slug, libelle: type.name })),
+])
 const chargement = ref(false)
 const envoi = ref(false)
 const erreur = ref('')
@@ -228,13 +240,7 @@ onMounted(async () => {
           <label class="block text-sm font-medium text-gray-700 mb-1" for="champ-date">
             Date <span class="text-red-600">*</span>
           </label>
-          <input
-            id="champ-date"
-            v-model="brouillon.date"
-            type="date"
-            required
-            class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-2 focus:outline-primary"
-          />
+          <ChampDate id="champ-date" v-model="brouillon.date" requis />
           <p v-if="erreursChamps.date" class="text-sm text-red-700 mt-1">
             {{ erreursChamps.date }}
           </p>
@@ -249,7 +255,7 @@ onMounted(async () => {
             v-model="brouillon.time"
             type="time"
             required
-            class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-2 focus:outline-primary"
+            class="w-full rounded-lg border border-gray-300 px-4 py-2.5 transition-colors hover:border-gray-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
           />
           <p v-if="erreursChamps.time" class="text-sm text-red-700 mt-1">
             {{ erreursChamps.time }}
@@ -274,16 +280,7 @@ onMounted(async () => {
 
         <div v-if="typesConnus" class="sm:col-span-2">
           <label class="block text-sm font-medium text-gray-700 mb-1" for="champ-type">Type</label>
-          <select
-            id="champ-type"
-            v-model="brouillon.typeEventSlug"
-            class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-2 focus:outline-primary"
-          >
-            <option :value="null">Sans type</option>
-            <option v-for="type in types" :key="type.slug" :value="type.slug">
-              {{ type.name }}
-            </option>
-          </select>
+          <ChampSelect id="champ-type" v-model="brouillon.typeEventSlug" :options="optionsDeType" />
         </div>
 
         <div class="sm:col-span-2">
@@ -346,12 +343,7 @@ onMounted(async () => {
           <label class="block text-sm font-medium text-gray-700 mb-1" for="champ-cloture">
             Clôture des inscriptions
           </label>
-          <input
-            id="champ-cloture"
-            v-model="brouillon.registrationDeadline"
-            type="date"
-            class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-2 focus:outline-primary"
-          />
+          <ChampDate id="champ-cloture" v-model="brouillon.registrationDeadline" />
           <p v-if="clotureApresEvenement" class="text-sm text-amber-700 mt-1">
             La clôture tombe après l'évènement.
           </p>

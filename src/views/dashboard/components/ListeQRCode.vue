@@ -72,9 +72,7 @@
     <div class="flex items-center justify-between px-4 py-3 border-t bg-gray-50">
       <div class="flex items-center gap-2 text-sm text-gray-700">
         <span>Afficher</span>
-        <select v-model="perPage" class="border border-gray-300 rounded-md px-2 py-1">
-          <option v-for="n in [5, 10, 15]" :key="n" :value="n">{{ n }}</option>
-        </select>
+        <ChampSelect v-model="perPage" :options="OPTIONS_PAR_PAGE" class="w-20" />
         <span>par page</span>
       </div>
 
@@ -113,6 +111,9 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import ChampSelect from '@/components/ui/ChampSelect.vue'
+
+const OPTIONS_PAR_PAGE = [5, 10, 15].map((n) => ({ valeur: n, libelle: String(n) }))
 
 const qrList = ref(
   Array.from({ length: 10 }, (_, i) => ({

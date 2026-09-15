@@ -54,10 +54,7 @@
         <label class="block font-medium"
           >Date d'expiration <span class="text-red-500">*</span></label
         >
-        <input
-          type="date"
-          class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary bg-gray-200"
-        />
+        <ChampDate v-model="dateExpiration" requis />
       </div>
       <div>
         <label class="block font-medium">Entreprise <span class="text-red-500">*</span></label>
@@ -86,4 +83,9 @@
   </div>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { ref } from 'vue'
+import ChampDate from '@/components/ui/ChampDate.vue'
+
+const dateExpiration = ref('')
+</script>

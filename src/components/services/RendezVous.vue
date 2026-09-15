@@ -49,21 +49,7 @@
                 <label class="block text-sm font-semibold text-gray-700 mb-2">
                   Type de service *
                 </label>
-                <select
-                  v-model="formData.service"
-                  class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
-                  required
-                >
-                  <option value="">Sélectionnez un service</option>
-                  <option value="consulat">Services consulaires</option>
-                  <option value="passeport">Demande de passeport</option>
-                  <option value="carte-consulaire">Carte consulaire</option>
-                  <option value="etat-civil">Actes d'état civil</option>
-                  <option value="legalisation">Légalisation de documents</option>
-                  <option value="visa">Information visa</option>
-                  <option value="ambassadeur">Audience avec l'Ambassadeur</option>
-                  <option value="autre">Autre service</option>
-                </select>
+                <ChampSelect v-model="formData.service" :options="OPTIONS_FORMDATA_SERVICE" />
               </div>
 
               <!-- Informations personnelles -->
@@ -119,36 +105,13 @@
                   <label class="block text-sm font-semibold text-gray-700 mb-2">
                     Date souhaitée *
                   </label>
-                  <input
-                    type="date"
-                    v-model="formData.date"
-                    :min="dateMin"
-                    class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
-                    required
-                  />
+                  <ChampDate v-model="formData.date" :min="dateMin" requis />
                 </div>
                 <div>
                   <label class="block text-sm font-semibold text-gray-700 mb-2">
                     Heure souhaitée *
                   </label>
-                  <select
-                    v-model="formData.heure"
-                    class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
-                    required
-                  >
-                    <option value="">Sélectionnez une heure</option>
-                    <option value="09:00">09:00</option>
-                    <option value="09:30">09:30</option>
-                    <option value="10:00">10:00</option>
-                    <option value="10:30">10:30</option>
-                    <option value="11:00">11:00</option>
-                    <option value="11:30">11:30</option>
-                    <option value="14:00">14:00</option>
-                    <option value="14:30">14:30</option>
-                    <option value="15:00">15:00</option>
-                    <option value="15:30">15:30</option>
-                    <option value="16:00">16:00</option>
-                  </select>
+                  <ChampSelect v-model="formData.heure" :options="OPTIONS_FORMDATA_HEURE" />
                 </div>
               </div>
 
@@ -417,6 +380,36 @@
 
 <script setup>
 import { ref, reactive } from 'vue'
+import ChampSelect from '@/components/ui/ChampSelect.vue'
+import ChampDate from '@/components/ui/ChampDate.vue'
+import { aujourdHui, decaler, versIso } from '@/components/ui/dates'
+
+const OPTIONS_FORMDATA_SERVICE = [
+  { valeur: '', libelle: 'Sélectionnez un service' },
+  { valeur: 'consulat', libelle: 'Services consulaires' },
+  { valeur: 'passeport', libelle: 'Demande de passeport' },
+  { valeur: 'carte-consulaire', libelle: 'Carte consulaire' },
+  { valeur: 'etat-civil', libelle: "Actes d'état civil" },
+  { valeur: 'legalisation', libelle: 'Légalisation de documents' },
+  { valeur: 'visa', libelle: 'Information visa' },
+  { valeur: 'ambassadeur', libelle: "Audience avec l'Ambassadeur" },
+  { valeur: 'autre', libelle: 'Autre service' },
+]
+
+const OPTIONS_FORMDATA_HEURE = [
+  { valeur: '', libelle: 'Sélectionnez une heure' },
+  { valeur: '09:00', libelle: '09:00' },
+  { valeur: '09:30', libelle: '09:30' },
+  { valeur: '10:00', libelle: '10:00' },
+  { valeur: '10:30', libelle: '10:30' },
+  { valeur: '11:00', libelle: '11:00' },
+  { valeur: '11:30', libelle: '11:30' },
+  { valeur: '14:00', libelle: '14:00' },
+  { valeur: '14:30', libelle: '14:30' },
+  { valeur: '15:00', libelle: '15:00' },
+  { valeur: '15:30', libelle: '15:30' },
+  { valeur: '16:00', libelle: '16:00' },
+]
 
 // État du formulaire
 const formData = reactive({
@@ -435,8 +428,10 @@ const formData = reactive({
 const isSubmitting = ref(false)
 const showModal = ref(false)
 
-// Date minimale (aujourd'hui + 2 jours ouvrés)
-const dateMin = ref(new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString().split('T')[0])
+// Date minimale : aujourd'hui plus deux jours. Le calcul reste en heure
+// locale — `toISOString()` rend une date UTC, qui recule d'un jour a l'ouest
+// de Greenwich et proposerait un creneau trop tot.
+const dateMin = ref(versIso(decaler(aujourdHui(), 2)))
 
 // Soumission du formulaire
 const submitRendezVous = async () => {
