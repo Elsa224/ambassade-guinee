@@ -151,7 +151,6 @@
                   >Les consuls Honoraires</router-link
                 >
                 <router-link
-                  v-if="rubriqueOuverte('/calendrier')"
                   to="/calendrier"
                   class="block px-4 py-2 text-sm text-gray-800 hover:bg-secondary hover:text-primary transition-all"
                   >Calendrier des fêtes légales</router-link

@@ -180,38 +180,70 @@ deux requetes se croisent.
 
 ---
 
-## 3. Calendrier des fetes
+## 3. Calendrier des jours feries
 
-Le dernier champ, et le seul des quarante-quatre qui soit **trouvable en
-ligne** : les fetes gabonaises sont publiques et le releve est fait. Il reste a
-le faire valider par l'ambassade, d'ou un ecran plutot qu'une table figee.
+Le dernier champ des quarante-quatre. Cette section proposait une forme
+— `GET /api/content/calendar`, un tableau plat, les cles `label` et
+`recurrent` — qui n'a pas ete retenue.
 
-Deux natures de fetes, qui ne se stockent pas pareil :
-
-- **fixes** — meme date chaque annee : 17 aout, 1er mai, 25 decembre ;
-- **mobiles** — Paques, Ascension, Aid el-Fitr, Aid el-Kebir : la date change
-  chaque annee et ne se calcule pas d'une regle simple, surtout pour les fetes
-  musulmanes qui dependent de l'observation.
+**C'est `docs/contrat-jours-feries.md` du depot back qui fait autorite**, et
+le front s'y conforme depuis le branchement de `Calendrier.vue`. Ce qui suit
+n'en retient que ce qui engage le front, pour eviter d'entretenir deux
+descriptions qui divergeraient :
 
 ```
-GET /api/content/calendar?year=2027
+GET /api/content/holidays
+GET /api/content/holidays?year=2027
 ```
 
 ```json
 {
-  "data": [
-    { "id": 1, "label": "Fete de l'Independance", "date": "2027-08-17", "recurrent": true },
-    { "id": 2, "label": "Aid el-Fitr", "date": "2027-03-20", "recurrent": false }
-  ]
+  "data": {
+    "year": 2026,
+    "available_years": [2025, 2026, 2027],
+    "intro": null,
+    "document_url": null,
+    "holidays": [
+      { "id": 1, "name": "Jour de l'An", "date": "2026-01-01", "type": "legale", "note": null }
+    ]
+  }
 }
 ```
 
-`recurrent: true` signifie que la date se repete a l'identique chaque annee ;
-le back la projette sur l'annee demandee. `recurrent: false` vaut pour une
-annee donnee et doit etre ressaisie — c'est un travail annuel de l'ambassade,
-pas un defaut.
+Quatre points s'imposent au front et ont ete obtenus explicitement :
 
-Administration : les quatre memes verbes sur `/api/admin/calendar`.
+1. **Une annee sans aucune fete rend 200**, `holidays` vide et
+   `available_years` toujours renseigne. Jamais 404. La page garde donc son
+   selecteur d'annee : consulter une annee vide ne doit pas effacer le moyen
+   d'en sortir.
+2. **Le bloc de reglages est toujours present** : `intro` et `document_url`
+   valent `null` quand rien n'est saisi. Rien n'est guineen par defaut — le
+   texte du decret, jadis ecrit en dur dans le gabarit, est desormais saisi
+   par l'ambassade ou n'existe pas.
+3. **`available_years` ne porte que les annees pourvues.** L'annee servie peut
+   en etre absente ; c'est au front d'ajouter cette valeur aux options de son
+   selecteur, et non au back de fausser le sens du champ.
+4. **Le PDF s'ouvre dans l'onglet** : le relais ne pose pas de
+   `Content-Disposition`. Le bouton dit donc « Consulter », pas
+   « Telecharger ». Forcer le telechargement demanderait un
+   `Content-Disposition: attachment` cote back, ce qui n'a pas ete demande.
+
+La notion de fete **recurrente** projetee par le back a ete abandonnee : il
+ne calcule aucune date et ne duplique pas une annee sur la suivante. Chaque
+annee est saisie en entier, dates fixes comprises. Une duplication d'annee
+serait un ajout ulterieur, pas une correction.
+
+`type` vaut `legale`, `nationale` ou `religieuse`, et rien d'autre : le
+libelle affiche et la couleur de la pastille sont au front. La pastille
+« Fete musulmane » du gabarit a disparu au profit de « Fete religieuse ».
+
+Administration : `GET`, `POST`, `PATCH` et `DELETE` sur `/api/admin/holidays`,
+plus `PUT` et `DELETE` sur `/api/admin/holidays/settings`. **Le `PUT` des
+reglages est un remplacement complet, pas une fusion** : un champ absent du
+corps vaut `null`, donc un `PUT` portant seulement `intro` efface le document.
+L'ecran d'administration envoie toujours les deux champs. Le document se
+televerse sur `POST /api/admin/content/document` — PDF seul, 5 Mo — et la
+route des images continue de refuser les PDF.
 
 ---
 

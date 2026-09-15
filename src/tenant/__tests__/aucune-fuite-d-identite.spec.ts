@@ -9,6 +9,7 @@ import Actualite from '@/views/Actualite.vue'
 import Ambassadeur from '@/components/ambassade/Ambassadeur.vue'
 import Chancellerie from '@/components/ambassade/Chancellerie.vue'
 import ConsulsHonoraires from '@/components/ambassade/ConsulsHonoraires.vue'
+import Calendrier from '@/components/ambassade/Calendrier.vue'
 import { useTenantStore } from '@/stores/tenant'
 import type { Embassy } from '@/api/bootstrap'
 import { GUINEE, GABON, GABON_AVANT_COLONNES } from '@/api/fixtures/tenants'
@@ -49,6 +50,9 @@ let contenuServi: unknown
 /** Ce que le CMS sert pour l'annuaire pendant un test donne. */
 let annuaireServi: unknown
 
+/** Ce que le CMS sert pour les jours feries pendant un test donne. */
+let feriesServies: unknown
+
 function reponse(corps: unknown) {
   return new Response(JSON.stringify(corps), {
     status: 200,
@@ -66,6 +70,7 @@ function routeur(chemin: string) {
       { path: '/ambassadeur', component: Ambassadeur },
       { path: '/chancellerie', component: Chancellerie },
       { path: '/consuls-honoraires', component: ConsulsHonoraires },
+      { path: '/calendrier', component: Calendrier },
       { path: '/demarche-ligne', component: Vide },
       { path: '/construction', component: Vide },
       { path: '/actualites/:slug', component: Vide },
@@ -100,11 +105,21 @@ describe("etancheite de l'identite entre ambassades", () => {
         if (chemin.includes('/api/content/home')) return Promise.resolve(reponse(contenuServi))
         if (chemin.includes('/api/content/directory'))
           return Promise.resolve(reponse(annuaireServi))
+        if (chemin.includes('/api/content/holidays')) return Promise.resolve(reponse(feriesServies))
         return Promise.resolve(reponse({ data: articlesGabon.data }))
       }),
     )
     contenuServi = { data: { welcome: null, leaders: [], showcase: [] } }
     annuaireServi = { data: { staff: [], consuls: [] } }
+    feriesServies = {
+      data: {
+        year: 2026,
+        available_years: [],
+        intro: null,
+        document_url: null,
+        holidays: [],
+      },
+    }
   })
 
   afterEach(() => {
@@ -195,6 +210,36 @@ describe("etancheite de l'identite entre ambassades", () => {
     const remplie = await rendre('/consuls-honoraires', GABON)
     expect(remplie.text()).toContain('Mariam Diallo')
     expect(remplie.text().match(IDENTITE_ETRANGERE)).toBeNull()
+  })
+
+  it('ne laisse aucune trace guineenne sur le calendrier des jours feries', async () => {
+    // La page portait en dur l'annee 2023, le decret guineen, treize fetes,
+    // une image du calendrier guineen et un tableau recapitulatif.
+    const vide = await rendre('/calendrier', GABON)
+    expect(vide.text().match(IDENTITE_ETRANGERE)).toBeNull()
+    expect(vide.text()).not.toContain('PRG')
+
+    feriesServies = {
+      data: {
+        year: 2026,
+        available_years: [2026],
+        intro: null,
+        document_url: null,
+        holidays: [
+          {
+            id: 1,
+            name: 'Fete de l Independance',
+            date: '2026-08-17',
+            type: 'nationale',
+            note: null,
+          },
+        ],
+      },
+    }
+    const remplie = await rendre('/calendrier', GABON)
+    expect(remplie.text()).toContain('17 août')
+    expect(remplie.text().match(IDENTITE_ETRANGERE)).toBeNull()
+    expect(remplie.text()).not.toContain('PRG')
   })
 
   it('ne laisse aucune trace guineenne sur la page des actualites', async () => {

@@ -137,4 +137,21 @@ describe("message d'erreur du contenu", () => {
       'momentanément indisponible',
     )
   })
+
+  it('explique un 413 rendu sans JSON par le serveur frontal', () => {
+    // Un envoi trop volumineux peut etre refuse avant d'atteindre
+    // l'application : la reponse est alors du HTML, le client fabrique
+    // « Erreur 413 », et ce texte est inutilisable pour qui televerse.
+    expect(messageErreurContenu(new ApiError('Erreur 413', 413, '<html>...</html>'))).toContain(
+      'dépasse la taille acceptée',
+    )
+  })
+
+  it('prefere le message de l application quand le 413 vient bien d elle', () => {
+    const refus = new ApiError('Fichier trop volumineux : 5 Mo au maximum.', 413, {
+      message: 'Fichier trop volumineux : 5 Mo au maximum.',
+    })
+
+    expect(messageErreurContenu(refus)).toBe('Fichier trop volumineux : 5 Mo au maximum.')
+  })
 })
