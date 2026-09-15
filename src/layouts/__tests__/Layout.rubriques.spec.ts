@@ -21,6 +21,8 @@ function routeur() {
       { path: '/', component: Vide },
       { path: '/actualite', component: Vide },
       { path: '/chancellerie', component: Chancellerie },
+      { path: '/consuls-honoraires', component: Chancellerie },
+      { path: '/calendrier', component: Chancellerie },
       { path: '/usa', component: Chancellerie },
       { path: '/demarche-ligne', component: Chancellerie },
       { path: '/actualites-ambassade', component: Chancellerie },
@@ -46,7 +48,7 @@ describe('rubriques fermees dans le gabarit public', () => {
   it('n instancie pas la page d une rubrique fermee, meme par URL directe', async () => {
     // Masquer le lien au menu ne protege rien : c'est ce chemin-la, saisi a la
     // main, qui ferait apparaitre le contenu d'une autre ambassade.
-    const wrapper = await visiter('/chancellerie', GABON)
+    const wrapper = await visiter('/demarche-ligne', GABON)
 
     expect(wrapper.text()).not.toContain(TEMOIN)
     expect(wrapper.text()).toContain('Rubrique en préparation')
@@ -67,9 +69,20 @@ describe('rubriques fermees dans le gabarit public', () => {
   })
 
   it('ne ferme rien sur le site guineen', async () => {
-    const wrapper = await visiter('/chancellerie', GUINEE)
+    const wrapper = await visiter('/demarche-ligne', GUINEE)
 
     expect(wrapper.text()).toContain(TEMOIN)
+  })
+
+  it('laisse atteindre les pages servies par le CMS, meme au Gabon', async () => {
+    // La chancellerie et les consuls honoraires ne dependent plus d'une
+    // rubrique : leur contenu vient de l'annuaire et elles se retractent
+    // d'elles-memes quand il est vide. Les fermer d'avance empecherait
+    // l'ambassade de voir ce qu'elle vient de saisir.
+    for (const chemin of ['/chancellerie', '/consuls-honoraires', '/calendrier']) {
+      const wrapper = await visiter(chemin, GABON)
+      expect(wrapper.text()).toContain(TEMOIN)
+    }
   })
 
   it('retire du menu les liens des rubriques fermees', async () => {
@@ -78,7 +91,7 @@ describe('rubriques fermees dans le gabarit public', () => {
       .findAllComponents({ name: 'RouterLink' })
       .map((l) => String(l.props('to')))
 
-    const fermes = ['/chancellerie', '/consuls-honoraires', '/calendrier', '/usa']
+    const fermes = ['/usa']
 
     expect(fermes.filter((chemin) => liens.includes(chemin))).toEqual([])
   })

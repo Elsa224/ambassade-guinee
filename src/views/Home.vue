@@ -94,6 +94,18 @@
                 <p v-if="dirigeant.subtitle" class="text-xs mt-1 opacity-80">
                   {{ dirigeant.subtitle }}
                 </p>
+                <!-- Seule la carte de l'ambassadeur mene a sa biographie : les
+                     autres dirigeants n'ont pas de page sur ce site. La carte
+                     vient du CMS, on reconnait donc l'ambassadeur a son role.
+                     Et le bouton ne promet la page que si le CMS sert la
+                     biographie : sinon il menerait a une rubrique vide. -->
+                <router-link
+                  v-if="biographieDisponible && estAmbassadeur(dirigeant)"
+                  to="/ambassadeur"
+                  class="inline-block mt-4 bg-white/20 hover:bg-white/30 border border-white/40 px-5 py-2 rounded-full text-sm font-semibold transition-colors"
+                >
+                  Biographie
+                </router-link>
               </div>
             </div>
           </div>
@@ -463,6 +475,23 @@ const ACCENTS = ['text-secondary', 'text-primary', 'text-secondary'] as const
 
 const habillageDuRang = (rang: number) => HABILLAGES[rang % HABILLAGES.length]
 const accentDuRang = (rang: number) => ACCENTS[rang % ACCENTS.length]
+
+/**
+ * La carte de l'ambassadeur, et elle seule, porte le bouton Biographie.
+ *
+ * Les dirigeants viennent du CMS sans type : le role est le seul indice.
+ * On le compare sans accents ni casse pour que « ambassadeur » saisi
+ * autrement dans le dashboard garde le bouton.
+ */
+/** Le bouton Biographie n'apparait que si le CMS sert le bloc `ambassador`. */
+const biographieDisponible = computed(() => contenu.value.ambassador !== null)
+
+const estAmbassadeur = (dirigeant: { role: string }) =>
+  dirigeant.role
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .includes('ambassadeur')
 
 onMounted(async () => {
   try {

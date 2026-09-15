@@ -1,8 +1,10 @@
 # Livraison de production, declenchee A LA MAIN uniquement.
 #
-# Aucun evenement automatique n'est branche ici : ni push, ni fusion sur main.
-# Une fusion vers main ne met donc jamais la production a jour toute seule ;
-# il faut venir ouvrir l'onglet Actions et lancer ce workflow explicitement.
+# Ce workflow-ci n'est branche sur aucun evenement automatique : il faut
+# ouvrir l'onglet Actions et le lancer explicitement. Mais il n'est plus le
+# seul chemin vers la production : deploy-prod.yml deploie le front sur
+# shared-prod a CHAQUE push sur main. Celui-ci reste le chemin de secours
+# (livrer une etiquette precise, relivrer sans nouveau push).
 #
 # Le travail « deployer » depend de l'environnement GitHub « production » :
 # une fois cet environnement configure avec des relecteurs obligatoires

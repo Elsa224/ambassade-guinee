@@ -30,23 +30,28 @@ describe('ouverture des rubriques selon l ambassade', () => {
   it('laisse ouverte une rubrique que l ambassade ne declare pas', () => {
     useTenantStore().embassy = { modules: { bilateral: true } } as unknown as Embassy
 
-    // `chancellerie` est absent des modules : absent ne veut pas dire ferme.
-    expect(ouvert('/chancellerie')).toBe(true)
+    // `consulat` est absent des modules : absent ne veut pas dire ferme.
+    expect(ouvert('/consulat')).toBe(true)
   })
 
   it('ferme une rubrique explicitement mise a false', () => {
-    useTenantStore().embassy = { modules: { chancellerie: false } } as unknown as Embassy
+    useTenantStore().embassy = { modules: { consulat: false } } as unknown as Embassy
 
-    expect(ouvert('/chancellerie')).toBe(false)
+    expect(ouvert('/consulat')).toBe(false)
   })
 
   it('laisse ouvert un chemin qui ne depend d aucune rubrique', () => {
-    useTenantStore().embassy = { modules: { chancellerie: false } } as unknown as Embassy
+    useTenantStore().embassy = { modules: { consulat: false } } as unknown as Embassy
 
     expect(ouvert('/')).toBe(true)
     expect(ouvert('/actualite')).toBe(true)
     expect(ouvert('/presentation')).toBe(true)
+    // Les trois pages servies par le CMS se retractent d'elles-memes : elles
+    // ne dependent plus d'aucune rubrique.
     expect(ouvert('/ambassadeur')).toBe(true)
+    expect(ouvert('/chancellerie')).toBe(true)
+    expect(ouvert('/consuls-honoraires')).toBe(true)
+    expect(ouvert('/calendrier')).toBe(true)
   })
 
   it('ferme les six pages de relations bilaterales d un seul drapeau', () => {
@@ -80,12 +85,8 @@ describe('ouverture des rubriques selon l ambassade', () => {
 
       expect(fermes.sort()).toEqual(
         [
-          '/ambassadeur',
           '/bahamas',
-          '/calendrier',
-          '/chancellerie',
           '/consulat',
-          '/consuls-honoraires',
           '/costa-rica',
           '/fond-monetaire',
           '/haiti',
@@ -103,8 +104,10 @@ describe('ouverture des rubriques selon l ambassade', () => {
       useTenantStore().embassy = GABON
 
       // `/demarche-ligne` n'en fait plus partie : son formulaire exige des
-      // pieces propres a un seul pays d'accueil.
-      const publiees = ['/', '/actualite', '/actualites-ambassade']
+      // pieces propres a un seul pays d'accueil. `/ambassadeur` en fait
+      // desormais partie : la page est servie par le CMS et se retracte
+      // d'elle-meme, la garde de rubrique n'a plus d'objet.
+      const publiees = ['/', '/actualite', '/actualites-ambassade', '/ambassadeur']
 
       expect(publiees.filter((chemin) => !ouvert(chemin))).toEqual([])
     })
@@ -144,8 +147,8 @@ describe('chemins dependant d un module a provisionner', () => {
 
   it('garde aux rubriques de contenu leur defaut ouvert', () => {
     // La generalisation ne doit pas contaminer l'autre regle.
-    expect(cheminOuvert('/chancellerie', { modules: {} })).toBe(true)
-    expect(cheminOuvert('/chancellerie', { modules: { chancellerie: false } })).toBe(false)
+    expect(cheminOuvert('/consulat', { modules: {} })).toBe(true)
+    expect(cheminOuvert('/consulat', { modules: { consulat: false } })).toBe(false)
     expect(cheminOuvert('/', { modules: {} })).toBe(true)
   })
 

@@ -51,6 +51,31 @@ export function mockApi(): Plugin {
 
   let prochainIdentifiant = 100
 
+  /**
+   * Annuaire par tenant : personnel et consuls honoraires. Vide au depart,
+   * comme le vrai back pour une ambassade neuve ; tout se saisit par
+   * l'ecran d'administration.
+   */
+  const annuaires: Record<
+    string,
+    { staff: Record<string, unknown>[]; consuls: Record<string, unknown>[] }
+  > = {
+    gabon: { staff: [], consuls: [] },
+    guinee: { staff: [], consuls: [] },
+  }
+
+  /**
+   * Jours feries par tenant : les fetes datees et le bloc de reglages unique.
+   * Vide au depart, comme le vrai back pour une ambassade neuve.
+   */
+  const calendriers: Record<
+    string,
+    { holidays: Record<string, unknown>[]; intro: string | null; document_url: string | null }
+  > = {
+    gabon: { holidays: [], intro: null, document_url: null },
+    guinee: { holidays: [], intro: null, document_url: null },
+  }
+
   interface EvenementSimule {
     publicToken: string
     isRegistrationClosed: boolean
@@ -60,6 +85,54 @@ export function mockApi(): Plugin {
   /** Rechargee a chaque appel pour que l'edition de la fixture soit visible sans redemarrage. */
   const evenementsPublics = (): EvenementSimule[] =>
     (fixture('evenements') as { data: EvenementSimule[] }).data
+
+  /**
+   * Ecritures d'administration, gardees en memoire.
+   *
+   * La fixture est relue a chaque appel pour qu'on puisse l'editer sans
+   * redemarrer : ecrire dedans annulerait cet avantage, et salirait un fichier
+   * versionne. Les creations et les retouches vivent donc a cote, et sont
+   * fusionnees a la lecture. Elles disparaissent au redemarrage du serveur de
+   * developpement, ce qui est le comportement voulu d'un simulateur.
+   */
+  const creationsAdmin: Record<string, unknown>[] = []
+  /** Logos deposes pendant la session de dev : octets et type, par slug. */
+  const logosDev = new Map<string, { octets: Buffer; type: string }>()
+  const retouchesAdmin = new Map<string, Record<string, unknown>>()
+
+  /** Meme rechargement pour la liste d'administration, paginee ci-dessous. */
+  const evenementsAdmin = (): Record<string, unknown>[] => {
+    const base = (fixture('evenements-admin') as { data: Record<string, unknown>[] }).data
+    return [...creationsAdmin, ...base].map((evenement) => {
+      const retouche = retouchesAdmin.get(String(evenement.slug))
+      return retouche ? { ...evenement, ...retouche } : evenement
+    })
+  }
+
+  /**
+   * Les types proposes a la creation : ceux que portent deja les evenements.
+   *
+   * Forme du back (releve brut de SecureCheck) : le libelle s'appelle
+   * `name`, pas `label`, et chaque type porte `isActive`.
+   */
+  const typesEvenement = (): { slug: string; name: string; isActive: boolean }[] => {
+    const vus = new Map<string, string>()
+    for (const evenement of evenementsAdmin()) {
+      const nom = evenement.typeLabel
+      if (typeof nom !== 'string' || nom === '') continue
+      if (!vus.has(nom)) vus.set(nom, slugifier(nom))
+    }
+    return [...vus].map(([nom, slug]) => ({ slug, name: nom, isActive: true }))
+  }
+
+  /** Slug a la maniere du back : minuscules, accents retires, tirets. */
+  const slugifier = (valeur: string): string =>
+    valeur
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-|-$/g, '')
   let prochainId = 100
   let prochainIdCategorie = 100
 
@@ -164,6 +237,36 @@ export function mockApi(): Plugin {
       return repondre(204, null)
     }
 
+    if (chemin === '/admin/content/ambassador' && methode === 'PUT') {
+      return void lireCorps().then((corps) => {
+        if (corps === null) return repondre(422, { message: 'Corps de requete illisible.' })
+        if (typeof corps.name !== 'string' || corps.name.trim() === '') {
+          return repondre(422, { message: 'Le nom est obligatoire.' })
+        }
+        if (typeof corps.title !== 'string' || corps.title.trim() === '') {
+          return repondre(422, { message: 'La fonction est obligatoire.' })
+        }
+        if (typeof corps.body_html !== 'string' || corps.body_html.trim() === '') {
+          return repondre(422, { message: 'La biographie est obligatoire.' })
+        }
+        // Le PUT remplace le bloc entier : `image_url` absente vaut null,
+        // comme au contrat.
+        contenu().ambassador = {
+          name: corps.name,
+          title: corps.title,
+          image_url:
+            typeof corps.image_url === 'string' && corps.image_url !== '' ? corps.image_url : null,
+          body_html: corps.body_html,
+        }
+        repondre(200, { data: contenu().ambassador })
+      })
+    }
+
+    if (chemin === '/admin/content/ambassador' && methode === 'DELETE') {
+      contenu().ambassador = null
+      return repondre(204, null)
+    }
+
     const BLOC_PAR_CHEMIN: Record<string, 'leaders' | 'showcase'> = {
       '/admin/content/leaders': 'leaders',
       '/admin/content/showcase': 'showcase',
@@ -233,6 +336,120 @@ export function mockApi(): Plugin {
       }
     }
 
+    // --- Annuaire : personnel et consuls honoraires ------------------------
+    const annuaire = () => annuaires[estGabon ? 'gabon' : 'guinee']!
+
+    if (chemin === '/content/directory' || chemin === '/admin/directory') {
+      return repondre(200, { data: annuaire() })
+    }
+
+    const LISTE_ANNUAIRE: Record<string, 'staff' | 'consuls'> = {
+      '/admin/directory/staff': 'staff',
+      '/admin/directory/consuls': 'consuls',
+    }
+
+    /** Champs obligatoires au contrat : name/role, plus city pour un consul. */
+    const OBLIGATOIRES: Record<'staff' | 'consuls', string[]> = {
+      staff: ['name', 'role'],
+      consuls: ['name', 'role', 'city'],
+    }
+
+    const FACULTATIFS: Record<'staff' | 'consuls', string[]> = {
+      staff: ['email', 'phone', 'image_url'],
+      consuls: ['address', 'email', 'phone'],
+    }
+
+    const listeAnnuaire = LISTE_ANNUAIRE[chemin]
+    if (listeAnnuaire && methode === 'POST') {
+      return void lireCorps().then((corps) => {
+        if (corps === null) return repondre(422, { message: 'Corps de requete illisible.' })
+        for (const champ of OBLIGATOIRES[listeAnnuaire]) {
+          if (typeof corps[champ] !== 'string' || (corps[champ] as string).trim() === '') {
+            return repondre(422, {
+              message: 'Le champ ' + champ + ' est obligatoire.',
+              errors: { [champ]: ['Le champ ' + champ + ' est obligatoire.'] },
+            })
+          }
+        }
+        const elements = annuaire()[listeAnnuaire]
+        const element: Record<string, unknown> = {
+          id: (prochainIdentifiant += 1),
+          position: elements.reduce((max, e) => Math.max(max, Number(e.position)), 0) + 1,
+        }
+        for (const champ of OBLIGATOIRES[listeAnnuaire]) element[champ] = corps[champ]
+        for (const champ of FACULTATIFS[listeAnnuaire]) element[champ] = corps[champ] ?? null
+        elements.push(element)
+        repondre(201, { data: element })
+      })
+    }
+
+    const ordreAnnuaire = Object.entries(LISTE_ANNUAIRE).find(
+      ([prefixe]) => chemin === `${prefixe}/order`,
+    )
+    if (ordreAnnuaire && methode === 'PUT') {
+      return void lireCorps().then((corps) => {
+        const ids = Array.isArray(corps?.ids) ? (corps.ids as number[]) : null
+        if (ids === null) return repondre(422, { message: 'Liste d identifiants attendue.' })
+        const elements = annuaire()[ordreAnnuaire[1]]
+        // Au contrat : la liste doit porter TOUS les identifiants, une fois
+        // chacun, sans identifiant etranger. Sinon 422, rien n'est modifie.
+        const attendus = new Set(elements.map((e) => e.id as number))
+        const valide =
+          ids.length === attendus.size &&
+          ids.every((id) => attendus.has(id)) &&
+          new Set(ids).size === ids.length
+        if (!valide) {
+          return repondre(422, {
+            message: 'La liste des identifiants est incomplete ou invalide.',
+            errors: { ids: ['La liste des identifiants est incomplete ou invalide.'] },
+          })
+        }
+        const reordonnes = ids.map((id) => elements.find((e) => e.id === id)!)
+        reordonnes.forEach((element, index) => (element.position = index + 1))
+        annuaire()[ordreAnnuaire[1]] = reordonnes
+        repondre(200, { data: reordonnes })
+      })
+    }
+
+    const viseAnnuaire = Object.entries(LISTE_ANNUAIRE)
+      .map(([prefixe, nom]) => {
+        const reste = chemin.startsWith(`${prefixe}/`) ? chemin.slice(prefixe.length + 1) : null
+        return reste !== null && /^\d+$/.test(reste) ? { liste: nom, id: Number(reste) } : null
+      })
+      .find((v) => v !== null)
+
+    if (viseAnnuaire) {
+      const elements = annuaire()[viseAnnuaire.liste]
+      const index = elements.findIndex((e) => e.id === viseAnnuaire.id)
+      if (index === -1) return repondre(404, { message: 'Élément introuvable.' })
+
+      if (methode === 'DELETE') {
+        // Au contrat : les positions restantes gardent leur trou jusqu'au
+        // prochain reordonnancement. Surtout ne pas renumeroter ici.
+        elements.splice(index, 1)
+        return repondre(204, null)
+      }
+
+      if (methode === 'PATCH') {
+        return void lireCorps().then((corps) => {
+          if (corps === null) return repondre(422, { message: 'Corps de requete illisible.' })
+          for (const champ of OBLIGATOIRES[viseAnnuaire.liste]) {
+            if (
+              champ in corps &&
+              (typeof corps[champ] !== 'string' || (corps[champ] as string).trim() === '')
+            ) {
+              return repondre(422, {
+                message: 'Le champ ' + champ + ' ne peut pas etre efface.',
+                errors: { [champ]: ['Le champ ' + champ + ' ne peut pas etre efface.'] },
+              })
+            }
+          }
+          Object.assign(elements[index]!, corps)
+          repondre(200, { data: elements[index] })
+        })
+      }
+    }
+
     if (chemin === '/admin/content/media' && methode === 'POST') {
       // Le serveur de developpement ne stocke rien : il rend une vignette
       // existante, ce qui suffit a eprouver l'enchainement de l'ecran.
@@ -266,6 +483,513 @@ export function mockApi(): Plugin {
 
     if (chemin === '/auth/logout' && methode === 'POST') {
       return repondre(204, null)
+    }
+
+    // --- Jours feries : calendrier et bloc de reglages ---------------------
+    // Fidele a `docs/contrat-jours-feries.md` du back : 200 systematique,
+    // listes vides plutot qu'absences, tri par date puis identifiant, PUT des
+    // reglages en REMPLACEMENT complet.
+    const calendrier = () => calendriers[estGabon ? 'gabon' : 'guinee']!
+
+    const TYPES_DE_FETE = ['legale', 'nationale', 'religieuse']
+
+    /** Annees pourvues, croissantes et sans doublon. L'annee servie n'y est pas ajoutee. */
+    const anneesPourvues = () =>
+      [...new Set(calendrier().holidays.map((fete) => Number(String(fete.date).slice(0, 4))))].sort(
+        (a, b) => a - b,
+      )
+
+    const feriesDeLAnnee = (annee: number) =>
+      calendrier()
+        .holidays.filter((fete) => String(fete.date).startsWith(String(annee)))
+        .sort((a, b) =>
+          String(a.date) === String(b.date)
+            ? Number(a.id) - Number(b.id)
+            : String(a.date).localeCompare(String(b.date)),
+        )
+
+    if ((chemin === '/content/holidays' || chemin === '/admin/holidays') && methode === 'GET') {
+      const brut = url.searchParams.get('year')
+      const annee = brut === null ? new Date().getFullYear() : Number(brut)
+      if (!Number.isInteger(annee) || annee < 1900 || annee > 2100) {
+        return repondre(422, { message: "L'annee doit etre comprise entre 1900 et 2100." })
+      }
+      return repondre(200, {
+        data: {
+          year: annee,
+          available_years: anneesPourvues(),
+          intro: calendrier().intro,
+          document_url: calendrier().document_url,
+          holidays: feriesDeLAnnee(annee),
+        },
+      })
+    }
+
+    if (chemin === '/admin/holidays' && methode === 'POST') {
+      return void lireCorps().then((corps) => {
+        if (corps === null) return repondre(422, { message: 'Corps de requete illisible.' })
+        const manquant = ['name', 'date', 'type'].find(
+          (champ) => typeof corps[champ] !== 'string' || String(corps[champ]).trim() === '',
+        )
+        if (manquant !== undefined) {
+          return repondre(422, { message: 'Le nom, la date et le type sont obligatoires.' })
+        }
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(String(corps.date))) {
+          return repondre(422, { message: 'La date doit etre au format AAAA-MM-JJ.' })
+        }
+        if (!TYPES_DE_FETE.includes(String(corps.type))) {
+          return repondre(422, { message: 'Le type de fete est inconnu.' })
+        }
+        const fete = {
+          id: (prochainIdentifiant += 1),
+          name: corps.name,
+          date: corps.date,
+          type: corps.type,
+          note: corps.note ?? null,
+        }
+        calendrier().holidays.push(fete)
+        repondre(201, { data: fete })
+      })
+    }
+
+    const feriePar = (id: number) => calendrier().holidays.find((fete) => fete.id === id)
+
+    if (/^\/admin\/holidays\/\d+$/.test(chemin)) {
+      const id = Number(chemin.split('/').pop())
+      const fete = feriePar(id)
+      // Une fete d'une autre ambassade n'existe pas du point de vue de
+      // l'appelante : 404, jamais 403.
+      if (fete === undefined) return repondre(404, { message: 'Fete introuvable.' })
+
+      if (methode === 'DELETE') {
+        const liste = calendrier().holidays
+        liste.splice(liste.indexOf(fete), 1)
+        return repondre(204, null)
+      }
+
+      if (methode === 'PATCH') {
+        return void lireCorps().then((corps) => {
+          if (corps === null) return repondre(422, { message: 'Corps de requete illisible.' })
+          for (const champ of ['name', 'date', 'type']) {
+            if (champ in corps && (corps[champ] === null || String(corps[champ]).trim() === '')) {
+              return repondre(422, { message: 'Le nom, la date et le type ne peuvent etre vides.' })
+            }
+          }
+          if ('type' in corps && !TYPES_DE_FETE.includes(String(corps.type))) {
+            return repondre(422, { message: 'Le type de fete est inconnu.' })
+          }
+          Object.assign(fete, corps)
+          repondre(200, { data: fete })
+        })
+      }
+    }
+
+    if (chemin === '/admin/holidays/settings') {
+      if (methode === 'DELETE') {
+        calendrier().intro = null
+        calendrier().document_url = null
+        return repondre(204, null)
+      }
+      if (methode === 'PUT') {
+        return void lireCorps().then((corps) => {
+          if (corps === null) return repondre(422, { message: 'Corps de requete illisible.' })
+          // Remplacement complet : un champ absent vaut null, comme au
+          // contrat. C'est le piege a reproduire ici, pas a adoucir.
+          calendrier().intro = (corps.intro as string | null) ?? null
+          calendrier().document_url = (corps.document_url as string | null) ?? null
+          repondre(200, {
+            data: { intro: calendrier().intro, document_url: calendrier().document_url },
+          })
+        })
+      }
+    }
+
+    // --- Module Evenements, administration ------------------------------
+    // Le plafond de 100 est celui du serveur : il rabat SILENCIEUSEMENT une
+    // limite plus grande. Le simuler ici evite de decouvrir cet ecart en
+    // production, ou une page reglee sur 500 lignes en rendrait 100.
+
+    if (chemin === '/admin/secure/events' && methode === 'GET') {
+      const tous = evenementsAdmin()
+      const limite = Math.min(100, Math.max(1, Number(url.searchParams.get('limit')) || 20))
+      const totalPages = Math.max(1, Math.ceil(tous.length / limite))
+      const page = Math.min(totalPages, Math.max(1, Number(url.searchParams.get('page')) || 1))
+      return repondre(200, {
+        data: tous.slice((page - 1) * limite, page * limite),
+        pagination: { page, limit: limite, total: tous.length, totalPages },
+      })
+    }
+
+    if (chemin === '/admin/secure/event-types' && methode === 'GET') {
+      return repondre(200, { data: typesEvenement() })
+    }
+
+    if (chemin === '/admin/secure/events' && methode === 'POST') {
+      return void lireCorps().then((corps) => {
+        const brouillon = corps ?? {}
+        const nom = String(brouillon.name ?? '')
+        // Le simulateur valide le minimum que le back valide, pour que l'ecran
+        // rencontre un 422 en developpement plutot qu'en production.
+        const manquants: Record<string, string[]> = {}
+        for (const champ of ['name', 'date', 'time', 'location']) {
+          if (!brouillon[champ]) manquants[champ] = ['Ce champ est obligatoire.']
+        }
+        if (Object.keys(manquants).length > 0) {
+          return repondre(422, {
+            message: 'Les donnees fournies sont invalides.',
+            errors: manquants,
+          })
+        }
+
+        const slug = `${slugifier(nom)}-${creationsAdmin.length + 1}`
+        const capacite = brouillon.capacity == null ? null : Number(brouillon.capacity)
+        const type = typesEvenement().find((t) => t.slug === brouillon.typeEventSlug)
+        const cree: Record<string, unknown> = {
+          slug,
+          name: nom,
+          date: brouillon.date,
+          time: brouillon.time,
+          location: brouillon.location,
+          description: brouillon.description ?? '',
+          status: 'ACTIVE',
+          createdAt: new Date().toISOString(),
+          logoUrl: null,
+          registrationOpen: brouillon.registrationOpen !== false,
+          registrationDeadline: brouillon.registrationDeadline ?? null,
+          capacity: capacite,
+          registeredCount: 0,
+          spotsRemaining: capacite,
+          // On rend `typeLabel`, jamais le slug recu : la reponse suit la forme
+          // de lecture, sans quoi le front lirait a la creation une forme qu'il
+          // ne reverra plus jamais ensuite.
+          typeLabel: type?.name ?? null,
+          participants: [],
+        }
+        creationsAdmin.unshift(cree)
+        return repondre(201, { data: cree })
+      })
+    }
+
+    // Publication : POST publie, DELETE retire, sans corps. La reponse du
+    // POST ne porte pas l'evenement — le front recharge la fiche derriere,
+    // et le simulateur l'y oblige en rendant la meme forme que le back.
+    const publication = /^\/admin\/secure\/events\/(.+)\/publication$/.exec(chemin)
+    if (publication && (methode === 'POST' || methode === 'DELETE')) {
+      const slug = decodeURIComponent(publication[1]!)
+      const trouve = evenementsAdmin().find((evenement) => evenement.slug === slug)
+      if (!trouve) return repondre(404, { message: "Cet evenement n'existe pas." })
+      const publie = methode === 'POST'
+      const retouche = {
+        ...retouchesAdmin.get(slug),
+        isPublished: publie,
+        publishedAt: publie ? new Date().toISOString() : null,
+      }
+      retouchesAdmin.set(slug, retouche)
+      if (!publie) return repondre(204, null)
+      return repondre(200, { data: { event_slug: slug, published: true } })
+    }
+
+    // Le QR d'inscription. 409 tant que l'evenement n'est pas publie,
+    // comme le back : avant publication, il n'existe aucune page
+    // d'inscription vers laquelle pointer. Le SVG rendu est un motif
+    // factice : le simulateur eprouve l'enchainement de l'ecran, pas la
+    // lisibilite du QR.
+    const qrInscription = /^\/admin\/secure\/events\/(.+)\/registration-qr$/.exec(chemin)
+    if (qrInscription && methode === 'GET') {
+      const slug = decodeURIComponent(qrInscription[1]!)
+      const trouve = evenementsAdmin().find((evenement) => evenement.slug === slug)
+      if (!trouve) return repondre(404, { message: "Cet evenement n'existe pas." })
+      if (trouve.isPublished !== true) {
+        return repondre(409, { message: "Publiez l'evenement avant de demander son QR." })
+      }
+      const svg =
+        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 8 8">' +
+        '<rect width="8" height="8" fill="#fff"/>' +
+        '<path fill="#000" d="M0 0h3v3H0zM5 0h3v3H5zM0 5h3v3H0zM4 4h1v1H4zM6 5h1v1H6zM5 6h1v2H5z"/>' +
+        '</svg>'
+      return repondre(200, {
+        data: {
+          registrationUrl: `http://${requete.headers.host ?? 'localhost:5173'}/evenements/inscription/dev-${encodeURIComponent(slug)}`,
+          qr: `data:image/svg+xml;base64,${Buffer.from(svg).toString('base64')}`,
+        },
+      })
+    }
+
+    // Le logo, en trois temps comme en production : POST presigne, PUT
+    // direct vers le "stockage" (ici une route locale /dev-stockage), GET
+    // des octets. Le PUT ne doit porter aucun jeton : l'URL presignee se
+    // suffit.
+    const logoEvenement = /^\/admin\/secure\/events\/(.+?)\/logo$/.exec(chemin)
+    if (logoEvenement && methode === 'POST') {
+      const slug = decodeURIComponent(logoEvenement[1]!)
+      const trouve = evenementsAdmin().find((evenement) => evenement.slug === slug)
+      if (!trouve) return repondre(404, { message: "Cet evenement n'existe pas." })
+      return void lireCorps().then((corps) => {
+        const mime = corps?.mimeType
+        if (mime !== 'image/png' && mime !== 'image/jpeg' && mime !== 'image/webp') {
+          return repondre(422, {
+            message: 'Les donnees fournies sont invalides.',
+            errors: { mimeType: ['Formats acceptes : PNG, JPEG ou WebP.'] },
+          })
+        }
+        if (typeof corps?.size === 'number' && corps.size > 2 * 1024 * 1024) {
+          return repondre(422, {
+            message: 'Les donnees fournies sont invalides.',
+            errors: { size: ['Le logo ne doit pas depasser 2 Mo.'] },
+          })
+        }
+        return repondre(200, {
+          success: true,
+          data: {
+            uploadUrl: `http://${requete.headers.host ?? 'localhost:5173'}/api/dev-stockage/${encodeURIComponent(slug)}?type=${encodeURIComponent(String(mime))}`,
+            key: `dev/events/${slug}/logo`,
+          },
+        })
+      })
+    }
+    if (logoEvenement && methode === 'GET') {
+      const slug = decodeURIComponent(logoEvenement[1]!)
+      const depose = logosDev.get(slug)
+      if (!depose) return repondre(404, { message: "Cet evenement n'a pas de logo." })
+      reponse.statusCode = 200
+      reponse.setHeader('Content-Type', depose.type)
+      return void reponse.end(depose.octets)
+    }
+
+    const depotLogo = /^\/dev-stockage\/(.+)$/.exec(chemin)
+    if (depotLogo && methode === 'PUT') {
+      const slug = decodeURIComponent(depotLogo[1]!)
+      const type = url.searchParams.get('type') ?? 'application/octet-stream'
+      const morceaux: Buffer[] = []
+      requete.on('data', (morceau) => morceaux.push(morceau))
+      requete.on('end', () => {
+        logosDev.set(slug, { octets: Buffer.concat(morceaux), type })
+        repondre(200, null)
+      })
+      return
+    }
+
+    // L'ajout d'invites. Un pass par invite, dans l'ordre du tableau ; le
+    // QR est un PNG factice, le simulateur eprouve l'enchainement de
+    // l'ecran, pas la lisibilite du code. Le lot est tout ou rien, comme
+    // chez SecureCheck.
+    const ajoutInvites = /^\/admin\/secure\/events\/(.+?)\/guests$/.exec(chemin)
+    if (ajoutInvites && methode === 'POST') {
+      const slug = decodeURIComponent(ajoutInvites[1]!)
+      const trouve = evenementsAdmin().find((evenement) => evenement.slug === slug)
+      if (!trouve) return repondre(404, { message: "Cet evenement n'existe pas." })
+      if (String(trouve.status).toUpperCase() === 'CANCELLED') {
+        return repondre(422, {
+          message: "L'evenement est annule : aucun pass ne peut etre emis.",
+        })
+      }
+      return void lireCorps().then((corps) => {
+        const invites = corps?.guests
+        if (!Array.isArray(invites) || invites.length === 0 || invites.length > 500) {
+          return repondre(422, {
+            message: 'Les donnees fournies sont invalides.',
+            errors: { guests: ['Le lot doit compter de 1 a 500 invites.'] },
+          })
+        }
+        const erreurs: Record<string, string[]> = {}
+        invites.forEach((invite: Record<string, unknown>, rang: number) => {
+          for (const champ of ['firstName', 'lastName'] as const) {
+            if (typeof invite?.[champ] !== 'string' || invite[champ] === '') {
+              erreurs[`guests.${rang}.${champ}`] = ['Ce champ est obligatoire.']
+            }
+          }
+          if (invite?.email !== undefined && !/^[^@\s]+@[^@\s]+$/.test(String(invite.email))) {
+            erreurs[`guests.${rang}.email`] = ['Ce courriel est invalide.']
+          }
+        })
+        if (Object.keys(erreurs).length > 0) {
+          return repondre(422, {
+            message: 'Les donnees fournies sont invalides.',
+            errors: erreurs,
+          })
+        }
+        // Un pixel PNG : ce qui compte est la forme (data URL PNG), pas le motif.
+        const pixel =
+          'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAAAAAA6fptVAAAACklEQVR4nGNiAAAABgADNjd8qAAAAABJRU5ErkJggg=='
+        const passes = invites.map((invite: Record<string, unknown>, rang: number) => ({
+          credential: {
+            uidn: `GA9${String(rang + 1).padStart(5, '0')}`,
+            type: 'event',
+            holderName: `${invite.firstName} ${invite.lastName}`,
+            holderEmail: invite.email ?? null,
+            status: 'active',
+            validFrom: null,
+            validUntil: null,
+            maxScans: null,
+            scansUsed: 0,
+            currentlyInside: false,
+            rfidTag: null,
+            eventId: slug,
+            createdAt: new Date().toISOString(),
+          },
+          qr: pixel,
+        }))
+        const compte = Number(trouve.registeredCount ?? 0) + invites.length
+        const retouche = { ...retouchesAdmin.get(slug), registeredCount: compte }
+        retouchesAdmin.set(slug, retouche)
+        return repondre(201, {
+          success: true,
+          message: `${invites.length} pass emis.`,
+          data: { event: { ...trouve, registeredCount: compte }, passes },
+        })
+      })
+    }
+
+    // La feuille de presence et son export. L'etat de pointage est derive
+    // deterministiquement des participants de la fixture : le simulateur
+    // eprouve les filtres, la pagination et le telechargement, pas la
+    // realite des passages. Le decompte suit le contrat : calcule apres
+    // `search`, AVANT le filtre `present`.
+    const feuillePresence = /^\/admin\/secure\/events\/(.+?)\/attendance(\/export)?$/.exec(chemin)
+    if (feuillePresence && methode === 'GET') {
+      const slug = decodeURIComponent(feuillePresence[1]!)
+      const trouve = evenementsAdmin().find((evenement) => evenement.slug === slug)
+      if (!trouve) return repondre(404, { message: "Cet evenement n'existe pas." })
+
+      const participants = (trouve.participants ?? []) as {
+        fullName: string
+        email: string
+        uidn: string
+      }[]
+      const lignes = participants
+        .map((participant, rang) => {
+          const aPointe = rang % 3 !== 2
+          return {
+            uidn: participant.uidn,
+            fullName: participant.fullName,
+            email: rang % 7 === 5 ? null : participant.email,
+            hasCheckedIn: aPointe,
+            checkInAt: aPointe ? new Date(Date.now() - rang * 90_000).toISOString() : null,
+            currentlyInside: aPointe && rang % 6 === 0,
+            scansUsed: aPointe ? 1 + (rang % 3) : 0,
+          }
+        })
+        .sort((a, b) => a.fullName.localeCompare(b.fullName, 'fr'))
+
+      const terme = (url.searchParams.get('search') ?? '').trim().toLowerCase()
+      const cherchees =
+        terme === ''
+          ? lignes
+          : lignes.filter((ligne) =>
+              [ligne.fullName, ligne.email ?? '', ligne.uidn].some((champ) =>
+                champ.toLowerCase().includes(terme),
+              ),
+            )
+
+      const summary = {
+        totalPasses: cherchees.length,
+        present: cherchees.filter((ligne) => ligne.hasCheckedIn).length,
+        currentlyInside: cherchees.filter((ligne) => ligne.currentlyInside).length,
+        absent: cherchees.filter((ligne) => !ligne.hasCheckedIn).length,
+      }
+
+      const present = url.searchParams.get('present')
+      const retenues =
+        present === 'true' || present === 'false'
+          ? cherchees.filter((ligne) => ligne.hasCheckedIn === (present === 'true'))
+          : cherchees
+
+      if (feuillePresence[2]) {
+        const format = url.searchParams.get('format') ?? 'csv'
+        if (format !== 'csv' && format !== 'xlsx') {
+          return repondre(422, { message: "Format d'export inconnu : csv ou xlsx." })
+        }
+        // Meme en xlsx le simulateur sert du CSV : l'ecran n'ouvre pas le
+        // fichier, il eprouve le telechargement et le nom propose.
+        const champsCsv = (ligne: (typeof retenues)[number]) =>
+          [
+            ligne.uidn,
+            ligne.fullName,
+            ligne.email ?? '',
+            ligne.hasCheckedIn ? 'Oui' : 'Non',
+            ligne.checkInAt ?? '',
+            ligne.currentlyInside ? 'Oui' : 'Non',
+            String(ligne.scansUsed),
+          ].join(',')
+        const csv = [
+          'uidn,fullName,email,hasCheckedIn,checkInAt,currentlyInside,scansUsed',
+          ...retenues.slice(0, 10_000).map(champsCsv),
+        ].join('\n')
+        const jour = new Date().toISOString().slice(0, 10)
+        reponse.statusCode = 200
+        reponse.setHeader(
+          'Content-Type',
+          format === 'csv'
+            ? 'text/csv; charset=utf-8'
+            : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        )
+        reponse.setHeader(
+          'Content-Disposition',
+          `attachment; filename="presence-${slugifier(slug)}-${jour}.${format}"`,
+        )
+        return void reponse.end(csv)
+      }
+
+      const limite = Math.min(100, Math.max(1, Number(url.searchParams.get('limit')) || 20))
+      const totalPages = Math.max(1, Math.ceil(retenues.length / limite))
+      const page = Math.min(totalPages, Math.max(1, Number(url.searchParams.get('page')) || 1))
+      return repondre(200, {
+        data: retenues.slice((page - 1) * limite, page * limite),
+        pagination: { page, limit: limite, total: retenues.length, totalPages },
+        summary,
+      })
+    }
+
+    // La fiche d'un evenement. Un slug inconnu rend 404 avec un message
+    // francais, comme le back : c'est ce que la fiche affiche telle quelle.
+    const fiche = /^\/admin\/secure\/events\/([^/]+)$/.exec(chemin)
+    if (fiche && methode === 'PATCH') {
+      const slug = decodeURIComponent(fiche[1]!)
+      const trouve = evenementsAdmin().find((evenement) => evenement.slug === slug)
+      if (!trouve) return repondre(404, { message: "Cet evenement n'existe pas." })
+      return void lireCorps().then((corps) => {
+        const brouillon = { ...corps }
+        // L'annulation suit le contrat du 2026-09-14 : `status` s'envoie
+        // SEUL, la seule valeur acceptee est `cancelled` (majuscules
+        // tolerees en entree), un evenement deja annule rend 422 avec un
+        // message seul, et l'annulation depublie.
+        if ('status' in brouillon) {
+          const valeur = String(brouillon.status ?? '').toLowerCase()
+          if (valeur !== 'cancelled' || Object.keys(brouillon).length > 1) {
+            return repondre(422, {
+              message: 'Les donnees fournies sont invalides.',
+              errors: { status: ["Seule l'annulation est acceptee, et elle s'envoie seule."] },
+            })
+          }
+          if (String(trouve.status).toLowerCase() === 'cancelled') {
+            return repondre(422, { message: 'Cet evenement est deja annule.' })
+          }
+          const retouche = {
+            ...retouchesAdmin.get(slug),
+            status: 'cancelled',
+            isPublished: false,
+            publishedAt: null,
+          }
+          retouchesAdmin.set(slug, retouche)
+          return repondre(200, { data: { ...trouve, ...retouche } })
+        }
+        // `typeEventSlug` s'ecrit mais ne se relit pas : on le traduit en
+        // `typeLabel`, comme le fait le back.
+        if ('typeEventSlug' in brouillon) {
+          const type = typesEvenement().find((t) => t.slug === brouillon.typeEventSlug)
+          brouillon.typeLabel = type?.name ?? null
+          delete brouillon.typeEventSlug
+        }
+        const retouche = { ...retouchesAdmin.get(slug), ...brouillon }
+        retouchesAdmin.set(slug, retouche)
+        return repondre(200, { data: { ...trouve, ...retouche } })
+      })
+    }
+    if (fiche && methode === 'GET') {
+      const slug = decodeURIComponent(fiche[1]!)
+      const trouve = evenementsAdmin().find((evenement) => evenement.slug === slug)
+      if (!trouve) return repondre(404, { message: "Cet evenement n'existe pas." })
+      return repondre(200, { data: trouve })
     }
 
     // --- Module Evenements, surface visiteur ---------------------------

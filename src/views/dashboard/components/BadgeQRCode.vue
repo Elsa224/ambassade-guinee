@@ -22,7 +22,7 @@
         <div
           class="w-28 h-28 bg-white rounded-full flex items-center justify-center shadow-md border-4 border-primary -mt-14"
         >
-          <img :src="logo" alt="Logo" class="w-20 h-20 object-contain mt-6" />
+          <img v-if="logo" :src="logo" alt="Logo" class="w-20 h-20 object-contain mt-6" />
         </div>
       </div>
 
@@ -108,9 +108,13 @@
 
 <script setup>
 import { ref } from 'vue'
+import { useIdentite } from '@/tenant/identite'
 
-// Logo et QR par défaut
-const logo = ref('/logo.png') // Mets ton vrai logo ici
+// Le logo vient du tenant : un fichier livre avec le build vaudrait pour
+// tous les domaines et afficherait l'embleme d'une autre ambassade.
+const { logo } = useIdentite()
+
+// QR par défaut
 const qrCodeUrl = ref('https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=ExempleQR')
 
 // Exemple de données du badge (à remplacer dynamiquement plus tard)

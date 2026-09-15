@@ -6,6 +6,10 @@ import { defineComponent, h } from 'vue'
 import Layout from '@/layouts/Layout.vue'
 import Home from '@/views/Home.vue'
 import Actualite from '@/views/Actualite.vue'
+import Ambassadeur from '@/components/ambassade/Ambassadeur.vue'
+import Chancellerie from '@/components/ambassade/Chancellerie.vue'
+import ConsulsHonoraires from '@/components/ambassade/ConsulsHonoraires.vue'
+import Calendrier from '@/components/ambassade/Calendrier.vue'
 import { useTenantStore } from '@/stores/tenant'
 import type { Embassy } from '@/api/bootstrap'
 import { GUINEE, GABON, GABON_AVANT_COLONNES } from '@/api/fixtures/tenants'
@@ -43,6 +47,12 @@ const Vide = defineComponent({ render: () => h('div') })
 /** Ce que le CMS sert pour le contenu d'accueil pendant un test donne. */
 let contenuServi: unknown
 
+/** Ce que le CMS sert pour l'annuaire pendant un test donne. */
+let annuaireServi: unknown
+
+/** Ce que le CMS sert pour les jours feries pendant un test donne. */
+let feriesServies: unknown
+
 function reponse(corps: unknown) {
   return new Response(JSON.stringify(corps), {
     status: 200,
@@ -57,7 +67,10 @@ function routeur(chemin: string) {
       { path: '/', component: Home },
       { path: '/actualite', component: Actualite },
       { path: '/presentation', component: Vide },
-      { path: '/ambassadeur', component: Vide },
+      { path: '/ambassadeur', component: Ambassadeur },
+      { path: '/chancellerie', component: Chancellerie },
+      { path: '/consuls-honoraires', component: ConsulsHonoraires },
+      { path: '/calendrier', component: Calendrier },
       { path: '/demarche-ligne', component: Vide },
       { path: '/construction', component: Vide },
       { path: '/actualites/:slug', component: Vide },
@@ -87,15 +100,26 @@ describe("etancheite de l'identite entre ambassades", () => {
     // liste d'articles a la place de son contenu.
     vi.stubGlobal(
       'fetch',
-      vi.fn((url: string) =>
-        Promise.resolve(
-          String(url).includes('/api/content/home')
-            ? reponse(contenuServi)
-            : reponse({ data: articlesGabon.data }),
-        ),
-      ),
+      vi.fn((url: string) => {
+        const chemin = String(url)
+        if (chemin.includes('/api/content/home')) return Promise.resolve(reponse(contenuServi))
+        if (chemin.includes('/api/content/directory'))
+          return Promise.resolve(reponse(annuaireServi))
+        if (chemin.includes('/api/content/holidays')) return Promise.resolve(reponse(feriesServies))
+        return Promise.resolve(reponse({ data: articlesGabon.data }))
+      }),
     )
     contenuServi = { data: { welcome: null, leaders: [], showcase: [] } }
+    annuaireServi = { data: { staff: [], consuls: [] } }
+    feriesServies = {
+      data: {
+        year: 2026,
+        available_years: [],
+        intro: null,
+        document_url: null,
+        holidays: [],
+      },
+    }
   })
 
   afterEach(() => {
@@ -107,6 +131,115 @@ describe("etancheite de l'identite entre ambassades", () => {
     const traces = wrapper.text().match(IDENTITE_ETRANGERE)
 
     expect(traces).toBeNull()
+  })
+
+  it("ne laisse aucune trace guineenne sur la page de l'ambassadeur", async () => {
+    // Cette page etait entierement ecrite en dur avec la biographie de
+    // l'ambassadeur de Guinee aux Etats-Unis : c'etait l'une des trois
+    // fuites arrivees en production. Elle est desormais servie par le CMS ;
+    // vide comme remplie du contenu gabonais, rien de guineen ne doit rester.
+    const vide = await rendre('/ambassadeur', GABON)
+    expect(vide.text().match(IDENTITE_ETRANGERE)).toBeNull()
+
+    contenuServi = {
+      data: {
+        ambassador: {
+          name: 'Persis Lionel Essono Ondo',
+          title: 'Ambassadeur Extraordinaire et Plenipotentiaire',
+          image_url: null,
+          body_html: '<p>Diplomate de carriere au service de la Republique Gabonaise.</p>',
+        },
+      },
+    }
+    const remplie = await rendre('/ambassadeur', GABON)
+    expect(remplie.text()).toContain('Persis Lionel Essono Ondo')
+    expect(remplie.text().match(IDENTITE_ETRANGERE)).toBeNull()
+  })
+
+  it('ne laisse aucune trace guineenne sur la page de la chancellerie', async () => {
+    // La page portait en dur l'equipe diplomatique de l'ambassade de Guinee
+    // aux Etats-Unis, sa juridiction et sa mission : vide comme remplie du
+    // personnel gabonais, rien de guineen ne doit rester.
+    const vide = await rendre('/chancellerie', GABON)
+    expect(vide.text().match(IDENTITE_ETRANGERE)).toBeNull()
+
+    annuaireServi = {
+      data: {
+        staff: [
+          {
+            id: 1,
+            name: 'Awa Ndong',
+            role: 'Premier Conseiller',
+            email: null,
+            phone: null,
+            image_url: null,
+            position: 1,
+          },
+        ],
+        consuls: [],
+      },
+    }
+    const remplie = await rendre('/chancellerie', GABON)
+    expect(remplie.text()).toContain('Awa Ndong')
+    expect(remplie.text().match(IDENTITE_ETRANGERE)).toBeNull()
+  })
+
+  it('ne laisse aucune trace guineenne sur la page des consuls honoraires', async () => {
+    // La page portait en dur deux consuls americains, leurs adresses, leurs
+    // numeros et le telephone de Washington.
+    const vide = await rendre('/consuls-honoraires', GABON)
+    expect(vide.text().match(IDENTITE_ETRANGERE)).toBeNull()
+
+    annuaireServi = {
+      data: {
+        staff: [],
+        consuls: [
+          {
+            id: 1,
+            name: 'Mariam Diallo',
+            role: 'Consul honoraire',
+            city: 'Kankan',
+            address: 'Rue 12, Kankan',
+            email: null,
+            phone: null,
+            position: 1,
+          },
+        ],
+      },
+    }
+    const remplie = await rendre('/consuls-honoraires', GABON)
+    expect(remplie.text()).toContain('Mariam Diallo')
+    expect(remplie.text().match(IDENTITE_ETRANGERE)).toBeNull()
+  })
+
+  it('ne laisse aucune trace guineenne sur le calendrier des jours feries', async () => {
+    // La page portait en dur l'annee 2023, le decret guineen, treize fetes,
+    // une image du calendrier guineen et un tableau recapitulatif.
+    const vide = await rendre('/calendrier', GABON)
+    expect(vide.text().match(IDENTITE_ETRANGERE)).toBeNull()
+    expect(vide.text()).not.toContain('PRG')
+
+    feriesServies = {
+      data: {
+        year: 2026,
+        available_years: [2026],
+        intro: null,
+        document_url: null,
+        holidays: [
+          {
+            id: 1,
+            name: 'Fete de l Independance',
+            date: '2026-08-17',
+            type: 'nationale',
+            note: null,
+          },
+        ],
+      },
+    }
+    const remplie = await rendre('/calendrier', GABON)
+    expect(remplie.text()).toContain('17 août')
+    expect(remplie.text().match(IDENTITE_ETRANGERE)).toBeNull()
+    expect(remplie.text()).not.toContain('PRG')
   })
 
   it('ne laisse aucune trace guineenne sur la page des actualites', async () => {

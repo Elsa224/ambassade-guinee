@@ -43,6 +43,8 @@ import Evenements from '@/views/evenements/Evenements.vue'
 import Dashboard from '@/views/dashboard/Dashboard.vue'
 import Articles from '@/views/dashboard/Articles.vue'
 import AccueilContenu from '@/views/dashboard/contenu/AccueilContenu.vue'
+import AnnuaireAdmin from '@/views/dashboard/annuaire/AnnuaireAdmin.vue'
+import JoursFeriesAdmin from '@/views/dashboard/jours-feries/JoursFeriesAdmin.vue'
 import Actualites from '@/views/dashboard/Actualites.vue'
 import Galerie from '@/views/dashboard/Galerie.vue'
 import Nouvelles from '@/views/dashboard/Nouvelles.vue'
@@ -50,6 +52,12 @@ import Nouvelles from '@/views/dashboard/Nouvelles.vue'
 import Utilisateur from '@/views/dashboard/Utilisateur.vue'
 import Scanner from '@/views/dashboard/Scanner.vue'
 import Evenement from '@/views/dashboard/Evenement.vue'
+import ListeEvenementsAdmin from '@/views/dashboard/evenements/ListeEvenements.vue'
+import FicheEvenementAdmin from '@/views/dashboard/evenements/FicheEvenement.vue'
+import RacineEvenementsAdmin from '@/views/dashboard/evenements/RacineEvenements.vue'
+import FormulaireEvenementAdmin from '@/views/dashboard/evenements/FormulaireEvenement.vue'
+import FeuillePresenceAdmin from '@/views/dashboard/evenements/FeuillePresence.vue'
+import AjoutInvitesAdmin from '@/views/dashboard/evenements/AjoutInvites.vue'
 import Visiteur from '@/views/dashboard/Visiteur.vue'
 import Demande from '@/views/dashboard/Demande.vue'
 import Presence from '@/views/dashboard/Presence.vue'
@@ -187,6 +195,40 @@ const router = createRouter({
         { path: '', name: 'dashboard', component: Dashboard },
         { path: 'articles', name: 'articles', component: Articles },
         { path: 'contenu-accueil', name: 'contenu-accueil', component: AccueilContenu },
+        { path: 'annuaire', name: 'annuaire-admin', component: AnnuaireAdmin },
+        { path: 'jours-feries', name: 'jours-feries-admin', component: JoursFeriesAdmin },
+        {
+          path: 'evenements',
+          component: RacineEvenementsAdmin,
+          children: [
+            { path: '', name: 'evenements-admin', component: ListeEvenementsAdmin },
+            // `nouveau` est declare avant `:slug` : l'ordre n'est pas ce qui
+            // tranche — vue-router classe le segment fixe au-dessus du
+            // parametre — mais le lire dans cet ordre evite de croire le
+            // contraire en relisant.
+            {
+              path: 'nouveau',
+              name: 'evenement-admin-nouveau',
+              component: FormulaireEvenementAdmin,
+            },
+            { path: ':slug', name: 'evenement-admin', component: FicheEvenementAdmin },
+            {
+              path: ':slug/modifier',
+              name: 'evenement-admin-modifier',
+              component: FormulaireEvenementAdmin,
+            },
+            {
+              path: ':slug/presence',
+              name: 'evenement-admin-presence',
+              component: FeuillePresenceAdmin,
+            },
+            {
+              path: ':slug/invites',
+              name: 'evenement-admin-invites',
+              component: AjoutInvitesAdmin,
+            },
+          ],
+        },
         { path: 'actualites', name: 'actualites', component: Actualites },
         { path: 'galerie', name: 'galerie', component: Galerie },
         { path: 'nouvelles', name: 'nouvelles', component: Nouvelles },

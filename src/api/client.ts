@@ -18,6 +18,23 @@ export class ApiError extends Error {
     this.statut = statut
     this.corps = corps
   }
+
+  /**
+   * Vrai si le serveur a lui-meme fourni un message, faux si le notre est
+   * fabrique faute de JSON exploitable.
+   *
+   * La distinction compte des qu'un intermediaire repond a la place de
+   * l'application — un 413 du serveur frontal rendu en HTML, par exemple :
+   * « Erreur 413 » est exact, et illisible pour la personne qui televerse.
+   */
+  get corpsPorteUnMessage(): boolean {
+    return (
+      this.corps !== null &&
+      typeof this.corps === 'object' &&
+      'message' in this.corps &&
+      typeof (this.corps as { message: unknown }).message === 'string'
+    )
+  }
 }
 
 let jeton: string | null = null
@@ -108,4 +125,60 @@ export function apiUpload<T>(chemin: string, formulaire: FormData): Promise<T> {
 
 export function apiDelete(chemin: string): Promise<void> {
   return requete<void>(chemin, { method: 'DELETE' }, false)
+}
+
+/** Un fichier servi par le back, avec le nom qu'il propose. */
+export interface FichierServi {
+  blob: Blob
+  nomFichier: string | null
+}
+
+/** Nom de fichier porte par un en-tete Content-Disposition, ou `null`. */
+export function nomDeContentDisposition(valeur: string | null): string | null {
+  if (!valeur) return null
+  const trouve = /filename="([^"]+)"/.exec(valeur)
+  return trouve?.[1] ?? null
+}
+
+/**
+ * Recupere un fichier protege par le jeton porteur.
+ *
+ * Un `<a href>` n'envoie pas d'en-tete `Authorization` : tout export de la
+ * surface d'administration passe donc par ici, puis par une URL d'objet.
+ * En cas d'echec le back repond en JSON, avec le meme contrat d'erreur que
+ * les autres routes : on le traduit en `ApiError`, jamais en fichier.
+ */
+export async function apiFichier(chemin: string): Promise<FichierServi> {
+  const enTetes: Record<string, string> = {}
+  if (jeton) enTetes.Authorization = `Bearer ${jeton}`
+
+  let reponse: Response
+  try {
+    reponse = await fetch(chemin, { headers: enTetes })
+  } catch (erreur) {
+    throw new ApiError(erreur instanceof Error ? erreur.message : 'Serveur injoignable', 0, null)
+  }
+
+  if (!reponse.ok) {
+    if (reponse.status === 401 && surNonAutorise) {
+      surNonAutorise()
+    }
+    const texte = await reponse.text()
+    let corps: unknown = null
+    try {
+      corps = JSON.parse(texte)
+    } catch {
+      corps = texte
+    }
+    const message =
+      corps !== null && typeof corps === 'object' && 'message' in corps
+        ? String((corps as { message: unknown }).message)
+        : `Erreur ${reponse.status}`
+    throw new ApiError(message, reponse.status, corps)
+  }
+
+  return {
+    blob: await reponse.blob(),
+    nomFichier: nomDeContentDisposition(reponse.headers.get('Content-Disposition')),
+  }
 }

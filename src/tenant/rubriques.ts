@@ -7,18 +7,21 @@
  * rattachee ici a un drapeau que le tenant declare dans `modules`.
  */
 export const RUBRIQUE_PAR_CHEMIN: Readonly<Record<string, string>> = {
-  '/chancellerie': 'chancellerie',
+  // `/chancellerie`, `/consuls-honoraires` et `/calendrier` n'y figurent
+  // plus : les trois pages sont servies par le CMS et se retractent
+  // d'elles-memes quand il ne sert rien, comme `/ambassadeur`. Leur garde
+  // n'existait que parce que leur contenu etait ecrit en dur.
   '/services-ambassadeur': 'services',
   // Le formulaire porte les pieces exigees par un seul pays d'accueil
   // (« preuve de residence aux USA ») : il suit la rubrique des services et
   // n'est pas un chemin neutre, contrairement a ce qu'on avait suppose.
   '/demarche-ligne': 'services',
-  '/consuls-honoraires': 'consuls_honoraires',
-  '/calendrier': 'calendrier',
   '/consulat': 'consulat',
   '/rendez-vous': 'rendez_vous',
   '/presentation': 'presentation',
-  '/ambassadeur': 'ambassadeur',
+  // `/ambassadeur` ne figure plus ici : la page est servie par le bloc
+  // `ambassador` du CMS et se retracte d'elle-meme quand il est vide. La
+  // garde n'existait que parce que la biographie etait ecrite en dur.
   '/relations-bilaterales': 'bilateral',
   '/usa': 'bilateral',
   '/costa-rica': 'bilateral',
