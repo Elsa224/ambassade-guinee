@@ -1,4 +1,4 @@
-import { apiGet } from './client'
+import { apiGet, apiPost, apiPut, apiPatch, apiDelete, apiUpload } from './client'
 
 /**
  * Calendrier des jours feries de l'ambassade.
@@ -138,4 +138,100 @@ export async function recupererCalendrier(annee?: number): Promise<CalendrierFer
     annee === undefined ? '/api/content/holidays' : `/api/content/holidays?year=${annee}`
   const reponse = await apiGet<Enveloppe<Partial<CalendrierFeries>>>(chemin)
   return normaliserCalendrier(reponse.data)
+}
+
+// --- Administration -------------------------------------------------------
+
+const ADMIN = '/api/admin/holidays'
+
+/** Meme enveloppe que la lecture visiteur : un seul appel a l'ouverture. */
+export async function recupererCalendrierAdmin(annee?: number): Promise<CalendrierFeries> {
+  const chemin = annee === undefined ? ADMIN : `${ADMIN}?year=${annee}`
+  const reponse = await apiGet<Enveloppe<Partial<CalendrierFeries>>>(chemin)
+  return normaliserCalendrier(reponse.data)
+}
+
+/**
+ * Champs saisissables d'une fete.
+ *
+ * `note` a `null` l'efface ; `name`, `date` et `type` n'ont pas de valeur
+ * vide qui ait un sens et rendent 422 a `null`.
+ */
+export type FeteSaisie = {
+  name: string
+  date: string
+  type: TypeDeFete
+  note: string | null
+}
+
+export async function ajouterFete(saisie: FeteSaisie): Promise<JourFerie> {
+  const reponse = await apiPost<Enveloppe<JourFerie>>(ADMIN, saisie)
+  return reponse.data
+}
+
+export async function modifierFete(id: number, saisie: Partial<FeteSaisie>): Promise<JourFerie> {
+  const reponse = await apiPatch<Enveloppe<JourFerie>>(`${ADMIN}/${id}`, saisie)
+  return reponse.data
+}
+
+export function supprimerFete(id: number): Promise<void> {
+  return apiDelete(`${ADMIN}/${id}`)
+}
+
+/** Le bloc de reglages : texte de presentation et document. */
+export interface ReglagesFeries {
+  intro: string | null
+  document_url: string | null
+}
+
+/**
+ * Remplace le bloc de reglages. ATTENTION : c'est un REMPLACEMENT COMPLET,
+ * pas une fusion.
+ *
+ * Un champ absent du corps vaut `null` au contrat : un enregistrement ne
+ * portant que `intro` effacerait le document. L'appelant envoie donc toujours
+ * les deux champs, y compris la valeur relue en lecture qu'il n'a pas
+ * modifiee. La signature l'impose plutot que de l'esperer.
+ */
+export async function enregistrerReglages(reglages: ReglagesFeries): Promise<ReglagesFeries> {
+  const reponse = await apiPut<Enveloppe<ReglagesFeries>>(`${ADMIN}/settings`, reglages)
+  return reponse.data
+}
+
+/** Efface le bloc entier. Equivaut a un enregistrement de corps vide. */
+export function supprimerReglages(): Promise<void> {
+  return apiDelete(`${ADMIN}/settings`)
+}
+
+/** Bornes du contrat, reprises pour eviter un aller-retour previsible. */
+export const TYPE_DOCUMENT_ACCEPTE = 'application/pdf'
+export const TAILLE_DOCUMENT_MAX = 5 * 1024 * 1024
+
+/** Message d'un refus previsible, ou `null` si le fichier est acceptable. */
+export function refusDuDocument(fichier: File): string | null {
+  if (fichier.type !== TYPE_DOCUMENT_ACCEPTE) {
+    return 'Seul le format PDF est accepté.'
+  }
+  if (fichier.size > TAILLE_DOCUMENT_MAX) {
+    return 'Le document ne doit pas dépasser 5 Mo.'
+  }
+  return null
+}
+
+/**
+ * Televerse le document et rend son URL absolue.
+ *
+ * La route est distincte de celle des images, qui refuse les PDF. L'URL est
+ * batie sur l'hote de la requete : l'ecran doit donc etre ouvert sur le
+ * domaine de l'ambassade pour qu'une URL relue en lecture soit re-acceptee
+ * en ecriture, comme pour `image_url`.
+ */
+export async function televerserDocument(fichier: File): Promise<string> {
+  const formulaire = new FormData()
+  formulaire.append('file', fichier)
+  const reponse = await apiUpload<Enveloppe<{ url: string }>>(
+    '/api/admin/content/document',
+    formulaire,
+  )
+  return reponse.data.url
 }

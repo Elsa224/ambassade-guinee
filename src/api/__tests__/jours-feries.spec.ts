@@ -1,6 +1,10 @@
 import { describe, it, expect, afterEach, vi } from 'vitest'
 import {
   recupererCalendrier,
+  recupererCalendrierAdmin,
+  enregistrerReglages,
+  ajouterFete,
+  refusDuDocument,
   normaliserCalendrier,
   anneesDuSelecteur,
   formaterJour,
@@ -126,5 +130,44 @@ describe('api des jours feries', () => {
     expect(libelleDuType('nationale')).toBe('Fête nationale')
     expect(libelleDuType('religieuse')).toBe('Fête religieuse')
     expect(libelleDuType('autre')).toBe('Jour férié')
+  })
+
+  it("lit la surface d'administration sur sa propre route", async () => {
+    const appels = servir({ data: CALENDRIER })
+
+    await recupererCalendrierAdmin(2027)
+
+    expect(appels).toEqual(['/api/admin/holidays?year=2027'])
+  })
+
+  it('enregistre les reglages en envoyant les deux champs', async () => {
+    // L'enregistrement est un REMPLACEMENT complet au contrat : la signature
+    // exige les deux champs pour qu'un appelant ne puisse pas effacer le
+    // document en ne portant que le texte.
+    servir({ data: { intro: 'Texte', document_url: null } })
+
+    const reglages = await enregistrerReglages({ intro: 'Texte', document_url: null })
+
+    expect(reglages).toEqual({ intro: 'Texte', document_url: null })
+  })
+
+  it('poste une fete sur la route admin', async () => {
+    const appels = servir({ data: { id: 1 } })
+
+    await ajouterFete({ name: 'Fete', date: '2026-05-01', type: 'legale', note: null })
+
+    expect(appels).toEqual(['/api/admin/holidays'])
+  })
+
+  it('refuse un document qui n est pas un PDF, avant tout aller-retour', () => {
+    const image = new File(['x'], 'c.png', { type: 'image/png' })
+
+    expect(refusDuDocument(image)).toContain('PDF')
+  })
+
+  it('accepte un PDF de taille raisonnable', () => {
+    const pdf = new File(['x'], 'c.pdf', { type: 'application/pdf' })
+
+    expect(refusDuDocument(pdf)).toBeNull()
   })
 })
