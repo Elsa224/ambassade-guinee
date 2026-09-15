@@ -80,8 +80,8 @@ async function rendre(): Promise<VueWrapper> {
 
 function boutonPar(ecran: VueWrapper, libelle: string) {
   const bouton = ecran.findAll('button').find((b) => b.text().includes(libelle))
-  expect(bouton, `bouton « ${libelle} » introuvable`).toBeDefined()
-  return bouton!
+  if (bouton === undefined) throw new Error(`bouton « ${libelle} » introuvable`)
+  return bouton
 }
 
 beforeEach(() => {
