@@ -7,6 +7,8 @@ import Layout from '@/layouts/Layout.vue'
 import Home from '@/views/Home.vue'
 import Actualite from '@/views/Actualite.vue'
 import Ambassadeur from '@/components/ambassade/Ambassadeur.vue'
+import Chancellerie from '@/components/ambassade/Chancellerie.vue'
+import ConsulsHonoraires from '@/components/ambassade/ConsulsHonoraires.vue'
 import { useTenantStore } from '@/stores/tenant'
 import type { Embassy } from '@/api/bootstrap'
 import { GUINEE, GABON, GABON_AVANT_COLONNES } from '@/api/fixtures/tenants'
@@ -44,6 +46,9 @@ const Vide = defineComponent({ render: () => h('div') })
 /** Ce que le CMS sert pour le contenu d'accueil pendant un test donne. */
 let contenuServi: unknown
 
+/** Ce que le CMS sert pour l'annuaire pendant un test donne. */
+let annuaireServi: unknown
+
 function reponse(corps: unknown) {
   return new Response(JSON.stringify(corps), {
     status: 200,
@@ -59,6 +64,8 @@ function routeur(chemin: string) {
       { path: '/actualite', component: Actualite },
       { path: '/presentation', component: Vide },
       { path: '/ambassadeur', component: Ambassadeur },
+      { path: '/chancellerie', component: Chancellerie },
+      { path: '/consuls-honoraires', component: ConsulsHonoraires },
       { path: '/demarche-ligne', component: Vide },
       { path: '/construction', component: Vide },
       { path: '/actualites/:slug', component: Vide },
@@ -88,15 +95,16 @@ describe("etancheite de l'identite entre ambassades", () => {
     // liste d'articles a la place de son contenu.
     vi.stubGlobal(
       'fetch',
-      vi.fn((url: string) =>
-        Promise.resolve(
-          String(url).includes('/api/content/home')
-            ? reponse(contenuServi)
-            : reponse({ data: articlesGabon.data }),
-        ),
-      ),
+      vi.fn((url: string) => {
+        const chemin = String(url)
+        if (chemin.includes('/api/content/home')) return Promise.resolve(reponse(contenuServi))
+        if (chemin.includes('/api/content/directory'))
+          return Promise.resolve(reponse(annuaireServi))
+        return Promise.resolve(reponse({ data: articlesGabon.data }))
+      }),
     )
     contenuServi = { data: { welcome: null, leaders: [], showcase: [] } }
+    annuaireServi = { data: { staff: [], consuls: [] } }
   })
 
   afterEach(() => {
@@ -130,6 +138,62 @@ describe("etancheite de l'identite entre ambassades", () => {
     }
     const remplie = await rendre('/ambassadeur', GABON)
     expect(remplie.text()).toContain('Persis Lionel Essono Ondo')
+    expect(remplie.text().match(IDENTITE_ETRANGERE)).toBeNull()
+  })
+
+  it('ne laisse aucune trace guineenne sur la page de la chancellerie', async () => {
+    // La page portait en dur l'equipe diplomatique de l'ambassade de Guinee
+    // aux Etats-Unis, sa juridiction et sa mission : vide comme remplie du
+    // personnel gabonais, rien de guineen ne doit rester.
+    const vide = await rendre('/chancellerie', GABON)
+    expect(vide.text().match(IDENTITE_ETRANGERE)).toBeNull()
+
+    annuaireServi = {
+      data: {
+        staff: [
+          {
+            id: 1,
+            name: 'Awa Ndong',
+            role: 'Premier Conseiller',
+            email: null,
+            phone: null,
+            image_url: null,
+            position: 1,
+          },
+        ],
+        consuls: [],
+      },
+    }
+    const remplie = await rendre('/chancellerie', GABON)
+    expect(remplie.text()).toContain('Awa Ndong')
+    expect(remplie.text().match(IDENTITE_ETRANGERE)).toBeNull()
+  })
+
+  it('ne laisse aucune trace guineenne sur la page des consuls honoraires', async () => {
+    // La page portait en dur deux consuls americains, leurs adresses, leurs
+    // numeros et le telephone de Washington.
+    const vide = await rendre('/consuls-honoraires', GABON)
+    expect(vide.text().match(IDENTITE_ETRANGERE)).toBeNull()
+
+    annuaireServi = {
+      data: {
+        staff: [],
+        consuls: [
+          {
+            id: 1,
+            name: 'Mariam Diallo',
+            role: 'Consul honoraire',
+            city: 'Kankan',
+            address: 'Rue 12, Kankan',
+            email: null,
+            phone: null,
+            position: 1,
+          },
+        ],
+      },
+    }
+    const remplie = await rendre('/consuls-honoraires', GABON)
+    expect(remplie.text()).toContain('Mariam Diallo')
     expect(remplie.text().match(IDENTITE_ETRANGERE)).toBeNull()
   })
 

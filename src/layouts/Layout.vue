@@ -135,7 +135,6 @@
                   >L'Ambassadeur</router-link
                 >
                 <router-link
-                  v-if="rubriqueOuverte('/chancellerie')"
                   to="/chancellerie"
                   class="block px-4 py-2 text-sm text-gray-800 hover:bg-secondary hover:text-primary transition-all border-b border-gray-100"
                   >La chancellerie diplomatique</router-link
@@ -147,7 +146,6 @@
                   >Les Services</router-link
                 >
                 <router-link
-                  v-if="rubriqueOuverte('/consuls-honoraires')"
                   to="/consuls-honoraires"
                   class="block px-4 py-2 text-sm text-gray-800 hover:bg-secondary hover:text-primary transition-all border-b border-gray-100"
                   >Les consuls Honoraires</router-link
