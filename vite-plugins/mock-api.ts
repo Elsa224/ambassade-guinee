@@ -51,6 +51,19 @@ export function mockApi(): Plugin {
 
   let prochainIdentifiant = 100
 
+  /**
+   * Annuaire par tenant : personnel et consuls honoraires. Vide au depart,
+   * comme le vrai back pour une ambassade neuve ; tout se saisit par
+   * l'ecran d'administration.
+   */
+  const annuaires: Record<
+    string,
+    { staff: Record<string, unknown>[]; consuls: Record<string, unknown>[] }
+  > = {
+    gabon: { staff: [], consuls: [] },
+    guinee: { staff: [], consuls: [] },
+  }
+
   interface EvenementSimule {
     publicToken: string
     isRegistrationClosed: boolean
@@ -307,6 +320,120 @@ export function mockApi(): Plugin {
           if (corps === null) return repondre(422, { message: 'Corps de requete illisible.' })
           Object.assign(actuels[index]!, corps)
           repondre(200, { data: actuels[index] })
+        })
+      }
+    }
+
+    // --- Annuaire : personnel et consuls honoraires ------------------------
+    const annuaire = () => annuaires[estGabon ? 'gabon' : 'guinee']!
+
+    if (chemin === '/content/directory' || chemin === '/admin/directory') {
+      return repondre(200, { data: annuaire() })
+    }
+
+    const LISTE_ANNUAIRE: Record<string, 'staff' | 'consuls'> = {
+      '/admin/directory/staff': 'staff',
+      '/admin/directory/consuls': 'consuls',
+    }
+
+    /** Champs obligatoires au contrat : name/role, plus city pour un consul. */
+    const OBLIGATOIRES: Record<'staff' | 'consuls', string[]> = {
+      staff: ['name', 'role'],
+      consuls: ['name', 'role', 'city'],
+    }
+
+    const FACULTATIFS: Record<'staff' | 'consuls', string[]> = {
+      staff: ['email', 'phone', 'image_url'],
+      consuls: ['address', 'email', 'phone'],
+    }
+
+    const listeAnnuaire = LISTE_ANNUAIRE[chemin]
+    if (listeAnnuaire && methode === 'POST') {
+      return void lireCorps().then((corps) => {
+        if (corps === null) return repondre(422, { message: 'Corps de requete illisible.' })
+        for (const champ of OBLIGATOIRES[listeAnnuaire]) {
+          if (typeof corps[champ] !== 'string' || (corps[champ] as string).trim() === '') {
+            return repondre(422, {
+              message: 'Le champ ' + champ + ' est obligatoire.',
+              errors: { [champ]: ['Le champ ' + champ + ' est obligatoire.'] },
+            })
+          }
+        }
+        const elements = annuaire()[listeAnnuaire]
+        const element: Record<string, unknown> = {
+          id: (prochainIdentifiant += 1),
+          position: elements.reduce((max, e) => Math.max(max, Number(e.position)), 0) + 1,
+        }
+        for (const champ of OBLIGATOIRES[listeAnnuaire]) element[champ] = corps[champ]
+        for (const champ of FACULTATIFS[listeAnnuaire]) element[champ] = corps[champ] ?? null
+        elements.push(element)
+        repondre(201, { data: element })
+      })
+    }
+
+    const ordreAnnuaire = Object.entries(LISTE_ANNUAIRE).find(
+      ([prefixe]) => chemin === `${prefixe}/order`,
+    )
+    if (ordreAnnuaire && methode === 'PUT') {
+      return void lireCorps().then((corps) => {
+        const ids = Array.isArray(corps?.ids) ? (corps.ids as number[]) : null
+        if (ids === null) return repondre(422, { message: 'Liste d identifiants attendue.' })
+        const elements = annuaire()[ordreAnnuaire[1]]
+        // Au contrat : la liste doit porter TOUS les identifiants, une fois
+        // chacun, sans identifiant etranger. Sinon 422, rien n'est modifie.
+        const attendus = new Set(elements.map((e) => e.id as number))
+        const valide =
+          ids.length === attendus.size &&
+          ids.every((id) => attendus.has(id)) &&
+          new Set(ids).size === ids.length
+        if (!valide) {
+          return repondre(422, {
+            message: 'La liste des identifiants est incomplete ou invalide.',
+            errors: { ids: ['La liste des identifiants est incomplete ou invalide.'] },
+          })
+        }
+        const reordonnes = ids.map((id) => elements.find((e) => e.id === id)!)
+        reordonnes.forEach((element, index) => (element.position = index + 1))
+        annuaire()[ordreAnnuaire[1]] = reordonnes
+        repondre(200, { data: reordonnes })
+      })
+    }
+
+    const viseAnnuaire = Object.entries(LISTE_ANNUAIRE)
+      .map(([prefixe, nom]) => {
+        const reste = chemin.startsWith(`${prefixe}/`) ? chemin.slice(prefixe.length + 1) : null
+        return reste !== null && /^\d+$/.test(reste) ? { liste: nom, id: Number(reste) } : null
+      })
+      .find((v) => v !== null)
+
+    if (viseAnnuaire) {
+      const elements = annuaire()[viseAnnuaire.liste]
+      const index = elements.findIndex((e) => e.id === viseAnnuaire.id)
+      if (index === -1) return repondre(404, { message: 'Élément introuvable.' })
+
+      if (methode === 'DELETE') {
+        // Au contrat : les positions restantes gardent leur trou jusqu'au
+        // prochain reordonnancement. Surtout ne pas renumeroter ici.
+        elements.splice(index, 1)
+        return repondre(204, null)
+      }
+
+      if (methode === 'PATCH') {
+        return void lireCorps().then((corps) => {
+          if (corps === null) return repondre(422, { message: 'Corps de requete illisible.' })
+          for (const champ of OBLIGATOIRES[viseAnnuaire.liste]) {
+            if (
+              champ in corps &&
+              (typeof corps[champ] !== 'string' || (corps[champ] as string).trim() === '')
+            ) {
+              return repondre(422, {
+                message: 'Le champ ' + champ + ' ne peut pas etre efface.',
+                errors: { [champ]: ['Le champ ' + champ + ' ne peut pas etre efface.'] },
+              })
+            }
+          }
+          Object.assign(elements[index]!, corps)
+          repondre(200, { data: elements[index] })
         })
       }
     }
