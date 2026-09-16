@@ -1,0 +1,89 @@
+{
+  "data": {
+    "platform": {
+      "name": "Express54",
+      "url": "https://www.express54.org",
+      "phone": null,
+      "description": "Deposez vos demandes, reglez vos frais et suivez vos dossiers en ligne."
+    },
+    "services": [
+      {
+        "id": 1,
+        "slug": "visa",
+        "title": "Visa",
+        "icon": "visa",
+        "summary": "Demande de visa pour le Gabon et informations sur les procedures.",
+        "delay": "5 jours ouvrables",
+        "fee": "Selon la categorie de visa",
+        "body_html": "<p>Toutes les demandes de visa pour la Republique gabonaise deposees en Republique de Guinee sont instruites par la section consulaire de l'Ambassade.</p><h2>Pieces a fournir</h2><ul><li>Formulaire de demande de visa rempli et signe</li><li>Passeport en cours de validite, valable au moins six mois apres la date d'entree prevue, comportant deux pages vierges</li><li>Deux photographies d'identite recentes, sur fond clair</li><li>Copie du billet aller-retour ou de la reservation</li><li>Justificatif d'hebergement : reservation d'hotel ou attestation d'accueil</li><li>Certificat international de vaccination contre la fievre jaune</li><li>Pour un visa d'affaires : lettre d'invitation de l'entreprise gabonaise et registre de commerce</li><li>Pour un mineur : acte de naissance et autorisation parentale legalisee</li></ul><h2>Categories de visa</h2><table><thead><tr><th>Categorie</th><th>Duree de sejour</th><th>Entrees</th></tr></thead><tbody><tr><td>Court sejour</td><td>90 jours au plus</td><td>Une ou plusieurs</td></tr><tr><td>Affaires</td><td>90 jours au plus</td><td>Plusieurs</td></tr><tr><td>Long sejour</td><td>Plus de 90 jours</td><td>Plusieurs</td></tr></tbody></table><h2>Deposer sa demande</h2><p>Le dossier se depose a la section consulaire aux heures d'ouverture, ou en ligne sur la plateforme de demarches. Le passeport est conserve pendant l'instruction.</p>",
+        "position": 1
+      },
+      {
+        "id": 2,
+        "slug": "passeport",
+        "title": "Passeport",
+        "icon": "passeport",
+        "summary": "Demande et renouvellement du passeport gabonais.",
+        "delay": "Variable selon Libreville",
+        "fee": null,
+        "body_html": "<p>Le passeport gabonais est etabli par les autorites de Libreville. L'Ambassade recoit le dossier, procede a l'enrolement et remet le titre des sa reception.</p><h2>Premiere demande</h2><ul><li>Formulaire de demande rempli et signe</li><li>Copie integrale de l'acte de naissance</li><li>Certificat de nationalite gabonaise</li><li>Carte nationale d'identite ou carte consulaire en cours de validite</li><li>Deux photographies d'identite recentes, aux normes biometriques</li><li>Justificatif de domicile en Republique de Guinee</li></ul><h2>Renouvellement</h2><ul><li>Formulaire de demande rempli et signe</li><li>Ancien passeport, original et copie des pages d'identite</li><li>Carte consulaire en cours de validite</li><li>Deux photographies d'identite recentes, aux normes biometriques</li></ul><h3>En cas de perte ou de vol</h3><p>Une declaration de perte ou de vol delivree par les autorites guineennes est exigee en plus des pieces du renouvellement.</p><h2>Retrait</h2><p>Le titre est remis en main propre au demandeur, sur presentation du recepisse. L'enrolement biometrique exige une presence physique : aucune demande ne se traite entierement par correspondance.</p>",
+        "position": 2
+      },
+      {
+        "id": 3,
+        "slug": "carte-consulaire",
+        "title": "Carte consulaire",
+        "icon": "carte-consulaire",
+        "summary": "Inscription au registre des Gabonais etablis en Guinee et renouvellement de la carte.",
+        "delay": "72 heures",
+        "fee": null,
+        "body_html": "<p>La carte consulaire atteste de votre inscription au registre des Gabonais etablis en Republique de Guinee. Elle vous permet d'etre assiste par l'Ambassade et conditionne la delivrance de plusieurs documents.</p><h2>Pieces a fournir</h2><ul><li>Formulaire d'inscription rempli et signe</li><li>Passeport gabonais ou acte de naissance</li><li>Certificat de nationalite gabonaise</li><li>Deux photographies d'identite recentes</li><li>Justificatif de domicile en Republique de Guinee</li><li>Justificatif d'activite : contrat de travail, carte d'etudiant ou attestation</li></ul><h2>Validite</h2><p>La carte est valable cinq ans. Signalez tout changement d'adresse ou de situation familiale : le registre ne vaut que s'il est a jour, notamment en cas d'urgence.</p>",
+        "position": 3
+      },
+      {
+        "id": 4,
+        "slug": "etat-civil",
+        "title": "Etat civil",
+        "icon": "etat-civil",
+        "summary": "Transcription des actes de naissance, de mariage et de deces.",
+        "delay": "10 jours ouvrables",
+        "fee": null,
+        "body_html": "<p>Les actes d'etat civil etablis en Republique de Guinee concernant des ressortissants gabonais doivent etre transcrits dans les registres de l'Ambassade pour produire leurs effets au Gabon.</p><h2>Naissance</h2><ul><li>Acte de naissance guineen, original et copie</li><li>Passeports ou cartes consulaires des parents</li><li>Acte de mariage des parents, le cas echeant</li><li>Certificat d'accouchement delivre par l'etablissement de sante</li></ul><h2>Mariage</h2><ul><li>Acte de mariage guineen, original et copie</li><li>Actes de naissance des deux epoux</li><li>Passeports ou cartes consulaires des deux epoux</li></ul><h2>Deces</h2><ul><li>Acte de deces guineen, original et copie</li><li>Certificat medical constatant le deces</li><li>Passeport ou carte consulaire du defunt</li></ul><p>La transcription est gratuite. Le delai court a compter de la remise d'un dossier complet.</p>",
+        "position": 4
+      },
+      {
+        "id": 5,
+        "slug": "legalisation",
+        "title": "Legalisation de documents",
+        "icon": "legalisation",
+        "summary": "Legalisation, certification et authentification de documents.",
+        "delay": "48 heures",
+        "fee": null,
+        "body_html": "<p>L'Ambassade legalise les signatures et les sceaux apposes sur les documents destines a etre produits au Gabon, ainsi que ceux etablis au Gabon et destines aux autorites guineennes.</p><h2>Documents recevables</h2><ul><li>Diplomes et releves de notes</li><li>Actes notaries et procurations</li><li>Documents commerciaux : factures, certificats d'origine, contrats</li><li>Attestations administratives</li></ul><h2>Conditions</h2><p>Le document doit avoir ete prealablement authentifie par l'autorite competente du pays d'origine. L'Ambassade legalise la signature de cette autorite, non le contenu du document.</p><p>Presentez l'original et une copie de chaque piece, ainsi qu'une piece d'identite.</p>",
+        "position": 5
+      },
+      {
+        "id": 6,
+        "slug": "titre-de-voyage",
+        "title": "Titre de voyage",
+        "icon": "transport",
+        "summary": "Laissez-passer et titres de voyage d'urgence.",
+        "delay": "24 a 48 heures",
+        "fee": null,
+        "body_html": "<p>Le laissez-passer est un titre a usage unique, delivre au ressortissant gabonais qui doit rentrer au Gabon sans disposer d'un passeport valide.</p><h2>Cas de delivrance</h2><ul><li>Perte ou vol du passeport</li><li>Passeport expire sans possibilite de renouvellement avant le depart</li><li>Retour d'urgence pour motif familial ou medical</li></ul><h2>Pieces a fournir</h2><ul><li>Declaration de perte ou de vol delivree par les autorites guineennes, le cas echeant</li><li>Tout document etablissant la nationalite gabonaise : acte de naissance, certificat de nationalite, copie du passeport perdu</li><li>Deux photographies d'identite recentes</li><li>Billet ou reservation attestant du voyage</li></ul><p>Le laissez-passer n'autorise qu'un seul trajet, a destination du Gabon. Il ne remplace pas le passeport et ne permet pas de voyager vers un pays tiers.</p>",
+        "position": 6
+      },
+      {
+        "id": 7,
+        "slug": "delivery-express",
+        "title": "Delivery Express",
+        "icon": "document",
+        "summary": "Envoi et reception de documents en express.",
+        "delay": "Selon la destination",
+        "fee": "A la charge du demandeur",
+        "body_html": "<p>Le service permet de recevoir un document consulaire a domicile, ou de faire parvenir des pieces a l'Ambassade sans se deplacer, par un transporteur agree.</p><h2>Comment proceder</h2><ul><li>Deposez votre demande en ligne sur la plateforme de demarches</li><li>Choisissez l'option d'envoi au moment du depot</li><li>Reglez les frais d'acheminement, qui restent a votre charge</li><li>Suivez l'acheminement avec le numero de suivi remis par le transporteur</li></ul><h2>Limites</h2><p>Les demarches qui exigent une presence physique ne peuvent pas etre traitees par ce canal : c'est le cas de l'enrolement biometrique du passeport et de toute remise en main propre.</p>",
+        "position": 7
+      }
+    ]
+  }
+}

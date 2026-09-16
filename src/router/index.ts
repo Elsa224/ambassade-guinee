@@ -178,6 +178,21 @@ const router = createRouter({
         { path: 'bahamas', name: 'bahamas', component: Bahamas },
         { path: 'fond-monetaire', name: 'fond-monetaire', component: FondMonetaire },
 
+        // La rubrique des services servie par le CMS. Elle ne remplace pas
+        // `services-ambassadeur`, qui porte encore le texte en dur de
+        // l'ambassade de Guinee aux Etats-Unis.
+        {
+          path: 'services',
+          name: 'services',
+          component: () => import('@/components/services/ServicesConsulaires.vue'),
+        },
+        {
+          path: 'services/:slug',
+          name: 'service-detail',
+          component: () => import('@/components/services/ServiceDetail.vue'),
+          props: true,
+        },
+
         { path: 'consulat', name: 'consulat', component: Consulat },
         { path: 'rendez-vous', name: 'rendez-vous', component: RendezVous },
         { path: 'demarche-ligne', name: 'demarche-ligne', component: DemarcheLigne },
@@ -195,6 +210,11 @@ const router = createRouter({
         { path: '', name: 'dashboard', component: Dashboard },
         { path: 'articles', name: 'articles', component: Articles },
         { path: 'contenu-accueil', name: 'contenu-accueil', component: AccueilContenu },
+        {
+          path: 'services',
+          name: 'services-admin',
+          component: () => import('@/views/dashboard/services/ServicesAdmin.vue'),
+        },
         { path: 'annuaire', name: 'annuaire-admin', component: AnnuaireAdmin },
         { path: 'jours-feries', name: 'jours-feries-admin', component: JoursFeriesAdmin },
         {

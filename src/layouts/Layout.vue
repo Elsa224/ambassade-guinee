@@ -281,6 +281,18 @@
               </div>
             </div>
 
+            <!-- La rubrique des services n'existe que pour les ambassades qui
+                 ont saisi les leurs dans le CMS. Celles dont le texte est
+                 encore compile dans le gabarit gardent « Les Services » dans
+                 le menu Ambassade. -->
+            <router-link
+              v-if="rubriqueOuverte('/services')"
+              to="/services"
+              class="nav-item px-3 py-2 rounded hover:bg-secondary hover:text-primary transition text-primary"
+              active-class="hover-active"
+              >Services</router-link
+            >
+
             <!-- Le module Evenements n'est pas provisionne pour toutes les
                  ambassades : l'entree disparait quand il ne l'est pas. -->
             <router-link
@@ -346,6 +358,12 @@
               </div>
             </div>
 
+            <router-link
+              v-if="rubriqueOuverte('/services')"
+              to="/services"
+              class="block px-3 py-2 rounded hover:bg-secondary hover:text-primary text-primary"
+              >Services</router-link
+            >
             <router-link
               v-if="rubriqueOuverte('/evenements')"
               to="/evenements"

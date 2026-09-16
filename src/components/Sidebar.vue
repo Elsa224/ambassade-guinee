@@ -64,6 +64,15 @@
           </router-link>
 
           <router-link
+            to="/dashboard/services"
+            class="flex items-center gap-3 px-4 py-2 rounded-xl text-white no-underline transition-all duration-300 text-sm font-medium hover:bg-yellow-500/20 hover:text-secondary hover:translate-x-1"
+            :active-class="LIEN_ACTIF"
+          >
+            <i class="bx bxs-briefcase text-xl flex-shrink-0"></i>
+            <span v-if="!isCollapsed">Services consulaires</span>
+          </router-link>
+
+          <router-link
             to="/dashboard/annuaire"
             class="flex items-center gap-3 px-4 py-2 rounded-xl text-white no-underline transition-all duration-300 text-sm font-medium hover:bg-yellow-500/20 hover:text-secondary hover:translate-x-1"
             :active-class="LIEN_ACTIF"

@@ -59,7 +59,7 @@
             <span class="bg-accent w-1 h-8 mr-3"></span>
             Biographie
           </h2>
-          <div class="prose prose-lg max-w-none text-gray-700" v-html="biographie.body_html"></div>
+          <div class="contenu-cms max-w-none text-gray-700" v-html="biographie.body_html"></div>
         </div>
       </div>
     </template>

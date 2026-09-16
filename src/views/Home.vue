@@ -113,7 +113,7 @@
              contrat l'exige, le front ne peut pas etre la derniere defense. -->
         <div
           v-if="motDeBienvenue && motDeBienvenue.body_html"
-          class="mt-12 bg-gray-50 p-8 rounded-2xl shadow-lg border-l-8 border-secondary prose max-w-none text-gray-700"
+          class="mt-12 bg-gray-50 p-8 rounded-2xl shadow-lg border-l-8 border-secondary contenu-cms max-w-none text-gray-700"
           v-html="motDeBienvenue.body_html"
         ></div>
       </div>

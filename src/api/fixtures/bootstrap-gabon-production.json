@@ -25,6 +25,7 @@
       "bilateral": false,
       "chancellerie": false,
       "services": false,
+      "services_consulaires": false,
       "consuls_honoraires": false,
       "calendrier": false,
       "consulat": false,
