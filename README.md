@@ -47,10 +47,10 @@ Pour ouvrir le site d'une autre ambassade, il suffit d'un sous-domaine de
 `localhost` qui porte son nom — ils resolvent tous vers 127.0.0.1, et Vite les
 accepte sans configuration :
 
-| Adresse | Ambassade servie |
-|---|---|
-| `http://localhost:5173/` | Guinee aux Etats-Unis |
-| `http://gabon.localhost:5173/` | Gabon en Guinee |
+| Adresse                        | Ambassade servie      |
+| ------------------------------ | --------------------- |
+| `http://localhost:5173/`       | Guinee aux Etats-Unis |
+| `http://gabon.localhost:5173/` | Gabon en Guinee       |
 
 Le parametre `?domain=` de la barre d'adresse n'y change rien : il n'est lu que
 par l'API, pas par le front. Le forcage explicite equivalent est l'en-tete

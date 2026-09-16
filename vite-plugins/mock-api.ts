@@ -275,7 +275,8 @@ export function mockApi(): Plugin {
         if (typeof corps.title !== 'string' || corps.title.trim() === '') {
           return repondre(422, { message: 'Le titre est obligatoire.' })
         }
-        const slug = typeof corps.slug === 'string' && corps.slug !== '' ? corps.slug : glisser(corps.title)
+        const slug =
+          typeof corps.slug === 'string' && corps.slug !== '' ? corps.slug : glisser(corps.title)
         if (listeServices().some((service) => service.slug === slug)) {
           return repondre(422, { message: 'Ce slug est deja pris par un autre service.' })
         }

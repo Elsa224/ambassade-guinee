@@ -4,7 +4,10 @@
       <h2 class="text-2xl font-bold text-gray-800">Services consulaires</h2>
       <p class="text-gray-600 mt-1">
         Les prestations présentées sur la page « Nos services » et leurs pages de détail.
-        <span class="font-medium">Tant qu'aucun service n'est enregistré, la rubrique entière — menu compris — n'apparaît pas sur le site.</span>
+        <span class="font-medium"
+          >Tant qu'aucun service n'est enregistré, la rubrique entière — menu compris — n'apparaît
+          pas sur le site.</span
+        >
       </p>
     </header>
 
@@ -19,7 +22,11 @@
     </p>
 
     <div v-else class="space-y-6">
-      <p v-if="message" class="bg-green-50 border border-green-200 text-green-800 rounded-xl px-4 py-3" role="status">
+      <p
+        v-if="message"
+        class="bg-green-50 border border-green-200 text-green-800 rounded-xl px-4 py-3"
+        role="status"
+      >
         {{ message }}
       </p>
 
@@ -129,9 +136,7 @@
         @modifier="ouvrirService"
       >
         <template #apercu="{ element }">
-          <div
-            class="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center shrink-0"
-          >
+          <div class="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
             <IconeService :icone="element.icon" />
           </div>
           <div class="min-w-0">
