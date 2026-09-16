@@ -116,3 +116,100 @@
 body {
   font-family: 'Futura LT Pro', 'Segoe UI', system-ui, sans-serif;
 }
+
+/*
+ * Mise en forme du HTML servi par le CMS.
+ *
+ * Tailwind remet a zero les marges des paragraphes, des titres et des listes.
+ * Un corps de texte saisi dans l'administration arrive donc colle, et la seule
+ * parade dont dispose une redactrice est de semer des <br> — ce qui a ete fait
+ * sur le mot de bienvenue du Gabon. Cette classe rend au contenu servi une
+ * mise en page lisible, sans que personne ait a connaitre le HTML.
+ *
+ * Elle ne s'applique qu'aux corps assainis cote serveur : le contrat l'exige,
+ * le front n'est pas la derniere ligne de defense.
+ */
+.contenu-cms > :first-child {
+  margin-top: 0;
+}
+
+.contenu-cms > :last-child {
+  margin-bottom: 0;
+}
+
+.contenu-cms p {
+  margin-block: 1rem;
+  line-height: 1.75;
+}
+
+.contenu-cms h2 {
+  margin-block: 2rem 1rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.contenu-cms h3 {
+  margin-block: 1.5rem 0.75rem;
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--color-ink-dark, #1f2937);
+}
+
+.contenu-cms ul,
+.contenu-cms ol {
+  margin-block: 1rem;
+  padding-inline-start: 1.5rem;
+  line-height: 1.75;
+}
+
+.contenu-cms ul {
+  list-style: disc;
+}
+
+.contenu-cms ol {
+  list-style: decimal;
+}
+
+.contenu-cms li {
+  margin-block: 0.375rem;
+}
+
+.contenu-cms a {
+  color: var(--color-accent);
+  text-decoration: underline;
+}
+
+.contenu-cms strong {
+  font-weight: 700;
+}
+
+.contenu-cms em {
+  font-style: italic;
+}
+
+/*
+ * Une grille de tarifs est le cas normal sur une page de service. Le tableau
+ * defile dans son propre cadre : sur un telephone, c'est lui qui deborde, pas
+ * la page.
+ */
+.contenu-cms table {
+  display: block;
+  overflow-x: auto;
+  width: 100%;
+  margin-block: 1.5rem;
+  border-collapse: collapse;
+  font-size: 0.9375rem;
+}
+
+.contenu-cms th,
+.contenu-cms td {
+  border: 1px solid #e5e7eb;
+  padding: 0.625rem 0.875rem;
+  text-align: left;
+}
+
+.contenu-cms th {
+  background-color: #f9fafb;
+  font-weight: 700;
+}
