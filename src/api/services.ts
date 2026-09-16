@@ -118,6 +118,28 @@ export async function recupererServices(): Promise<ContenuServices> {
   return normaliserServices(reponse.data)
 }
 
+/**
+ * Un apercu de l'adresse que le back derivera d'un titre.
+ *
+ * Il sert de texte indicatif dans l'ecran de saisie et n'est jamais envoye :
+ * la derivation appartient au back, seul a connaitre les slugs deja pris dans
+ * l'ambassade.
+ *
+ * Les tirets sont retires APRES la troncature, et c'est tout l'interet de la
+ * fonction : les retirer avant laisserait un titre de plus de soixante
+ * caracteres proposer une adresse terminee par un tiret, que la regle de
+ * forme refuse.
+ */
+export function apercuDeSlug(titre: string): string {
+  return titre
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .slice(0, 60)
+    .replace(/^-+|-+$/g, '')
+}
+
 /** Le service designe par son slug, ou `null` s'il n'est pas servi. */
 export function serviceParSlug(contenu: ContenuServices, slug: string): Service | null {
   return contenu.services.find((service) => service.slug === slug) ?? null
@@ -132,7 +154,16 @@ export async function recupererServicesAdmin(): Promise<ContenuServices> {
   return normaliserServices(reponse.data)
 }
 
-export type ServiceSaisi = Omit<Service, 'id' | 'position'>
+/**
+ * Ce qu'un ecran d'administration envoie.
+ *
+ * `slug` est facultatif : le contrat confie sa derivation au back, qui est
+ * seul a connaitre les slugs deja pris dans l'ambassade. Le front qui
+ * deriverait le sien usurperait cette responsabilite — et un titre long
+ * produirait un slug tronque, refuse par la regle de forme alors que
+ * personne ne l'a saisi.
+ */
+export type ServiceSaisi = Omit<Service, 'id' | 'position' | 'slug'> & { slug?: string }
 
 export async function ajouterService(saisi: ServiceSaisi): Promise<Service> {
   const reponse = await apiPost<Enveloppe<Service>>(`${ADMIN}/services`, saisi)

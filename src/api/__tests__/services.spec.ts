@@ -4,6 +4,7 @@ import {
   recupererServices,
   serviceParSlug,
   iconeDuService,
+  apercuDeSlug,
   SERVICES_VIDES,
   ICONE_PAR_DEFAUT,
   type Service,
@@ -72,6 +73,32 @@ describe('le choix de l icone', () => {
     // connaitra : la carte doit rester lisible en attendant, pas vide.
     expect(iconeDuService({ icon: null })).toBe(ICONE_PAR_DEFAUT)
     expect(iconeDuService({ icon: 'tampon-magique' as never })).toBe(ICONE_PAR_DEFAUT)
+  })
+})
+
+describe('l apercu de l adresse derivee du titre', () => {
+  it('met en minuscules, retire les accents et remplace le reste par des tirets', () => {
+    expect(apercuDeSlug('État civil')).toBe('etat-civil')
+    expect(apercuDeSlug('Legalisation de documents')).toBe('legalisation-de-documents')
+  })
+
+  it('ne termine jamais par un tiret, meme sur un titre tronque', () => {
+    // C'est le defaut trouve en revue cote back : les tirets retires AVANT la
+    // troncature laissaient un titre long proposer une adresse terminee par
+    // un tiret, aussitot refusee par la regle de forme — et l'agent recevait
+    // une 422 sur un champ qu'il n'avait pas rempli.
+    const titreLong = 'Demande de visa de long sejour pour les ressortissants etrangers'
+    const apercu = apercuDeSlug(titreLong)
+
+    expect(apercu.length).toBeLessThanOrEqual(60)
+    expect(apercu.endsWith('-')).toBe(false)
+    expect(apercu.startsWith('-')).toBe(false)
+  })
+
+  it('rend une chaine vide pour un titre sans caractere utilisable', () => {
+    // Le champ part alors absent de la requete, et le back derive lui-meme.
+    expect(apercuDeSlug('   ')).toBe('')
+    expect(apercuDeSlug('')).toBe('')
   })
 })
 

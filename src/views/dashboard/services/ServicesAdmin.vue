@@ -291,6 +291,7 @@ import ChampSelect from '@/components/ui/ChampSelect.vue'
 import IconeService from '@/components/services/IconeService.vue'
 import { messageErreurContenu } from '@/api/contenu'
 import {
+  apercuDeSlug,
   recupererServicesAdmin,
   ajouterService,
   modifierService,
@@ -363,16 +364,15 @@ const elementsOrdonnes = computed(() =>
   contenu.value.services.map((service) => ({ ...service, name: service.title })),
 )
 
-/** Ce que le back derivera du titre si l'adresse est laissee vide. */
-const slugPropose = computed(() =>
-  saisie.title
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-    .slice(0, 60),
-)
+/**
+ * Un apercu de ce que le back derivera du titre, affiche en texte indicatif.
+ *
+ * Il n'est jamais envoye : la derivation appartient au back, seul a connaitre
+ * les slugs deja pris. Les tirets sont retires APRES la troncature, sinon un
+ * titre de plus de soixante caracteres proposerait une adresse terminee par
+ * un tiret, que la regle de forme refuse.
+ */
+const slugPropose = computed(() => apercuDeSlug(saisie.title))
 
 function annoncer(texte: string): void {
   message.value = texte
@@ -476,7 +476,9 @@ async function enregistrerLeService(): Promise<void> {
   // une case vide sur le site.
   const saisi = {
     title: saisie.title,
-    slug: saisie.slug === '' ? slugPropose.value : saisie.slug,
+    // L'adresse laissee vide n'est pas envoyee du tout : le back la derive,
+    // et sur une modification un champ absent ne touche a rien.
+    ...(saisie.slug === '' ? {} : { slug: saisie.slug }),
     summary: saisie.summary === '' ? null : saisie.summary,
     icon: saisie.icon === '' ? null : saisie.icon,
     delay: saisie.delay === '' ? null : saisie.delay,

@@ -87,7 +87,12 @@ Les regles, dans l'ordre d'importance :
    (`^[a-z0-9]+(-[a-z0-9]+)*$`, 60 caracteres au plus). Le back le derive du
    titre a la creation si l'administrateur n'en propose pas ; il ne le change
    jamais tout seul ensuite, car un slug qui bouge casse les liens deja
-   partages.
+   partages. Cette derivation appartient au back et a lui seul : un front qui
+   deriverait la sienne usurperait la connaissance des slugs deja pris, et un
+   titre long y produirait une adresse tronquee terminee par un tiret, refusee
+   par la regle de forme alors que personne ne l'a saisie. Le front laisse donc
+   le champ absent de la requete quand l'administrateur ne le remplit pas, et
+   n'en affiche qu'un apercu indicatif.
 4. **`icon` est une cle d'une liste fermee**, tenue en configuration cote back
    et connue du front :
    `visa`, `passeport`, `carte-consulaire`, `etat-civil`, `legalisation`,
@@ -166,6 +171,12 @@ Le corps accepte en POST et PATCH : `slug`, `title`, `summary`, `icon`,
 `delay`, `fee`, `body_html`. Le back repond 422 avec `errors` par champ, comme
 partout ailleurs ; le front affiche ses messages tels quels. Les suppressions
 rendent 204 sans corps.
+
+`PUT services/platform` **remplace** le bloc entier : un champ absent du corps
+vaut `null`, et l'ecran envoie donc toujours les quatre champs. `PATCH
+services/{id}` fait l'inverse et ne touche pas aux champs absents. La
+difference est assumee : le bandeau est un formulaire unique qu'on enregistre
+en entier, un service se corrige champ par champ.
 
 L'administrateur **peut** changer un slug par PATCH s'il en assume la
 consequence — les liens deja diffuses cassent, et l'ecran le dit. Le back, lui,
