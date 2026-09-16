@@ -12,12 +12,11 @@
                 :alt="nomDeLAmbassade"
                 class="h-12 w-auto object-contain"
               />
-              <img
-                v-if="drapeau"
-                :src="drapeau"
-                :alt="`Drapeau ${articleDuPays(nomOfficiel)} ${nomOfficiel}`"
-                class="h-12 w-auto object-contain"
-              />
+              <!-- Le drapeau ne figure plus ici : accole aux armoiries, dans une
+                   barre blanche, les deux emblemes se disputaient la meme place.
+                   L'ambassade reste identifiee par ses armoiries dans l'en-tete,
+                   et le drapeau garde ses emplacements en pied de page, sur la
+                   page d'accueil et sur les pages de l'ambassade. -->
             </div>
           </div>
 
