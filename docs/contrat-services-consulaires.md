@@ -117,7 +117,14 @@ reste est requis des lors que l'entree existe.
 | `summary` | 255 caracteres |
 | `slug` | 60 caracteres |
 | `delay`, `fee` | 60 caracteres chacun |
-| `body_html` | 100 000 caracteres |
+| `body_html` | 16 000 caracteres en entree, 60 000 octets apres assainissement |
+
+La borne du corps est double, et les deux comptent. La colonne est un `TEXT`
+MySQL, donc 65 535 **octets** et non caracteres, et l'assainissement en ajoute
+a l'ecriture : HTMLPurifier pose `rel="noreferrer noopener"` sur chaque lien.
+Une borne en caracteres seule ne protegerait donc pas la colonne. C'est la
+meme valeur que le mot de bienvenue ; le plus long brouillon gabonais fait
+2 500 caracteres, soit un facteur six de marge.
 
 ### Ce que la surface visiteur ne fait pas
 

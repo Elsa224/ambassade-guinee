@@ -253,7 +253,7 @@
           ></textarea>
           <p class="text-xs text-gray-500 mt-1.5">
             Les balises simples sont acceptées&nbsp;: titres, paragraphes, gras, italique, listes et
-            tableaux — utiles pour une grille de tarifs.
+            tableaux — utiles pour une grille de tarifs. 16&nbsp;000 caractères au plus.
           </p>
         </div>
 
