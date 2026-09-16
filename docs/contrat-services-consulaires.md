@@ -2,7 +2,11 @@
 
 > Proposition ecrite par la session front le 2026-09-16, a la demande de
 > l'ambassade du Gabon, qui veut une rubrique « Nos services » alimentee par
-> son administration. Le back reste libre de la forme interne ; ce document
+> son administration. Amendee le meme jour par la session back, dont les sept
+> amendements sont integres ici : surface visiteur non gardee par le module,
+> profil d'assainissement « riche » distinct, validation de `icon` cote
+> serveur, bornes des champs, slug modifiable par l'administrateur,
+> suppressions en 204. Le back reste libre de la forme interne ; ce document
 > fige **ce que le front appelle et ce qu'il lit**. En cas d'ecart, c'est le
 > document du depot back qui tranchera, comme pour le bootstrap et le contenu
 > d'accueil.
@@ -70,22 +74,31 @@ Les regles, dans l'ordre d'importance :
    comprise. C'est ce qui empeche la fuite : une page « Nos services » vide
    vaudrait mieux que le texte d'une autre ambassade, mais une rubrique absente
    vaut mieux que les deux.
-2. **`body_html` est assaini cote serveur**, avec le meme jeu de balises que le
-   mot de bienvenue, augmente des titres de niveau 2 et 3 et des tableaux :
-   une grille de tarifs est le cas normal ici. Le front l'insere avec `v-html`,
-   il ne peut pas etre la derniere ligne de defense.
+2. **`body_html` est assaini cote serveur**, selon un profil « riche » propre
+   aux corps de services : celui du mot de bienvenue — qui autorise deja les
+   titres de niveau 2 et 3 — augmente des tableaux, `colspan` et `rowspan`
+   compris. Une grille de tarifs est le cas normal ici, et un `colspan` retire
+   en silence disloque la grille a l'affichage. Le profil reste distinct de
+   celui du mot de bienvenue, qui n'a pas a recevoir de tableaux. Le front
+   insere ce corps avec `v-html` : il ne peut pas etre la derniere ligne de
+   defense.
 3. **`slug` identifie le service dans l'URL publique** `/services/{slug}`. Il
    est unique par ambassade, stable dans le temps, en minuscules sans accent
    (`^[a-z0-9]+(-[a-z0-9]+)*$`, 60 caracteres au plus). Le back le derive du
    titre a la creation si l'administrateur n'en propose pas ; il ne le change
    jamais tout seul ensuite, car un slug qui bouge casse les liens deja
    partages.
-4. **`icon` est une cle d'une liste fermee**, tenue par le front :
+4. **`icon` est une cle d'une liste fermee**, tenue en configuration cote back
+   et connue du front :
    `visa`, `passeport`, `carte-consulaire`, `etat-civil`, `legalisation`,
-   `document`, `transport`, `assistance`, `entreprise`, `etudes`. Une cle
-   inconnue, ou `null`, rend l'icone generique `document`. Le CMS ne sert
-   jamais de balisage d'icone : ce serait une surface d'injection pour un gain
-   nul.
+   `document`, `transport`, `assistance`, `entreprise`, `etudes`. Le back
+   refuse une cle inconnue par une 422 sur le champ `icon` : sans cela, un
+   agent qui saisit « visas » obtiendrait l'icone generique sans comprendre
+   pourquoi. `null` reste accepte. Le front, lui, rend `document` pour toute
+   cle qu'il ne connait pas, y compris une cle ajoutee plus tard en
+   configuration : une version en avance du back ne casse jamais la page.
+   Le CMS ne sert jamais de balisage d'icone : ce serait une surface
+   d'injection pour un gain nul.
 5. **`position` ordonne la liste**, croissant. A defaut, l'ordre du tableau
    fait foi.
 6. **`delay` et `fee` sont des chaines courtes et libres** (60 caracteres au
@@ -95,6 +108,28 @@ Les regles, dans l'ordre d'importance :
 
 `platform`, `summary`, `delay`, `fee` et `icon` peuvent valoir `null`. Tout le
 reste est requis des lors que l'entree existe.
+
+### Bornes
+
+| Champ | Borne |
+|---|---|
+| `title` | 120 caracteres |
+| `summary` | 255 caracteres |
+| `slug` | 60 caracteres |
+| `delay`, `fee` | 60 caracteres chacun |
+| `body_html` | 100 000 caracteres |
+
+### Ce que la surface visiteur ne fait pas
+
+`GET /api/content/services` **n'est pas garde par le module**. Il rend 200 avec
+`services: []` et `platform: null` quand l'ambassade n'a rien saisi, y compris
+quand elle ne declare pas `services_consulaires`. Le drapeau de modules sert au
+front a decider s'il annonce la rubrique au menu, rien de plus.
+
+Deux mecanismes de retraction qui se contredisent finissent toujours par
+diverger : celui-ci vit dans la reponse, pas dans un code d'erreur. Le risque
+de fuite est nul, puisqu'une ambassade sans service enregistre rend une
+reponse vide quoi qu'il arrive.
 
 ### Le bloc `platform`
 
@@ -122,7 +157,12 @@ l'utilisateur — rien a envoyer. Meme forme que les dirigeants et la vitrine.
 
 Le corps accepte en POST et PATCH : `slug`, `title`, `summary`, `icon`,
 `delay`, `fee`, `body_html`. Le back repond 422 avec `errors` par champ, comme
-partout ailleurs ; le front affiche ses messages tels quels.
+partout ailleurs ; le front affiche ses messages tels quels. Les suppressions
+rendent 204 sans corps.
+
+L'administrateur **peut** changer un slug par PATCH s'il en assume la
+consequence — les liens deja diffuses cassent, et l'ecran le dit. Le back, lui,
+ne rederive jamais le slug d'un titre modifie.
 
 Deux erreurs a distinguer, parce que le front les presente differemment :
 

@@ -163,7 +163,7 @@
               id="titre-service"
               v-model.trim="saisie.title"
               type="text"
-              maxlength="191"
+              maxlength="120"
               class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary"
             />
           </div>
