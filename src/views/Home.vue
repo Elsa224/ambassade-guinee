@@ -42,13 +42,11 @@
 
         <!-- IMAGES DROITE -->
         <div class="grid grid-cols-2 gap-6">
-          <img
-            v-if="drapeau"
-            :src="drapeau"
-            :alt="`Drapeau ${articleDuPays(nomOfficiel)} ${nomOfficiel}`"
-            class="rounded-2xl shadow-lg object-cover h-48 w-full"
-          />
-
+          <!-- La grille ne porte plus l'embleme du tenant : elle ne montre que
+               les photos de la vitrine, servies par le CMS. L'ambassade qui
+               veut son drapeau ici le televerse comme premiere photo, et
+               choisit ainsi l'image qu'elle montre en grand, plutot que de se
+               voir imposer l'aplat qui sert d'embleme en pied de page. -->
           <img
             v-for="(photo, rang) in photosVitrine"
             :key="photo.id"
@@ -430,11 +428,11 @@
 import { computed, onMounted, ref } from 'vue'
 import { useActualites, formaterDate, formaterDateCourte } from '@/composables/useActualites'
 import { useTenantStore } from '@/stores/tenant'
-import { useIdentite, articleDuPays } from '@/tenant/identite'
+import { useIdentite } from '@/tenant/identite'
 import { recupererContenuAccueil, CONTENU_VIDE, type ContenuAccueil } from '@/api/contenu'
 
 const tenant = useTenantStore()
-const { nomOfficiel, nomDeLAmbassade, logo, drapeau } = useIdentite()
+const { nomDeLAmbassade, logo } = useIdentite()
 
 // Rubriques de contenu : ouvertes tant que l'ambassade ne les ferme pas.
 const servicesOuverts = computed(() => tenant.rubriqueOuverte('services'))
