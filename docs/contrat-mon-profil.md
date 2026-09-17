@@ -68,21 +68,24 @@ proposee, en ajout de l'existant :
     "email": "awa@exemple.test",
     "role": "admin",
     "embassy_id": 1,
-    "phone": null,
-    "job_title": null,
     "last_login_at": "2026-09-17T08:12:44Z",
     "password_changed_at": "2026-06-02T10:03:11Z"
   }
 }
 ```
 
-`phone` et `job_title` sont **facultatifs et nullables**. Ils ne sont pas du
-decor : une ambassade a besoin de savoir qui, parmi ses comptes, tient quoi —
-et `job_title` est ce que l'ecran des utilisateurs affichera a cote du role.
-Si le back prefere ne pas les porter, **qu'il le dise avant de coder** : le
-front retirera les champs de l'ecran plutot que d'afficher des cases vides.
-La discipline est la meme que partout ailleurs dans ce gabarit — ce que le
-CMS ne sert pas n'existe pas.
+**`phone` et `job_title` sont retires de la demande.** Ils figuraient dans la
+premiere version de ce document ; les colonnes n'existent pas cote CMS, et la
+session back a recommande de ne pas les creer sans usage precis. La discipline
+du gabarit tranche dans le meme sens : un champ facultatif que personne ne
+remplit reste une case vide a l'ecran pour toujours, et ce que le CMS ne sert
+pas n'existe pas.
+
+> Elsa n'a pas exprime d'usage pour ces deux champs ; c'est donc le repli qui
+> s'applique, et il se defait en une ligne. Si une ambassade a besoin de
+> savoir qui, parmi ses comptes, tient quoi, `job_title` reviendra a cote du
+> role sur l'ecran des utilisateurs — deux colonnes nullables ne coutent rien
+> une fois qu'on sait a quoi elles servent.
 
 `last_login_at` et `password_changed_at` sont en **lecture seule**. Le second
 n'est pas cosmetique : c'est le seul moyen pour un agent de savoir si son mot
@@ -97,8 +100,13 @@ PATCH /api/auth/me
 Corps accepte, tous les champs facultatifs, seuls ceux presents sont ecrits :
 
 ```json
-{ "name": "Awa Ndong", "phone": "+224 620 00 00 00", "job_title": "Chargee de communication" }
+{ "name": "Awa Ndong" }
 ```
+
+Un seul champ modifiable aujourd'hui, et c'est assez : le nom est ce que
+l'ecran des utilisateurs et le menu affichent. La route reste au pluriel —
+`PATCH` avec un objet — pour que l'ajout d'un champ plus tard ne change pas
+sa forme.
 
 Reponse `200` avec l'utilisateur complet, dans la meme forme que `me`.
 
@@ -143,15 +151,40 @@ au serveur**, qui la rend en 422 avec son message. L'ecran herite verifiait
 « au moins 6 caracteres » en dur, dans un ecran qui n'envoyait rien : une
 regle inventee cote client est une promesse que personne ne tient.
 
-Deux questions dont la reponse m'importe avant d'ecrire l'ecran :
+### Deux comportements, tranches par Elsa le 2026-09-17
 
-1. **Les autres jetons sont-ils revoques ?** Un changement de mot de passe
-   apres un soupcon de compromission n'a de sens que s'il ferme les autres
-   sessions. Si oui, le front previendra l'utilisateur AVANT d'enregistrer, et
-   traitera le 401 qui suivra sur ses propres appels comme normal plutot que
-   comme une panne. Si non, dites-le : l'ecran ne promettra rien.
-2. **Un courriel de notification part-il ?** Si oui, l'ecran le dit. Sinon il
-   se taira.
+Ils etaient poses en questions dans la premiere version de ce document. Ce ne
+sont pas des details d'implementation : ce sont des **promesses faites a un
+utilisateur**, et elles appartenaient donc a Elsa, pas aux sessions. Elle a
+tranche, dans le sens que la session du CMS back recommandait.
+
+**1. Les autres jetons sont revoques — TOUS SAUF celui en cours.**
+
+Quelqu'un qui change son mot de passe parce qu'il le croit compromis s'attend
+a ce que l'autre poste tombe, et n'a aucune raison d'etre ejecte du sien.
+
+Deux consequences pour le front, et la seconde est contre-intuitive :
+
+- l'ecran **previent avant d'enregistrer** : « Vos autres sessions seront
+  fermees. » Une deconnexion silencieuse sur un autre appareil serait prise
+  pour une panne ;
+- l'ecran **ne traite AUCUN 401 comme normal** apres l'enregistrement,
+  puisque la session courante survit. Un 401 qui surviendrait malgre tout est
+  une anomalie a signaler, pas un effet attendu. C'est l'inverse de ce que le
+  front aurait fait si la revocation avait tout emporte — d'ou l'importance
+  d'avoir pose la question au lieu de supposer.
+
+**2. Un courriel de notification part**, a l'adresse du compte.
+
+C'est le seul signal qu'aurait quelqu'un dont le compte a ete pris : celui
+qui change le mot de passe n'est pas forcement celui qui le connaissait.
+L'ecran l'annonce donc explicitement, avant l'enregistrement, en meme temps
+que l'avertissement sur les sessions.
+
+Le corps du courriel appartient au back, pas au front. Une seule exigence, et
+elle n'est pas cosmetique : **il ne doit contenir ni mot de passe, ni jeton,
+ni lien qui authentifie**. Un courriel dont l'interception suffit a prendre le
+compte annule le benefice de l'avertissement.
 
 ## Les refus sur lesquels le front compte
 
@@ -186,9 +219,11 @@ son mot de passe est un compte qu'on ne peut pas securiser.
 > Les etats de compte, pour la meme raison, sont **`actif`** et
 > **`suspendu`** : en francais, en minuscules, tels que le back les applique.
 
-Deux sections : l'identite (nom, telephone, fonction, et le courriel affiche
-en lecture seule avec la raison), puis le mot de passe. La date du dernier
-changement est affichee si le back la sert, et absente sinon.
+Deux sections : l'identite (le nom, et le courriel affiche en lecture seule
+avec la raison), puis le mot de passe — avec l'avertissement sur les autres
+sessions et le courriel de notification, pose AVANT le bouton et non apres.
+La date du dernier changement est affichee si le back la sert, et absente
+sinon.
 
 L'entree de menu remplacera « Mon profil », retiree du gabarit le 2026-09-17
 parce qu'elle menait a un ecran qui affichait « John Doe ».
