@@ -5,6 +5,11 @@ import {
   televerserImage,
   refusDuFichier,
   messageErreurContenu,
+  normaliserBanniere,
+  enregistrerBanniere,
+  supprimerBanniere,
+  ajouterDiapositive,
+  ordonnerDiapositives,
   CONTENU_VIDE,
 } from '../contenu'
 import { ApiError } from '../client'
@@ -71,6 +76,79 @@ describe("normalisation du contenu d'accueil", () => {
     normaliserContenu({ showcase: servi })
 
     expect(servi[0]!.id).toBe(1)
+  })
+})
+
+describe("banniere d'accueil", () => {
+  it("vaut `null` quand l'ambassade n'a rien choisi", () => {
+    // `null` veut dire « rien choisi », et le gabarit sert alors sa propre
+    // banniere. La cle est toujours presente : « absent ou null » seraient
+    // deux etats pour un seul sens, et le front finirait par n'en tester qu'un.
+    expect(normaliserBanniere(null)).toBeNull()
+    expect(normaliserBanniere(undefined)).toBeNull()
+    expect(normaliserContenu({}).hero).toBeNull()
+  })
+
+  it('traite une mise en page inconnue comme la banniere simple', () => {
+    // Le contrat le dit, et la raison est qu'une ambassade ne doit pas perdre
+    // sa banniere parce qu'un mot a change de nom cote serveur.
+    const banniere = normaliserBanniere({ variant: 'panoramique' as never, slides: [] })
+
+    expect(banniere?.variant).toBe('classique')
+  })
+
+  it('ordonne les diapositives par position et jamais par identifiant', () => {
+    const banniere = normaliserBanniere({
+      variant: 'diaporama',
+      slides: [
+        { id: 9, image_url: 'a.webp', quote: null, author: null, position: 2 },
+        { id: 3, image_url: 'b.webp', quote: null, author: null, position: 1 },
+      ],
+    })
+
+    expect(banniere?.slides.map((d) => d.id)).toEqual([3, 9])
+  })
+
+  it("n'envoie ni les diapositives ni rien d'autre dans le PUT", async () => {
+    // Le PUT porte la mise en page et ses deux textes. Les diapositives ont
+    // leurs propres routes : c'est ce qui permet de repasser en banniere
+    // simple sans rien perdre.
+    const appel = vi.fn(() => Promise.resolve(reponse({ data: {} })))
+    vi.stubGlobal('fetch', appel)
+
+    await enregistrerBanniere({ variant: 'classique', title: null, intro: 'Accroche.' })
+
+    const [adresse, options] = appel.mock.calls[0]! as unknown as [string, RequestInit]
+    expect(adresse).toContain('/api/admin/content/hero')
+    expect(options.method).toBe('PUT')
+    expect(JSON.parse(String(options.body))).toEqual({
+      variant: 'classique',
+      title: null,
+      intro: 'Accroche.',
+    })
+  })
+
+  it('distingue la suppression franche des deux autres gestes', async () => {
+    const appel = vi.fn(() => Promise.resolve(new Response(null, { status: 204 })))
+    vi.stubGlobal('fetch', appel)
+
+    await supprimerBanniere()
+
+    const [adresse, options] = appel.mock.calls[0]! as unknown as [string, RequestInit]
+    expect(adresse).toContain('/api/admin/content/hero')
+    expect(options.method).toBe('DELETE')
+  })
+
+  it('cree une diapositive sur sa propre route, et reordonne sur la sienne', async () => {
+    const appel = vi.fn(() => Promise.resolve(reponse({ data: {} }, 201)))
+    vi.stubGlobal('fetch', appel)
+
+    await ajouterDiapositive({ image_url: 'https://cms.test/1.webp', quote: null, author: null })
+    await ordonnerDiapositives([3, 1])
+
+    const adresses = (appel.mock.calls as unknown as [string][]).map(([adresse]) => String(adresse))
+    expect(adresses[0]).toContain('/api/admin/content/hero/slides')
+    expect(adresses[1]).toContain('/api/admin/content/hero/slides/order')
   })
 })
 

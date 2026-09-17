@@ -46,7 +46,51 @@ export interface ImageVitrine {
   position: number
 }
 
+/**
+ * Les deux mises en page de la banniere d'accueil.
+ *
+ * `classique` est la banniere du gabarit, celle qui s'affiche aujourd'hui.
+ * `diaporama` est la maquette demandee par la direction : des photos plein
+ * ecran qui defilent, chacune portant une citation signee. Ce sont deux mises
+ * en page du meme bloc, pas deux blocs.
+ */
+export const VARIANTES_BANNIERE = ['classique', 'diaporama'] as const
+export type VarianteBanniere = (typeof VARIANTES_BANNIERE)[number]
+
+export interface DiapositiveBanniere {
+  id: number
+  image_url: string
+  /** Texte brut : il se lie en interpolation, jamais en `v-html`. */
+  quote: string | null
+  author: string | null
+  position: number
+}
+
+/**
+ * La banniere d'accueil choisie par l'ambassade.
+ *
+ * `title` a `null` laisse le gabarit afficher le nom de l'ambassade du
+ * bootstrap, comme aujourd'hui ; `intro` a `null` n'affiche aucune accroche.
+ * Les quatre champs de texte — ici `title` et `intro`, et `quote` et `author`
+ * sur chaque diapositive — sont du TEXTE BRUT stocke en texte brut : les
+ * balises sont retirees a l'ecriture. Ils se lient en interpolation normale.
+ * Le gabarit porte par ailleurs des champs assainis qui, eux, s'inserent en
+ * `v-html` (`welcome.body_html`, la biographie, le corps d'un service) : le
+ * reflexe existe, d'ou cette phrase.
+ */
+export interface BanniereAccueil {
+  variant: VarianteBanniere
+  title: string | null
+  intro: string | null
+  slides: DiapositiveBanniere[]
+}
+
 export interface ContenuAccueil {
+  /**
+   * `null` vaut « l'ambassade n'a rien choisi » : le gabarit sert sa banniere
+   * par defaut. La cle est toujours presente, jamais absente.
+   */
+  hero: BanniereAccueil | null
   welcome: MotDeBienvenue | null
   ambassador: BiographieAmbassadeur | null
   leaders: Dirigeant[]
@@ -59,6 +103,7 @@ interface Enveloppe<T> {
 
 /** Le contenu vide : ce que le gabarit affiche tant que l'API ne sert rien. */
 export const CONTENU_VIDE: ContenuAccueil = {
+  hero: null,
   welcome: null,
   ambassador: null,
   leaders: [],
@@ -85,11 +130,39 @@ export function normaliserContenu(
   servi: Partial<ContenuAccueil> | null | undefined,
 ): ContenuAccueil {
   return {
+    hero: normaliserBanniere(servi?.hero),
     welcome: servi?.welcome ?? null,
     ambassador: servi?.ambassador ?? null,
     leaders: ordonner(servi?.leaders ?? []),
     showcase: ordonner(servi?.showcase ?? []),
   }
+}
+
+/**
+ * Ce que le front lit du bloc `hero`.
+ *
+ * Deux replis, et aucun n'est defensif : une variante inconnue vaut
+ * `classique`, parce que le contrat le dit et qu'une ambassade ne doit pas
+ * perdre sa banniere parce qu'un mot a change ; et `slides` absent vaut liste
+ * vide, comme partout ailleurs. La regle « un diaporama sans image retombe sur
+ * classique » n'est PAS appliquee ici : elle regarde l'affichage, et l'ecran
+ * d'administration doit continuer de montrer la variante reellement
+ * enregistree.
+ */
+export function normaliserBanniere(
+  servie: Partial<BanniereAccueil> | null | undefined,
+): BanniereAccueil | null {
+  if (servie === null || servie === undefined) return null
+  return {
+    variant: estVarianteConnue(servie.variant) ? servie.variant : 'classique',
+    title: servie.title ?? null,
+    intro: servie.intro ?? null,
+    slides: ordonner(servie.slides ?? []),
+  }
+}
+
+function estVarianteConnue(valeur: unknown): valeur is VarianteBanniere {
+  return typeof valeur === 'string' && (VARIANTES_BANNIERE as readonly string[]).includes(valeur)
 }
 
 export async function recupererContenuAccueil(): Promise<ContenuAccueil> {
@@ -176,6 +249,72 @@ export function supprimerImageVitrine(id: number): Promise<void> {
 
 export function ordonnerVitrine(ids: readonly number[]): Promise<void> {
   return apiPut(`${ADMIN}/showcase/order`, { ids })
+}
+
+/** Ce que porte le `PUT /hero` : la mise en page et ses deux textes, rien d'autre. */
+export type BanniereSaisie = Pick<BanniereAccueil, 'variant' | 'title' | 'intro'>
+
+/**
+ * Remplace la banniere sans toucher aux diapositives.
+ *
+ * Les diapositives ont leurs propres routes, comme les dirigeants et la
+ * vitrine. L'effacement franc est reserve a `supprimerBanniere`, et c'est la
+ * toute la difference entre les deux gestes.
+ */
+export async function enregistrerBanniere(saisie: BanniereSaisie): Promise<BanniereAccueil> {
+  const reponse = await apiPut<Enveloppe<BanniereAccueil>>(`${ADMIN}/hero`, saisie)
+  return reponse.data
+}
+
+/**
+ * Supprime la banniere, **et ses diapositives avec elle**.
+ *
+ * L'ecran qui appelle ceci doit l'annoncer en toutes lettres : un « retour au
+ * defaut » qui garderait secretement cinq images, pretes a reapparaitre a la
+ * prochaine ecriture, est un piege. Pour garder les images en affichant la
+ * banniere simple, on enregistre `variant: 'classique'` — c'est a cela que
+ * sert la variante.
+ */
+export function supprimerBanniere(): Promise<void> {
+  return apiDelete(`${ADMIN}/hero`)
+}
+
+export type DiapositiveSaisie = Omit<DiapositiveBanniere, 'id' | 'position'>
+
+/** Le back refuse la sixieme en 422 ; le front n'en propose pas davantage. */
+export const DIAPOSITIVES_MAX = 5
+
+export async function ajouterDiapositive(saisie: DiapositiveSaisie): Promise<DiapositiveBanniere> {
+  const reponse = await apiPost<Enveloppe<DiapositiveBanniere>>(`${ADMIN}/hero/slides`, saisie)
+  return reponse.data
+}
+
+export async function modifierDiapositive(
+  id: number,
+  saisie: Partial<DiapositiveSaisie>,
+): Promise<DiapositiveBanniere> {
+  const reponse = await apiPatch<Enveloppe<DiapositiveBanniere>>(
+    `${ADMIN}/hero/slides/${id}`,
+    saisie,
+  )
+  return reponse.data
+}
+
+export function supprimerDiapositive(id: number): Promise<void> {
+  return apiDelete(`${ADMIN}/hero/slides/${id}`)
+}
+
+/**
+ * Reordonne les diapositives.
+ *
+ * Cette route rend **404** quand l'ambassade n'a pas encore de banniere, la ou
+ * `leaders/order` et `showcase/order` rendent 422 : la banniere est
+ * proprietaire de ses diapositives, son absence signifie que l'operation n'a
+ * pas d'objet. L'ecran doit donc traiter ce 404 comme « la banniere a disparu
+ * depuis le chargement », c'est-a-dire recharger, et non comme « introuvable ».
+ */
+export function ordonnerDiapositives(ids: readonly number[]): Promise<void> {
+  return apiPut(`${ADMIN}/hero/slides/order`, { ids })
 }
 
 /** Bornes du televersement, reprises du contrat pour les verifier avant envoi. */

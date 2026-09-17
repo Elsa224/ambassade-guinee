@@ -1,7 +1,35 @@
 <template>
   <div class="min-h-screen bg-gray-50">
-    <!-- HERO -->
-    <section class="py-20 bg-cover bg-center" :style="{ backgroundImage: `url(${bgHero})` }">
+    <!-- HERO en diaporama, quand l'ambassade a choisi cette mise en page et
+         televerse au moins une image. -->
+    <BanniereDiaporama
+      v-if="diaporamaAffiche"
+      :titre="titreDeLaBanniere"
+      :intro="banniere?.intro ?? null"
+      :logo="logo"
+      :diapositives="banniere?.slides ?? []"
+    >
+      <template #boutons>
+        <router-link
+          to="/actualite"
+          class="bg-primary hover:bg-primary-dark text-white px-8 py-4 rounded-xl font-semibold shadow-lg transition-colors"
+        >
+          Consulter les actualités
+        </router-link>
+        <router-link
+          v-if="servicesConsulairesOuverts"
+          to="/services"
+          class="text-white font-semibold flex items-center gap-2 hover:text-secondary transition-colors"
+        >
+          Nos services
+          <i class="bx bx-right-arrow-alt text-xl" aria-hidden="true"></i>
+        </router-link>
+      </template>
+    </BanniereDiaporama>
+
+    <!-- HERO classique : le defaut du gabarit, et ce que garde toute
+         ambassade qui ne saisit rien. -->
+    <section v-else class="py-20 bg-cover bg-center" :style="{ backgroundImage: `url(${bgHero})` }">
       <div class="max-w-7xl mx-auto px-6 lg:px-8 grid lg:grid-cols-2 gap-16 items-center">
         <!-- TEXTE GAUCHE -->
         <div>
@@ -10,13 +38,15 @@
 
           <!-- Titre -->
           <h1 class="text-4xl lg:text-5xl font-bold text-gray-900 leading-tight mb-6">
-            {{ nomDeLAmbassade }}
+            {{ titreDeLaBanniere }}
           </h1>
 
-          <!-- Le paragraphe qui suivait etait du faux texte de maquette
-               (« Ut velit mauris, egestas sed... »), reste en production. Il
-               attend un vrai texte d'accroche, que l'API ne transmet pas
-               encore. -->
+          <!-- Le faux texte de maquette qui occupait cette place (« Ut velit
+               mauris, egestas sed... ») est remplace par l'accroche saisie
+               dans le CMS. Rien saisi, rien affiche. -->
+          <p v-if="banniere?.intro" class="text-lg text-gray-700 leading-relaxed mb-8">
+            {{ banniere.intro }}
+          </p>
 
           <!-- Boutons : le premier menait a `/services`, qui n'est pas une
                route, sous le libelle de maquette « Button 1 ». Les deux
@@ -254,59 +284,38 @@
     <!-- Section Démarches consulaires et actualités récentes -->
     <section class="py-20 bg-white">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          <!-- Démarches consulaires -->
-          <div>
+        <div class="grid grid-cols-1 gap-12" :class="{ 'lg:grid-cols-2': demarches.length > 0 }">
+          <!-- Demarches consulaires : servies par le CMS, et absentes tant
+               qu'aucun service n'est publie. -->
+          <div v-if="demarches.length > 0">
             <h2 class="text-3xl font-bold text-primary mb-6 flex items-center gap-3">
               <span class="w-2 h-8 bg-secondary rounded-full"></span>
               Démarches consulaires
             </h2>
             <div class="space-y-4">
               <router-link
-                to="/construction"
+                v-for="service in demarches"
+                :key="service.id"
+                :to="`/services/${service.slug}`"
                 class="block bg-gray-50 p-5 rounded-xl hover:bg-primary hover:text-white group transition-all"
               >
-                <div class="flex items-center justify-between">
-                  <span class="font-semibold text-lg">Comment obtenir un visa ?</span>
-                  <i
-                    class="bx bx-chevron-right text-2xl group-hover:translate-x-2 transition-transform"
-                  ></i>
-                </div>
-              </router-link>
-              <router-link
-                to="/construction"
-                class="block bg-gray-50 p-5 rounded-xl hover:bg-primary hover:text-white group transition-all"
-              >
-                <div class="flex items-center justify-between">
-                  <span class="font-semibold text-lg">Renouvellement de passeport</span>
-                  <i
-                    class="bx bx-chevron-right text-2xl group-hover:translate-x-2 transition-transform"
-                  ></i>
-                </div>
-              </router-link>
-              <router-link
-                to="/construction"
-                class="block bg-gray-50 p-5 rounded-xl hover:bg-primary hover:text-white group transition-all"
-              >
-                <div class="flex items-center justify-between">
-                  <span class="font-semibold text-lg">Légalisation de documents</span>
-                  <i
-                    class="bx bx-chevron-right text-2xl group-hover:translate-x-2 transition-transform"
-                  ></i>
-                </div>
-              </router-link>
-              <router-link
-                to="/construction"
-                class="block bg-gray-50 p-5 rounded-xl hover:bg-primary hover:text-white group transition-all"
-              >
-                <div class="flex items-center justify-between">
-                  <span class="font-semibold text-lg">Inscription consulaire</span>
+                <div class="flex items-center justify-between gap-4">
+                  <span class="font-semibold text-lg">{{ service.title }}</span>
                   <i
                     class="bx bx-chevron-right text-2xl group-hover:translate-x-2 transition-transform"
                   ></i>
                 </div>
               </router-link>
             </div>
+
+            <router-link
+              v-if="services.services.length > demarches.length"
+              to="/services"
+              class="inline-flex items-center gap-2 mt-6 font-semibold text-accent hover:gap-3 transition-all"
+            >
+              Voir tous les services
+              <i class="bx bx-right-arrow-alt" aria-hidden="true"></i>
+            </router-link>
           </div>
 
           <!-- Actualités récentes -->
@@ -425,17 +434,23 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, onBeforeUnmount, watch, ref } from 'vue'
 import { useActualites, formaterDate, formaterDateCourte } from '@/composables/useActualites'
 import { useTenantStore } from '@/stores/tenant'
 import { useIdentite } from '@/tenant/identite'
 import { recupererContenuAccueil, CONTENU_VIDE, type ContenuAccueil } from '@/api/contenu'
+import { recupererServices, SERVICES_VIDES, type ContenuServices } from '@/api/services'
+import BanniereDiaporama from '@/components/accueil/BanniereDiaporama.vue'
+import { poserEnteteEnSurimpression } from '@/tenant/banniere'
 
 const tenant = useTenantStore()
 const { nomDeLAmbassade, logo } = useIdentite()
 
 // Rubriques de contenu : ouvertes tant que l'ambassade ne les ferme pas.
 const servicesOuverts = computed(() => tenant.rubriqueOuverte('services'))
+
+/** La rubrique servie par le CMS, distincte de la page ecrite en dur. */
+const servicesConsulairesOuverts = computed(() => tenant.rubriqueOuverte('services_consulaires'))
 
 /**
  * Contenu d'accueil servi par le CMS : mot de bienvenue, dirigeants, vitrine.
@@ -456,6 +471,30 @@ const contenu = ref<ContenuAccueil>({ ...CONTENU_VIDE })
  * depuis son administration. Garder les deux mecanismes ferait remplir un
  * formulaire sans rien voir apparaitre.
  */
+/**
+ * La banniere choisie par l'ambassade, ou `null` quand elle n'a rien choisi.
+ */
+const banniere = computed(() => contenu.value.hero)
+
+/**
+ * Un diaporama sans image n'est pas un diaporama : c'est un aplat sombre ou
+ * personne ne trouve le menu. Le front ne fait donc pas confiance a la seule
+ * valeur du champ et verifie qu'il y a au moins une photo. Le back, lui,
+ * enregistre cette combinaison sans broncher — refuser imposerait de
+ * televerser les images avant de choisir la mise en page.
+ */
+const diaporamaAffiche = computed(
+  () => banniere.value?.variant === 'diaporama' && banniere.value.slides.length > 0,
+)
+
+/** Le titre saisi, ou le nom de l'ambassade comme aujourd'hui. */
+const titreDeLaBanniere = computed(() => banniere.value?.title ?? nomDeLAmbassade.value)
+
+// L'en-tete ne passe en surimpression que devant le diaporama reellement
+// affiche, et reprend sa forme habituelle des qu'on quitte l'accueil.
+watch(diaporamaAffiche, poserEnteteEnSurimpression, { immediate: true })
+onBeforeUnmount(() => poserEnteteEnSurimpression(false))
+
 const motDeBienvenue = computed(() => contenu.value.welcome)
 const dirigeants = computed(() => contenu.value.leaders)
 const photosVitrine = computed(() => contenu.value.showcase)
@@ -491,6 +530,27 @@ const estAmbassadeur = (dirigeant: { role: string }) =>
     .toLowerCase()
     .includes('ambassadeur')
 
+/**
+ * Les services consulaires servis par le CMS, pour la section « Demarches
+ * consulaires ».
+ *
+ * Les quatre entrees de cette section menaient a `/construction` : des
+ * intitules ecrits en dur, sans destination. Les faire pointer sur un slug
+ * devine — `/services/visa` parce que l'intitule parle de visa — remettrait le
+ * contenu d'une ambassade dans le gabarit des autres : rien ne garantit
+ * qu'un poste nomme son service ainsi, ni qu'il en offre un. La liste vient
+ * donc de la meme source que la page `/services`, et chaque entree pointe sur
+ * le service qu'elle nomme.
+ */
+const services = ref<ContenuServices>({ ...SERVICES_VIDES })
+
+/**
+ * Quatre entrees au plus : la section est une mise en avant, pas la rubrique.
+ * L'ordre est celui choisi par l'ambassade, deja applique par l'API.
+ */
+const DEMARCHES_EN_AVANT = 4
+const demarches = computed(() => services.value.services.slice(0, DEMARCHES_EN_AVANT))
+
 onMounted(async () => {
   try {
     contenu.value = await recupererContenuAccueil()
@@ -499,6 +559,13 @@ onMounted(async () => {
     // d'accueil d'ambassade, une section absente vaut mieux qu'un message
     // d'erreur — et surtout, le repli n'est jamais le contenu compile dans le
     // gabarit, qui est celui d'une autre ambassade.
+  }
+
+  try {
+    services.value = await recupererServices()
+  } catch {
+    // Meme discipline : sans service servi, la colonne des demarches
+    // disparait et les actualites occupent la largeur.
   }
 })
 

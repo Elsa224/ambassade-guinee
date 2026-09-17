@@ -471,6 +471,114 @@ export function mockApi(): Plugin {
       return repondre(204, null)
     }
 
+    // --- Banniere d'accueil ------------------------------------------------
+    // Le faux serveur reproduit les refus et les codes du vrai. Le plus
+    // singulier est le 404 de `hero/slides/order` sans banniere, la ou les
+    // deux autres listes rendent 422 : la banniere est proprietaire de ses
+    // diapositives, son absence signifie que l'operation n'a pas d'objet.
+    type Banniere = {
+      variant: string
+      title: string | null
+      intro: string | null
+      slides: Record<string, unknown>[]
+    }
+    const banniere = () => contenu().hero as Banniere | null
+    const diapositives = () => banniere()?.slides ?? []
+    const renumeroterDiapositives = () => {
+      diapositives().forEach((diapositive, index) => (diapositive.position = index + 1))
+    }
+
+    if (chemin === '/admin/content/hero') {
+      if (methode === 'PUT') {
+        return void lireCorps().then((corps) => {
+          if (corps === null) return repondre(422, { message: 'Corps de requete illisible.' })
+          if (corps.variant !== 'classique' && corps.variant !== 'diaporama') {
+            return repondre(422, { message: 'La mise en page doit etre classique ou diaporama.' })
+          }
+          // Le PUT ne touche pas aux diapositives : elles ont leurs routes.
+          const existante = banniere()
+          contenu().hero = {
+            variant: corps.variant,
+            title: typeof corps.title === 'string' && corps.title !== '' ? corps.title : null,
+            intro: typeof corps.intro === 'string' && corps.intro !== '' ? corps.intro : null,
+            slides: existante?.slides ?? [],
+          }
+          repondre(200, { data: contenu().hero })
+        })
+      }
+
+      if (methode === 'DELETE') {
+        // Suppression franche : les diapositives partent avec la banniere.
+        contenu().hero = null
+        return repondre(204, null)
+      }
+    }
+
+    if (chemin === '/admin/content/hero/slides' && methode === 'POST') {
+      return void lireCorps().then((corps) => {
+        if (corps === null) return repondre(422, { message: 'Corps de requete illisible.' })
+        if (typeof corps.image_url !== 'string' || corps.image_url === '') {
+          return repondre(422, { message: "L'image est obligatoire." })
+        }
+        // Le bloc se cree par le premier PUT ou la premiere diapositive,
+        // indifferemment : aucun 409 pour l'ordre des gestes.
+        if (banniere() === null) {
+          contenu().hero = { variant: 'diaporama', title: null, intro: null, slides: [] }
+        }
+        if (diapositives().length >= 5) {
+          return repondre(422, { message: 'La banniere ne peut pas porter plus de 5 images.' })
+        }
+        const diapositive = {
+          image_url: corps.image_url,
+          quote: corps.quote ?? null,
+          author: corps.author ?? null,
+          id: (prochainIdentifiant += 1),
+          position: diapositives().length + 1,
+        }
+        diapositives().push(diapositive)
+        repondre(201, { data: diapositive })
+      })
+    }
+
+    if (chemin === '/admin/content/hero/slides/order' && methode === 'PUT') {
+      return void lireCorps().then((corps) => {
+        if (banniere() === null) return repondre(404, { message: 'Aucune banniere enregistree.' })
+        const ids = Array.isArray(corps?.ids) ? (corps.ids as number[]) : null
+        if (ids === null) return repondre(422, { message: 'Liste d identifiants attendue.' })
+        const actuelles = diapositives()
+        const reordonnees = ids
+          .map((id) => actuelles.find((d) => d.id === id))
+          .filter((d): d is Record<string, unknown> => d !== undefined)
+        const restantes = actuelles.filter((d) => !ids.includes(d.id as number))
+        banniere()!.slides = [...reordonnees, ...restantes]
+        renumeroterDiapositives()
+        repondre(204, null)
+      })
+    }
+
+    const diapositiveVisee = chemin.startsWith('/admin/content/hero/slides/')
+      ? chemin.slice('/admin/content/hero/slides/'.length)
+      : null
+    if (diapositiveVisee !== null && /^\d+$/.test(diapositiveVisee)) {
+      const actuelles = diapositives()
+      const index = actuelles.findIndex((d) => d.id === Number(diapositiveVisee))
+      if (index === -1) return repondre(404, { message: 'Diapositive introuvable.' })
+
+      if (methode === 'DELETE') {
+        actuelles.splice(index, 1)
+        renumeroterDiapositives()
+        return repondre(204, null)
+      }
+
+      if (methode === 'PATCH') {
+        return void lireCorps().then((corps) => {
+          if (corps === null) return repondre(422, { message: 'Corps de requete illisible.' })
+          Object.assign(actuelles[index]!, corps)
+          repondre(200, { data: actuelles[index] })
+        })
+      }
+    }
+
     const BLOC_PAR_CHEMIN: Record<string, 'leaders' | 'showcase'> = {
       '/admin/content/leaders': 'leaders',
       '/admin/content/showcase': 'showcase',
