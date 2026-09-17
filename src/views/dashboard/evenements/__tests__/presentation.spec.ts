@@ -7,18 +7,16 @@ function avecStatut(status: string): EvenementAdmin {
 }
 
 describe('etat d un evenement', () => {
-  it('traduit les etats connus', () => {
-    expect(etatDe(avecStatut('SCHEDULED')).libelle).toBe('Programmé')
-    expect(etatDe(avecStatut('ACTIVE')).libelle).toBe('En cours')
-    expect(etatDe(avecStatut('CANCELLED')).libelle).toBe('Annulé')
-    expect(etatDe(avecStatut('COMPLETED')).libelle).toBe('Terminé')
-  })
-
-  it('accepte la casse servie par le back', () => {
-    // La liste sert « ACTIVE », la reponse d'annulation « cancelled », et le
-    // premier vrai evenement est arrive en « scheduled ».
+  it('traduit les trois etats du service, servis en minuscules', () => {
+    // `EVENT_STATUS` du service, releve dans son code le 2026-09-17 : il n'y
+    // en a pas d'autres, et ils sont serialises verbatim, en minuscules.
     expect(etatDe(avecStatut('scheduled')).libelle).toBe('Programmé')
     expect(etatDe(avecStatut('cancelled')).libelle).toBe('Annulé')
+    expect(etatDe(avecStatut('done')).libelle).toBe('Terminé')
+  })
+
+  it('accepte aussi les majuscules', () => {
+    expect(etatDe(avecStatut('SCHEDULED')).libelle).toBe('Programmé')
   })
 
   it('montre un etat inconnu plutot que de le masquer', () => {
@@ -33,13 +31,14 @@ describe('annulation possible', () => {
     // Le bouton « Annuler » avait purement disparu de la fiche.
     expect(estAnnulable('scheduled')).toBe(true)
     expect(estAnnulable('POSTPONED')).toBe(true)
-    expect(estAnnulable('ACTIVE')).toBe(true)
   })
 
   it('ne se propose pas deux fois sur un etat terminal', () => {
-    expect(estAnnulable('CANCELLED')).toBe(false)
     expect(estAnnulable('cancelled')).toBe(false)
-    expect(estAnnulable('COMPLETED')).toBe(false)
+    expect(estAnnulable('CANCELLED')).toBe(false)
+    // `done` est masque par decision d'interface : le serveur, lui, ne
+    // refuse l'annulation que sur `cancelled` et laisserait passer celle-ci.
+    expect(estAnnulable('done')).toBe(false)
   })
 })
 
