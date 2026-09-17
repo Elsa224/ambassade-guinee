@@ -67,10 +67,20 @@ function liensAllumes(wrapper: Awaited<ReturnType<typeof monter>>): string[] {
     .map((a) => a.attributes('href') ?? '')
 }
 
+/**
+ * Les tests d'habillage ci-dessous portent sur la rubrique « Evenements »,
+ * qui n'est affichee que si le module est ouvert : ils la declarent donc
+ * ouverte. Le cas ferme a son propre test, plus bas.
+ */
+const GABON_AVEC_EVENEMENTS = {
+  ...GABON,
+  modules: { ...GABON.modules, secure_events: true },
+}
+
 describe('barre laterale du tableau de bord', () => {
   beforeEach(() => {
     setActivePinia(createPinia())
-    useTenantStore().embassy = GABON
+    useTenantStore().embassy = GABON_AVEC_EVENEMENTS
   })
 
   it('n allume que la rubrique consultee', async () => {
@@ -122,5 +132,27 @@ describe('barre laterale du tableau de bord', () => {
     const sources = wrapper.findAll('img').map((i) => i.attributes('src') ?? '')
 
     expect(sources).toContain(GABON.logo_image)
+  })
+
+  it("n'annonce pas les Evenements quand le module n'est pas ouvert", async () => {
+    // Le module suppose un compte Ambassade Secure provisionne. Ferme, toutes
+    // ses routes rendent 404 : annoncer l'entree menerait l'administrateur sur
+    // un ecran vide dont il n'a pas la clef.
+    useTenantStore().embassy = { ...GABON, modules: { ...GABON.modules, secure_events: false } }
+    const wrapper = await monter('/dashboard')
+
+    const liens = wrapper.findAll('a').map((a) => a.attributes('href') ?? '')
+    expect(liens).not.toContain('/dashboard/evenements')
+  })
+
+  it("n'annonce pas les Evenements tant que le bootstrap n'a pas repondu", async () => {
+    // Sinon l'entree apparait puis disparait le temps d'un aller-retour.
+    const tenant = useTenantStore()
+    tenant.embassy = null
+    tenant.chargement = true
+    const wrapper = await monter('/dashboard')
+
+    const liens = wrapper.findAll('a').map((a) => a.attributes('href') ?? '')
+    expect(liens).not.toContain('/dashboard/evenements')
   })
 })

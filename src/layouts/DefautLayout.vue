@@ -119,7 +119,7 @@
                        toutes les ambassades. -->
                   <div class="hidden lg:block text-left">
                     <p class="text-sm font-medium text-gray-800">
-                      {{ auth.utilisateur?.nom || 'Administrateur' }}
+                      {{ auth.utilisateur?.name || 'Administrateur' }}
                     </p>
                     <p v-if="auth.utilisateur?.email" class="text-xs text-gray-500">
                       {{ auth.utilisateur.email }}
@@ -133,15 +133,17 @@
                   v-if="showProfile"
                   class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl z-50"
                 >
+                  <!--
+                    « Mon profil » a disparu : il menait a un tableau de bord
+                    d'analyse herite du fork, peuple de visiteurs inventes. Il
+                    reviendra avec les vraies routes de compte.
+
+                    « Parametres » pointait sur ce meme ecran alors que
+                    l'ambassade en a un vrai : il mene desormais ou son
+                    intitule le promet.
+                  -->
                   <router-link
-                    to="/dashboard/profile"
-                    class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                  >
-                    <i class="bx bx-user"></i>
-                    <span>Mon profil</span>
-                  </router-link>
-                  <router-link
-                    to="/dashboard/profile"
+                    to="/dashboard/parametres"
                     class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                   >
                     <i class="bx bx-cog"></i>

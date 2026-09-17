@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { bornesAffichees, type Pagination } from '@/api/evenements-admin'
-import ChampSelect from '@/components/ui/ChampSelect.vue'
+import { bornesAffichees, type Pagination } from './pagination'
+import ChampSelect from './ChampSelect.vue'
 
 /**
  * Navigation entre les pages.
@@ -10,7 +10,15 @@ import ChampSelect from '@/components/ui/ChampSelect.vue'
  * exact (« 61-90 sur 204 ») plutot qu'une navigation a l'aveugle ou seul le
  * bouton suivant renseigne sur ce qui reste.
  */
-const props = defineProps<{ pagination: Pagination; desactive?: boolean }>()
+/**
+ * `libelleVide` nomme ce qui manque : « Aucun evenement », « Aucun article ».
+ * Un « Aucun element » generique dit moins que le titre de la page qu'on a
+ * sous les yeux, et se remarque comme un texte de composant.
+ */
+const props = withDefaults(
+  defineProps<{ pagination: Pagination; desactive?: boolean; libelleVide?: string }>(),
+  { desactive: false, libelleVide: 'Aucun élément' },
+)
 const emit = defineEmits<{ page: [numero: number]; limite: [lignes: number] }>()
 
 const LIGNES_POSSIBLES = [10, 20, 50, 100] as const
@@ -52,7 +60,7 @@ function aller(numero: number) {
     class="flex flex-wrap items-center justify-between gap-4 border-t border-gray-200 px-5 py-3.5"
   >
     <p class="text-sm text-gray-600 tabular-nums">
-      <template v-if="pagination.total === 0">Aucun évènement</template>
+      <template v-if="pagination.total === 0">{{ libelleVide }}</template>
       <template v-else>
         <span class="font-medium text-gray-800">{{ bornes.premier }}–{{ bornes.dernier }}</span>
         sur {{ pagination.total }}

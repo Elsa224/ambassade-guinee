@@ -57,7 +57,7 @@
         <p class="text-sm text-gray-600">Brouillons</p>
       </div>
       <div class="bg-white rounded-xl shadow-md p-4 text-center">
-        <p class="text-2xl font-bold text-blue-600">{{ totalVues }}</p>
+        <p class="text-2xl font-bold text-primary">{{ totalVues }}</p>
         <p class="text-sm text-gray-600">Total vues</p>
       </div>
     </div>
@@ -130,16 +130,7 @@
                 <div class="text-xs text-gray-500 mt-1">{{ actualite.resume }}</div>
               </td>
               <td class="px-6 py-4">
-                <span
-                  :class="[
-                    'px-2 py-1 text-xs rounded-full',
-                    actualite.type === 'actualites-ambassade'
-                      ? 'bg-purple-100 text-purple-600'
-                      : actualite.type === 'actualites-diplomatique'
-                        ? 'bg-blue-100 text-blue-600'
-                        : 'bg-green-100 text-green-600',
-                  ]"
-                >
+                <span :class="['px-2 py-1 text-xs rounded-full', 'bg-gray-100 text-gray-700']">
                   {{ getTypeLabel(actualite.type) }}
                 </span>
               </td>
@@ -165,7 +156,7 @@
                 <div class="flex gap-2">
                   <button
                     @click="viewActualite(actualite)"
-                    class="text-blue-600 hover:text-blue-800"
+                    class="text-primary hover:text-primary-dark"
                   >
                     <i class="bx bx-show text-xl"></i>
                   </button>
@@ -189,31 +180,12 @@
         </table>
       </div>
 
-      <!-- Pagination -->
-      <div class="px-6 py-4 border-t flex items-center justify-between">
-        <div class="text-sm text-gray-500">
-          Affichage de {{ (pageCourante - 1) * itemsParPage + 1 }} à
-          {{ Math.min(pageCourante * itemsParPage, actualitesFiltrees.length) }} sur
-          {{ actualitesFiltrees.length }} actualités
-        </div>
-        <div class="flex gap-2">
-          <button
-            @click="pageCourante--"
-            :disabled="pageCourante === 1"
-            class="px-3 py-1 border rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <i class="bx bx-chevron-left"></i>
-          </button>
-          <span class="px-3 py-1 bg-primary text-white rounded-lg">{{ pageCourante }}</span>
-          <button
-            @click="pageCourante++"
-            :disabled="pageCourante === totalPages"
-            class="px-3 py-1 border rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <i class="bx bx-chevron-right"></i>
-          </button>
-        </div>
-      </div>
+      <Pagination
+        :pagination="pagination"
+        libelle-vide="Aucune actualité"
+        @page="pageCourante = $event"
+        @limite="changerLignesParPage"
+      />
     </div>
 
     <!-- ========== MODAL AJOUTER/MODIFIER - CENTRÉE ========== -->
@@ -372,16 +344,7 @@
             <h2 class="text-2xl font-bold text-gray-800 mb-2">{{ viewActualiteData.titre }}</h2>
             <div class="flex gap-4 text-sm text-gray-500 mb-4">
               <span>{{ formatDate(viewActualiteData.date) }}</span>
-              <span
-                :class="[
-                  'px-2 py-1 text-xs rounded-full',
-                  viewActualiteData.type === 'actualites-ambassade'
-                    ? 'bg-purple-100 text-purple-600'
-                    : viewActualiteData.type === 'actualites-diplomatique'
-                      ? 'bg-blue-100 text-blue-600'
-                      : 'bg-green-100 text-green-600',
-                ]"
-              >
+              <span :class="['px-2 py-1 text-xs rounded-full', 'bg-gray-100 text-gray-700']">
                 {{ getTypeLabel(viewActualiteData.type) }}
               </span>
               <span>{{ viewActualiteData.vues }} vues</span>
@@ -431,6 +394,11 @@ import {
 } from '@/api/articles'
 import ChampSelect from '@/components/ui/ChampSelect.vue'
 import ChampDate from '@/components/ui/ChampDate.vue'
+import Pagination from '@/components/ui/Pagination.vue'
+import { paginerEnMemoire } from '@/components/ui/pagination'
+
+/** Dix lignes tenaient dans la page ; le lecteur peut desormais en demander plus. */
+const LIGNES_PAR_DEFAUT = 10
 const OPTIONS_FILTRETYPE = [
   { valeur: '', libelle: 'Tous les types' },
   { valeur: 'actualites-ambassade', libelle: 'Actualités Ambassade' },
@@ -473,7 +441,7 @@ const filtreType = ref('')
 const filtreStatut = ref('')
 const tri = ref('recent')
 const pageCourante = ref(1)
-const itemsParPage = 10
+const itemsParPage = ref(LIGNES_PAR_DEFAUT)
 
 // Modal
 const showModal = ref(false)
@@ -545,8 +513,8 @@ const actualitesFiltrees = computed(() => {
 })
 
 const actualitesPaginees = computed(() => {
-  const start = (pageCourante.value - 1) * itemsParPage
-  const end = start + itemsParPage
+  const start = (pageCourante.value - 1) * itemsParPage.value
+  const end = start + itemsParPage.value
   return actualitesFiltrees.value.slice(start, end)
 })
 
@@ -555,7 +523,21 @@ const actualitesBrouillons = computed(() =>
   actualites.value.filter((a) => a.statut === 'Brouillon'),
 )
 const totalVues = computed(() => actualites.value.reduce((sum, a) => sum + a.vues, 0))
-const totalPages = computed(() => Math.ceil(actualitesFiltrees.value.length / itemsParPage))
+/**
+ * La barre de pagination attend la meme forme que celle servie par le back
+ * pour les evenements. `paginerEnMemoire` la construit ici, ou actualitesFiltrees
+ * est deja en memoire, et garantit au passage `totalPages >= 1` : l'ancien
+ * calcul rendait zero sur une liste vide, ce qui laissait le bouton
+ * « suivant » actif et permettait d'avancer dans le neant.
+ */
+const pagination = computed(() =>
+  paginerEnMemoire(actualitesFiltrees.value.length, pageCourante.value, itemsParPage.value),
+)
+
+function changerLignesParPage(lignes) {
+  itemsParPage.value = lignes
+  pageCourante.value = 1
+}
 
 // Fonctions utilitaires
 const getTypeLabel = (type) => {

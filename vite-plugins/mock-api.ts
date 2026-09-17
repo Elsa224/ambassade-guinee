@@ -14,6 +14,22 @@ import path from 'node:path'
  * aucun rapport avec un compte reel.
  */
 const IDENTIFIANTS_DEV = { email: 'admin@exemple-ambassade.test', password: 'motdepasse' }
+
+/**
+ * Le compte servi par la connexion et par `/auth/me`, dans la forme EXACTE du
+ * vrai back : `AuthController::userPayload()` rend `name`, `role` et
+ * `embassy_id`. Ce bouchon servait `nom`, que le back n'a jamais envoye ; le
+ * front s'y etait aligne, et le nom de l'administrateur ne s'affichait jamais
+ * en production. Un faux serveur qui invente un champ ne simplifie rien : il
+ * deplace le bug jusqu'au deploiement.
+ */
+const COMPTE_DEV = {
+  id: 1,
+  name: 'Administrateur',
+  email: IDENTIFIANTS_DEV.email,
+  role: 'admin',
+  embassy_id: 1,
+}
 const JETON_DEV = 'jeton-de-developpement'
 
 function fixture(nom: string): unknown {
@@ -777,7 +793,7 @@ export function mockApi(): Plugin {
         ) {
           return repondre(200, {
             token: JETON_DEV,
-            user: { id: 1, nom: 'Administrateur', email: IDENTIFIANTS_DEV.email, role: 'admin' },
+            user: COMPTE_DEV,
           })
         }
         return repondre(422, { message: 'Identifiants invalides.' })
@@ -789,7 +805,7 @@ export function mockApi(): Plugin {
         return repondre(401, { message: 'Non authentifie.' })
       }
       return repondre(200, {
-        user: { id: 1, nom: 'Administrateur', email: IDENTIFIANTS_DEV.email, role: 'admin' },
+        user: COMPTE_DEV,
       })
     }
 
