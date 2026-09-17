@@ -1,5 +1,11 @@
 import { apiGet, apiPost, apiPatch, apiDelete, apiFichier, ApiError } from './client'
 import type { FichierServi } from './client'
+// La forme d'une pagination n'est pas propre aux evenements : elle vit dans
+// `components/ui/pagination.ts` et se reexporte ici, ou le contrat du back est
+// decrit.
+import type { Pagination } from '@/components/ui/pagination'
+
+export { bornesAffichees, type Pagination } from '@/components/ui/pagination'
 
 /**
  * Surface d'administration du module Evenements.
@@ -81,12 +87,6 @@ export interface EvenementAdmin {
  * Les quatre champs sont garantis, ce qui permet d'afficher un total exact
  * (« 61-90 sur 204 ») plutot qu'une navigation a l'aveugle.
  */
-export interface Pagination {
-  page: number
-  limit: number
-  total: number
-  totalPages: number
-}
 
 export interface PageEvenements {
   evenements: EvenementAdmin[]
@@ -102,13 +102,6 @@ export interface PageEvenements {
  */
 export const LIMITE_MAX = 100
 export const LIMITE_DEFAUT = 20
-
-/** Bornes de la page affichee, pour le libelle « 61-90 sur 204 ». */
-export function bornesAffichees(pagination: Pagination): { premier: number; dernier: number } {
-  if (pagination.total === 0) return { premier: 0, dernier: 0 }
-  const premier = (pagination.page - 1) * pagination.limit + 1
-  return { premier, dernier: Math.min(pagination.page * pagination.limit, pagination.total) }
-}
 
 interface EnveloppePaginee {
   data: EvenementAdmin[]

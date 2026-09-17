@@ -53,7 +53,7 @@
         <p class="text-sm text-gray-600">Brouillons</p>
       </div>
       <div class="bg-white rounded-xl shadow-md p-4 text-center">
-        <p class="text-2xl font-bold text-blue-600">{{ totalVues }}</p>
+        <p class="text-2xl font-bold text-primary">{{ totalVues }}</p>
         <p class="text-sm text-gray-600">Total vues</p>
       </div>
     </div>
@@ -150,7 +150,10 @@
               <td class="px-6 py-4 text-sm text-gray-500">{{ article.vues }} vues</td>
               <td class="px-6 py-4">
                 <div class="flex gap-2">
-                  <button @click="viewArticle(article)" class="text-blue-600 hover:text-blue-800">
+                  <button
+                    @click="viewArticle(article)"
+                    class="text-primary hover:text-primary-dark"
+                  >
                     <i class="bx bx-show text-xl"></i>
                   </button>
                   <button
@@ -172,31 +175,12 @@
         </table>
       </div>
 
-      <!-- Pagination -->
-      <div class="px-6 py-4 border-t flex items-center justify-between">
-        <div class="text-sm text-gray-500">
-          Affichage de {{ (pageCourante - 1) * itemsParPage + 1 }} à
-          {{ Math.min(pageCourante * itemsParPage, articlesFiltres.length) }} sur
-          {{ articlesFiltres.length }} articles
-        </div>
-        <div class="flex gap-2">
-          <button
-            @click="pageCourante--"
-            :disabled="pageCourante === 1"
-            class="px-3 py-1 border rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <i class="bx bx-chevron-left"></i>
-          </button>
-          <span class="px-3 py-1 bg-primary text-white rounded-lg">{{ pageCourante }}</span>
-          <button
-            @click="pageCourante++"
-            :disabled="pageCourante === totalPages"
-            class="px-3 py-1 border rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <i class="bx bx-chevron-right"></i>
-          </button>
-        </div>
-      </div>
+      <Pagination
+        :pagination="pagination"
+        libelle-vide="Aucun article"
+        @page="pageCourante = $event"
+        @limite="changerLignesParPage"
+      />
     </div>
 
     <!-- ========== MODAL AJOUTER/MODIFIER - CENTRÉE ========== -->
@@ -369,6 +353,11 @@ import {
 } from '@/api/articles'
 import ChampSelect from '@/components/ui/ChampSelect.vue'
 import ChampDate from '@/components/ui/ChampDate.vue'
+import Pagination from '@/components/ui/Pagination.vue'
+import { paginerEnMemoire } from '@/components/ui/pagination'
+
+/** Dix lignes tenaient dans la page ; le lecteur peut desormais en demander plus. */
+const LIGNES_PAR_DEFAUT = 10
 const OPTIONS_FILTRECATEGORIE = [
   { valeur: '', libelle: 'Toutes les catégories' },
   { valeur: 'actualites-ambassade', libelle: 'Actualités Ambassade' },
@@ -411,7 +400,7 @@ const filtreCategorie = ref('')
 const filtreStatut = ref('')
 const tri = ref('recent')
 const pageCourante = ref(1)
-const itemsParPage = 10
+const itemsParPage = ref(LIGNES_PAR_DEFAUT)
 
 // Modal
 const showModal = ref(false)
@@ -480,15 +469,29 @@ const articlesFiltres = computed(() => {
 })
 
 const articlesPagines = computed(() => {
-  const start = (pageCourante.value - 1) * itemsParPage
-  const end = start + itemsParPage
+  const start = (pageCourante.value - 1) * itemsParPage.value
+  const end = start + itemsParPage.value
   return articlesFiltres.value.slice(start, end)
 })
 
 const articlesPubliés = computed(() => articles.value.filter((a) => a.statut === 'Publié'))
 const articlesBrouillons = computed(() => articles.value.filter((a) => a.statut === 'Brouillon'))
 const totalVues = computed(() => articles.value.reduce((sum, a) => sum + a.vues, 0))
-const totalPages = computed(() => Math.ceil(articlesFiltres.value.length / itemsParPage))
+/**
+ * La barre de pagination attend la meme forme que celle servie par le back
+ * pour les evenements. `paginerEnMemoire` la construit ici, ou articlesFiltres
+ * est deja en memoire, et garantit au passage `totalPages >= 1` : l'ancien
+ * calcul rendait zero sur une liste vide, ce qui laissait le bouton
+ * « suivant » actif et permettait d'avancer dans le neant.
+ */
+const pagination = computed(() =>
+  paginerEnMemoire(articlesFiltres.value.length, pageCourante.value, itemsParPage.value),
+)
+
+function changerLignesParPage(lignes) {
+  itemsParPage.value = lignes
+  pageCourante.value = 1
+}
 
 const getCategorieLabel = (categorie) => {
   const labels = {
