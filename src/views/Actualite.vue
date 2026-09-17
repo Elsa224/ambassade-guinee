@@ -38,7 +38,7 @@
               :class="
                 categorieActive === 'tous'
                   ? 'bg-primary text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-secondary hover:text-primary'
+                  : 'bg-gray-100 text-gray-700 hover:bg-secondary hover:text-ink-dark'
               "
             >
               Toutes
@@ -51,7 +51,7 @@
               :class="
                 categorieActive === categorie.slug
                   ? 'text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-secondary hover:text-primary'
+                  : 'bg-gray-100 text-gray-700 hover:bg-secondary hover:text-ink-dark'
               "
               :style="
                 categorieActive === categorie.slug
@@ -125,7 +125,7 @@
                 <div class="flex items-center justify-between">
                   <router-link
                     :to="`/actualites/${actualiteUne.slug}`"
-                    class="inline-flex items-center gap-2 bg-secondary text-primary px-6 py-3 rounded-lg font-semibold hover:bg-primary hover:text-white transition-all group"
+                    class="inline-flex items-center gap-2 bg-secondary text-ink-dark px-6 py-3 rounded-lg font-semibold hover:bg-primary hover:text-white transition-all group"
                   >
                     Lire l'article complet
                     <i
@@ -228,7 +228,7 @@
             <button
               @click="pageCourante--"
               :disabled="pageCourante === 1"
-              class="w-10 h-10 rounded-lg border border-gray-300 flex items-center justify-center hover:bg-secondary hover:text-primary transition-colors disabled:opacity-50 disabled:hover:bg-transparent"
+              class="w-10 h-10 rounded-lg border border-gray-300 flex items-center justify-center hover:bg-secondary hover:text-ink-dark transition-colors disabled:opacity-50 disabled:hover:bg-transparent"
             >
               <i class="bx bx-chevron-left"></i>
             </button>
@@ -241,7 +241,7 @@
               :class="
                 pageCourante === page
                   ? 'bg-primary text-white'
-                  : 'border border-gray-300 hover:bg-secondary hover:text-primary'
+                  : 'border border-gray-300 hover:bg-secondary hover:text-ink-dark'
               "
             >
               {{ page }}
@@ -250,7 +250,7 @@
             <button
               @click="pageCourante++"
               :disabled="pageCourante === pagesTotales"
-              class="w-10 h-10 rounded-lg border border-gray-300 flex items-center justify-center hover:bg-secondary hover:text-primary transition-colors disabled:opacity-50 disabled:hover:bg-transparent"
+              class="w-10 h-10 rounded-lg border border-gray-300 flex items-center justify-center hover:bg-secondary hover:text-ink-dark transition-colors disabled:opacity-50 disabled:hover:bg-transparent"
             >
               <i class="bx bx-chevron-right"></i>
             </button>
@@ -280,7 +280,7 @@
           />
           <button
             type="submit"
-            class="bg-secondary text-primary px-8 py-4 rounded-lg font-semibold hover:bg-white transition-all whitespace-nowrap flex items-center justify-center gap-2"
+            class="bg-secondary text-ink-dark px-8 py-4 rounded-lg font-semibold hover:bg-white transition-all whitespace-nowrap flex items-center justify-center gap-2"
           >
             S'abonner
             <i class="bx bx-send"></i>

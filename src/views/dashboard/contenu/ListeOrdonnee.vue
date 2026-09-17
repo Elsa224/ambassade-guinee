@@ -71,7 +71,7 @@
 
     <button
       type="button"
-      class="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-primary hover:underline"
+      class="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-primary-dark hover:underline"
       @click="$emit('ajouter')"
     >
       <i class="bx bx-plus" aria-hidden="true"></i>

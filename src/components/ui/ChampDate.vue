@@ -125,7 +125,7 @@
         <button
           type="button"
           :disabled="aujourdHuiHorsBornes"
-          class="rounded-md px-2 py-1 text-sm font-medium text-primary transition-colors hover:bg-primary/10 disabled:text-gray-300 disabled:hover:bg-transparent"
+          class="rounded-md px-2 py-1 text-sm font-medium text-primary-dark transition-colors hover:bg-primary/10 disabled:text-gray-300 disabled:hover:bg-transparent"
           @click="allerAAujourdHui"
         >
           Aujourd'hui

@@ -18,7 +18,7 @@
     <template v-else-if="article">
       <router-link
         to="/actualite"
-        class="inline-flex items-center gap-2 text-primary hover:text-primary-dark mb-6 text-sm font-medium"
+        class="inline-flex items-center gap-2 text-primary-dark hover:underline mb-6 text-sm font-medium"
       >
         <i class="bx bx-arrow-back"></i>
         Retour aux actualités

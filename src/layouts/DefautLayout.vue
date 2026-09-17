@@ -83,7 +83,7 @@
                     class="bx bx-envelope text-2xl text-gray-600 hover:text-primary transition-colors"
                   ></i>
                   <span
-                    class="absolute -top-1 -right-1 bg-secondary text-primary text-xs rounded-full w-4 h-4 flex items-center justify-center"
+                    class="absolute -top-1 -right-1 bg-secondary text-ink-dark text-xs rounded-full w-4 h-4 flex items-center justify-center"
                     >2</span
                   >
                 </button>

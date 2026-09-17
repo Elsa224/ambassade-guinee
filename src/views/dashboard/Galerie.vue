@@ -62,7 +62,7 @@
         <h3 class="text-lg font-semibold text-gray-800">Albums</h3>
         <button
           @click="openAlbumModal('add')"
-          class="text-primary text-sm hover:underline flex items-center gap-1"
+          class="text-primary-dark text-sm hover:underline flex items-center gap-1"
         >
           <i class="bx bx-plus-circle"></i>
           Nouvel album

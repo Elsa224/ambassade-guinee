@@ -67,7 +67,7 @@
               <td class="px-4 py-3">
                 <button
                   @click="voirCourrier(courrier)"
-                  class="text-sm font-medium text-primary hover:text-primary-dark hover:underline transition-colors duration-200"
+                  class="text-sm font-medium text-primary-dark hover:text-primary-dark hover:underline transition-colors duration-200"
                 >
                   🧷
                 </button>
@@ -90,7 +90,7 @@
                     <!-- ✅ Ajouter -->
                     <button
                       @click="ajouter()"
-                      class="flex items-center w-full px-4 py-2 text-sm text-primary hover:bg-green-50 transition-colors duration-150"
+                      class="flex items-center w-full px-4 py-2 text-sm text-primary-dark hover:bg-green-50 transition-colors duration-150"
                     >
                       <i class="bx bx-plus-circle mr-2 text-primary"></i>
                       Ajouter

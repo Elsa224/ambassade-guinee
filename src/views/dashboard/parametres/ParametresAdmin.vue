@@ -162,7 +162,7 @@
             <p class="text-sm font-medium text-gray-700">Numéros de téléphone</p>
             <button
               type="button"
-              class="text-sm font-semibold text-primary hover:underline disabled:opacity-50 disabled:no-underline"
+              class="text-sm font-semibold text-primary-dark hover:underline disabled:opacity-50 disabled:no-underline"
               :disabled="saisie.contact.phones.length >= NUMEROS_MAX"
               @click="ajouterNumero"
             >
@@ -314,7 +314,7 @@
         </p>
         <p
           v-else-if="enregistre"
-          class="text-sm text-primary font-semibold flex-1 min-w-[12rem]"
+          class="text-sm text-primary-dark font-semibold flex-1 min-w-[12rem]"
           role="status"
         >
           Paramètres enregistrés. Le site est à jour.

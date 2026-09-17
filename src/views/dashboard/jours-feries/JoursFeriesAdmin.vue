@@ -172,7 +172,7 @@
                 :href="saisieReglages.document_url"
                 target="_blank"
                 rel="noopener"
-                class="text-primary font-semibold hover:underline text-sm"
+                class="text-primary-dark font-semibold hover:underline text-sm"
               >
                 Consulter le document
               </a>
