@@ -117,24 +117,6 @@
             <span v-if="!isCollapsed">Actualités</span>
           </router-link>
 
-          <router-link
-            to="/dashboard/galerie"
-            class="flex items-center gap-3 px-4 py-2 rounded-xl text-white no-underline transition-all duration-300 text-sm font-medium hover:bg-yellow-500/20 hover:text-secondary hover:translate-x-1"
-            :active-class="LIEN_ACTIF"
-          >
-            <i class="bx bxs-image text-xl flex-shrink-0"></i>
-            <span v-if="!isCollapsed">Galerie photos</span>
-          </router-link>
-
-          <router-link
-            to="/dashboard/nouvelles"
-            class="flex items-center gap-3 px-4 py-2 rounded-xl text-white no-underline transition-all duration-300 text-sm font-medium hover:bg-yellow-500/20 hover:text-secondary hover:translate-x-1"
-            :active-class="LIEN_ACTIF"
-          >
-            <i class="bx bxs-bell text-xl flex-shrink-0"></i>
-            <span v-if="!isCollapsed">Nouvelles</span>
-          </router-link>
-
           <!-- Lien Site Internet (pour retourner au site public) -->
           <router-link
             to="/"
@@ -147,8 +129,13 @@
         </div>
       </div>
 
-      <!-- ========== GROUPE AMBASSADESECURE ========== -->
-      <div>
+      <!--
+        ========== GROUPE AMBASSADESECURE ==========
+        Le groupe entier depend du module : il ne contient plus que les
+        Evenements, et un intitule qu'on deplie sur rien est une impasse. La
+        garde porte donc sur l'en-tete, pas seulement sur le lien.
+      -->
+      <div v-if="evenementsOuverts">
         <div
           @click="toggleAmbassade"
           class="flex items-center justify-between px-4 py-3 rounded-xl cursor-pointer transition-all duration-300 text-white hover:bg-yellow-500/20 hover:text-secondary"
@@ -166,106 +153,12 @@
 
         <div v-show="isAmbassadeOpen" class="ml-2 flex flex-col gap-1">
           <router-link
-            to="/dashboard/utilisateurs"
-            class="flex items-center gap-3 px-4 py-2 rounded-xl text-white no-underline transition-all duration-300 text-sm font-medium hover:bg-yellow-500/20 hover:text-secondary hover:translate-x-1"
-            :active-class="LIEN_ACTIF"
-          >
-            <i class="bx bx-user text-xl flex-shrink-0"></i>
-            <span v-if="!isCollapsed">Utilisateurs</span>
-          </router-link>
-
-          <router-link
-            to="/dashboard/scanner"
-            class="flex items-center gap-3 px-4 py-2 rounded-xl text-white no-underline transition-all duration-300 text-sm font-medium hover:bg-yellow-500/20 hover:text-secondary hover:translate-x-1"
-            :active-class="LIEN_ACTIF"
-          >
-            <i class="bx bx-qr-scan text-xl flex-shrink-0"></i>
-            <span v-if="!isCollapsed">Scanner QR Code</span>
-          </router-link>
-
-          <!-- Le module suppose un compte Ambassade Secure provisionne : ferme,
-               toutes ses routes rendent 404. Annoncer l'entree mene alors a un
-               ecran vide dont l'ambassade n'a pas la clef. -->
-          <router-link
-            v-if="evenementsOuverts"
             to="/dashboard/evenements"
             class="flex items-center gap-3 px-4 py-2 rounded-xl text-white no-underline transition-all duration-300 text-sm font-medium hover:bg-yellow-500/20 hover:text-secondary hover:translate-x-1"
             :active-class="LIEN_ACTIF"
           >
             <i class="bx bx-calendar-event text-xl flex-shrink-0"></i>
             <span v-if="!isCollapsed">Evènements</span>
-          </router-link>
-
-          <router-link
-            to="/dashboard/visiteur"
-            class="flex items-center gap-3 px-4 py-2 rounded-xl text-white no-underline transition-all duration-300 text-sm font-medium hover:bg-yellow-500/20 hover:text-secondary hover:translate-x-1"
-            :active-class="LIEN_ACTIF"
-          >
-            <i class="bx bx-list-ul text-xl flex-shrink-0"></i>
-            <span v-if="!isCollapsed">Liste des visiteurs</span>
-          </router-link>
-
-          <router-link
-            to="/dashboard/demande"
-            class="flex items-center gap-3 px-4 py-2 rounded-xl text-white no-underline transition-all duration-300 text-sm font-medium hover:bg-yellow-500/20 hover:text-secondary hover:translate-x-1"
-            :active-class="LIEN_ACTIF"
-          >
-            <i class="bx bx-envelope text-xl flex-shrink-0"></i>
-            <span v-if="!isCollapsed">Demande</span>
-          </router-link>
-
-          <router-link
-            to="/dashboard/presence"
-            class="flex items-center gap-3 px-4 py-2 rounded-xl text-white no-underline transition-all duration-300 text-sm font-medium hover:bg-yellow-500/20 hover:text-secondary hover:translate-x-1"
-            :active-class="LIEN_ACTIF"
-          >
-            <i class="bx bx-check-square text-xl flex-shrink-0"></i>
-            <span v-if="!isCollapsed">Liste de présence</span>
-          </router-link>
-
-          <router-link
-            to="/dashboard/cartes/liste"
-            class="flex items-center gap-3 px-4 py-2 rounded-xl text-white no-underline transition-all duration-300 text-sm font-medium hover:bg-yellow-500/20 hover:text-secondary hover:translate-x-1"
-            :active-class="LIEN_ACTIF"
-          >
-            <i class="bx bx-id-card text-xl flex-shrink-0"></i>
-            <span v-if="!isCollapsed">Carte de membre</span>
-          </router-link>
-
-          <router-link
-            to="/dashboard/courriers/liste"
-            class="flex items-center gap-3 px-4 py-2 rounded-xl text-white no-underline transition-all duration-300 text-sm font-medium hover:bg-yellow-500/20 hover:text-secondary hover:translate-x-1"
-            :active-class="LIEN_ACTIF"
-          >
-            <i class="bx bx-mail-send text-xl flex-shrink-0"></i>
-            <span v-if="!isCollapsed">Liste de courriers</span>
-          </router-link>
-
-          <router-link
-            to="/dashboard/taches"
-            class="flex items-center gap-3 px-4 py-2 rounded-xl text-white no-underline transition-all duration-300 text-sm font-medium hover:bg-yellow-500/20 hover:text-secondary hover:translate-x-1"
-            :active-class="LIEN_ACTIF"
-          >
-            <i class="bx bx-task text-xl flex-shrink-0"></i>
-            <span v-if="!isCollapsed">Tâches</span>
-          </router-link>
-
-          <router-link
-            to="/dashboard/projets/liste"
-            class="flex items-center gap-3 px-4 py-2 rounded-xl text-white no-underline transition-all duration-300 text-sm font-medium hover:bg-yellow-500/20 hover:text-secondary hover:translate-x-1"
-            :active-class="LIEN_ACTIF"
-          >
-            <i class="bx bx-folder text-xl flex-shrink-0"></i>
-            <span v-if="!isCollapsed">Projets</span>
-          </router-link>
-
-          <router-link
-            to="/dashboard/documents"
-            class="flex items-center gap-3 px-4 py-2 rounded-xl text-white no-underline transition-all duration-300 text-sm font-medium hover:bg-yellow-500/20 hover:text-secondary hover:translate-x-1"
-            :active-class="LIEN_ACTIF"
-          >
-            <i class="bx bx-file text-xl flex-shrink-0"></i>
-            <span v-if="!isCollapsed">Documents</span>
           </router-link>
         </div>
       </div>
@@ -299,7 +192,7 @@ const tenant = useTenantStore()
 /**
  * Le tableau de bord n'est pas le site : l'administrateur est chez lui, et une
  * entree de menu qui mene a un 404 se lit comme une panne. L'etat « attente »
- * masque l'entree le temps du bootstrap, pour eviter qu'elle n'apparaisse puis
+ * masque le groupe le temps du bootstrap, pour eviter qu'il n'apparaisse puis
  * disparaisse ; la regle et le cas du bootstrap en echec sont documentes dans
  * `tenant/module-administration.ts`.
  */
