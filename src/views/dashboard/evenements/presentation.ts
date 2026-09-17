@@ -39,9 +39,27 @@ export interface Etat {
 }
 
 const ETATS: Record<string, Etat> = {
+  SCHEDULED: { libelle: 'Programmé', ton: 'neutre' },
   ACTIVE: { libelle: 'En cours', ton: 'positif' },
   CANCELLED: { libelle: 'Annulé', ton: 'attention' },
   COMPLETED: { libelle: 'Terminé', ton: 'eteint' },
+}
+
+/**
+ * Etats terminaux : un evenement qui y est arrive ne s'annule plus.
+ *
+ * La regle est ecrite par la NEGATIVE, et c'est le point important. Elle a
+ * d'abord ete ecrite par la positive — « annulable si ACTIVE » — et le
+ * premier vrai evenement servi par Ambassade Secure est arrive en
+ * `scheduled`, un etat que le front ne connaissait pas : le bouton
+ * « Annuler » avait purement disparu de la fiche. Un etat inconnu ne doit
+ * jamais retirer un geste, seulement ne pas en promettre un.
+ */
+const ETATS_TERMINAUX = ['CANCELLED', 'COMPLETED']
+
+/** Vrai tant que l'evenement n'est pas deja annule ou termine. */
+export function estAnnulable(statut: string): boolean {
+  return !ETATS_TERMINAUX.includes(statut.toUpperCase())
 }
 
 /**

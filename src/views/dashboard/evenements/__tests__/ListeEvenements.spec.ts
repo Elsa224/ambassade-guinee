@@ -72,6 +72,11 @@ async function rendre() {
       { path: '/dashboard/evenements', name: 'evenements-admin', component: Vide },
       { path: '/dashboard/evenements/nouveau', name: 'evenement-admin-nouveau', component: Vide },
       { path: '/dashboard/evenements/:slug', name: 'evenement-admin', component: Vide },
+      {
+        path: '/dashboard/evenements/:slug/modifier',
+        name: 'evenement-admin-modifier',
+        component: Vide,
+      },
     ],
   })
   routeur.push('/dashboard/evenements')
@@ -185,5 +190,82 @@ describe('liste d administration des evenements', () => {
     const wrapper = await rendre()
 
     expect(wrapper.text()).toContain('Aucun évènement')
+  })
+})
+
+/**
+ * La colonne d'actions.
+ *
+ * La liste n'en avait aucune : le seul chemin vers la fiche etait le nom de
+ * l'evenement, et rien ne disait qu'il etait cliquable. Elsa l'a signale sur
+ * le premier vrai evenement cree.
+ */
+describe('colonne des actions', () => {
+  beforeEach(() => {
+    demandes = []
+  })
+
+  afterEach(() => {
+    vi.unstubAllGlobals()
+  })
+
+  it('mene a la fiche et au formulaire de chaque evenement', async () => {
+    servir([evenement()])
+    const ecran = await rendre()
+
+    const liens = ecran.findAll('tbody a').map((lien) => lien.attributes('href'))
+    expect(liens).toContain('/dashboard/evenements/fete-nationale')
+    expect(liens).toContain('/dashboard/evenements/fete-nationale/modifier')
+  })
+
+  it("propose l'annulation d'un evenement dont l'etat est inconnu du front", async () => {
+    // « scheduled » est ce que sert le vrai Ambassade Secure, et le front ne
+    // le connaissait pas. La regle etait ecrite par la positive — annulable
+    // si ACTIVE — donc le geste disparaissait purement.
+    servir([evenement({ status: 'scheduled' })])
+    const ecran = await rendre()
+
+    expect(ecran.find('button[aria-label^="Annuler"]').exists()).toBe(true)
+  })
+
+  it("ne propose pas d'annuler un evenement deja annule", async () => {
+    servir([evenement({ status: 'cancelled' })])
+    const ecran = await rendre()
+
+    expect(ecran.find('button[aria-label^="Annuler"]').exists()).toBe(false)
+  })
+
+  it("demande confirmation avant d'annuler, et n'appelle rien si on refuse", async () => {
+    servir([evenement()])
+    const ecran = await rendre()
+    vi.spyOn(window, 'confirm').mockReturnValue(false)
+
+    await ecran.find('button[aria-label^="Annuler"]').trigger('click')
+    await flushPromises()
+
+    expect(demandes.filter((url) => url.includes('fete-nationale'))).toEqual([])
+  })
+
+  it('annule puis recharge la liste quand on confirme', async () => {
+    servir([evenement()])
+    const ecran = await rendre()
+    vi.spyOn(window, 'confirm').mockReturnValue(true)
+
+    await ecran.find('button[aria-label^="Annuler"]').trigger('click')
+    await flushPromises()
+
+    // L'annulation est un PATCH `{status: 'cancelled'}`, pas un DELETE :
+    // cote Ambassade Secure c'est une annulation douce, les pass emis
+    // survivent. D'ou le libelle « Annuler » et non « Supprimer ».
+    const appels = vi.mocked(fetch).mock.calls
+    const annulation = appels.find(
+      (appel) => (appel[1] as RequestInit | undefined)?.method === 'PATCH',
+    )
+    expect(annulation).toBeDefined()
+    expect(String(annulation![0])).toContain('fete-nationale')
+    expect((annulation![1] as RequestInit).body).toBe(JSON.stringify({ status: 'cancelled' }))
+    // La liste est relue apres coup : l'etat affiche vient du back, jamais
+    // d'une supposition locale sur ce que l'annulation a fait.
+    expect(derniereDemande()).toContain('/api/admin/secure/events?')
   })
 })

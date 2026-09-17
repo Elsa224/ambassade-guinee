@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import {
+  annulerEvenement,
   listerEvenementsAdmin,
   LIMITE_DEFAUT,
   type EvenementAdmin,
   type Pagination as FormePagination,
 } from '@/api/evenements-admin'
 import { messageErreur } from '@/api/evenements'
-import { dateLisible, etatDe, remplissage } from './presentation'
+import { dateLisible, estAnnulable, etatDe, remplissage } from './presentation'
 import PastilleEtat from '@/components/ui/PastilleEtat.vue'
 import Pagination from '@/components/ui/Pagination.vue'
 
@@ -47,6 +48,37 @@ async function charger(page = pagination.value.page, limite = pagination.value.l
     evenements.value = []
   } finally {
     chargement.value = false
+  }
+}
+
+/**
+ * Annulation depuis la liste.
+ *
+ * Le geste s'appelle « Annuler », jamais « Supprimer » : cote Ambassade
+ * Secure, `DELETE` est une annulation douce qui CONSERVE les pass deja
+ * emis. Promettre une suppression serait mentir sur ce qui se passe.
+ *
+ * La confirmation est demandee ici comme sur la fiche : l'annulation est
+ * visible des inscrits et du site public, et rien ne permet de revenir en
+ * arriere d'un clic.
+ */
+const annulationEnCours = ref('')
+
+async function annuler(evenement: EvenementAdmin) {
+  if (annulationEnCours.value !== '') return
+  if (!window.confirm(`Annuler « ${evenement.name} » ? Les inscrits pourront en être informés.`)) {
+    return
+  }
+
+  annulationEnCours.value = evenement.slug
+  erreur.value = ''
+  try {
+    await annulerEvenement(evenement.slug)
+    await charger()
+  } catch (souleve) {
+    erreur.value = messageErreur(souleve)
+  } finally {
+    annulationEnCours.value = ''
   }
 }
 
@@ -130,12 +162,18 @@ onMounted(() => charger(1))
               >
                 Site
               </th>
+              <th
+                class="sticky top-0 z-10 bg-gray-50 border-b border-gray-200 px-5 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500"
+                scope="col"
+              >
+                Actions
+              </th>
             </tr>
           </thead>
 
           <tbody v-if="chargement">
             <tr v-for="ligne in 5" :key="ligne" class="border-b border-gray-100">
-              <td class="px-5 py-4" :colspan="publicationConnue ? 6 : 5">
+              <td class="px-5 py-4" :colspan="publicationConnue ? 7 : 6">
                 <span class="block h-4 rounded bg-gray-100 animate-pulse" aria-hidden="true"></span>
                 <span class="sr-only">Chargement des évènements…</span>
               </td>
@@ -144,7 +182,7 @@ onMounted(() => charger(1))
 
           <tbody v-else-if="evenements.length === 0">
             <tr>
-              <td class="px-5 py-16 text-center" :colspan="publicationConnue ? 6 : 5">
+              <td class="px-5 py-16 text-center" :colspan="publicationConnue ? 7 : 6">
                 <p class="font-medium text-gray-700">Aucun évènement pour le moment</p>
                 <p class="text-sm text-gray-500 mt-1">
                   Les évènements créés dans Ambassade Secure apparaissent ici.
@@ -219,6 +257,43 @@ onMounted(() => charger(1))
                   :libelle="evenement.isPublished ? 'Publié' : 'Non publié'"
                   :ton="evenement.isPublished ? 'positif' : 'eteint'"
                 />
+              </td>
+
+              <td class="px-5 py-4">
+                <div class="flex gap-1">
+                  <RouterLink
+                    :to="{ name: 'evenement-admin', params: { slug: evenement.slug } }"
+                    class="rounded-md p-1.5 text-gray-500 transition-colors hover:bg-gray-100 hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                    :aria-label="`Ouvrir la fiche de ${evenement.name}`"
+                  >
+                    <i class="bx bx-show text-xl" aria-hidden="true"></i>
+                  </RouterLink>
+                  <RouterLink
+                    :to="{ name: 'evenement-admin-modifier', params: { slug: evenement.slug } }"
+                    class="rounded-md p-1.5 text-gray-500 transition-colors hover:bg-gray-100 hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                    :aria-label="`Modifier ${evenement.name}`"
+                  >
+                    <i class="bx bx-edit-alt text-xl" aria-hidden="true"></i>
+                  </RouterLink>
+                  <button
+                    v-if="estAnnulable(evenement.status)"
+                    type="button"
+                    :disabled="annulationEnCours !== ''"
+                    class="rounded-md p-1.5 text-gray-500 transition-colors hover:bg-red-50 hover:text-red-700 disabled:opacity-50"
+                    :aria-label="`Annuler ${evenement.name}`"
+                    @click="annuler(evenement)"
+                  >
+                    <i
+                      class="bx text-xl"
+                      :class="
+                        annulationEnCours === evenement.slug
+                          ? 'bx-loader-alt bx-spin'
+                          : 'bx-x-circle'
+                      "
+                      aria-hidden="true"
+                    ></i>
+                  </button>
+                </div>
               </td>
             </tr>
           </tbody>
