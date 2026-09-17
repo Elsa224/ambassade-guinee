@@ -72,14 +72,13 @@
               <label for="annee-feries" class="block text-sm text-gray-500 mb-1">
                 Changer d'année
               </label>
-              <select
+              <ChampSelect
                 id="annee-feries"
-                v-model.number="anneeChoisie"
-                class="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-accent"
-                @change="charger(anneeChoisie)"
-              >
-                <option v-for="annee in annees" :key="annee" :value="annee">{{ annee }}</option>
-              </select>
+                v-model="anneeChoisie"
+                :options="optionsDAnnee"
+                class="w-36"
+                @update:model-value="charger(Number($event))"
+              />
             </div>
           </div>
 
@@ -177,6 +176,7 @@ import {
   type TypeDeFete,
 } from '@/api/jours-feries'
 import { useIdentite, articleDuPays } from '@/tenant/identite'
+import ChampSelect from '@/components/ui/ChampSelect.vue'
 
 /**
  * La page portait en dur le calendrier guineen : l'annee 2023 figee, le
@@ -202,6 +202,11 @@ const anneeChoisie = ref(CALENDRIER_VIDE.year)
 const { nomOfficiel, nomDeLAmbassade, drapeau } = useIdentite()
 
 const annees = computed(() => anneesDuSelecteur(calendrier.value))
+
+/** Les memes annees, dans la forme que la liste deroulante consomme. */
+const optionsDAnnee = computed(() =>
+  annees.value.map((annee) => ({ valeur: annee, libelle: String(annee) })),
+)
 /**
  * La retractation se juge sur l'ambassade, pas sur l'annee affichee.
  *

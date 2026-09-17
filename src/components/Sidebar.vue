@@ -8,7 +8,7 @@
     <!-- Bouton toggle -->
     <button
       @click="toggleSidebar"
-      class="absolute -right-3 top-20 bg-secondary text-primary rounded-full p-1 cursor-pointer shadow-lg transition-all duration-300 hover:scale-110 z-10"
+      class="absolute -right-3 top-20 bg-secondary text-ink-dark rounded-full p-1 cursor-pointer shadow-lg transition-all duration-300 hover:scale-110 z-10"
     >
       <i :class="isCollapsed ? 'bx bx-menu' : 'bx bx-menu-alt-left'" class="text-xl"></i>
     </button>
@@ -64,12 +64,30 @@
           </router-link>
 
           <router-link
+            to="/dashboard/services"
+            class="flex items-center gap-3 px-4 py-2 rounded-xl text-white no-underline transition-all duration-300 text-sm font-medium hover:bg-yellow-500/20 hover:text-secondary hover:translate-x-1"
+            :active-class="LIEN_ACTIF"
+          >
+            <i class="bx bxs-briefcase text-xl flex-shrink-0"></i>
+            <span v-if="!isCollapsed">Services consulaires</span>
+          </router-link>
+
+          <router-link
             to="/dashboard/annuaire"
             class="flex items-center gap-3 px-4 py-2 rounded-xl text-white no-underline transition-all duration-300 text-sm font-medium hover:bg-yellow-500/20 hover:text-secondary hover:translate-x-1"
             :active-class="LIEN_ACTIF"
           >
             <i class="bx bxs-contact text-xl flex-shrink-0"></i>
             <span v-if="!isCollapsed">Annuaire</span>
+          </router-link>
+
+          <router-link
+            to="/dashboard/parametres"
+            class="flex items-center gap-3 px-4 py-2 rounded-xl text-white no-underline transition-all duration-300 text-sm font-medium hover:bg-yellow-500/20 hover:text-secondary hover:translate-x-1"
+            :active-class="LIEN_ACTIF"
+          >
+            <i class="bx bxs-cog text-xl flex-shrink-0"></i>
+            <span v-if="!isCollapsed">Paramètres</span>
           </router-link>
 
           <router-link
@@ -277,7 +295,7 @@ const auth = useAuthStore()
 const { logo, nomDeLAmbassade } = useIdentite()
 
 /** Habillage du lien de la rubrique ouverte, partage par tous les liens. */
-const LIEN_ACTIF = '!bg-secondary !text-primary'
+const LIEN_ACTIF = '!bg-secondary !text-ink-dark'
 const isCollapsed = ref(false)
 
 // État d'ouverture des groupes

@@ -193,9 +193,7 @@
       <div class="flex flex-col sm:flex-row justify-between items-center gap-3 mt-4">
         <div class="flex items-center gap-2">
           <span class="text-gray-600 text-sm">Afficher</span>
-          <select v-model="perPage" class="border rounded p-1">
-            <option v-for="n in [5, 10, 15]" :key="n" :value="n">{{ n }}</option>
-          </select>
+          <ChampSelect v-model="perPage" :options="OPTIONS_PAR_PAGE" class="w-20" />
           <span class="text-gray-600 text-sm">événements par page</span>
         </div>
         <div class="flex gap-1 flex-wrap justify-center">
@@ -302,6 +300,9 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import ChampSelect from '@/components/ui/ChampSelect.vue'
+
+const OPTIONS_PAR_PAGE = [5, 10, 15].map((n) => ({ valeur: n, libelle: String(n) }))
 
 // ---------- Types ----------
 interface Visitor {

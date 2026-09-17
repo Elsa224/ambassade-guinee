@@ -19,6 +19,16 @@
     "contact": {
       "address": "2112 Leroy Place NW, Washington, DC 20008",
       "phone": "+1 202 986 4300",
+      "phones": [
+        {
+          "label": "Standard",
+          "number": "+1 202 986 4300"
+        },
+        {
+          "label": "Service consulaire",
+          "number": "+1 202 986 4301"
+        }
+      ],
       "email": "contact@exemple-ambassade.test",
       "hours": "Du lundi au vendredi, 9h - 17h"
     },

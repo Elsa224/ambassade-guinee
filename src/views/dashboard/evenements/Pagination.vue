@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { bornesAffichees, type Pagination } from '@/api/evenements-admin'
+import ChampSelect from '@/components/ui/ChampSelect.vue'
 
 /**
  * Navigation entre les pages.
@@ -13,6 +14,11 @@ const props = defineProps<{ pagination: Pagination; desactive?: boolean }>()
 const emit = defineEmits<{ page: [numero: number]; limite: [lignes: number] }>()
 
 const LIGNES_POSSIBLES = [10, 20, 50, 100] as const
+
+const optionsDeLignes = LIGNES_POSSIBLES.map((lignes) => ({
+  valeur: lignes,
+  libelle: String(lignes),
+}))
 
 const bornes = computed(() => bornesAffichees(props.pagination))
 
@@ -56,16 +62,13 @@ function aller(numero: number) {
     <div class="flex items-center gap-4">
       <label class="flex items-center gap-2 text-sm text-gray-600">
         <span class="hidden sm:inline">Lignes</span>
-        <select
-          class="border border-gray-300 rounded-lg py-1.5 pl-2.5 pr-8 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary"
-          :value="pagination.limit"
-          :disabled="desactive"
-          @change="emit('limite', Number(($event.target as HTMLSelectElement).value))"
-        >
-          <option v-for="lignes in LIGNES_POSSIBLES" :key="lignes" :value="lignes">
-            {{ lignes }}
-          </option>
-        </select>
+        <ChampSelect
+          :model-value="pagination.limit"
+          :options="optionsDeLignes"
+          :desactive="desactive"
+          class="w-24"
+          @update:model-value="emit('limite', Number($event))"
+        />
       </label>
 
       <nav class="flex items-center gap-1" aria-label="Pages">

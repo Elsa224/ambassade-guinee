@@ -145,6 +145,28 @@ describe('chemins dependant d un module a provisionner', () => {
     expect(cheminOuvert('/evenements-passes', { modules: { secure_events: false } })).toBe(true)
   })
 
+  it('ferme la rubrique des services servie par le CMS tant qu elle n est pas declaree', () => {
+    // Meme defaut que les autres modules : une ambassade qui n'a rien saisi
+    // n'annonce pas la rubrique. Sans cela, le menu promettrait une page qui
+    // se retracte aussitot.
+    expect(cheminOuvert('/services', null)).toBe(false)
+    expect(cheminOuvert('/services', { modules: {} })).toBe(false)
+    expect(cheminOuvert('/services', { modules: { services_consulaires: true } })).toBe(true)
+  })
+
+  it('ne confond pas la rubrique du CMS avec la page ecrite en dur', () => {
+    // `services` garde la page guineenne compilee dans le gabarit ; le
+    // confondre avec `services_consulaires` ouvrirait le texte d'une
+    // ambassade a qui demande la rubrique d'une autre.
+    expect(cheminOuvert('/services', { modules: { services: true } })).toBe(false)
+    expect(
+      cheminOuvert('/services-ambassadeur', {
+        slug: 'gabon',
+        modules: { services_consulaires: true },
+      }),
+    ).toBe(false)
+  })
+
   it('garde aux rubriques de contenu leur defaut ouvert', () => {
     // La generalisation ne doit pas contaminer l'autre regle.
     expect(cheminOuvert('/consulat', { modules: {} })).toBe(true)

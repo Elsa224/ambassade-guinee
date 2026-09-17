@@ -19,6 +19,7 @@
     "contact": {
       "address": "",
       "phone": "",
+      "phones": [],
       "email": "ambassade@gabon-gn.org",
       "hours": "Du lundi au vendredi, 8h - 16h"
     },
@@ -26,6 +27,7 @@
       "bilateral": false,
       "chancellerie": false,
       "services": false,
+      "services_consulaires": true,
       "consuls_honoraires": false,
       "calendrier": false,
       "consulat": false,

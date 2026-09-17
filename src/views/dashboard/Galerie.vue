@@ -50,25 +50,9 @@
           />
         </div>
 
-        <select
-          v-model="filtreAlbum"
-          class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary"
-        >
-          <option value="">Tous les albums</option>
-          <option v-for="album in albums" :key="album.id" :value="album.id">
-            {{ album.nom }}
-          </option>
-        </select>
+        <ChampSelect v-model="filtreAlbum" :options="optionsDeFiltreAlbum" class="min-w-48" />
 
-        <select
-          v-model="tri"
-          class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary"
-        >
-          <option value="recent">Plus récentes</option>
-          <option value="ancien">Plus anciennes</option>
-          <option value="vues">Plus vues</option>
-          <option value="titre">Titre A-Z</option>
-        </select>
+        <ChampSelect v-model="tri" :options="OPTIONS_TRI" />
       </div>
     </div>
 
@@ -78,7 +62,7 @@
         <h3 class="text-lg font-semibold text-gray-800">Albums</h3>
         <button
           @click="openAlbumModal('add')"
-          class="text-primary text-sm hover:underline flex items-center gap-1"
+          class="text-primary-dark text-sm hover:underline flex items-center gap-1"
         >
           <i class="bx bx-plus-circle"></i>
           Nouvel album
@@ -373,15 +357,7 @@
             <!-- Album -->
             <div class="mb-4">
               <label class="block text-sm font-medium text-gray-700 mb-1">Album</label>
-              <select
-                v-model="formPhoto.albumId"
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary"
-              >
-                <option value="">Sans album</option>
-                <option v-for="album in albums" :key="album.id" :value="album.id">
-                  {{ album.nom }}
-                </option>
-              </select>
+              <ChampSelect v-model="formPhoto.albumId" :options="optionsDAlbum" />
             </div>
 
             <!-- Tags -->
@@ -546,10 +522,29 @@ import visiteCulturelleImage from '@/assets/images/partenaire.webp'
 import visitesOfficiellesCover from '@/assets/images/president.webp'
 import ceremoniesCover from '@/assets/images/hero5.webp'
 import conferencesCover from '@/assets/images/hero6.webp'
+import ChampSelect from '@/components/ui/ChampSelect.vue'
+
+const OPTIONS_TRI = [
+  { valeur: 'recent', libelle: 'Plus récentes' },
+  { valeur: 'ancien', libelle: 'Plus anciennes' },
+  { valeur: 'vues', libelle: 'Plus vues' },
+  { valeur: 'titre', libelle: 'Titre A-Z' },
+]
 
 // Données
 const photos = ref([])
 const albums = ref([])
+
+/** Les albums servis, dans la forme que les listes deroulantes consomment. */
+const optionsDAlbum = computed(() => [
+  { valeur: '', libelle: 'Sans album' },
+  ...albums.value.map((album) => ({ valeur: album.id, libelle: album.nom })),
+])
+
+const optionsDeFiltreAlbum = computed(() => [
+  { valeur: '', libelle: 'Tous les albums' },
+  ...albums.value.map((album) => ({ valeur: album.id, libelle: album.nom })),
+])
 const searchQuery = ref('')
 const filtreAlbum = ref('')
 const tri = ref('recent')

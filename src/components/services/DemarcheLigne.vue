@@ -119,11 +119,7 @@
                 <label class="block text-sm font-medium text-gray-700 mb-2"
                   >Date de naissance *</label
                 >
-                <input
-                  type="date"
-                  v-model="form.dob"
-                  class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-accent focus:border-transparent transition"
-                />
+                <ChampDate v-model="form.dob" />
               </div>
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2"
@@ -583,6 +579,7 @@
 
 <script setup>
 import { ref, computed } from 'vue'
+import ChampDate from '@/components/ui/ChampDate.vue'
 
 const steps = [{ title: 'Formulaire' }, { title: 'Documents' }, { title: 'Paiement' }]
 

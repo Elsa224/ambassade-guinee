@@ -54,6 +54,13 @@ export function rubriqueDuChemin(chemin: string): string | null {
  */
 export const MODULE_PAR_CHEMIN: Readonly<Record<string, string>> = {
   '/evenements': 'secure_events',
+  // La rubrique des services servie par le CMS porte une cle distincte de
+  // `services`, qui garde la page ecrite en dur de l'ambassade de Guinee aux
+  // Etats-Unis. Les deux coexistent : une ambassade qui a saisi ses services
+  // dans le CMS declare `services_consulaires`, celle dont le texte est encore
+  // compile dans le gabarit garde `services`. Confondre les deux ouvrirait la
+  // page guineenne a qui demande la nouvelle rubrique.
+  '/services': 'services_consulaires',
 }
 
 /** Module dont depend un chemin, ou `null` s'il n'en depend d'aucun. */

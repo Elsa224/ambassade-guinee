@@ -137,7 +137,7 @@
       <div class="bg-white rounded-xl shadow-md p-6">
         <div class="flex justify-between items-center mb-4">
           <h3 class="font-semibold text-gray-800">Derniers articles</h3>
-          <router-link to="/dashboard/articles" class="text-sm text-primary hover:underline"
+          <router-link to="/dashboard/articles" class="text-sm text-primary-dark hover:underline"
             >Voir tous →</router-link
           >
         </div>
@@ -171,7 +171,7 @@
       <div class="bg-white rounded-xl shadow-md p-6">
         <div class="flex justify-between items-center mb-4">
           <h3 class="font-semibold text-gray-800">Messages récents</h3>
-          <router-link to="/dashboard/articles" class="text-sm text-primary hover:underline"
+          <router-link to="/dashboard/articles" class="text-sm text-primary-dark hover:underline"
             >Voir tous →</router-link
           >
         </div>

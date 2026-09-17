@@ -12,12 +12,11 @@
                 :alt="nomDeLAmbassade"
                 class="h-12 w-auto object-contain"
               />
-              <img
-                v-if="drapeau"
-                :src="drapeau"
-                :alt="`Drapeau ${articleDuPays(nomOfficiel)} ${nomOfficiel}`"
-                class="h-12 w-auto object-contain"
-              />
+              <!-- Le drapeau ne figure plus ici : accole aux armoiries, dans une
+                   barre blanche, les deux emblemes se disputaient la meme place.
+                   L'ambassade reste identifiee par ses armoiries dans l'en-tete,
+                   et le drapeau garde ses emplacements en pied de page, sur la
+                   page d'accueil et sur les pages de l'ambassade. -->
             </div>
           </div>
 
@@ -28,7 +27,7 @@
           <div class="hidden lg:flex items-center gap-4">
             <router-link
               to="/"
-              class="nav-item px-3 py-2 rounded hover:bg-secondary hover:text-primary transition"
+              class="nav-item px-3 py-2 rounded hover:bg-secondary hover:text-ink-dark transition"
               active-class="hover-active"
               >Accueil</router-link
             >
@@ -38,15 +37,15 @@
               <div class="flex items-center">
                 <router-link
                   to="/actualite"
-                  class="nav-item px-3 py-2 rounded-l hover:bg-secondary hover:text-primary transition text-primary"
+                  class="nav-item px-3 py-2 rounded-l hover:bg-secondary hover:text-ink-dark transition text-primary"
                   active-class="hover-active"
                 >
                   Actualités
                 </router-link>
                 <button
                   @click.stop="toggleDropdown('actualites')"
-                  class="nav-item px-2 py-2 rounded-r hover:bg-secondary hover:text-primary transition border-l border-primary/20"
-                  :class="{ 'bg-secondary text-primary': openDropdowns.actualites }"
+                  class="nav-item px-2 py-2 rounded-r hover:bg-secondary hover:text-ink-dark transition border-l border-primary/20"
+                  :class="{ 'bg-secondary text-ink-dark': openDropdowns.actualites }"
                 >
                   <svg
                     class="w-4 h-4 transition-transform duration-200"
@@ -70,19 +69,19 @@
               >
                 <router-link
                   to="/actualites-ambassade"
-                  class="block px-4 py-2 text-sm text-gray-800 hover:bg-secondary hover:text-primary transition-all border-b border-gray-100 last:border-0"
+                  class="block px-4 py-2 text-sm text-gray-800 hover:bg-secondary hover:text-ink-dark transition-all border-b border-gray-100 last:border-0"
                 >
                   Actualités de l'Ambassade
                 </router-link>
                 <router-link
                   to="/actualites-diplomatique"
-                  class="block px-4 py-2 text-sm text-gray-800 hover:bg-secondary hover:text-primary transition-all border-b border-gray-100 last:border-0"
+                  class="block px-4 py-2 text-sm text-gray-800 hover:bg-secondary hover:text-ink-dark transition-all border-b border-gray-100 last:border-0"
                 >
                   Actualités diplomatiques
                 </router-link>
                 <router-link
                   to="/actualites-gouvernementale"
-                  class="block px-4 py-2 text-sm text-gray-800 hover:bg-secondary hover:text-primary transition-all"
+                  class="block px-4 py-2 text-sm text-gray-800 hover:bg-secondary hover:text-ink-dark transition-all"
                 >
                   Actualités gouvernementales
                 </router-link>
@@ -94,15 +93,15 @@
               <div class="flex items-center">
                 <router-link
                   to="/presentation"
-                  class="nav-item px-3 py-2 rounded-l hover:bg-secondary hover:text-primary transition text-primary"
+                  class="nav-item px-3 py-2 rounded-l hover:bg-secondary hover:text-ink-dark transition text-primary"
                   active-class="hover-active"
                 >
                   Ambassade
                 </router-link>
                 <button
                   @click.stop="toggleDropdown('ambassade')"
-                  class="nav-item px-2 py-2 rounded-r hover:bg-secondary hover:text-primary transition border-l border-primary/20"
-                  :class="{ 'bg-secondary text-primary': openDropdowns.ambassade }"
+                  class="nav-item px-2 py-2 rounded-r hover:bg-secondary hover:text-ink-dark transition border-l border-primary/20"
+                  :class="{ 'bg-secondary text-ink-dark': openDropdowns.ambassade }"
                 >
                   <svg
                     class="w-4 h-4 transition-transform duration-200"
@@ -126,33 +125,33 @@
               >
                 <router-link
                   to="/presentation"
-                  class="block px-4 py-2 text-sm text-gray-800 hover:bg-secondary hover:text-primary transition-all border-b border-gray-100"
+                  class="block px-4 py-2 text-sm text-gray-800 hover:bg-secondary hover:text-ink-dark transition-all border-b border-gray-100"
                   >Présentation</router-link
                 >
                 <router-link
                   to="/ambassadeur"
-                  class="block px-4 py-2 text-sm text-gray-800 hover:bg-secondary hover:text-primary transition-all border-b border-gray-100"
+                  class="block px-4 py-2 text-sm text-gray-800 hover:bg-secondary hover:text-ink-dark transition-all border-b border-gray-100"
                   >L'Ambassadeur</router-link
                 >
                 <router-link
                   to="/chancellerie"
-                  class="block px-4 py-2 text-sm text-gray-800 hover:bg-secondary hover:text-primary transition-all border-b border-gray-100"
+                  class="block px-4 py-2 text-sm text-gray-800 hover:bg-secondary hover:text-ink-dark transition-all border-b border-gray-100"
                   >La chancellerie diplomatique</router-link
                 >
                 <router-link
                   v-if="rubriqueOuverte('/services-ambassadeur')"
                   to="/services-ambassadeur"
-                  class="block px-4 py-2 text-sm text-gray-800 hover:bg-secondary hover:text-primary transition-all border-b border-gray-100"
+                  class="block px-4 py-2 text-sm text-gray-800 hover:bg-secondary hover:text-ink-dark transition-all border-b border-gray-100"
                   >Les Services</router-link
                 >
                 <router-link
                   to="/consuls-honoraires"
-                  class="block px-4 py-2 text-sm text-gray-800 hover:bg-secondary hover:text-primary transition-all border-b border-gray-100"
+                  class="block px-4 py-2 text-sm text-gray-800 hover:bg-secondary hover:text-ink-dark transition-all border-b border-gray-100"
                   >Les consuls Honoraires</router-link
                 >
                 <router-link
                   to="/calendrier"
-                  class="block px-4 py-2 text-sm text-gray-800 hover:bg-secondary hover:text-primary transition-all"
+                  class="block px-4 py-2 text-sm text-gray-800 hover:bg-secondary hover:text-ink-dark transition-all"
                   >Calendrier des fêtes légales</router-link
                 >
               </div>
@@ -163,15 +162,15 @@
               <div class="flex items-center">
                 <router-link
                   to="/relations-bilaterales"
-                  class="nav-item px-3 py-2 rounded-l hover:bg-secondary hover:text-primary transition text-primary"
+                  class="nav-item px-3 py-2 rounded-l hover:bg-secondary hover:text-ink-dark transition text-primary"
                   active-class="hover-active"
                 >
                   Relations
                 </router-link>
                 <button
                   @click.stop="toggleDropdown('relations')"
-                  class="nav-item px-2 py-2 rounded-r hover:bg-secondary hover:text-primary transition border-l border-primary/20"
-                  :class="{ 'bg-secondary text-primary': openDropdowns.relations }"
+                  class="nav-item px-2 py-2 rounded-r hover:bg-secondary hover:text-ink-dark transition border-l border-primary/20"
+                  :class="{ 'bg-secondary text-ink-dark': openDropdowns.relations }"
                 >
                   <svg
                     class="w-4 h-4 transition-transform duration-200"
@@ -195,27 +194,27 @@
               >
                 <router-link
                   to="/usa"
-                  class="block px-4 py-2 text-sm text-gray-800 hover:bg-secondary hover:text-primary transition-all border-b border-gray-100"
+                  class="block px-4 py-2 text-sm text-gray-800 hover:bg-secondary hover:text-ink-dark transition-all border-b border-gray-100"
                   >Les Etats-Unis d'Amérique</router-link
                 >
                 <router-link
                   to="/costa-rica"
-                  class="block px-4 py-2 text-sm text-gray-800 hover:bg-secondary hover:text-primary transition-all border-b border-gray-100"
+                  class="block px-4 py-2 text-sm text-gray-800 hover:bg-secondary hover:text-ink-dark transition-all border-b border-gray-100"
                   >La République du Costa Rica</router-link
                 >
                 <router-link
                   to="/haiti"
-                  class="block px-4 py-2 text-sm text-gray-800 hover:bg-secondary hover:text-primary transition-all border-b border-gray-100"
+                  class="block px-4 py-2 text-sm text-gray-800 hover:bg-secondary hover:text-ink-dark transition-all border-b border-gray-100"
                   >La République d'Haïti</router-link
                 >
                 <router-link
                   to="/bahamas"
-                  class="block px-4 py-2 text-sm text-gray-800 hover:bg-secondary hover:text-primary transition-all border-b border-gray-100"
+                  class="block px-4 py-2 text-sm text-gray-800 hover:bg-secondary hover:text-ink-dark transition-all border-b border-gray-100"
                   >Le Commonwealth des Bahamas</router-link
                 >
                 <router-link
                   to="/fond-monetaire"
-                  class="block px-4 py-2 text-sm text-gray-800 hover:bg-secondary hover:text-primary transition-all"
+                  class="block px-4 py-2 text-sm text-gray-800 hover:bg-secondary hover:text-ink-dark transition-all"
                   >Le FMI et la Banque mondiale</router-link
                 >
               </div>
@@ -232,15 +231,15 @@
               <div class="flex items-center">
                 <router-link
                   :to="premierServiceOuvert"
-                  class="nav-item px-3 py-2 rounded-l hover:bg-secondary hover:text-primary transition text-primary"
+                  class="nav-item px-3 py-2 rounded-l hover:bg-secondary hover:text-ink-dark transition text-primary"
                   active-class="hover-active"
                 >
                   Services
                 </router-link>
                 <button
                   @click.stop="toggleDropdown('services')"
-                  class="nav-item px-2 py-2 rounded-r hover:bg-secondary hover:text-primary transition border-l border-primary/20"
-                  :class="{ 'bg-secondary text-primary': openDropdowns.services }"
+                  class="nav-item px-2 py-2 rounded-r hover:bg-secondary hover:text-ink-dark transition border-l border-primary/20"
+                  :class="{ 'bg-secondary text-ink-dark': openDropdowns.services }"
                 >
                   <svg
                     class="w-4 h-4 transition-transform duration-200"
@@ -265,29 +264,41 @@
                 <router-link
                   v-if="rubriqueOuverte('/consulat')"
                   to="/consulat"
-                  class="block px-4 py-2 text-sm text-gray-800 hover:bg-secondary hover:text-primary transition-all border-b border-gray-100"
+                  class="block px-4 py-2 text-sm text-gray-800 hover:bg-secondary hover:text-ink-dark transition-all border-b border-gray-100"
                   >Le consulat</router-link
                 >
                 <router-link
                   v-if="rubriqueOuverte('/rendez-vous')"
                   to="/rendez-vous"
-                  class="block px-4 py-2 text-sm text-gray-800 hover:bg-secondary hover:text-primary transition-all border-b border-gray-100"
+                  class="block px-4 py-2 text-sm text-gray-800 hover:bg-secondary hover:text-ink-dark transition-all border-b border-gray-100"
                   >Prise de rendez-vous</router-link
                 >
                 <router-link
                   to="/demarche-ligne"
-                  class="block px-4 py-2 text-sm text-gray-800 hover:bg-secondary hover:text-primary transition-all"
+                  class="block px-4 py-2 text-sm text-gray-800 hover:bg-secondary hover:text-ink-dark transition-all"
                   >Vos démarches en ligne</router-link
                 >
               </div>
             </div>
+
+            <!-- La rubrique des services n'existe que pour les ambassades qui
+                 ont saisi les leurs dans le CMS. Celles dont le texte est
+                 encore compile dans le gabarit gardent « Les Services » dans
+                 le menu Ambassade. -->
+            <router-link
+              v-if="rubriqueOuverte('/services')"
+              to="/services"
+              class="nav-item px-3 py-2 rounded hover:bg-secondary hover:text-ink-dark transition text-primary"
+              active-class="hover-active"
+              >Services</router-link
+            >
 
             <!-- Le module Evenements n'est pas provisionne pour toutes les
                  ambassades : l'entree disparait quand il ne l'est pas. -->
             <router-link
               v-if="rubriqueOuverte('/evenements')"
               to="/evenements"
-              class="nav-item px-3 py-2 rounded hover:bg-secondary hover:text-primary transition text-primary"
+              class="nav-item px-3 py-2 rounded hover:bg-secondary hover:text-ink-dark transition text-primary"
               active-class="hover-active"
               >Évènements</router-link
             >
@@ -295,7 +306,7 @@
             <!-- Bouton de connexion -->
             <router-link
               to="/connexion"
-              class="bg-secondary text-primary px-5 py-2 rounded-full font-semibold hover:bg-primary hover:text-white transition-all ml-4 flex items-center gap-2"
+              class="bg-secondary text-ink-dark px-5 py-2 rounded-full font-semibold hover:bg-primary hover:text-white transition-all ml-4 flex items-center gap-2"
             >
               <i class="bx bx-user text-lg"></i>
               Connexion
@@ -308,14 +319,14 @@
           <div class="flex flex-col gap-2">
             <router-link
               to="/"
-              class="block px-3 py-2 rounded hover:bg-secondary hover:text-primary text-primary"
+              class="block px-3 py-2 rounded hover:bg-secondary hover:text-ink-dark text-primary"
               >Accueil</router-link
             >
 
             <!-- Version mobile avec accordéon -->
             <div v-for="menu in menusMobilesOuverts" :key="menu.key">
               <div
-                class="flex items-center justify-between px-3 py-2 rounded hover:bg-secondary hover:text-primary text-primary"
+                class="flex items-center justify-between px-3 py-2 rounded hover:bg-secondary hover:text-ink-dark text-primary"
               >
                 <router-link :to="menu.path" class="flex-1">{{ menu.label }}</router-link>
                 <button @click.stop="toggleSubmenu(menu.key)" class="p-1">
@@ -340,7 +351,7 @@
                   v-for="item in menu.items"
                   :key="item.path"
                   :to="item.path"
-                  class="block px-3 py-1 hover:bg-secondary hover:text-primary text-primary"
+                  class="block px-3 py-1 hover:bg-secondary hover:text-ink-dark text-primary"
                 >
                   {{ item.label }}
                 </router-link>
@@ -348,19 +359,25 @@
             </div>
 
             <router-link
+              v-if="rubriqueOuverte('/services')"
+              to="/services"
+              class="block px-3 py-2 rounded hover:bg-secondary hover:text-ink-dark text-primary"
+              >Services</router-link
+            >
+            <router-link
               v-if="rubriqueOuverte('/evenements')"
               to="/evenements"
-              class="block px-3 py-2 rounded hover:bg-secondary hover:text-primary text-primary"
+              class="block px-3 py-2 rounded hover:bg-secondary hover:text-ink-dark text-primary"
               >Évènements</router-link
             >
             <router-link
               to="/construction"
-              class="block px-3 py-2 rounded hover:bg-secondary hover:text-primary text-primary"
+              class="block px-3 py-2 rounded hover:bg-secondary hover:text-ink-dark text-primary"
               >Vidéos</router-link
             >
             <router-link
               to="/connexion"
-              class="block px-3 py-2 rounded bg-secondary text-primary font-semibold text-center"
+              class="block px-3 py-2 rounded bg-secondary text-ink-dark font-semibold text-center"
               >Connexion</router-link
             >
           </div>
@@ -440,25 +457,25 @@
               <div class="mt-6 flex space-x-3">
                 <a
                   href="#"
-                  class="p-2 bg-white/10 hover:bg-secondary hover:text-primary rounded-full transition-all duration-200"
+                  class="p-2 bg-white/10 hover:bg-secondary hover:text-ink-dark rounded-full transition-all duration-200"
                 >
                   <i class="bx bxl-facebook text-lg"></i>
                 </a>
                 <a
                   href="#"
-                  class="p-2 bg-white/10 hover:bg-secondary hover:text-primary rounded-full transition-all duration-200"
+                  class="p-2 bg-white/10 hover:bg-secondary hover:text-ink-dark rounded-full transition-all duration-200"
                 >
                   <i class="bx bxl-twitter text-lg"></i>
                 </a>
                 <a
                   href="#"
-                  class="p-2 bg-white/10 hover:bg-secondary hover:text-primary rounded-full transition-all duration-200"
+                  class="p-2 bg-white/10 hover:bg-secondary hover:text-ink-dark rounded-full transition-all duration-200"
                 >
                   <i class="bx bxl-youtube text-lg"></i>
                 </a>
                 <a
                   href="#"
-                  class="p-2 bg-white/10 hover:bg-secondary hover:text-primary rounded-full transition-all duration-200"
+                  class="p-2 bg-white/10 hover:bg-secondary hover:text-ink-dark rounded-full transition-all duration-200"
                 >
                   <i class="bx bxl-instagram text-lg"></i>
                 </a>

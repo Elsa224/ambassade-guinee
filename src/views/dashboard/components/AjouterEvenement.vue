@@ -60,32 +60,12 @@
 
       <div>
         <label class="block mb-2 text-gray-700">Ville</label>
-        <select
-          v-model="newEvent.ville"
-          class="w-full border rounded-lg p-2 bg-gray-100 focus:ring-2 focus:ring-primary"
-        >
-          <option value="">Sélectionner une ville</option>
-          <option>Abidjan</option>
-          <option>Paris</option>
-          <option>New York</option>
-          <option>Tokyo</option>
-          <option>Autre...</option>
-        </select>
+        <ChampSelect v-model="newEvent.ville" :options="OPTIONS_NEWEVENT_VILLE" />
       </div>
 
       <div>
         <label class="block mb-2 text-gray-700">Pays</label>
-        <select
-          v-model="newEvent.pays"
-          class="w-full border rounded-lg p-2 bg-gray-100 focus:ring-2 focus:ring-primary"
-        >
-          <option value="">Sélectionner un pays</option>
-          <option>Côte d'Ivoire</option>
-          <option>France</option>
-          <option>USA</option>
-          <option>Japon</option>
-          <option>Autre...</option>
-        </select>
+        <ChampSelect v-model="newEvent.pays" :options="OPTIONS_NEWEVENT_PAYS" />
       </div>
 
       <div>
@@ -110,12 +90,7 @@
         <label class="block mb-2 text-gray-700"
           >Date de l'Événement <span class="text-red-500">*</span></label
         >
-        <input
-          v-model="newEvent.date"
-          type="date"
-          required
-          class="w-full border rounded-lg p-2 bg-gray-100 focus:ring-2 focus:ring-primary"
-        />
+        <ChampDate v-model="newEvent.date" requis />
       </div>
 
       <div>
@@ -126,7 +101,7 @@
           v-model="newEvent.heure"
           type="time"
           required
-          class="w-full border rounded-lg p-2 bg-gray-100 focus:ring-2 focus:ring-primary"
+          class="w-full rounded-lg border border-gray-300 px-4 py-2.5 transition-colors hover:border-gray-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
         />
       </div>
 
@@ -243,6 +218,26 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import avatarDefaut from '@/assets/avatar-defaut.svg'
+import ChampSelect from '@/components/ui/ChampSelect.vue'
+import ChampDate from '@/components/ui/ChampDate.vue'
+
+const OPTIONS_NEWEVENT_VILLE = [
+  { valeur: '', libelle: 'Sélectionner une ville' },
+  { valeur: 'Abidjan', libelle: 'Abidjan' },
+  { valeur: 'Paris', libelle: 'Paris' },
+  { valeur: 'New York', libelle: 'New York' },
+  { valeur: 'Tokyo', libelle: 'Tokyo' },
+  { valeur: 'Autre...', libelle: 'Autre...' },
+] as const
+
+const OPTIONS_NEWEVENT_PAYS = [
+  { valeur: '', libelle: 'Sélectionner un pays' },
+  { valeur: "Côte d'Ivoire", libelle: "Côte d'Ivoire" },
+  { valeur: 'France', libelle: 'France' },
+  { valeur: 'USA', libelle: 'USA' },
+  { valeur: 'Japon', libelle: 'Japon' },
+  { valeur: 'Autre...', libelle: 'Autre...' },
+] as const
 
 const emit = defineEmits(['add-event'])
 

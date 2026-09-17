@@ -28,6 +28,22 @@ interface Categorie {
   couleur: string
 }
 
+/**
+ * Derive un slug d'un titre, comme le back le fera a la creation.
+ *
+ * Minuscules, accents retires, tout le reste devient un tiret : c'est la
+ * forme exigee par le contrat des services consulaires.
+ */
+function glisser(titre: string): string {
+  return titre
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .slice(0, 60)
+    .replace(/^-+|-+$/g, '')
+}
+
 export function mockApi(): Plugin {
   // Etat en memoire : remis a zero a chaque redemarrage du serveur de dev.
   let articles = (fixture('articles') as { data: unknown[] }).data as Record<string, unknown>[]
@@ -35,6 +51,19 @@ export function mockApi(): Plugin {
     string,
     unknown
   >[]
+
+  /**
+   * Les deux ambassades, en memoire.
+   *
+   * Le bootstrap les relit ici plutot que dans les fixtures : sans cela,
+   * l'ecran des parametres enregistrerait et le site continuerait d'afficher
+   * l'ancienne valeur, ce qui est precisement la panne que le contrat demande
+   * d'eviter cote serveur.
+   */
+  const ambassades: Record<string, Record<string, unknown>> = {
+    guinee: (fixture('bootstrap') as { embassy: Record<string, unknown> }).embassy,
+    gabon: (fixture('bootstrap-gabon') as { embassy: Record<string, unknown> }).embassy,
+  }
 
   /**
    * Contenu d'accueil, par ambassade et en memoire.
@@ -47,6 +76,19 @@ export function mockApi(): Plugin {
   const contenus: Record<string, Record<string, unknown>> = {
     gabon: structuredClone((fixture('contenu-gabon') as { data: Record<string, unknown> }).data),
     guinee: structuredClone((fixture('contenu-vide') as { data: Record<string, unknown> }).data),
+  }
+
+  /**
+   * Services consulaires, par ambassade et en memoire.
+   *
+   * Le Gabon part rempli, avec les brouillons de textes remis a l'ambassade,
+   * pour que les pages publiques soient visibles sans saisie prealable. La
+   * Guinee part vide : sa page `/services-ambassadeur` porte encore son
+   * contenu en dur, et rien ne doit lui etre prete ici.
+   */
+  const servicesParTenant: Record<string, Record<string, unknown>> = {
+    gabon: structuredClone((fixture('services-gabon') as { data: Record<string, unknown> }).data),
+    guinee: structuredClone((fixture('services-vides') as { data: Record<string, unknown> }).data),
   }
 
   let prochainIdentifiant = 100
@@ -169,13 +211,24 @@ export function mockApi(): Plugin {
   const gestionnaireApi = (requete: IncomingMessage, reponse: ServerResponse) => {
     const url = new URL(requete.url ?? '/', 'http://localhost')
 
-    // L'en-tete prime sur le parametre : le front envoie toujours
-    // `?domain=<hostname>`, qui vaut « localhost » en developpement et ne
-    // designe donc aucune ambassade. `X-Embassy-Domain` est le forcage
-    // explicite, celui que la vraie API accepte aussi.
+    // Trois sources, par ordre de priorite.
+    //
+    // `X-Embassy-Domain` est le forcage explicite, celui que la vraie API
+    // accepte aussi. `?domain=` vient ensuite : seul `/api/bootstrap` le
+    // transmet, et il vaut « localhost » en developpement.
+    //
+    // `Host` est le dernier recours, et c'est lui qui fait fonctionner le
+    // multi-tenant en local. La vraie API resout l'ambassade par cet en-tete,
+    // que le navigateur envoie sur chaque requete ; sans lui ici, tous les
+    // appels de contenu — qui ne portent pas `?domain=` — retombaient sur
+    // l'ambassade d'origine, et le site gabonais affichait un contenu vide
+    // alors que son theme etait bien charge.
     const entete = requete.headers['x-embassy-domain']
     const domaineDemande = String(
-      (Array.isArray(entete) ? entete[0] : entete) || url.searchParams.get('domain') || '',
+      (Array.isArray(entete) ? entete[0] : entete) ||
+        url.searchParams.get('domain') ||
+        requete.headers.host ||
+        '',
     )
     const estGabon = domaineDemande.includes('gabon')
     const chemin = url.pathname
@@ -204,8 +257,58 @@ export function mockApi(): Plugin {
         })
       })
 
+    const ambassade = () => ambassades[estGabon ? 'gabon' : 'guinee']!
+
     if (chemin === '/bootstrap') {
-      return repondre(200, fixture(estGabon ? 'bootstrap-gabon' : 'bootstrap'))
+      return repondre(200, { embassy: ambassade() })
+    }
+
+    // --- Parametres de l'ambassade : identite, coordonnees, couleurs -------
+    //
+    // Le PUT reproduit les trois refus du contrat plutot que de les ignorer.
+    // Un faux serveur plus permissif que le vrai est un piege de diagnostic :
+    // l'ecran passerait ici et echouerait en 422 contre la vraie API.
+    if (chemin === '/admin/embassy') {
+      if (methode === 'GET') return repondre(200, { data: ambassade() })
+
+      if (methode === 'PUT') {
+        return lireCorps().then((corps) => {
+          if (corps === null) return repondre(400, { message: 'Corps de requete illisible.' })
+
+          for (const interdit of ['slug', 'domain', 'modules'] as const) {
+            if (interdit in corps) {
+              return repondre(422, {
+                message: `Le champ ${interdit} n'est pas modifiable depuis l'administration.`,
+              })
+            }
+          }
+
+          const contactRecu = (corps.contact ?? {}) as Record<string, unknown>
+          if ('phone' in contactRecu) {
+            return repondre(422, {
+              message: 'Le numero principal est derive : renseignez contact.phones.',
+            })
+          }
+
+          const courante = ambassade()
+          const identite = courante.identite as Record<string, unknown>
+          const contact = courante.contact as Record<string, unknown>
+          const theme = courante.theme as Record<string, unknown>
+
+          if ('display_name' in corps) courante.display_name = corps.display_name
+          Object.assign(identite, (corps.identite ?? {}) as Record<string, unknown>)
+          Object.assign(theme, (corps.theme ?? {}) as Record<string, unknown>)
+          Object.assign(contact, contactRecu)
+
+          // `phone` est derive de la premiere entree, jamais stocke : deux
+          // sources de verite pour un meme numero divergeraient a la premiere
+          // modification.
+          const numeros = (contact.phones ?? []) as { number?: string }[]
+          contact.phone = numeros.length > 0 ? (numeros[0].number ?? '') : ''
+
+          return repondre(200, { data: courante })
+        })
+      }
     }
 
     // --- Contenu d'accueil : mot de bienvenue, dirigeants, vitrine ---------
@@ -219,6 +322,105 @@ export function mockApi(): Plugin {
 
     if (chemin === '/content/home' || chemin === '/admin/content/home') {
       return repondre(200, { data: contenu() })
+    }
+
+    // --- Services consulaires ---------------------------------------------
+    const servicesDuTenant = () => servicesParTenant[estGabon ? 'gabon' : 'guinee']!
+    const listeServices = () => servicesDuTenant().services as Record<string, unknown>[]
+
+    if (chemin === '/content/services' || chemin === '/admin/content/services') {
+      if (methode === 'GET') return repondre(200, { data: servicesDuTenant() })
+    }
+
+    if (chemin === '/admin/content/services' && methode === 'POST') {
+      return void lireCorps().then((corps) => {
+        if (corps === null) return repondre(422, { message: 'Corps de requete illisible.' })
+        if (typeof corps.title !== 'string' || corps.title.trim() === '') {
+          return repondre(422, { message: 'Le titre est obligatoire.' })
+        }
+        const slug =
+          typeof corps.slug === 'string' && corps.slug !== '' ? corps.slug : glisser(corps.title)
+        if (listeServices().some((service) => service.slug === slug)) {
+          return repondre(422, { message: 'Ce slug est deja pris par un autre service.' })
+        }
+        const service = {
+          ...corps,
+          slug,
+          id: (prochainIdentifiant += 1),
+          position: listeServices().length + 1,
+        }
+        listeServices().push(service)
+        repondre(201, { data: service })
+      })
+    }
+
+    if (chemin === '/admin/content/services/order' && methode === 'PUT') {
+      return void lireCorps().then((corps) => {
+        const ids = Array.isArray(corps?.ids) ? (corps.ids as number[]) : null
+        if (ids === null) return repondre(422, { message: 'Liste d identifiants attendue.' })
+        const actuels = listeServices()
+        const ordonnes = ids
+          .map((id) => actuels.find((service) => service.id === id))
+          .filter((service): service is Record<string, unknown> => service !== undefined)
+        ordonnes.forEach((service, index) => (service.position = index + 1))
+        servicesDuTenant().services = ordonnes
+        repondre(204, null)
+      })
+    }
+
+    if (chemin === '/admin/content/services/platform') {
+      if (methode === 'PUT') {
+        return void lireCorps().then((corps) => {
+          if (corps === null) return repondre(422, { message: 'Corps de requete illisible.' })
+          if (typeof corps.name !== 'string' || corps.name.trim() === '') {
+            return repondre(422, { message: 'Le nom de la plateforme est obligatoire.' })
+          }
+          if (typeof corps.url !== 'string' || corps.url.trim() === '') {
+            return repondre(422, { message: "L'adresse de la plateforme est obligatoire." })
+          }
+          servicesDuTenant().platform = {
+            name: corps.name,
+            url: corps.url,
+            phone: typeof corps.phone === 'string' && corps.phone !== '' ? corps.phone : null,
+            description:
+              typeof corps.description === 'string' && corps.description !== ''
+                ? corps.description
+                : null,
+          }
+          repondre(200, { data: servicesDuTenant().platform })
+        })
+      }
+      if (methode === 'DELETE') {
+        servicesDuTenant().platform = null
+        return repondre(204, null)
+      }
+    }
+
+    const serviceVise = /^\/admin\/content\/services\/(\d+)$/.exec(chemin)
+    if (serviceVise) {
+      const id = Number(serviceVise[1])
+      const rang = listeServices().findIndex((service) => service.id === id)
+      if (rang === -1) return repondre(404, { message: 'Service introuvable.' })
+
+      if (methode === 'PATCH') {
+        return void lireCorps().then((corps) => {
+          if (corps === null) return repondre(422, { message: 'Corps de requete illisible.' })
+          if (
+            typeof corps.slug === 'string' &&
+            listeServices().some((autre) => autre.slug === corps.slug && autre.id !== id)
+          ) {
+            return repondre(422, { message: 'Ce slug est deja pris par un autre service.' })
+          }
+          Object.assign(listeServices()[rang]!, corps)
+          repondre(200, { data: listeServices()[rang] })
+        })
+      }
+
+      if (methode === 'DELETE') {
+        listeServices().splice(rang, 1)
+        listeServices().forEach((service, index) => (service.position = index + 1))
+        return repondre(204, null)
+      }
     }
 
     if (chemin === '/admin/content/welcome' && methode === 'PUT') {

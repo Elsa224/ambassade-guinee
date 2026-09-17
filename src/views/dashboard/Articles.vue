@@ -30,35 +30,11 @@
           />
         </div>
 
-        <select
-          v-model="filtreCategorie"
-          class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary"
-        >
-          <option value="">Toutes les catégories</option>
-          <option value="actualites-ambassade">Actualités Ambassade</option>
-          <option value="actualites-diplomatique">Actualités Diplomatiques</option>
-          <option value="actualites-gouvernementale">Actualités Gouvernementales</option>
-        </select>
+        <ChampSelect v-model="filtreCategorie" :options="OPTIONS_FILTRECATEGORIE" />
 
-        <select
-          v-model="filtreStatut"
-          class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary"
-        >
-          <option value="">Tous les statuts</option>
-          <option value="Publié">Publié</option>
-          <option value="Brouillon">Brouillon</option>
-          <option value="À valider">À valider</option>
-        </select>
+        <ChampSelect v-model="filtreStatut" :options="OPTIONS_FILTRESTATUT" />
 
-        <select
-          v-model="tri"
-          class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary"
-        >
-          <option value="recent">Plus récent</option>
-          <option value="ancien">Plus ancien</option>
-          <option value="titre">Titre A-Z</option>
-          <option value="vues">Plus vus</option>
-        </select>
+        <ChampSelect v-model="tri" :options="OPTIONS_TRI" />
       </div>
     </div>
 
@@ -255,15 +231,10 @@
             <!-- Catégorie -->
             <div class="mb-4">
               <label class="block text-sm font-medium text-gray-700 mb-1">Catégorie *</label>
-              <select
+              <ChampSelect
                 v-model="formArticle.categorie"
-                required
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary"
-              >
-                <option value="actualites-ambassade">Actualités de l'Ambassade</option>
-                <option value="actualites-diplomatique">Actualités diplomatiques</option>
-                <option value="actualites-gouvernementale">Actualités gouvernementales</option>
-              </select>
+                :options="OPTIONS_FORMARTICLE_CATEGORIE"
+              />
             </div>
 
             <!-- Résumé -->
@@ -308,24 +279,13 @@
             <div class="grid grid-cols-2 gap-4 mb-4">
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Statut</label>
-                <select
-                  v-model="formArticle.statut"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary"
-                >
-                  <option value="Brouillon">Brouillon</option>
-                  <option value="Publié">Publié</option>
-                  <option value="À valider">À valider</option>
-                </select>
+                <ChampSelect v-model="formArticle.statut" :options="OPTIONS_FORMARTICLE_STATUT" />
               </div>
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1"
                   >Date de publication</label
                 >
-                <input
-                  v-model="formArticle.date"
-                  type="date"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary"
-                />
+                <ChampDate v-model="formArticle.date" />
               </div>
             </div>
 
@@ -407,6 +367,40 @@ import {
   libelleStatut,
   statutDepuisLibelle,
 } from '@/api/articles'
+import ChampSelect from '@/components/ui/ChampSelect.vue'
+import ChampDate from '@/components/ui/ChampDate.vue'
+const OPTIONS_FILTRECATEGORIE = [
+  { valeur: '', libelle: 'Toutes les catégories' },
+  { valeur: 'actualites-ambassade', libelle: 'Actualités Ambassade' },
+  { valeur: 'actualites-diplomatique', libelle: 'Actualités Diplomatiques' },
+  { valeur: 'actualites-gouvernementale', libelle: 'Actualités Gouvernementales' },
+]
+
+const OPTIONS_FILTRESTATUT = [
+  { valeur: '', libelle: 'Tous les statuts' },
+  { valeur: 'Publié', libelle: 'Publié' },
+  { valeur: 'Brouillon', libelle: 'Brouillon' },
+  { valeur: 'À valider', libelle: 'À valider' },
+]
+
+const OPTIONS_TRI = [
+  { valeur: 'recent', libelle: 'Plus récent' },
+  { valeur: 'ancien', libelle: 'Plus ancien' },
+  { valeur: 'titre', libelle: 'Titre A-Z' },
+  { valeur: 'vues', libelle: 'Plus vus' },
+]
+
+const OPTIONS_FORMARTICLE_CATEGORIE = [
+  { valeur: 'actualites-ambassade', libelle: "Actualités de l'Ambassade" },
+  { valeur: 'actualites-diplomatique', libelle: 'Actualités diplomatiques' },
+  { valeur: 'actualites-gouvernementale', libelle: 'Actualités gouvernementales' },
+]
+
+const OPTIONS_FORMARTICLE_STATUT = [
+  { valeur: 'Brouillon', libelle: 'Brouillon' },
+  { valeur: 'Publié', libelle: 'Publié' },
+  { valeur: 'À valider', libelle: 'À valider' },
+]
 
 // Données des articles
 const articles = ref([])

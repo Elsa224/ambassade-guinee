@@ -31,11 +31,7 @@
             class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
             v-model="searchQuery"
           />
-          <input
-            type="date"
-            class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-            v-model="dateFilter"
-          />
+          <ChampDate v-model="dateFilter" />
           <button
             class="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
           >
@@ -118,7 +114,7 @@
                   {{ task.creationDate }}
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ task.parent }}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-primary">
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-primary-dark">
                   {{ task.title }}
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
@@ -212,6 +208,7 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import ChampDate from '@/components/ui/ChampDate.vue'
 
 const router = useRouter()
 const searchQuery = ref('')

@@ -18,7 +18,7 @@
     <template v-else-if="article">
       <router-link
         to="/actualite"
-        class="inline-flex items-center gap-2 text-primary hover:text-primary-dark mb-6 text-sm font-medium"
+        class="inline-flex items-center gap-2 text-primary-dark hover:underline mb-6 text-sm font-medium"
       >
         <i class="bx bx-arrow-back"></i>
         Retour aux actualités
@@ -46,7 +46,7 @@
       <p class="text-lg text-gray-700 font-medium mb-6">{{ article.resume }}</p>
 
       <!-- Le contenu est du HTML rendu par le CMS (spec 4.2). -->
-      <div class="prose max-w-none text-gray-800 leading-relaxed" v-html="article.contenu"></div>
+      <div class="contenu-cms max-w-none text-gray-800" v-html="article.contenu"></div>
     </template>
   </article>
 </template>
