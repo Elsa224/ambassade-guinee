@@ -97,16 +97,32 @@
               </div>
             </div>
 
-            <!-- Ambassade - Menu cliquable avec chevron -->
+            <!-- Ambassade.
+                 L'intitule ne menait a /presentation, qui se termine sur
+                 « Rubrique en preparation » pour toute ambassade autre que
+                 celle d'origine : un clic sur le menu principal donnait donc
+                 une page vide, alors que le sous-menu, lui, porte quatre
+                 pages bien vivantes. L'intitule n'ouvre plus que le
+                 sous-menu quand la page de presentation n'est pas servie. -->
             <div class="relative group">
               <div class="flex items-center">
                 <router-link
+                  v-if="rubriqueOuverte('/presentation')"
                   to="/presentation"
                   class="nav-item px-3 py-2 rounded-l hover:bg-secondary hover:text-ink-dark transition text-primary"
                   active-class="hover-active"
                 >
                   Ambassade
                 </router-link>
+                <button
+                  v-else
+                  type="button"
+                  @click.stop="toggleDropdown('ambassade')"
+                  class="nav-item px-3 py-2 rounded-l hover:bg-secondary hover:text-ink-dark transition text-primary"
+                  :class="{ 'bg-secondary text-ink-dark': openDropdowns.ambassade }"
+                >
+                  Ambassade
+                </button>
                 <button
                   @click.stop="toggleDropdown('ambassade')"
                   class="nav-item px-2 py-2 rounded-r hover:bg-secondary hover:text-ink-dark transition border-l border-primary/20"
@@ -133,6 +149,7 @@
                 class="absolute top-full left-0 min-w-[240px] bg-white rounded-lg shadow-lg z-50 py-1 mt-1 max-h-[80vh] overflow-y-auto"
               >
                 <router-link
+                  v-if="rubriqueOuverte('/presentation')"
                   to="/presentation"
                   class="block px-4 py-2 text-sm text-gray-800 hover:bg-secondary hover:text-ink-dark transition-all border-b border-gray-100"
                   >Présentation</router-link
@@ -337,7 +354,20 @@
               <div
                 class="flex items-center justify-between px-3 py-2 rounded hover:bg-secondary hover:text-ink-dark text-primary"
               >
-                <router-link :to="menu.path" class="flex-1">{{ menu.label }}</router-link>
+                <!-- L'intitule n'est un lien que si sa propre page est
+                     servie. Sinon il deplie le sous-menu, comme au format
+                     bureau : « Ambassade » menait a une page en preparation. -->
+                <router-link v-if="menu.path" :to="menu.path" class="flex-1">
+                  {{ menu.label }}
+                </router-link>
+                <button
+                  v-else
+                  type="button"
+                  class="flex-1 text-left"
+                  @click.stop="toggleSubmenu(menu.key)"
+                >
+                  {{ menu.label }}
+                </button>
                 <button @click.stop="toggleSubmenu(menu.key)" class="p-1">
                   <svg
                     class="w-4 h-4 transition-transform duration-200"
@@ -848,7 +878,13 @@ const premierServiceOuvert = computed(
 
 const menusMobilesOuverts = computed(() =>
   mobileMenus.value
-    .map((menu) => ({ ...menu, items: menu.items.filter((item) => rubriqueOuverte(item.path)) }))
+    .map((menu) => ({
+      ...menu,
+      // `null` plutot que le chemin quand la page de l'intitule n'est pas
+      // servie : le gabarit rend alors un bouton de depliage, pas un lien.
+      path: rubriqueOuverte(menu.path) ? menu.path : null,
+      items: menu.items.filter((item) => rubriqueOuverte(item.path)),
+    }))
     .filter((menu) => menu.items.length > 0),
 )
 
