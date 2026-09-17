@@ -126,6 +126,30 @@ describe("banniere dans l'ecran du contenu d'accueil", () => {
     expect(ecriture?.corps).toEqual({ variant: 'classique', title: null, intro: null })
   })
 
+  it('annonce que le bloc est centre quand aucune image ne porte de citation', async () => {
+    // Rien dans le formulaire ne le laisse deviner : la citation est
+    // facultative image par image, et c'est leur absence a toutes qui deplace
+    // le bloc au centre.
+    servir({ variant: 'diaporama', title: null, intro: null, slides: [diapositive(1)] })
+
+    const wrapper = await monter()
+
+    expect(wrapper.text()).toContain('Aucune image ne porte de citation')
+  })
+
+  it('ne dit plus rien du centrage des que la citation est saisie', async () => {
+    servir({
+      variant: 'diaporama',
+      title: null,
+      intro: null,
+      slides: [{ ...diapositive(1), quote: 'Renforcer les liens.' }],
+    })
+
+    const wrapper = await monter()
+
+    expect(wrapper.text()).not.toContain('Aucune image ne porte de citation')
+  })
+
   it("ne propose pas de supprimer une banniere qui n'existe pas", async () => {
     servir(null)
 

@@ -129,6 +129,16 @@
           bannière simple.
         </p>
 
+        <p
+          v-if="diaporamaSansCitation"
+          class="mt-5 bg-gray-50 border border-gray-200 text-gray-700 rounded-lg px-4 py-3 text-sm"
+          role="status"
+        >
+          Aucune image ne porte de citation : le site centre le titre, l'accroche et les boutons sur
+          la photo. Ajoutez une citation à une image pour revenir à la mise en page en deux
+          colonnes, titre à gauche et citation à droite.
+        </p>
+
         <div v-if="banniere.variant === 'diaporama'" class="mt-6 border-t border-gray-100 pt-6">
           <ListeOrdonnee
             titre="Images du diaporama"
@@ -652,7 +662,8 @@ const MISES_EN_PAGE = [
   {
     valeur: 'diaporama' as VarianteBanniere,
     libelle: 'Diaporama',
-    description: 'Des photos plein écran qui défilent, chacune portant une citation signée.',
+    description:
+      'Des photos plein écran qui défilent. Avec une citation, le titre passe à gauche et la citation à droite ; sans citation, le titre et les boutons sont centrés sur la photo.',
   },
 ] as const
 
@@ -673,6 +684,21 @@ const diapositives = computed(() => contenu.value.hero?.slides ?? [])
  */
 const diaporamaSansImage = computed(
   () => banniere.variant === 'diaporama' && diapositives.value.length === 0,
+)
+
+/**
+ * Le diaporama sans aucune citation, cas qui change sa composition.
+ *
+ * Le site centre alors le titre, l'accroche et les boutons sur la photo, au
+ * lieu de la maquette a deux colonnes. L'ecran l'annonce parce que rien dans
+ * le formulaire ne le laisse deviner : la citation est facultative image par
+ * image, et c'est leur absence a TOUTES qui deplace le bloc.
+ */
+const diaporamaSansCitation = computed(
+  () =>
+    banniere.variant === 'diaporama' &&
+    diapositives.value.length > 0 &&
+    diapositives.value.every((diapositive) => !diapositive.quote),
 )
 
 const diapositiveOuverte = ref(false)
