@@ -302,9 +302,11 @@ export function mockApi(): Plugin {
 
           // `phone` est derive de la premiere entree, jamais stocke : deux
           // sources de verite pour un meme numero divergeraient a la premiere
-          // modification.
+          // modification. Liste vide, la production sert `null` et non une
+          // chaine vide : un faux serveur plus indulgent que le vrai est un
+          // piege de diagnostic.
           const numeros = (contact.phones ?? []) as { number?: string }[]
-          contact.phone = numeros.length > 0 ? (numeros[0].number ?? '') : ''
+          contact.phone = numeros.length > 0 ? (numeros[0].number ?? null) : null
 
           return repondre(200, { data: courante })
         })

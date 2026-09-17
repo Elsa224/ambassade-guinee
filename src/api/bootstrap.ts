@@ -18,10 +18,14 @@ export interface NumeroTelephone {
  * et l'API refuse explicitement un `phone` isole plutot que de l'ignorer. La
  * consequence tient en une phrase : l'ordre de `phones` porte du sens, et
  * changer le numero principal du site, c'est changer la premiere entree.
+ *
+ * Il vaut `null` quand la liste est vide, et c'est le cas servi en production
+ * pour le Gabon, qui n'a fourni aucun numero. Releve le 2026-09-17 sur
+ * `GET /api/bootstrap` : le type l'annoncait en chaine, ce qui etait faux.
  */
 export interface EmbassyContact {
   address: string
-  phone: string
+  phone: string | null
   phones: NumeroTelephone[]
   email: string
   hours: string
