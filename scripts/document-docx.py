@@ -209,7 +209,14 @@ STYLES = (
     f'<w:rFonts w:ascii="{POLICE}" w:hAnsi="{POLICE}" w:cs="{POLICE}"/>'
     f'<w:color w:val="{ENCRE}"/><w:sz w:val="21"/></w:rPr></w:rPrDefault>'
     '<w:pPrDefault><w:pPr><w:spacing w:after="120" w:line="276" w:lineRule="auto"/>'
-    "</w:pPr></w:pPrDefault></w:docDefaults></w:styles>"
+    "</w:pPr></w:pPrDefault></w:docDefaults>"
+    # Certaines versions de Word ignorent `docDefaults` si le style Normal
+    # n'existe pas : la police y est donc redite plutot que supposee.
+    '<w:style w:type="paragraph" w:default="1" w:styleId="Normal">'
+    '<w:name w:val="Normal"/><w:rPr>'
+    f'<w:rFonts w:ascii="{POLICE}" w:hAnsi="{POLICE}" w:cs="{POLICE}"/>'
+    f'<w:color w:val="{ENCRE}"/><w:sz w:val="21"/></w:rPr></w:style>'
+    "</w:styles>"
 )
 
 NUMEROTATION = (
