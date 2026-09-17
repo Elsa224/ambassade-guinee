@@ -14,6 +14,14 @@ import {
 } from '@/api/evenements-admin'
 import { messageErreur } from '@/api/evenements'
 import { dateLisible, estAnnulable, etatDe, remplissage } from './presentation'
+import {
+  afficheEnJpeg,
+  couleursDuTenant,
+  dessinerAffiche,
+  nomDeFichier,
+  type DonneesAffiche,
+} from './affiche-qr'
+import { useIdentite } from '@/tenant/identite'
 import PastilleEtat from '@/components/ui/PastilleEtat.vue'
 
 /**
@@ -30,6 +38,7 @@ import PastilleEtat from '@/components/ui/PastilleEtat.vue'
  * L'apercu passe par `recupererLogo` puis une URL d'objet.
  */
 const route = useRoute()
+const { nomDeLAmbassade, logo: logoAmbassade } = useIdentite()
 
 const evenement = ref<EvenementAdmin | null>(null)
 const chargement = ref(true)
@@ -169,37 +178,122 @@ async function copierAdresse() {
 }
 
 /**
- * Ouvre une page reduite au QR et lance l'impression.
+ * L'affiche d'inscription, composee une seule fois.
  *
- * Le document est construit par le DOM, jamais par concatenation : le nom de
- * l'evenement vient d'Ambassade Secure et ne doit pas etre interprete comme
- * du HTML.
+ * Imprimer et partager partent de la MEME image : l'ancienne impression
+ * fabriquait sa propre page — titre en sans-serif sur fond blanc, QR au
+ * milieu — et un partage aurait fabrique la sienne. Deux rendus separes
+ * auraient diverge des la premiere retouche.
  */
-function imprimerQr() {
+const affiche = ref(false)
+const erreurAffiche = ref('')
+
+function donneesDeLAffiche(): DonneesAffiche | null {
   const donnees = qr.value
   const actuel = evenement.value
-  if (!donnees || !actuel) return
-  const fenetre = window.open('', '_blank', 'width=640,height=800')
-  if (!fenetre) return
-  const doc = fenetre.document
-  doc.title = "QR d'inscription"
-  const style = doc.createElement('style')
-  style.textContent =
-    'body{font-family:sans-serif;text-align:center;padding:3rem}' +
-    'img{width:70%;max-width:420px}h1{font-size:1.5rem}p{color:#444}'
-  doc.head.appendChild(style)
-  const titre = doc.createElement('h1')
-  titre.textContent = actuel.name
-  const sousTitre = doc.createElement('p')
-  sousTitre.textContent = `Inscription — ${dateLisible(actuel.date)} à ${actuel.time}`
-  const image = doc.createElement('img')
-  image.alt = "QR d'inscription"
-  image.addEventListener('load', () => {
-    fenetre.focus()
-    fenetre.print()
-  })
-  image.src = donnees.qr
-  doc.body.append(titre, sousTitre, image)
+  if (!donnees || !actuel) return null
+  return {
+    nomEvenement: actuel.name,
+    dateLisible: dateLisible(actuel.date),
+    heure: actuel.time,
+    lieu: actuel.location,
+    nomAmbassade: nomDeLAmbassade.value,
+    urlInscription: donnees.registrationUrl,
+    qr: donnees.qr,
+    logo: logoAmbassade.value === '' ? undefined : logoAmbassade.value,
+    couleurs: couleursDuTenant(),
+  }
+}
+
+/**
+ * Imprime l'affiche.
+ *
+ * Le document de la fenetre d'impression est construit par le DOM, jamais
+ * par concatenation : le nom de l'evenement vient d'Ambassade Secure et n'a
+ * pas a etre interprete comme du HTML.
+ */
+async function imprimerQr(): Promise<void> {
+  const donnees = donneesDeLAffiche()
+  if (!donnees || affiche.value) return
+  affiche.value = true
+  erreurAffiche.value = ''
+  try {
+    const canevas = await dessinerAffiche(donnees)
+    const fenetre = window.open('', '_blank', 'width=720,height=960')
+    if (!fenetre) {
+      erreurAffiche.value =
+        "La fenêtre d'impression a été bloquée par le navigateur. Autorisez les fenêtres surgissantes, ou partagez l'affiche en image."
+      return
+    }
+    const doc = fenetre.document
+    doc.title = `Inscription — ${donnees.nomEvenement}`
+    const style = doc.createElement('style')
+    // L'affiche est deja au format A4 : elle occupe la page entiere, sans
+    // marge du navigateur qui ajouterait un liseré blanc a l'impression.
+    style.textContent =
+      '@page{size:A4 portrait;margin:0}' +
+      'html,body{margin:0;padding:0}' +
+      'img{display:block;width:100%;height:auto}'
+    doc.head.appendChild(style)
+    const image = doc.createElement('img')
+    image.alt = "Affiche d'inscription"
+    image.addEventListener('load', () => {
+      fenetre.focus()
+      fenetre.print()
+    })
+    image.src = canevas.toDataURL('image/png')
+    doc.body.appendChild(image)
+  } catch (souleve) {
+    erreurAffiche.value =
+      souleve instanceof Error ? souleve.message : "L'affiche n'a pas pu être composée."
+  } finally {
+    affiche.value = false
+  }
+}
+
+/**
+ * Partage l'affiche en JPEG.
+ *
+ * `navigator.share` avec un fichier ouvre directement WhatsApp, Signal ou
+ * le courriel sur telephone, et c'est le geste attendu. Sur un ordinateur de
+ * bureau, l'API n'existe le plus souvent pas : on retombe alors sur un
+ * telechargement, que l'on glisse ensuite dans la conversation. Jamais de
+ * message d'echec pour une fonction simplement absente.
+ */
+async function partagerQr(): Promise<void> {
+  const donnees = donneesDeLAffiche()
+  if (!donnees || affiche.value) return
+  affiche.value = true
+  erreurAffiche.value = ''
+  try {
+    const image = await afficheEnJpeg(donnees)
+    const fichier = new File([image], nomDeFichier(donnees.nomEvenement), { type: 'image/jpeg' })
+
+    if (navigator.canShare?.({ files: [fichier] })) {
+      try {
+        await navigator.share({ files: [fichier], title: donnees.nomEvenement })
+        return
+      } catch (souleve) {
+        // L'utilisateur a ferme le panneau de partage : ce n'est pas un
+        // echec, et surtout pas une raison de lui imposer un telechargement.
+        if (souleve instanceof DOMException && souleve.name === 'AbortError') return
+      }
+    }
+
+    const url = URL.createObjectURL(image)
+    const lien = document.createElement('a')
+    lien.href = url
+    lien.download = fichier.name
+    document.body.appendChild(lien)
+    lien.click()
+    lien.remove()
+    URL.revokeObjectURL(url)
+  } catch (souleve) {
+    erreurAffiche.value =
+      souleve instanceof Error ? souleve.message : "L'affiche n'a pas pu être composée."
+  } finally {
+    affiche.value = false
+  }
 }
 
 /**
@@ -526,14 +620,31 @@ onMounted(charger)
                   </button>
                   <button
                     type="button"
-                    class="border border-gray-300 text-gray-700 text-sm font-medium px-3 py-1.5 rounded-lg"
+                    :disabled="affiche"
+                    class="border border-gray-300 text-gray-700 text-sm font-medium px-3 py-1.5 rounded-lg disabled:opacity-60"
                     @click="imprimerQr"
                   >
-                    Imprimer le QR
+                    {{ affiche ? 'Préparation…' : "Imprimer l'affiche" }}
+                  </button>
+                  <button
+                    type="button"
+                    :disabled="affiche"
+                    class="border border-gray-300 text-gray-700 text-sm font-medium px-3 py-1.5 rounded-lg disabled:opacity-60"
+                    @click="partagerQr"
+                  >
+                    {{ affiche ? 'Préparation…' : "Partager l'affiche" }}
                   </button>
                 </div>
+                <p
+                  v-if="erreurAffiche"
+                  class="text-sm text-red-700 bg-red-50 border border-red-200 rounded-lg px-3 py-2"
+                  role="alert"
+                >
+                  {{ erreurAffiche }}
+                </p>
                 <p class="text-xs text-gray-500">
-                  Le QR est un SVG : il s'imprime proprement à n'importe quelle taille.
+                  L'affiche porte les couleurs de l'ambassade. « Partager » l'envoie en JPEG vers
+                  WhatsApp ou une autre messagerie, ou la télécharge sur ordinateur.
                 </p>
               </div>
             </div>

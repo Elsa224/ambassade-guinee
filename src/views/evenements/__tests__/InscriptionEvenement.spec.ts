@@ -6,9 +6,25 @@ import { defineComponent, h } from 'vue'
 import InscriptionEvenement from '../InscriptionEvenement.vue'
 import evenementsFixture from '@/api/fixtures/evenements.json'
 
-const OUVERT = evenementsFixture.data.find((e) => e.publicToken === 'AbC123ouvert')!
-const CLOS = evenementsFixture.data.find((e) => e.publicToken === 'DeF456complet')!
-const SANS_LIMITE = evenementsFixture.data.find((e) => e.publicToken === 'GhI789illimite')!
+/**
+ * La fiche publique telle que le back la sert VRAIMENT : sans `publicToken`.
+ *
+ * La fixture le porte parce qu'elle decrit la LISTE, ou il existe bien. La
+ * fiche `GET /api/secure/events/{token}` ne le renvoie pas. Les tests
+ * lisaient donc une forme que l'API ne produit jamais, et ont laisse passer
+ * une inscription qui postait vers `.../undefined/register` : sur le premier
+ * vrai evenement, toute inscription echouait en 404.
+ */
+function fiche(token: string) {
+  const { publicToken: _ignore, ...carte } = evenementsFixture.data.find(
+    (e) => e.publicToken === token,
+  )!
+  return carte
+}
+
+const OUVERT = fiche('AbC123ouvert')
+const CLOS = fiche('DeF456complet')
+const SANS_LIMITE = fiche('GhI789illimite')
 
 const Vide = defineComponent({ render: () => h('div') })
 
