@@ -17,56 +17,81 @@
       aria-hidden="true"
     ></div>
 
-    <!-- Voile systematique. Le texte n'est pas pose sur une couleur mais sur
-         une photographie televersee par l'ambassade : aucun rapport de
-         contraste n'est mesurable a l'avance, et il varie d'un point a
-         l'autre de la meme image. Le degrade s'eclaircit vers la droite pour
-         laisser voir la photo, mais son plancher ne descend pas sous 45 % :
-         la maquette d'origine passait a 20 % au milieu de la banniere, ce qui
-         tient devant trois portraits sombres et pas devant la premiere photo
-         claire. -->
+    <!-- Voile systematique, et seul dispositif : le texte est pose dessus
+         sans cadre. Le texte n'est pas pose sur une couleur mais sur une
+         photographie televersee par l'ambassade, dont rien n'est mesurable a
+         l'avance. Le plancher est donc calcule contre le PIRE cas possible,
+         une photographie entierement blanche :
+
+           voile a 65 %  ->  texte blanc              : 6,98
+                             titre en couleur secondaire : 4,74 (jaune gabonais)
+
+         Les deux passent le seuil de 4,5, quelle que soit l'image. C'est ce
+         qui remplace le fond opaque derriere les blocs de texte : la garantie
+         est la meme, et la photographie reste visible. La maquette d'origine
+         descend a 20 %, ou le titre jaune tombe a 1,6 devant une photo claire. -->
     <div
-      class="absolute inset-0 bg-gradient-to-r from-black/80 via-black/65 to-black/45"
+      class="absolute inset-0 bg-gradient-to-r from-black/75 via-black/70 to-black/65"
       aria-hidden="true"
     ></div>
 
     <div class="relative max-w-7xl mx-auto px-6 lg:px-8 py-24 w-full">
-      <!-- Second dispositif : derriere le seul bloc de texte, un fond plus
-           dense encore, pour que la lisibilite ne depende pas de ce que
-           l'image contient a cet endroit-la. -->
-      <div class="max-w-2xl bg-black/45 backdrop-blur-sm rounded-2xl px-8 py-10">
-        <h1 class="text-3xl lg:text-5xl font-bold text-white leading-tight mb-5 text-balance">
-          {{ titre }}
-        </h1>
+      <div class="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+        <!-- Colonne de gauche : l'identite de l'ambassade. Elle ne change pas
+             d'une diapositive a l'autre — c'est ce qui la distingue de la
+             citation, et ce qui evite que le titre du site clignote. -->
+        <div>
+          <img v-if="logo" :src="logo" :alt="titre" class="w-16 mb-6" />
 
-        <p v-if="intro" class="text-lg text-white/90 leading-relaxed mb-8">{{ intro }}</p>
+          <h1 class="text-3xl lg:text-5xl font-bold text-secondary leading-tight mb-5 text-balance">
+            {{ titre }}
+          </h1>
 
-        <!-- Citation de la diapositive courante. Texte brut : interpolation,
-             jamais `v-html`. -->
-        <blockquote v-if="citation" class="border-l-4 border-secondary pl-5 mb-8">
-          <p class="text-white/95 italic leading-relaxed">« {{ citation.quote }} »</p>
-          <footer v-if="citation.author" class="text-secondary font-semibold text-sm mt-2">
-            {{ citation.author }}
-          </footer>
-        </blockquote>
+          <p v-if="intro" class="text-white/90 leading-relaxed mb-8">{{ intro }}</p>
 
-        <div class="flex flex-wrap items-center gap-5">
-          <slot name="boutons" />
+          <div class="flex flex-wrap items-center gap-5">
+            <slot name="boutons" />
+          </div>
         </div>
-      </div>
 
-      <!-- Pastilles : seulement s'il y a de quoi naviguer. -->
-      <div v-if="diapositives.length > 1" class="flex items-center gap-3 mt-10">
-        <button
-          v-for="(diapositive, rang) in diapositives"
-          :key="diapositive.id"
-          type="button"
-          class="h-3 rounded-full transition-all focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
-          :class="rang === rangAffiche ? 'w-10 bg-secondary' : 'w-3 bg-white/50 hover:bg-white/80'"
-          :aria-label="`Afficher l'image ${rang + 1} sur ${diapositives.length}`"
-          :aria-current="rang === rangAffiche"
-          @click="afficher(rang)"
-        ></button>
+        <!-- Colonne de droite : ce qui change. La citation, sa signature, et
+             les pastilles numerotees qui disent laquelle on regarde. -->
+        <div class="lg:border-l lg:border-white/20 lg:pl-12">
+          <i class="bx bxs-quote-left text-3xl text-secondary/80" aria-hidden="true"></i>
+
+          <!-- `aria-live` parce que ce bloc change tout seul : sans lui, une
+               lecture d'ecran ne saurait jamais que le texte a ete remplace. -->
+          <div aria-live="polite">
+            <p v-if="citation" class="text-lg text-white/95 leading-relaxed mt-4">
+              {{ citation.quote }}
+            </p>
+            <p
+              v-if="citation?.author"
+              class="text-secondary font-semibold text-sm tracking-wide uppercase mt-5"
+            >
+              {{ citation.author }}
+            </p>
+          </div>
+
+          <div v-if="diapositives.length > 1" class="flex items-center gap-4 mt-10">
+            <button
+              v-for="(diapositive, rang) in diapositives"
+              :key="diapositive.id"
+              type="button"
+              class="w-12 h-12 rounded-full border-2 font-semibold tabular-nums transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+              :class="
+                rang === rangAffiche
+                  ? 'border-secondary bg-secondary/20 text-secondary'
+                  : 'border-white/40 text-white/70 hover:border-white hover:text-white'
+              "
+              :aria-label="`Afficher l'image ${rang + 1} sur ${diapositives.length}`"
+              :aria-current="rang === rangAffiche"
+              @click="afficher(rang)"
+            >
+              {{ String(rang + 1).padStart(2, '0') }}
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </section>
@@ -90,6 +115,7 @@ import type { DiapositiveBanniere } from '@/api/contenu'
 const proprietes = defineProps<{
   titre: string
   intro: string | null
+  logo: string
   diapositives: readonly DiapositiveBanniere[]
 }>()
 
