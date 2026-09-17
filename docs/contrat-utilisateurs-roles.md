@@ -348,3 +348,55 @@ invitations, garde du dernier administrateur, refus 403 du `super_admin` depuis
 une route d'ambassade — et non un branchement. C'est une decision d'Elsa, pas
 une suite automatique. La session back a indique vouloir reprendre la garde du
 dernier administrateur telle quelle.
+
+## Etat au 2026-09-17 : livre, et verifie contre le code
+
+Cette section **remplace celle qui precede** (« Etat cote back au 2026-09-17 »,
+qui relevait une surface inexistante). Le lot back a ete livre le meme jour et
+deploye sur shared-dev. Ce qui suit a ete lu dans son code — `UserController`,
+`GardesUtilisateur`, les trois `FormRequest`, `InvitationService`,
+`InvitationController`, `EnsureUserIsAdmin` — et non dans une annonce : c'est
+la discipline que l'episode `ACTIVE`/`COMPLETED` a imposee.
+
+Les six routes du contrat existent, a leur adresse et avec leur verbe.
+L'enumeration servie est bien `admin`, `super_admin`, `editeur`, et les etats
+de compte `actif` et `suspendu`.
+
+**Trois ecarts de forme**, aucun contredisant le contrat, tous a connaitre :
+
+1. **La liste est paginee** — `{ data, meta }`, `meta` portant
+   `current_page`, `last_page`, `per_page`, `total`, et `per_page` accepte en
+   parametre jusqu'a 100. Le contrat demandait une liste nue ; le back a eu
+   raison de le dire, car lire `data` comme le tout aurait cache les comptes
+   au-dela du vingt-cinquieme sans qu'aucun ecran ne s'en plaigne.
+2. **`invitation.url` n'est presente que si `sent` vaut `false`.** C'est un
+   jeton en clair : le rendre quand le courriel est parti donnerait a un
+   administrateur le lien d'activation d'un pair sans passer par sa boite. Le
+   front n'affiche donc le lien que dans ce cas, et rien dans l'autre.
+3. **Un compte suspendu par DECISION refuse le renvoi d'invitation** (422,
+   « Ce compte est suspendu ; aucune invitation ne peut lui etre envoyee. »).
+   Ce refus n'etait pas dans le contrat, et il est juste : honorer une
+   invitation pose un mot de passe, ce qui n'a jamais eu vocation a lever une
+   sanction. Le back le distingue par `suspended_at`, **qui n'est pas servi** :
+   le front ne peut donc pas prevoir ce refus. Il offre le geste sur tout
+   compte suspendu et laisse le serveur refuser — un etat qu'on ne connait pas
+   ne doit pas retirer un geste, seulement s'abstenir de le promettre.
+
+**Deux consequences hors de la surface des comptes :**
+
+- **`PUT /api/admin/embassy` exige desormais le role administrateur.** Un
+  editeur qui pouvait ecrire les parametres de l'ambassade avant ce lot ne le
+  peut plus. La matrice de ce document l'annoncait ; c'est maintenant applique.
+- **Une page publique est devenue obligatoire cote front.**
+  `InvitationService` batit l'URL du courriel sur `INVITATION_PATH`
+  (`/invitation/{token}` par defaut) et sur le domaine de l'ambassade du compte
+  invite. Sans cette route, creer un compte n'aboutit a rien : chaque
+  invitation mene a une adresse introuvable, et le defaut ne se verrait qu'au
+  premier agent invite. Meme exigence que le chemin impose par le QR
+  d'inscription aux evenements, et un test la verrouille.
+
+**Le garde du dernier administrateur n'est PAS calcule cote front.** La liste
+est paginee : compter les administrateurs actifs sur une page pourrait se
+tromper. Seul le refus « on n'agit pas sur son propre compte » est tranche d'avance
+par l'ecran, parce qu'il se decide en comparant deux identifiants. Le reste est
+refuse par le serveur, et c'est son message qui s'affiche.

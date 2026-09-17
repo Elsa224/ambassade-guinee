@@ -81,13 +81,27 @@
             <span v-if="!isCollapsed">Annuaire</span>
           </router-link>
 
+          <!-- Les deux entrees que le back reserve aux administrateurs. Un
+               editeur qui les verrait n'obtiendrait que des 403 ; la garde
+               reste cosmetique, c'est le serveur qui refuse. -->
           <router-link
+            v-if="administration"
             to="/dashboard/parametres"
             class="flex items-center gap-3 px-4 py-2 rounded-xl text-white no-underline transition-all duration-300 text-sm font-medium hover:bg-yellow-500/20 hover:text-secondary hover:translate-x-1"
             :active-class="LIEN_ACTIF"
           >
             <i class="bx bxs-cog text-xl flex-shrink-0"></i>
             <span v-if="!isCollapsed">Paramètres</span>
+          </router-link>
+
+          <router-link
+            v-if="administration"
+            to="/dashboard/utilisateurs"
+            class="flex items-center gap-3 px-4 py-2 rounded-xl text-white no-underline transition-all duration-300 text-sm font-medium hover:bg-yellow-500/20 hover:text-secondary hover:translate-x-1"
+            :active-class="LIEN_ACTIF"
+          >
+            <i class="bx bxs-group text-xl flex-shrink-0"></i>
+            <span v-if="!isCollapsed">Utilisateurs</span>
           </router-link>
 
           <router-link
@@ -175,6 +189,7 @@ import { useAuthStore } from '@/stores/auth'
 import { useTenantStore } from '@/stores/tenant'
 import { useIdentite } from '@/tenant/identite'
 import { etatDuModule } from '@/tenant/module-administration'
+import { peutAdministrer } from '@/acces/roles'
 
 const router = useRouter()
 const auth = useAuthStore()
@@ -188,6 +203,16 @@ const tenant = useTenantStore()
  * `tenant/module-administration.ts`.
  */
 const evenementsOuverts = computed(() => etatDuModule('secure_events', tenant) === 'ouvert')
+
+/**
+ * Les surfaces qui engagent l'ambassade, reservees aux administrateurs.
+ *
+ * Un role encore inconnu — le temps que `/auth/me` reponde, ou si l'appel
+ * echoue — les laisse visibles : ne pas savoir n'est pas un refus, et retirer
+ * ses parametres a un administrateur pour une panne de notre cote serait plus
+ * couteux que le clignotement que voit un editeur au rechargement.
+ */
+const administration = computed(() => peutAdministrer(auth.utilisateur?.role))
 
 // Le logo vient de l'ambassade consultee. Il etait importe du depot :
 // l'embleme guineen s'affichait donc dans la barre laterale de toutes les

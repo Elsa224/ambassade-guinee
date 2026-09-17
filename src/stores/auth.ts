@@ -48,6 +48,15 @@ export const useAuthStore = defineStore('auth', () => {
 
   const estAuthentifie = computed(() => token.value !== null)
 
+  /**
+   * L'aller-retour d'identite en cours, quand il y en a un.
+   *
+   * Les gardes de route en dependent : une garde de role posee avant que
+   * `/auth/me` ait repondu ne sait pas qui elle a en face, et renverrait un
+   * administrateur hors de ses propres parametres au moindre rechargement.
+   */
+  const attenteIdentite = ref<Promise<void> | null>(null)
+
   function enregistrerJeton(valeur: string | null): void {
     token.value = valeur
     setAuthToken(valeur)
@@ -58,14 +67,27 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
+  /**
+   * Ouvre une session a partir d'un jeton deja obtenu.
+   *
+   * Deux chemins y arrivent : la connexion par mot de passe, et l'acceptation
+   * d'une invitation, qui rend exactement la meme paire `{ token, user }`. La
+   * personne invitee repart donc connectee, sans avoir a se reconnecter juste
+   * apres avoir choisi son mot de passe.
+   */
+  function ouvrirSession(jeton: string, compte: Utilisateur): void {
+    enregistrerJeton(jeton)
+    utilisateur.value = compte
+    attenteIdentite.value = null
+  }
+
   /** Rend true si la connexion a réussi ; le message d'erreur reste dans `erreur`. */
   async function login(email: string, password: string): Promise<boolean> {
     chargement.value = true
     erreur.value = null
     try {
       const reponse = await apiPost<ReponseConnexion>('/api/auth/login', { email, password })
-      enregistrerJeton(reponse.token)
-      utilisateur.value = reponse.user
+      ouvrirSession(reponse.token, reponse.user)
       return true
     } catch (souleve) {
       erreur.value =
@@ -91,6 +113,7 @@ export const useAuthStore = defineStore('auth', () => {
     } finally {
       enregistrerJeton(null)
       utilisateur.value = null
+      attenteIdentite.value = null
     }
   }
 
@@ -117,7 +140,7 @@ export const useAuthStore = defineStore('auth', () => {
 
     token.value = persiste
     setAuthToken(persiste)
-    void apiGet<ReponseSession>('/api/auth/me')
+    attenteIdentite.value = apiGet<ReponseSession>('/api/auth/me')
       .then((reponse) => {
         utilisateur.value = reponse.user
       })
@@ -126,5 +149,28 @@ export const useAuthStore = defineStore('auth', () => {
       })
   }
 
-  return { token, utilisateur, chargement, erreur, estAuthentifie, login, logout, restaurerSession }
+  /**
+   * Attend que l'identite soit connue, si un aller-retour est en cours.
+   *
+   * Rend la main immediatement quand il n'y en a pas — apres une connexion,
+   * ou quand aucun jeton n'est persiste. L'echec de `/auth/me` n'est pas
+   * propage : la garde decidera avec un role inconnu, et ne pas savoir n'est
+   * pas un refus.
+   */
+  async function pretPourLesGardes(): Promise<void> {
+    if (attenteIdentite.value !== null) await attenteIdentite.value
+  }
+
+  return {
+    token,
+    utilisateur,
+    chargement,
+    erreur,
+    estAuthentifie,
+    ouvrirSession,
+    login,
+    logout,
+    restaurerSession,
+    pretPourLesGardes,
+  }
 })

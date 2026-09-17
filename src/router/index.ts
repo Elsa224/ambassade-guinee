@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { peutAdministrer } from '@/acces/roles'
 
 // Layouts
 import Layout from '@/layouts/Layout.vue'
@@ -181,9 +182,22 @@ const router = createRouter({
         },
         { path: 'annuaire', name: 'annuaire-admin', component: AnnuaireAdmin },
         {
+          // `PUT /api/admin/embassy` exige le role administrateur depuis le
+          // lot des roles : un editeur qui atteindrait cet ecran pourrait
+          // encore le LIRE, et n'obtiendrait qu'un 403 en enregistrant.
           path: 'parametres',
           name: 'parametres-admin',
+          meta: { administration: true },
           component: () => import('@/views/dashboard/parametres/ParametresAdmin.vue'),
+        },
+        {
+          // Toute la surface `/api/admin/users` est refusee en 403 a un
+          // editeur, LECTURE COMPRISE : la liste des adresses de ses
+          // collegues n'est pas du contenu.
+          path: 'utilisateurs',
+          name: 'utilisateurs-admin',
+          meta: { administration: true },
+          component: () => import('@/views/dashboard/utilisateurs/UtilisateursAdmin.vue'),
         },
         {
           // Le seul ecran du tableau de bord ouvert a tous les roles : un
@@ -248,6 +262,16 @@ const router = createRouter({
       component: () => import('@/views/Connexion.vue'),
     },
 
+    // Chemin impose par le back, qui batit l'URL du courriel d'invitation sur
+    // `INVITATION_PATH` (`/invitation/{token}` par defaut) : il doit
+    // correspondre exactement, sinon chaque invitation mene a une adresse
+    // introuvable et aucun compte cree ne devient utilisable.
+    {
+      path: '/invitation/:token',
+      name: 'invitation',
+      component: () => import('@/views/Invitation.vue'),
+    },
+
     // Redirection 404 éventuelle (optionnelle)
     // { path: '/:pathMatch(.*)*', redirect: '/' }
   ],
@@ -259,7 +283,7 @@ const router = createRouter({
  * /dashboard exige desormais une session. La destination demandee est
  * conservee pour y revenir apres la connexion.
  */
-router.beforeEach((destination) => {
+router.beforeEach(async (destination) => {
   const auth = useAuthStore()
   const versDashboard =
     destination.path === '/dashboard' || destination.path.startsWith('/dashboard/')
@@ -270,6 +294,27 @@ router.beforeEach((destination) => {
 
   if (destination.path === '/connexion' && auth.estAuthentifie) {
     return { path: '/dashboard' }
+  }
+
+  /**
+   * Les deux surfaces qui engagent l'ambassade — ses parametres et ses
+   * comptes — sont reservees aux administrateurs.
+   *
+   * L'attente est indispensable : `restaurerSession()` remet le jeton en
+   * place de facon synchrone mais l'identite demande un aller-retour, et une
+   * garde de role qui tranche avant sa reponse ne sait pas qui elle a en
+   * face. Sans cela, un administrateur qui recharge la page de ses propres
+   * parametres en serait sorti.
+   *
+   * Et le refus n'est jamais prononce sur un role inconnu : `peutAdministrer`
+   * ouvre quand l'identite manque, parce que ne pas savoir n'est pas un
+   * refus. C'est le serveur qui refuse, en 403, et c'est lui qui fait foi.
+   */
+  if (versDashboard && destination.meta.administration === true) {
+    await auth.pretPourLesGardes()
+    if (!peutAdministrer(auth.utilisateur?.role)) {
+      return { path: '/dashboard' }
+    }
   }
 
   return true
