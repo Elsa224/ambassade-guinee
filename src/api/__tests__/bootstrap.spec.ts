@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { fetchBootstrap, normaliserEmbassy } from '../bootstrap'
 import gabonProduction from '@/api/fixtures/bootstrap-gabon-production.json'
+import gabonFixture from '@/api/fixtures/bootstrap-gabon.json'
 import guineeFixture from '@/api/fixtures/bootstrap.json'
 
 function reponse(corps: unknown) {
@@ -57,6 +58,16 @@ describe("normalisation d'une ambassade servie", () => {
 
     expect(embassy.logo_image).toBe('')
     expect(embassy.flag_image).toBe('')
+  })
+
+  it("garde le telephone derive a `null` quand aucun numero n'est fourni", () => {
+    // C'est la forme servie en production pour le Gabon, qui n'a donne aucun
+    // numero. Le type l'annoncait en chaine, ce qui etait faux ; le gabarit
+    // masque la ligne via le repli de `useIdentite` sur la chaine vide.
+    const embassy = normaliserEmbassy(gabonFixture.embassy)
+
+    expect(embassy.contact.phones).toEqual([])
+    expect(embassy.contact.phone).toBeNull()
   })
 
   it('conserve le slug et les modules, dont depend le filtrage des rubriques', () => {
