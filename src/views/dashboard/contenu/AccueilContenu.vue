@@ -22,6 +22,144 @@
     </p>
 
     <div v-else class="space-y-6">
+      <!-- Bannière d'accueil -->
+      <section class="bg-white shadow-sm rounded-xl p-6">
+        <div class="flex items-start justify-between gap-4 mb-5">
+          <div>
+            <h3 class="text-lg font-semibold text-primary">Bannière d'accueil</h3>
+            <p class="text-sm text-gray-500 mt-0.5">
+              Le grand visuel en haut de la page d'accueil, et sa mise en page.
+            </p>
+          </div>
+          <EtatSection :rempli="contenu.hero !== null" />
+        </div>
+
+        <fieldset class="mb-6">
+          <legend class="block text-sm font-medium text-gray-700 mb-2">Mise en page</legend>
+          <div class="grid gap-3 sm:grid-cols-2">
+            <label
+              v-for="choix in MISES_EN_PAGE"
+              :key="choix.valeur"
+              class="flex gap-3 border rounded-lg px-4 py-3 cursor-pointer transition-colors"
+              :class="
+                banniere.variant === choix.valeur
+                  ? 'border-primary bg-primary/5'
+                  : 'border-gray-200 hover:bg-gray-50'
+              "
+            >
+              <input
+                v-model="banniere.variant"
+                type="radio"
+                name="mise-en-page-banniere"
+                :value="choix.valeur"
+                class="mt-1"
+              />
+              <span>
+                <span class="block font-semibold text-gray-800">{{ choix.libelle }}</span>
+                <span class="block text-sm text-gray-600">{{ choix.description }}</span>
+              </span>
+            </label>
+          </div>
+        </fieldset>
+
+        <div class="space-y-5">
+          <div>
+            <label for="titre-banniere" class="block text-sm font-medium text-gray-700 mb-1.5">
+              Titre
+            </label>
+            <input
+              id="titre-banniere"
+              v-model.trim="banniere.title"
+              type="text"
+              :maxlength="LONGUEURS_BANNIERE.title"
+              class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary/40"
+            />
+            <p class="text-xs text-gray-500 mt-1">
+              Laissé vide, le site affiche le nom de l'ambassade :
+              <span class="font-medium">{{ nomDeLAmbassade }}</span>
+            </p>
+          </div>
+
+          <div>
+            <label for="intro-banniere" class="block text-sm font-medium text-gray-700 mb-1.5">
+              Accroche
+            </label>
+            <textarea
+              id="intro-banniere"
+              v-model.trim="banniere.intro"
+              rows="3"
+              :maxlength="LONGUEURS_BANNIERE.intro"
+              class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary/40"
+            ></textarea>
+            <p class="text-xs text-gray-500 mt-1">
+              {{ banniere.intro.length }} / {{ LONGUEURS_BANNIERE.intro }} caractères. Laissée vide,
+              aucune accroche n'est affichée.
+            </p>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-4 mt-6">
+          <button
+            type="button"
+            class="bg-primary text-white px-5 py-2 rounded-lg font-semibold hover:bg-primary-dark disabled:opacity-50"
+            :disabled="enregistrement"
+            @click="enregistrerLaBanniere"
+          >
+            Enregistrer
+          </button>
+          <button
+            v-if="contenu.hero !== null"
+            type="button"
+            class="text-sm font-semibold text-red-700 hover:underline"
+            @click="retourAuDefautOuvert = true"
+          >
+            Revenir à la bannière par défaut
+          </button>
+        </div>
+
+        <!-- Le diaporama vide ne se devine pas : le site retombe sur la
+             bannière simple, et l'écran doit le dire avant que l'éditrice
+             aille vérifier sur le site. -->
+        <p
+          v-if="diaporamaSansImage"
+          class="mt-5 bg-amber-50 border border-amber-200 text-amber-800 rounded-lg px-4 py-3 text-sm"
+          role="status"
+        >
+          Aucune image n'est encore ajoutée. Tant que le diaporama est vide, le site affiche la
+          bannière simple.
+        </p>
+
+        <div v-if="banniere.variant === 'diaporama'" class="mt-6 border-t border-gray-100 pt-6">
+          <ListeOrdonnee
+            titre="Images du diaporama"
+            :description="`Les photos qui défilent, avec leur citation. ${DIAPOSITIVES_MAX} au maximum.`"
+            libelle-ajout="Ajouter une image"
+            :elements="diapositives"
+            @monter="(id) => deplacerDiapositive(id, -1)"
+            @descendre="(id) => deplacerDiapositive(id, 1)"
+            @supprimer="retirerDiapositive"
+            @ajouter="ouvrirDiapositive(null)"
+            @modifier="ouvrirDiapositive"
+          >
+            <template #apercu="{ element }">
+              <img :src="element.image_url" alt="" class="w-20 h-14 rounded-lg object-cover" />
+              <div class="min-w-0">
+                <p class="text-sm text-gray-700 truncate">
+                  {{ element.quote || 'Aucune citation' }}
+                </p>
+                <p v-if="element.author" class="text-xs text-gray-500 truncate">
+                  {{ element.author }}
+                </p>
+              </div>
+            </template>
+          </ListeOrdonnee>
+
+          <p v-if="diapositives.length >= DIAPOSITIVES_MAX" class="text-sm text-gray-500 mt-2">
+            Le maximum de {{ DIAPOSITIVES_MAX }} images est atteint.
+          </p>
+        </div>
+      </section>
+
       <!-- Mot de bienvenue -->
       <section class="bg-white shadow-sm rounded-xl p-6">
         <div class="flex items-start justify-between gap-4 mb-5">
@@ -284,6 +422,119 @@
       </form>
     </Boite>
 
+    <!-- Formulaire d'une image du diaporama -->
+    <Boite
+      v-if="diapositiveOuverte"
+      :titre="diapositiveEditee ? 'Modifier l\'image' : 'Ajouter une image'"
+      @fermer="diapositiveOuverte = false"
+    >
+      <form class="space-y-5" @submit.prevent="enregistrerLaDiapositive">
+        <ChampImage v-model="saisieDiapositive.image_url" libelle="Image de fond" requis />
+
+        <p class="text-xs text-gray-500 -mt-2">
+          Le texte est posé sur cette photo, sous un voile sombre. Une image très claire reste
+          lisible, mais une image chargée au centre gêne la lecture.
+        </p>
+
+        <div>
+          <label for="citation-diapositive" class="block text-sm font-medium text-gray-700 mb-1.5">
+            Citation <span class="text-gray-400 font-normal">(facultative)</span>
+          </label>
+          <textarea
+            id="citation-diapositive"
+            v-model.trim="citationDiapositive"
+            rows="3"
+            :maxlength="LONGUEURS_BANNIERE.quote"
+            class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary"
+          ></textarea>
+          <p class="text-xs text-gray-500 mt-1.5">
+            {{ citationDiapositive.length }} / {{ LONGUEURS_BANNIERE.quote }} caractères.
+          </p>
+        </div>
+
+        <div>
+          <label for="auteur-diapositive" class="block text-sm font-medium text-gray-700 mb-1.5">
+            Signature <span class="text-gray-400 font-normal">(facultative)</span>
+          </label>
+          <input
+            id="auteur-diapositive"
+            v-model.trim="auteurDiapositive"
+            type="text"
+            :maxlength="LONGUEURS_BANNIERE.author"
+            class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary"
+          />
+          <p class="text-xs text-gray-500 mt-1.5">Le nom de la personne citée, et sa fonction.</p>
+        </div>
+
+        <p v-if="erreurFormulaire" class="text-sm text-red-700" role="alert">
+          {{ erreurFormulaire }}
+        </p>
+
+        <div class="flex justify-end gap-3 pt-2">
+          <button
+            type="button"
+            class="px-4 py-2.5 text-gray-700 font-semibold"
+            @click="diapositiveOuverte = false"
+          >
+            Annuler
+          </button>
+          <button
+            type="submit"
+            :disabled="enregistrement"
+            class="bg-primary hover:bg-primary-dark disabled:opacity-60 text-white font-semibold px-5 py-2.5 rounded-lg transition-colors"
+          >
+            Enregistrer
+          </button>
+        </div>
+      </form>
+    </Boite>
+
+    <!-- Retour a la banniere par defaut : la suppression est franche, et
+         l'ecran le dit en toutes lettres. Une editrice qui veut garder ses
+         images en affichant la banniere simple change de mise en page. -->
+    <Boite
+      v-if="retourAuDefautOuvert"
+      titre="Revenir à la bannière par défaut ?"
+      @fermer="retourAuDefautOuvert = false"
+    >
+      <div class="space-y-5">
+        <p class="text-gray-700">
+          Le titre, l'accroche et
+          <span class="font-semibold"
+            >les {{ diapositives.length }} image{{ diapositives.length > 1 ? 's' : '' }} du
+            diaporama</span
+          >
+          seront supprimés. Cette action est définitive.
+        </p>
+        <p class="text-gray-700">
+          Pour garder vos images tout en affichant la bannière simple, choisissez plutôt la mise en
+          page <span class="font-semibold">Bannière simple</span> et enregistrez.
+        </p>
+
+        <p v-if="erreurFormulaire" class="text-sm text-red-700" role="alert">
+          {{ erreurFormulaire }}
+        </p>
+
+        <div class="flex justify-end gap-3 pt-2">
+          <button
+            type="button"
+            class="px-4 py-2.5 text-gray-700 font-semibold"
+            @click="retourAuDefautOuvert = false"
+          >
+            Annuler
+          </button>
+          <button
+            type="button"
+            :disabled="enregistrement"
+            class="bg-red-700 hover:bg-red-800 disabled:opacity-60 text-white font-semibold px-5 py-2.5 rounded-lg transition-colors"
+            @click="revenirAuDefaut"
+          >
+            Supprimer la bannière
+          </button>
+        </div>
+      </div>
+    </Boite>
+
     <!-- Formulaire d'une photo -->
     <Boite
       v-if="photoOuverte"
@@ -343,7 +594,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted } from 'vue'
+import { useIdentite } from '@/tenant/identite'
 import ChampImage from './ChampImage.vue'
 import ListeOrdonnee from './ListeOrdonnee.vue'
 import EtatSection from './EtatSection.vue'
@@ -354,6 +606,13 @@ import {
   supprimerMotDeBienvenue,
   enregistrerBiographieAmbassadeur,
   supprimerBiographieAmbassadeur,
+  enregistrerBanniere,
+  supprimerBanniere,
+  ajouterDiapositive,
+  modifierDiapositive,
+  supprimerDiapositive,
+  ordonnerDiapositives,
+  DIAPOSITIVES_MAX,
   ajouterDirigeant,
   modifierDirigeant,
   supprimerDirigeant,
@@ -367,6 +626,8 @@ import {
   type ContenuAccueil,
   type Dirigeant,
   type ImageVitrine,
+  type DiapositiveBanniere,
+  type VarianteBanniere,
 } from '@/api/contenu'
 
 const contenu = ref<ContenuAccueil>({ ...CONTENU_VIDE })
@@ -375,6 +636,51 @@ const erreurChargement = ref('')
 const enregistrement = ref(false)
 const erreurFormulaire = ref('')
 const message = ref('')
+
+const { nomDeLAmbassade } = useIdentite()
+
+/**
+ * Les deux mises en page, decrites par ce qu'elles montrent et non par leur
+ * nom technique : l'editrice choisit un rendu, pas une valeur d'enumeration.
+ */
+const MISES_EN_PAGE = [
+  {
+    valeur: 'classique' as VarianteBanniere,
+    libelle: 'Bannière simple',
+    description: "Le visuel actuel du site, avec le titre et les boutons d'accès aux rubriques.",
+  },
+  {
+    valeur: 'diaporama' as VarianteBanniere,
+    libelle: 'Diaporama',
+    description: 'Des photos plein écran qui défilent, chacune portant une citation signée.',
+  },
+] as const
+
+/** Bornes du contrat, comptees en caracteres et non en octets. */
+const LONGUEURS_BANNIERE = { title: 200, intro: 400, quote: 300, author: 120 } as const
+
+const banniere = reactive({ variant: 'classique' as VarianteBanniere, title: '', intro: '' })
+
+const diapositives = computed(() => contenu.value.hero?.slides ?? [])
+
+/**
+ * Le cas que le site traite en silence, et que l'ecran doit annoncer.
+ *
+ * Un diaporama sans image n'est pas un diaporama : le site retombe sur la
+ * banniere simple. Le back enregistre pourtant cette combinaison sans
+ * broncher, et c'est voulu — la refuser imposerait de televerser les images
+ * avant de choisir la mise en page.
+ */
+const diaporamaSansImage = computed(
+  () => banniere.variant === 'diaporama' && diapositives.value.length === 0,
+)
+
+const diapositiveOuverte = ref(false)
+const diapositiveEditee = ref<DiapositiveBanniere | null>(null)
+const saisieDiapositive = reactive({ image_url: '' })
+const citationDiapositive = ref('')
+const auteurDiapositive = ref('')
+const retourAuDefautOuvert = ref(false)
 
 const bienvenue = reactive({ title: '', body_html: '' })
 
@@ -400,6 +706,9 @@ async function charger(): Promise<void> {
   erreurChargement.value = ''
   try {
     contenu.value = await recupererContenuAdmin()
+    banniere.variant = contenu.value.hero?.variant ?? 'classique'
+    banniere.title = contenu.value.hero?.title ?? ''
+    banniere.intro = contenu.value.hero?.intro ?? ''
     bienvenue.title = contenu.value.welcome?.title ?? 'Mot de bienvenue'
     bienvenue.body_html = contenu.value.welcome?.body_html ?? ''
     ambassadeur.name = contenu.value.ambassador?.name ?? ''
@@ -434,6 +743,78 @@ async function agir(action: () => Promise<unknown>, succes: string): Promise<boo
   } finally {
     enregistrement.value = false
   }
+}
+
+/**
+ * Enregistre la mise en page et ses deux textes, sans toucher aux images.
+ *
+ * Les diapositives ont leurs propres routes : c'est ce qui permet de passer en
+ * banniere simple sans rien perdre, et c'est toute la difference avec
+ * `revenirAuDefaut`.
+ */
+async function enregistrerLaBanniere(): Promise<void> {
+  await agir(
+    () =>
+      enregistrerBanniere({
+        variant: banniere.variant,
+        title: banniere.title === '' ? null : banniere.title,
+        intro: banniere.intro === '' ? null : banniere.intro,
+      }),
+    'Bannière enregistrée.',
+  )
+}
+
+async function revenirAuDefaut(): Promise<void> {
+  const fait = await agir(
+    supprimerBanniere,
+    'Bannière supprimée : le site affiche le visuel par défaut.',
+  )
+  if (fait) retourAuDefautOuvert.value = false
+}
+
+function ouvrirDiapositive(id: number | null): void {
+  erreurFormulaire.value = ''
+  const existante = diapositives.value.find((d) => d.id === id) ?? null
+  diapositiveEditee.value = existante
+  saisieDiapositive.image_url = existante?.image_url ?? ''
+  citationDiapositive.value = existante?.quote ?? ''
+  auteurDiapositive.value = existante?.author ?? ''
+  diapositiveOuverte.value = true
+}
+
+async function enregistrerLaDiapositive(): Promise<void> {
+  if (saisieDiapositive.image_url === '') {
+    erreurFormulaire.value = 'Choisissez une image.'
+    return
+  }
+  const corps = {
+    image_url: saisieDiapositive.image_url,
+    quote: citationDiapositive.value === '' ? null : citationDiapositive.value,
+    author: auteurDiapositive.value === '' ? null : auteurDiapositive.value,
+  }
+  const editee = diapositiveEditee.value
+  const fait = await agir(
+    () => (editee ? modifierDiapositive(editee.id, corps) : ajouterDiapositive(corps)),
+    editee ? 'Image modifiée.' : 'Image ajoutée.',
+  )
+  if (fait) diapositiveOuverte.value = false
+}
+
+async function retirerDiapositive(id: number): Promise<void> {
+  await agir(() => supprimerDiapositive(id), 'Image retirée.')
+}
+
+/** Deplace une image d'un rang, et envoie l'ordre complet au serveur. */
+async function deplacerDiapositive(id: number, pas: -1 | 1): Promise<void> {
+  const actuelles = diapositives.value
+  const index = actuelles.findIndex((d) => d.id === id)
+  const cible = index + pas
+  if (index === -1 || cible < 0 || cible >= actuelles.length) return
+
+  const ids = actuelles.map((d) => d.id)
+  ;[ids[index], ids[cible]] = [ids[cible]!, ids[index]!]
+
+  await agir(() => ordonnerDiapositives(ids), 'Ordre des images mis à jour.')
 }
 
 async function enregistrerBienvenue(): Promise<void> {

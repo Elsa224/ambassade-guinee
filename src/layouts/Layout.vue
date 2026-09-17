@@ -1,7 +1,14 @@
 <template>
   <div class="min-h-screen flex flex-col">
     <!-- Navbar blanche -->
-    <nav class="bg-white text-primary fixed top-0 left-0 right-0 z-50 shadow-md">
+    <nav
+      class="fixed top-0 left-0 right-0 z-50 transition-colors"
+      :class="
+        enteteSurimpression
+          ? 'entete-surimpression bg-black/35 backdrop-blur-md text-white'
+          : 'bg-white text-primary shadow-md'
+      "
+    >
       <div class="max-w-7xl mx-auto px-1 sm:px-6 lg:px-8 py-2">
         <div class="flex items-center justify-between">
           <div class="flex flex-col gap-1">
@@ -21,7 +28,9 @@
           </div>
 
           <!-- Mobile menu button -->
-          <button @click="toggleMobileMenu" class="lg:hidden text-2xl text-primary">☰</button>
+          <button @click="toggleMobileMenu" class="bouton-menu lg:hidden text-2xl text-primary">
+            ☰
+          </button>
 
           <!-- Desktop menu -->
           <div class="hidden lg:flex items-center gap-4">
@@ -386,7 +395,7 @@
     </nav>
 
     <!-- Main content -->
-    <main class="flex-1 pt-10">
+    <main class="flex-1" :class="enteteSurimpression ? 'pt-0' : 'pt-10'">
       <div class="flex-1">
         <!-- Masquer le lien au menu ne suffit pas : une URL tapee a la main
              atteindrait quand meme la page. La rubrique fermee n'instancie
@@ -695,6 +704,7 @@ import BientotDisponible from '@/components/BientotDisponible.vue'
 import { useTenantStore } from '@/stores/tenant'
 import { cheminOuvert } from '@/tenant/rubriques'
 import { useIdentite, articleDuPays } from '@/tenant/identite'
+import { enteteEnSurimpression } from '@/tenant/banniere'
 
 const tenant = useTenantStore()
 
@@ -710,6 +720,13 @@ const {
   courriel,
   horaires,
 } = useIdentite()
+
+/**
+ * L'en-tete translucide suit la banniere de l'accueil, et rien d'autre : la
+ * page d'accueil leve ce drapeau quand elle affiche reellement le diaporama,
+ * et le baisse en se demontant. Voir `src/tenant/banniere.ts`.
+ */
+const enteteSurimpression = enteteEnSurimpression
 
 const anneeCourante = new Date().getFullYear()
 
@@ -855,15 +872,31 @@ const toggleSubmenu = (key) => {
   transition: all 0.3s ease;
 }
 
+/* L'encre foncee, et non la couleur principale : sur le jaune du drapeau
+   gabonais, le vert ne donne que 2,36 de contraste. Ces deux regles portent
+   l'attribut de portee de Vue, elles l'emportaient donc sur les classes
+   utilitaires corrigees ailleurs — le survol restait illisible. */
 .nav-item:hover {
   background-color: var(--color-secondary);
-  color: var(--color-primary);
+  color: var(--color-ink-dark);
 }
 
 /* Classe pour le hover des liens dans les dropdowns */
 .hover-active:hover {
   background-color: var(--color-secondary);
-  color: var(--color-primary);
+  color: var(--color-ink-dark);
+}
+
+/* En-tete en surimpression, devant le diaporama de l'accueil seulement. Le
+   texte passe au blanc parce qu'il est pose sur une photographie assombrie ;
+   le survol garde l'encre foncee, sur le jaune qui apparait alors. */
+.entete-surimpression .nav-item,
+.entete-surimpression .bouton-menu {
+  color: #ffffff;
+}
+
+.entete-surimpression .nav-item:hover {
+  color: var(--color-ink-dark);
 }
 
 /* Animation pour les flèches */

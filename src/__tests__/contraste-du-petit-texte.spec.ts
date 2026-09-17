@@ -43,6 +43,29 @@ describe('contraste du petit texte', () => {
     expect(fautifs).toEqual([])
   })
 
+  it('ne pose pas la couleur principale sur la secondaire en CSS non plus', () => {
+    // La garde des classes utilitaires ne suffit pas : une regle ecrite dans
+    // un bloc <style scoped> porte l'attribut de portee de Vue, sa
+    // specificite depasse celle des classes, et elle les annule en silence.
+    // C'est exactement ce qui s'est passe dans l'en-tete du gabarit, ou le
+    // survul des entrees de menu restait vert sur jaune apres la correction
+    // des classes.
+    const fautifs: string[] = []
+    for (const chemin of composants()) {
+      const contenu = readFileSync(join(racine, chemin), 'utf8')
+      const styles = contenu.slice(contenu.indexOf('<style'))
+      for (const regle of styles.split('}')) {
+        const poseLaSecondaire = /background(-color)?:\s*var\(--color-secondary\)/.test(regle)
+        const ecritEnPrincipale = /(?<!background-)color:\s*var\(--color-primary\)/.test(regle)
+        if (poseLaSecondaire && ecritEnPrincipale) {
+          fautifs.push(`${chemin} : ${regle.trim().split('\n')[0]}`)
+        }
+      }
+    }
+
+    expect(fautifs).toEqual([])
+  })
+
   it('ne pose pas la couleur principale sur la secondaire', () => {
     const fautifs: string[] = []
     for (const chemin of composants()) {
