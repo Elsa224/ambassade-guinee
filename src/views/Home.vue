@@ -254,59 +254,38 @@
     <!-- Section Démarches consulaires et actualités récentes -->
     <section class="py-20 bg-white">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          <!-- Démarches consulaires -->
-          <div>
+        <div class="grid grid-cols-1 gap-12" :class="{ 'lg:grid-cols-2': demarches.length > 0 }">
+          <!-- Demarches consulaires : servies par le CMS, et absentes tant
+               qu'aucun service n'est publie. -->
+          <div v-if="demarches.length > 0">
             <h2 class="text-3xl font-bold text-primary mb-6 flex items-center gap-3">
               <span class="w-2 h-8 bg-secondary rounded-full"></span>
               Démarches consulaires
             </h2>
             <div class="space-y-4">
               <router-link
-                to="/construction"
+                v-for="service in demarches"
+                :key="service.id"
+                :to="`/services/${service.slug}`"
                 class="block bg-gray-50 p-5 rounded-xl hover:bg-primary hover:text-white group transition-all"
               >
-                <div class="flex items-center justify-between">
-                  <span class="font-semibold text-lg">Comment obtenir un visa ?</span>
-                  <i
-                    class="bx bx-chevron-right text-2xl group-hover:translate-x-2 transition-transform"
-                  ></i>
-                </div>
-              </router-link>
-              <router-link
-                to="/construction"
-                class="block bg-gray-50 p-5 rounded-xl hover:bg-primary hover:text-white group transition-all"
-              >
-                <div class="flex items-center justify-between">
-                  <span class="font-semibold text-lg">Renouvellement de passeport</span>
-                  <i
-                    class="bx bx-chevron-right text-2xl group-hover:translate-x-2 transition-transform"
-                  ></i>
-                </div>
-              </router-link>
-              <router-link
-                to="/construction"
-                class="block bg-gray-50 p-5 rounded-xl hover:bg-primary hover:text-white group transition-all"
-              >
-                <div class="flex items-center justify-between">
-                  <span class="font-semibold text-lg">Légalisation de documents</span>
-                  <i
-                    class="bx bx-chevron-right text-2xl group-hover:translate-x-2 transition-transform"
-                  ></i>
-                </div>
-              </router-link>
-              <router-link
-                to="/construction"
-                class="block bg-gray-50 p-5 rounded-xl hover:bg-primary hover:text-white group transition-all"
-              >
-                <div class="flex items-center justify-between">
-                  <span class="font-semibold text-lg">Inscription consulaire</span>
+                <div class="flex items-center justify-between gap-4">
+                  <span class="font-semibold text-lg">{{ service.title }}</span>
                   <i
                     class="bx bx-chevron-right text-2xl group-hover:translate-x-2 transition-transform"
                   ></i>
                 </div>
               </router-link>
             </div>
+
+            <router-link
+              v-if="services.services.length > demarches.length"
+              to="/services"
+              class="inline-flex items-center gap-2 mt-6 font-semibold text-accent hover:gap-3 transition-all"
+            >
+              Voir tous les services
+              <i class="bx bx-right-arrow-alt" aria-hidden="true"></i>
+            </router-link>
           </div>
 
           <!-- Actualités récentes -->
@@ -430,6 +409,7 @@ import { useActualites, formaterDate, formaterDateCourte } from '@/composables/u
 import { useTenantStore } from '@/stores/tenant'
 import { useIdentite } from '@/tenant/identite'
 import { recupererContenuAccueil, CONTENU_VIDE, type ContenuAccueil } from '@/api/contenu'
+import { recupererServices, SERVICES_VIDES, type ContenuServices } from '@/api/services'
 
 const tenant = useTenantStore()
 const { nomDeLAmbassade, logo } = useIdentite()
@@ -491,6 +471,27 @@ const estAmbassadeur = (dirigeant: { role: string }) =>
     .toLowerCase()
     .includes('ambassadeur')
 
+/**
+ * Les services consulaires servis par le CMS, pour la section « Demarches
+ * consulaires ».
+ *
+ * Les quatre entrees de cette section menaient a `/construction` : des
+ * intitules ecrits en dur, sans destination. Les faire pointer sur un slug
+ * devine — `/services/visa` parce que l'intitule parle de visa — remettrait le
+ * contenu d'une ambassade dans le gabarit des autres : rien ne garantit
+ * qu'un poste nomme son service ainsi, ni qu'il en offre un. La liste vient
+ * donc de la meme source que la page `/services`, et chaque entree pointe sur
+ * le service qu'elle nomme.
+ */
+const services = ref<ContenuServices>({ ...SERVICES_VIDES })
+
+/**
+ * Quatre entrees au plus : la section est une mise en avant, pas la rubrique.
+ * L'ordre est celui choisi par l'ambassade, deja applique par l'API.
+ */
+const DEMARCHES_EN_AVANT = 4
+const demarches = computed(() => services.value.services.slice(0, DEMARCHES_EN_AVANT))
+
 onMounted(async () => {
   try {
     contenu.value = await recupererContenuAccueil()
@@ -499,6 +500,13 @@ onMounted(async () => {
     // d'accueil d'ambassade, une section absente vaut mieux qu'un message
     // d'erreur — et surtout, le repli n'est jamais le contenu compile dans le
     // gabarit, qui est celui d'une autre ambassade.
+  }
+
+  try {
+    services.value = await recupererServices()
+  } catch {
+    // Meme discipline : sans service servi, la colonne des demarches
+    // disparait et les actualites occupent la largeur.
   }
 })
 
