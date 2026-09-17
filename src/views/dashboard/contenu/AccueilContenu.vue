@@ -596,7 +596,7 @@
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted } from 'vue'
 import { useIdentite } from '@/tenant/identite'
-import ChampImage from './ChampImage.vue'
+import ChampImage from '@/components/ui/ChampImage.vue'
 import ListeOrdonnee from './ListeOrdonnee.vue'
 import EtatSection from './EtatSection.vue'
 import Boite from './Boite.vue'
