@@ -264,7 +264,7 @@ onMounted(charger)
   <div class="flex flex-col h-[calc(100vh-var(--hauteur-barre)-3rem)]">
     <RouterLink
       :to="{ name: 'evenements-admin' }"
-      class="self-start text-sm text-gray-500 hover:text-primary mb-4"
+      class="self-start text-sm text-gray-500 hover:text-primary-dark mb-4"
     >
       &larr; Tous les évènements
     </RouterLink>

@@ -8,7 +8,7 @@
     <!-- Bouton toggle -->
     <button
       @click="toggleSidebar"
-      class="absolute -right-3 top-20 bg-secondary text-primary rounded-full p-1 cursor-pointer shadow-lg transition-all duration-300 hover:scale-110 z-10"
+      class="absolute -right-3 top-20 bg-secondary text-ink-dark rounded-full p-1 cursor-pointer shadow-lg transition-all duration-300 hover:scale-110 z-10"
     >
       <i :class="isCollapsed ? 'bx bx-menu' : 'bx bx-menu-alt-left'" class="text-xl"></i>
     </button>
@@ -295,7 +295,7 @@ const auth = useAuthStore()
 const { logo, nomDeLAmbassade } = useIdentite()
 
 /** Habillage du lien de la rubrique ouverte, partage par tous les liens. */
-const LIEN_ACTIF = '!bg-secondary !text-primary'
+const LIEN_ACTIF = '!bg-secondary !text-ink-dark'
 const isCollapsed = ref(false)
 
 // État d'ouverture des groupes

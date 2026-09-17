@@ -51,7 +51,7 @@
               </span>
               <span
                 v-else
-                class="text-xs font-semibold text-primary bg-primary/10 px-2 py-0.5 rounded-full whitespace-nowrap"
+                class="text-xs font-semibold text-primary-dark bg-primary/10 px-2 py-0.5 rounded-full whitespace-nowrap"
               >
                 Inscriptions ouvertes
               </span>

@@ -194,7 +194,7 @@ onMounted(async () => {
       :to="
         modification ? { name: 'evenement-admin', params: { slug } } : { name: 'evenements-admin' }
       "
-      class="self-start text-sm text-gray-500 hover:text-primary mb-4"
+      class="self-start text-sm text-gray-500 hover:text-primary-dark mb-4"
     >
       &larr; {{ modification ? "Retour à l'évènement" : 'Tous les évènements' }}
     </RouterLink>

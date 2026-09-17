@@ -94,7 +94,7 @@
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                   {{ project.company }}
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-primary">
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-primary-dark">
                   {{ project.title }}
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">

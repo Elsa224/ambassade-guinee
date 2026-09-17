@@ -114,7 +114,7 @@
                   {{ task.creationDate }}
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ task.parent }}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-primary">
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-primary-dark">
                   {{ task.title }}
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">

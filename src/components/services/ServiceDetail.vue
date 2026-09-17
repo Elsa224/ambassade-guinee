@@ -78,7 +78,7 @@
               v-for="autre in autresServices"
               :key="autre.id"
               :to="`/services/${autre.slug}`"
-              class="inline-flex items-center gap-2 bg-white border border-gray-200 rounded-full px-4 py-2 text-sm text-gray-700 hover:border-primary hover:text-primary transition-colors"
+              class="inline-flex items-center gap-2 bg-white border border-gray-200 rounded-full px-4 py-2 text-sm text-gray-700 hover:border-primary hover:text-primary-dark transition-colors"
             >
               {{ autre.title }}
             </router-link>

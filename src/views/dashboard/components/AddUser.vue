@@ -98,7 +98,7 @@
 
     <div class="mt-6 text-center">
       <button
-        class="bg-primary text-white px-6 py-2 rounded-lg font-semibold hover:bg-secondary hover:text-primary transition shadow-md"
+        class="bg-primary text-white px-6 py-2 rounded-lg font-semibold hover:bg-secondary hover:text-ink-dark transition shadow-md"
       >
         Ajouter un utilisateur
       </button>
