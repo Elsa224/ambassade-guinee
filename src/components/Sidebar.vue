@@ -183,7 +183,11 @@
             <span v-if="!isCollapsed">Scanner QR Code</span>
           </router-link>
 
+          <!-- Le module suppose un compte Ambassade Secure provisionne : ferme,
+               toutes ses routes rendent 404. Annoncer l'entree mene alors a un
+               ecran vide dont l'ambassade n'a pas la clef. -->
           <router-link
+            v-if="evenementsOuverts"
             to="/dashboard/evenements"
             class="flex items-center gap-3 px-4 py-2 rounded-xl text-white no-underline transition-all duration-300 text-sm font-medium hover:bg-yellow-500/20 hover:text-secondary hover:translate-x-1"
             :active-class="LIEN_ACTIF"
@@ -281,13 +285,25 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { useTenantStore } from '@/stores/tenant'
 import { useIdentite } from '@/tenant/identite'
+import { etatDuModule } from '@/tenant/module-administration'
 
 const router = useRouter()
 const auth = useAuthStore()
+const tenant = useTenantStore()
+
+/**
+ * Le tableau de bord n'est pas le site : l'administrateur est chez lui, et une
+ * entree de menu qui mene a un 404 se lit comme une panne. L'etat « attente »
+ * masque l'entree le temps du bootstrap, pour eviter qu'elle n'apparaisse puis
+ * disparaisse ; la regle et le cas du bootstrap en echec sont documentes dans
+ * `tenant/module-administration.ts`.
+ */
+const evenementsOuverts = computed(() => etatDuModule('secure_events', tenant) === 'ouvert')
 
 // Le logo vient de l'ambassade consultee. Il etait importe du depot :
 // l'embleme guineen s'affichait donc dans la barre laterale de toutes les
