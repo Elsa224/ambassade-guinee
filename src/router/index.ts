@@ -216,6 +216,11 @@ const router = createRouter({
           component: () => import('@/views/dashboard/services/ServicesAdmin.vue'),
         },
         { path: 'annuaire', name: 'annuaire-admin', component: AnnuaireAdmin },
+        {
+          path: 'parametres',
+          name: 'parametres-admin',
+          component: () => import('@/views/dashboard/parametres/ParametresAdmin.vue'),
+        },
         { path: 'jours-feries', name: 'jours-feries-admin', component: JoursFeriesAdmin },
         {
           path: 'evenements',

@@ -53,6 +53,19 @@ export function mockApi(): Plugin {
   >[]
 
   /**
+   * Les deux ambassades, en memoire.
+   *
+   * Le bootstrap les relit ici plutot que dans les fixtures : sans cela,
+   * l'ecran des parametres enregistrerait et le site continuerait d'afficher
+   * l'ancienne valeur, ce qui est precisement la panne que le contrat demande
+   * d'eviter cote serveur.
+   */
+  const ambassades: Record<string, Record<string, unknown>> = {
+    guinee: (fixture('bootstrap') as { embassy: Record<string, unknown> }).embassy,
+    gabon: (fixture('bootstrap-gabon') as { embassy: Record<string, unknown> }).embassy,
+  }
+
+  /**
    * Contenu d'accueil, par ambassade et en memoire.
    *
    * Le site guineen part volontairement d'un contenu VIDE : c'est l'etat reel
@@ -244,8 +257,58 @@ export function mockApi(): Plugin {
         })
       })
 
+    const ambassade = () => ambassades[estGabon ? 'gabon' : 'guinee']!
+
     if (chemin === '/bootstrap') {
-      return repondre(200, fixture(estGabon ? 'bootstrap-gabon' : 'bootstrap'))
+      return repondre(200, { embassy: ambassade() })
+    }
+
+    // --- Parametres de l'ambassade : identite, coordonnees, couleurs -------
+    //
+    // Le PUT reproduit les trois refus du contrat plutot que de les ignorer.
+    // Un faux serveur plus permissif que le vrai est un piege de diagnostic :
+    // l'ecran passerait ici et echouerait en 422 contre la vraie API.
+    if (chemin === '/admin/embassy') {
+      if (methode === 'GET') return repondre(200, { data: ambassade() })
+
+      if (methode === 'PUT') {
+        return lireCorps().then((corps) => {
+          if (corps === null) return repondre(400, { message: 'Corps de requete illisible.' })
+
+          for (const interdit of ['slug', 'domain', 'modules'] as const) {
+            if (interdit in corps) {
+              return repondre(422, {
+                message: `Le champ ${interdit} n'est pas modifiable depuis l'administration.`,
+              })
+            }
+          }
+
+          const contactRecu = (corps.contact ?? {}) as Record<string, unknown>
+          if ('phone' in contactRecu) {
+            return repondre(422, {
+              message: 'Le numero principal est derive : renseignez contact.phones.',
+            })
+          }
+
+          const courante = ambassade()
+          const identite = courante.identite as Record<string, unknown>
+          const contact = courante.contact as Record<string, unknown>
+          const theme = courante.theme as Record<string, unknown>
+
+          if ('display_name' in corps) courante.display_name = corps.display_name
+          Object.assign(identite, (corps.identite ?? {}) as Record<string, unknown>)
+          Object.assign(theme, (corps.theme ?? {}) as Record<string, unknown>)
+          Object.assign(contact, contactRecu)
+
+          // `phone` est derive de la premiere entree, jamais stocke : deux
+          // sources de verite pour un meme numero divergeraient a la premiere
+          // modification.
+          const numeros = (contact.phones ?? []) as { number?: string }[]
+          contact.phone = numeros.length > 0 ? (numeros[0].number ?? '') : ''
+
+          return repondre(200, { data: courante })
+        })
+      }
     }
 
     // --- Contenu d'accueil : mot de bienvenue, dirigeants, vitrine ---------

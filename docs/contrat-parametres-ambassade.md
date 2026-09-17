@@ -46,9 +46,15 @@ GET /api/admin/embassy
 ```
 
 Rend exactement la forme de `embassy` dans `/api/bootstrap` — meme imbrication
-de `identite`, memes noms de champs. Le front sait deja la normaliser :
-reutiliser cette forme evite d'ecrire un second normaliseur qui divergerait du
-premier.
+de `identite`, memes noms de champs, meme classe de ressource cote serveur. Le
+front sait deja la normaliser : reutiliser cette forme evite d'ecrire un second
+normaliseur qui divergerait du premier.
+
+Une seule difference, et elle est d'enveloppe, pas de forme : `/api/bootstrap`
+rend `{ "embassy": … }`, les routes d'administration rendent une ressource
+seule, donc `{ "data": … }`. Le `PUT` rend l'ambassade mise a jour dans cette
+meme enveloppe, et non un 204 : l'ecran reaffiche ce que le serveur a retenu,
+plutot que ce qu'il croit avoir envoye.
 
 ### Ecriture
 
@@ -68,13 +74,63 @@ PUT /api/admin/embassy
   },
   "contact": {
     "address": "…",
-    "phone": "…",
+    "phones": [{ "label": "Standard", "number": "+224 000 00 00 00" }],
     "email": "…",
     "hours": "…"
   },
-  "theme": { "primary": "#009e60", "secondary": "#fcd116" }
+  "theme": {
+    "color_primary": "#009e60",
+    "color_secondary": "#fcd116",
+    "color_accent": "#3a75c4"
+  }
 }
 ```
+
+> **Corrige le 2026-09-17.** Ce bloc annoncait `"theme": { "primary", "secondary" }`
+> et un `contact.phone` au singulier. Les deux etaient faux, et la premiere
+> erreur etait la plus couteuse des deux : la validation ne connait pas les
+> cles nues, l'aplatissement en colonnes ne lit que les trois noms prefixes,
+> et un envoi de `primary` aurait ete **ignore en silence** — un formulaire qui
+> enregistre sans rien changer et sans erreur. Releve par la session back a la
+> lecture de `UpdateEmbassyRequest`, en reponse a une question posee avant
+> d'ecrire l'ecran.
+
+### Les trois couleurs, et leurs noms
+
+`theme.color_primary`, `theme.color_secondary` et `theme.color_accent` — trois
+cles prefixees, celles que sert deja `/api/bootstrap`. Les trois sont NOT NULL :
+on les remplace, on ne les vide pas. Chacune est un hexadecimal a trois ou six
+chiffres, casse libre.
+
+### Le numero principal est derive, pas stocke
+
+`contact.phones` est une **liste ordonnee** d'objets `{ label, number }`, au
+plus vingt entrees, les deux champs obligatoires, libelle 60 caracteres et
+numero 40. Aucun format n'est impose sur le numero, et c'est assume : les
+usages nationaux varient trop, et un refus a tort coute plus cher qu'une
+saisie qu'un humain corrige.
+
+`contact.phone`, que le bootstrap sert bien en lecture, est le `number` de la
+**premiere entree** de cette liste. Il n'est jamais stocke — deux sources de
+verite pour un meme numero divergeraient a la premiere modification — et il
+est **explicitement refuse en ecriture**, par une erreur de validation et non
+par un filtrage silencieux : l'ecran apprend que son intention n'a pas ete
+honoree.
+
+Consequence directe pour tout formulaire : **l'ordre de la liste porte du
+sens**. Changer le numero principal du site, c'est changer la premiere entree,
+et un ecran qui n'offre pas de reordonner la liste rend ce geste impossible.
+
+Le reste de `contact` : `address` (2000 caracteres, effacable), `email`
+(valide comme adresse, 191, effacable), `hours` (500, effacable).
+
+### Ce qui est effacable, et ce qui ne l'est pas
+
+`identite.country_name_official` et `country_name_short` ne sont pas
+`nullable` : on les remplace, on ne les vide pas. `display_name`, lui, l'est —
+et c'est precisement ce qui rend atteignable la chaine de repli vers
+« Ambassade de la {country_name_official} ». Un ecran qui propose de vider ce
+champ arme donc ce repli, et il doit le dire a l'endroit ou il le propose.
 
 ### Ce que l'ambassade ne doit PAS pouvoir modifier
 
@@ -87,6 +143,11 @@ oubli :
 | `domain` | Change le domaine qui resout l'ambassade : une erreur de saisie rend le site injoignable |
 | `modules` | C'est du **provisionnement**. Une ambassade ne doit pas pouvoir s'ouvrir un module qu'elle n'a pas souscrit |
 
+Les trois sont **refuses par une erreur de validation**, avec un message
+chacun, et non filtres en silence. La consequence est concrete pour un ecran
+d'administration : reposter tel quel l'objet recu en lecture fait echouer
+l'enregistrement entier en 422. On n'envoie que les champs modifiables.
+
 `modules` est le point le plus important des trois. Le front traite ces
 drapeaux comme fermes par defaut et s'y fie pour decider ce qu'il affiche : les
 rendre modifiables depuis le tableau de bord de l'ambassade reviendrait a lui
@@ -96,14 +157,17 @@ distincte et une autorisation distincte.
 
 ### La regle qui compte : le bootstrap doit refleter le PUT
 
-`GET /api/bootstrap` est appele a chaque chargement de page et il est
-vraisemblablement mis en cache cote serveur. **Un PUT accepte doit invalider ce
-cache immediatement.** Sans cela, l'ambassade corrige son numero de telephone,
-recharge son site, voit l'ancien, et conclut que l'enregistrement n'a pas
-fonctionne — puis recommence.
+`GET /api/bootstrap` est appele a chaque chargement de page. Si sa reponse
+etait mise en cache, l'ambassade corrigerait son numero de telephone,
+rechargerait son site, verrait l'ancien, et conclurait que l'enregistrement n'a
+pas fonctionne — puis recommencerait.
 
-C'est le seul point de ce document ou un ecart produirait un bug qu'aucun code
-du front ne peut rattraper.
+**Le point est regle, et mieux qu'attendu : il n'y a aucun cache a invalider.**
+Verifie en production par la session back le 2026-09-17 — le controleur relit
+la base a chaque requete, et la reponse porte `Cache-Control: no-cache,
+private`. Ce document demandait une invalidation ; il n'y a rien a invalider.
+Un rechargement du tenant apres enregistrement suffit, et l'ambassade voit son
+site a jour sans se deconnecter.
 
 ### Sur le theme
 

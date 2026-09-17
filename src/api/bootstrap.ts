@@ -1,10 +1,28 @@
 import { apiGet } from './client'
 import type { ThemeColors } from '@/theme/applyTheme'
 
-/** Coordonnees de l'ambassade (spec 4.1). */
+/**
+ * Un numero de telephone de l'ambassade, avec ce qu'il designe : « Standard »,
+ * « Service des visas », « Urgences consulaires ».
+ */
+export interface NumeroTelephone {
+  label: string
+  number: string
+}
+
+/**
+ * Coordonnees de l'ambassade (spec 4.1).
+ *
+ * `phone` est **derive et non stocke** : c'est le numero de la premiere entree
+ * de `phones`. Il est donc en lecture seule — l'ecriture passe par la liste,
+ * et l'API refuse explicitement un `phone` isole plutot que de l'ignorer. La
+ * consequence tient en une phrase : l'ordre de `phones` porte du sens, et
+ * changer le numero principal du site, c'est changer la premiere entree.
+ */
 export interface EmbassyContact {
   address: string
   phone: string
+  phones: NumeroTelephone[]
   email: string
   hours: string
 }
@@ -46,7 +64,7 @@ interface IdentiteServie {
   logo_image: string | null
 }
 
-interface EmbassyServie {
+export interface EmbassyServie {
   id: number
   slug: string
   domain: string
@@ -58,7 +76,11 @@ interface EmbassyServie {
   display_name?: string | null
   identite: IdentiteServie
   theme: ThemeColors
-  contact: EmbassyContact
+  /**
+   * `phones` manque tant que le back qui sert ce domaine est anterieur a la
+   * liste : le cas existe en production, et vaut liste vide.
+   */
+  contact: Omit<EmbassyContact, 'phones'> & { phones?: NumeroTelephone[] }
   modules?: Record<string, boolean>
 }
 
@@ -69,11 +91,13 @@ interface ReponseBootstrap {
 /**
  * Aplatit l'ambassade servie en la forme que le gabarit consomme.
  *
- * Deux absences sont des cas reels, pas des defenses de principe :
- * `display_name` vaut `null` pour un tenant provisionne avant la colonne, et
- * les images valent `null` tant que l'ambassade n'a rien fourni. Les unes
- * comme les autres deviennent des chaines vides, que les `v-if` du gabarit
- * savent masquer et que `useIdentite` sait remplacer.
+ * Trois absences sont des cas reels, pas des defenses de principe :
+ * `display_name` vaut `null` pour un tenant provisionne avant la colonne, les
+ * images valent `null` tant que l'ambassade n'a rien fourni, et `phones`
+ * manque tant que le back du domaine est anterieur a la liste. Les deux
+ * premieres deviennent des chaines vides, que les `v-if` du gabarit savent
+ * masquer et que `useIdentite` sait remplacer ; la troisieme devient une
+ * liste vide.
  */
 export function normaliserEmbassy(servie: EmbassyServie): Embassy {
   const { identite, ...tenant } = servie
@@ -85,6 +109,7 @@ export function normaliserEmbassy(servie: EmbassyServie): Embassy {
     demonym: identite.demonym,
     flag_image: identite.flag_image ?? '',
     logo_image: identite.logo_image ?? '',
+    contact: { ...servie.contact, phones: servie.contact.phones ?? [] },
     modules: servie.modules ?? {},
   }
 }
