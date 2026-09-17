@@ -29,7 +29,21 @@ const COMPTE_DEV = {
   email: IDENTIFIANTS_DEV.email,
   role: 'admin',
   embassy_id: 1,
+  last_login_at: '2026-09-17T08:12:44.000000Z',
+  /**
+   * `null` tant que le mot de passe n'a pas change depuis la mise en service.
+   * Le vrai back ne remplit RIEN retroactivement : ecrire la date d'une
+   * migration affirmerait un changement qui n'a pas eu lieu. Le bouchon suit,
+   * sinon l'ecran ne montrerait jamais son cas « jamais change ».
+   */
+  password_changed_at: null as string | null,
 }
+
+/** Le mot de passe courant du compte de developpement, qui peut changer. */
+let motDePasseDev = IDENTIFIANTS_DEV.password
+
+/** Longueur minimale, celle que le vrai back applique. */
+const LONGUEUR_MOT_DE_PASSE = 8
 const JETON_DEV = 'jeton-de-developpement'
 
 function fixture(nom: string): unknown {
@@ -787,10 +801,10 @@ export function mockApi(): Plugin {
     if (chemin === '/auth/login' && methode === 'POST') {
       return void lireCorps().then((corps) => {
         if (corps === null) return repondre(422, { message: 'Corps de requete illisible.' })
-        if (
-          corps.email === IDENTIFIANTS_DEV.email &&
-          corps.password === IDENTIFIANTS_DEV.password
-        ) {
+        // `motDePasseDev` et non la constante : apres un changement depuis
+        // l'ecran de profil, se reconnecter avec l'ancien mot de passe doit
+        // echouer, sinon le bouchon ferait croire que rien n'a change.
+        if (corps.email === IDENTIFIANTS_DEV.email && corps.password === motDePasseDev) {
           return repondre(200, {
             token: JETON_DEV,
             user: COMPTE_DEV,
@@ -800,12 +814,90 @@ export function mockApi(): Plugin {
       })
     }
 
-    if (chemin === '/auth/me') {
+    if (chemin === '/auth/me' && methode === 'GET') {
       if (requete.headers.authorization !== `Bearer ${JETON_DEV}`) {
         return repondre(401, { message: 'Non authentifie.' })
       }
       return repondre(200, {
         user: COMPTE_DEV,
+      })
+    }
+
+    /**
+     * Modification de son propre compte.
+     *
+     * Les quatre refus et leurs messages EXACTS sont ceux du vrai back,
+     * releves le 2026-09-17. Un bouchon plus permissif que le serveur ne
+     * simplifie rien : il deplace le bug jusqu'au deploiement, comme l'a
+     * fait `nom` contre `name`.
+     */
+    if (chemin === '/auth/me' && methode === 'PATCH') {
+      if (requete.headers.authorization !== `Bearer ${JETON_DEV}`) {
+        return repondre(401, { message: 'Non authentifie.' })
+      }
+      return void lireCorps().then((corps) => {
+        if (corps === null) return repondre(422, { message: 'Corps de requete illisible.' })
+        if ('email' in corps) {
+          return repondre(422, {
+            message:
+              'Le courriel ne se change pas ici : il sert a se connecter et son changement demande une verification.',
+          })
+        }
+        if ('role' in corps) {
+          return repondre(422, {
+            message: 'Le role se change depuis la gestion des utilisateurs, par un administrateur.',
+          })
+        }
+        if ('embassy_id' in corps) {
+          return repondre(422, { message: "L'ambassade de rattachement ne se change pas." })
+        }
+        const nom = typeof corps.name === 'string' ? corps.name.trim() : ''
+        if (nom === '') return repondre(422, { message: 'Le nom est obligatoire.' })
+        COMPTE_DEV.name = nom
+        repondre(200, { user: COMPTE_DEV })
+      })
+    }
+
+    /**
+     * Changement de mot de passe.
+     *
+     * Le bouchon verifie REELLEMENT l'ancien mot de passe et retient le
+     * nouveau : l'ecran herite affichait « Mot de passe modifie avec
+     * succes ! » sans rien envoyer a personne, et un bouchon qui accepterait
+     * tout reproduirait ce mensonge d'un cran en arriere.
+     *
+     * Ce qu'il ne simule pas : la revocation des autres jetons et le
+     * courriel de notification. Il n'y a qu'un jeton et pas de courrier en
+     * developpement ; l'ecran les ANNONCE, c'est ce qui est verifiable ici.
+     */
+    if (chemin === '/auth/password' && methode === 'POST') {
+      if (requete.headers.authorization !== `Bearer ${JETON_DEV}`) {
+        return repondre(401, { message: 'Non authentifie.' })
+      }
+      return void lireCorps().then((corps) => {
+        if (corps === null) return repondre(422, { message: 'Corps de requete illisible.' })
+        const actuel = typeof corps.current_password === 'string' ? corps.current_password : ''
+        const nouveau = typeof corps.password === 'string' ? corps.password : ''
+        const confirmation =
+          typeof corps.password_confirmation === 'string' ? corps.password_confirmation : ''
+
+        if (actuel === '') {
+          return repondre(422, { message: 'Le mot de passe actuel est obligatoire.' })
+        }
+        if (actuel !== motDePasseDev) {
+          return repondre(422, { message: 'Le mot de passe actuel est incorrect.' })
+        }
+        if (nouveau !== confirmation) {
+          return repondre(422, { message: 'Les deux mots de passe ne correspondent pas.' })
+        }
+        if (nouveau.length < LONGUEUR_MOT_DE_PASSE) {
+          return repondre(422, {
+            message: `Le mot de passe fait au moins ${LONGUEUR_MOT_DE_PASSE} caracteres.`,
+          })
+        }
+        motDePasseDev = nouveau
+        COMPTE_DEV.password_changed_at = new Date().toISOString()
+        repondre(204, null)
       })
     }
 

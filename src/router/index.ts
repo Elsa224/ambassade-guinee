@@ -185,6 +185,14 @@ const router = createRouter({
           name: 'parametres-admin',
           component: () => import('@/views/dashboard/parametres/ParametresAdmin.vue'),
         },
+        {
+          // Le seul ecran du tableau de bord ouvert a tous les roles : un
+          // compte qui ne peut pas changer son mot de passe est un compte
+          // qu'on ne peut pas securiser.
+          path: 'profil',
+          name: 'mon-profil',
+          component: () => import('@/views/dashboard/MonProfil.vue'),
+        },
         { path: 'jours-feries', name: 'jours-feries-admin', component: JoursFeriesAdmin },
         {
           path: 'evenements',
