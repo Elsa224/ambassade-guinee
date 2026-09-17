@@ -13,7 +13,7 @@ import {
   type QrInscription,
 } from '@/api/evenements-admin'
 import { messageErreur } from '@/api/evenements'
-import { dateLisible, etatDe, remplissage } from './presentation'
+import { dateLisible, estAnnulable, etatDe, remplissage } from './presentation'
 import PastilleEtat from '@/components/ui/PastilleEtat.vue'
 
 /**
@@ -127,7 +127,7 @@ function basculerSurLeSite() {
 }
 
 /** Un evenement deja annule ou termine ne s'annule pas une seconde fois. */
-const annulable = computed(() => evenement.value?.status.toUpperCase() === 'ACTIVE')
+const annulable = computed(() => (evenement.value ? estAnnulable(evenement.value.status) : false))
 
 /**
  * Le QR d'inscription, charge a la demande.
