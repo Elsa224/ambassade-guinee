@@ -22,9 +22,17 @@ const RACINE = resolve(__dirname, '../../..')
 
 const lire = (chemin: string) => readFileSync(resolve(RACINE, chemin), 'utf8')
 
-/** Les adresses que l'administration ne doit plus proposer. */
+/**
+ * Les adresses que l'administration ne doit plus proposer.
+ *
+ * `/dashboard/utilisateurs` en est SORTI le 2026-09-17 : l'ecran herite — un
+ * pointage de presence avec un selecteur d'annee ecrit en dur — a ete remplace
+ * par un vrai ecran branche sur `/api/admin/users`. Ce que cette garde
+ * interdit, ce n'est pas une adresse, c'est un ecran qui affirme un resultat
+ * qu'il ne produit pas ; le test suivant verifie donc que le remplacant, lui,
+ * appelle bien l'API.
+ */
 const CHEMINS_RETIRES = [
-  '/dashboard/utilisateurs',
   '/dashboard/scanner',
   '/dashboard/visiteur',
   '/dashboard/demande',
@@ -64,6 +72,18 @@ describe("le tableau de bord n'annonce que des ecrans vivants", () => {
     )
 
     expect(restantes).toEqual([])
+  })
+
+  it("l'ecran des utilisateurs appelle vraiment l'API", () => {
+    // L'entree « Utilisateurs » est revenue dans le menu : elle ne doit y etre
+    // revenue qu'avec un ecran vivant. Les deux ecrans herites qu'il remplace
+    // ne faisaient aucun appel reseau — `UserList.vue` affichait des presences
+    // qui n'ont jamais eu lieu, et le champ « Role » d'`AddUser.vue` etait une
+    // saisie de texte libre dans un formulaire sans `submit`.
+    const ecran = lire('views/dashboard/utilisateurs/UtilisateursAdmin.vue')
+
+    expect(ecran).toContain("from '@/api/utilisateurs'")
+    expect(ecran).toContain('listerComptes')
   })
 
   it("n'affiche aucun compteur invente sur la page d'accueil", () => {

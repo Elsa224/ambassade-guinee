@@ -12,6 +12,7 @@ import {
 } from '@/api/evenements-admin'
 import { messageErreur } from '@/api/evenements'
 import ChampDate from '@/components/ui/ChampDate.vue'
+import ChampHeure from '@/components/ui/ChampHeure.vue'
 import ChampSelect from '@/components/ui/ChampSelect.vue'
 
 /**
@@ -250,13 +251,7 @@ onMounted(async () => {
           <label class="block text-sm font-medium text-gray-700 mb-1" for="champ-heure">
             Heure <span class="text-red-600">*</span>
           </label>
-          <input
-            id="champ-heure"
-            v-model="brouillon.time"
-            type="time"
-            required
-            class="w-full rounded-lg border border-gray-300 px-4 py-2.5 transition-colors hover:border-gray-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
-          />
+          <ChampHeure id="champ-heure" v-model="brouillon.time" requis />
           <p v-if="erreursChamps.time" class="text-sm text-red-700 mt-1">
             {{ erreursChamps.time }}
           </p>

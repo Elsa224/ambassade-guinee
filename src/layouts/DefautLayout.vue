@@ -134,14 +134,23 @@
                   class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl z-50"
                 >
                   <!--
-                    « Mon profil » a disparu : il menait a un tableau de bord
-                    d'analyse herite du fork, peuple de visiteurs inventes. Il
-                    reviendra avec les vraies routes de compte.
+                    « Mon profil » est revenu avec les vraies routes de
+                    compte, livrees le 2026-09-17. L'ecran qu'il ouvrait
+                    auparavant affichait « John Doe » en dur et proposait un
+                    changement de mot de passe qui n'envoyait rien a
+                    personne.
 
                     « Parametres » pointait sur ce meme ecran alors que
                     l'ambassade en a un vrai : il mene desormais ou son
                     intitule le promet.
                   -->
+                  <router-link
+                    to="/dashboard/profil"
+                    class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  >
+                    <i class="bx bx-user"></i>
+                    <span>Mon profil</span>
+                  </router-link>
                   <router-link
                     to="/dashboard/parametres"
                     class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
@@ -187,39 +196,41 @@ const showNotifications = ref(false)
 const showMessages = ref(false)
 const showProfile = ref(false)
 
-// Titre dynamique selon la page
-const currentPageTitle = computed(() => {
-  const titles = {
-    '/admin/dashboard': 'Tableau de bord',
-    '/admin/articles': 'Gestion des articles',
-    '/admin/actualites': 'Gestion des actualités',
-    '/admin/photos': 'Galerie photos',
-    '/admin/nouvelles': 'Nouvelles',
-    '/admin/categories': 'Catégories',
-    '/admin/commentaires': 'Commentaires',
-    '/admin/utilisateurs': 'Utilisateurs',
-    '/admin/parametres': 'Paramètres',
-    '/admin/profil': 'Mon profil',
+/**
+ * Le titre et l'icone de la barre, par chemin.
+ *
+ * Les deux tables etaient indexees sur des chemins `/admin/...` qui n'existent
+ * dans aucune route : le tableau de bord affichait donc « Administration » et
+ * l'icone par defaut sur chacune de ses pages. Une seule table, indexee sur
+ * les chemins reels, evite qu'elles divergent — et les entrees d'ecrans
+ * supprimes en 2026 sont parties avec eux.
+ */
+const RUBRIQUES = {
+  '/dashboard': { titre: 'Tableau de bord', icone: 'bx bxs-dashboard' },
+  '/dashboard/contenu-accueil': { titre: "Contenu de l'accueil", icone: 'bx bxs-home-heart' },
+  '/dashboard/services': { titre: 'Services consulaires', icone: 'bx bxs-briefcase' },
+  '/dashboard/annuaire': { titre: 'Annuaire', icone: 'bx bxs-contact' },
+  '/dashboard/parametres': { titre: "Paramètres de l'ambassade", icone: 'bx bxs-cog' },
+  '/dashboard/utilisateurs': { titre: 'Utilisateurs', icone: 'bx bxs-group' },
+  '/dashboard/jours-feries': { titre: 'Jours fériés', icone: 'bx bxs-calendar-star' },
+  '/dashboard/articles': { titre: 'Articles', icone: 'bx bxs-news' },
+  '/dashboard/profil': { titre: 'Mon profil', icone: 'bx bxs-user-circle' },
+}
+
+/**
+ * Les evenements portent des chemins a identifiant (`/dashboard/evenements/
+ * fete-nationale/presence`) : une table exacte ne pourrait pas les nommer, et
+ * le prefixe suffit.
+ */
+const rubrique = computed(() => {
+  if (route.path.startsWith('/dashboard/evenements')) {
+    return { titre: 'Evènements', icone: 'bx bx-calendar-event' }
   }
-  return titles[route.path] || 'Administration'
+  return RUBRIQUES[route.path] ?? { titre: 'Administration', icone: 'bx bxs-dashboard' }
 })
 
-// Icône dynamique selon la page
-const currentPageIcon = computed(() => {
-  const icons = {
-    '/admin/dashboard': 'bx bxs-dashboard',
-    '/admin/articles': 'bx bxs-news',
-    '/admin/actualites': 'bx bxs-megaphone',
-    '/admin/photos': 'bx bxs-image',
-    '/admin/nouvelles': 'bx bxs-bell',
-    '/admin/categories': 'bx bxs-category',
-    '/admin/commentaires': 'bx bxs-chat',
-    '/admin/utilisateurs': 'bx bxs-user',
-    '/admin/parametres': 'bx bxs-cog',
-    '/admin/profil': 'bx bxs-user-circle',
-  }
-  return icons[route.path] || 'bx bxs-dashboard'
-})
+const currentPageTitle = computed(() => rubrique.value.titre)
+const currentPageIcon = computed(() => rubrique.value.icone)
 
 const handleSidebarToggle = (collapsed) => {
   isSidebarCollapsed.value = collapsed
