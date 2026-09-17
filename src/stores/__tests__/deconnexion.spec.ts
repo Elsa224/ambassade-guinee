@@ -30,9 +30,10 @@ function connecter(): void {
   auth.token = 'jeton-de-test'
   auth.utilisateur = {
     id: 1,
-    nom: 'Administrateur',
+    name: 'Administrateur',
     email: 'admin@exemple-ambassade.test',
     role: 'admin',
+    embassy_id: 1,
   }
   setAuthToken('jeton-de-test')
   localStorage.setItem('cms_token', 'jeton-de-test')
