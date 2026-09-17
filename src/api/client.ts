@@ -20,21 +20,78 @@ export class ApiError extends Error {
   }
 
   /**
-   * Vrai si le serveur a lui-meme fourni un message, faux si le notre est
+   * Vrai si le serveur a lui-meme fourni un texte, faux si le notre est
    * fabrique faute de JSON exploitable.
    *
    * La distinction compte des qu'un intermediaire repond a la place de
    * l'application — un 413 du serveur frontal rendu en HTML, par exemple :
    * « Erreur 413 » est exact, et illisible pour la personne qui televerse.
+   *
+   * Le detail par champ compte comme un texte fourni, au meme titre que le
+   * `message` d'ensemble : c'est de lui que `message` est desormais tire.
    */
   get corpsPorteUnMessage(): boolean {
+    if (this.corps === null || typeof this.corps === 'undefined') return false
+    if (typeof this.corps !== 'object') return false
+    if (messagesDeValidation(this.corps).length > 0) return true
     return (
-      this.corps !== null &&
-      typeof this.corps === 'object' &&
       'message' in this.corps &&
-      typeof (this.corps as { message: unknown }).message === 'string'
+      typeof (this.corps as { message: unknown }).message === 'string' &&
+      (this.corps as { message: string }).message.trim() !== ''
     )
   }
+}
+
+/**
+ * Messages de validation ranges par champ, tels que Laravel les rend :
+ * `{ "errors": { "email": ["L adresse de courriel est obligatoire."] } }`.
+ *
+ * Seul le premier message de chaque champ est retenu — les suivants redisent
+ * la meme regle autrement — et les doublons sont ecartes, deux champs voisins
+ * refuses pour la meme raison rendant deux fois la meme phrase.
+ */
+function messagesDeValidation(corps: unknown): string[] {
+  if (corps === null || typeof corps !== 'object' || !('errors' in corps)) return []
+  const brut = (corps as { errors: unknown }).errors
+  if (brut === null || typeof brut !== 'object' || Array.isArray(brut)) return []
+
+  const messages: string[] = []
+  for (const valeur of Object.values(brut as Record<string, unknown>)) {
+    const premier = Array.isArray(valeur) ? valeur[0] : valeur
+    if (typeof premier !== 'string' || premier.trim() === '') continue
+    if (!messages.includes(premier)) messages.push(premier)
+  }
+  return messages
+}
+
+/**
+ * Le texte a montrer quand une reponse est en echec.
+ *
+ * **Le detail par champ passe AVANT le `message` d'ensemble**, et c'est tout
+ * l'objet de cette fonction. Sur un refus de validation portant sur plusieurs
+ * champs, Laravel resume par le premier message suivi de
+ * « (and 2 more errors) » : une phrase francaise terminee par un decompte en
+ * anglais, et, plus grave que la langue, deux champs fautifs sur trois passes
+ * sous silence. La personne corrige le champ nomme, renvoie, et se fait
+ * refuser de nouveau sans jamais apprendre ce qui manque.
+ *
+ * Les ecrans qui rangent eux-memes les messages sous leurs champs
+ * (`erreursDeChamp`) n'etaient pas touches ; tous les autres affichaient ce
+ * resume, et le formulaire des parametres de l'ambassade envoie dix champs.
+ *
+ * Le repli reste le `message` du serveur, puis « Erreur N » quand la reponse
+ * ne porte aucun texte — cas d'un intermediaire qui repond en HTML.
+ */
+export function messageDeLEchec(corps: unknown, statut: number): string {
+  const parChamp = messagesDeValidation(corps)
+  if (parChamp.length > 0) return parChamp.join(' ')
+
+  if (corps !== null && typeof corps === 'object' && 'message' in corps) {
+    const message = String((corps as { message: unknown }).message)
+    if (message.trim() !== '') return message
+  }
+
+  return `Erreur ${statut}`
 }
 
 let jeton: string | null = null
@@ -88,11 +145,7 @@ async function requete<T>(chemin: string, options: RequestInit, avecCorps: boole
       surNonAutorise()
     }
 
-    const message =
-      corps !== null && typeof corps === 'object' && 'message' in corps
-        ? String((corps as { message: unknown }).message)
-        : `Erreur ${reponse.status}`
-    throw new ApiError(message, reponse.status, corps)
+    throw new ApiError(messageDeLEchec(corps, reponse.status), reponse.status, corps)
   }
 
   return corps as T
@@ -170,11 +223,7 @@ export async function apiFichier(chemin: string): Promise<FichierServi> {
     } catch {
       corps = texte
     }
-    const message =
-      corps !== null && typeof corps === 'object' && 'message' in corps
-        ? String((corps as { message: unknown }).message)
-        : `Erreur ${reponse.status}`
-    throw new ApiError(message, reponse.status, corps)
+    throw new ApiError(messageDeLEchec(corps, reponse.status), reponse.status, corps)
   }
 
   return {
