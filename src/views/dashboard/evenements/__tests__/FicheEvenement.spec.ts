@@ -1,5 +1,6 @@
 import { describe, it, expect, afterEach, vi } from 'vitest'
 import { mount, flushPromises } from '@vue/test-utils'
+import { createPinia } from 'pinia'
 import { createRouter, createMemoryHistory } from 'vue-router'
 import { defineComponent, h } from 'vue'
 import FicheEvenement from '../FicheEvenement.vue'
@@ -155,7 +156,9 @@ async function rendre(slug = 'fete-nationale') {
   })
   routeur.push(`/dashboard/evenements/${slug}`)
   await routeur.isReady()
-  const wrapper = mount(FicheEvenement, { global: { plugins: [routeur] } })
+  // La fiche lit l'identite de l'ambassade (nom et logo) pour composer
+  // l'affiche d'inscription : il lui faut donc un magasin actif.
+  const wrapper = mount(FicheEvenement, { global: { plugins: [routeur, createPinia()] } })
   await flushPromises()
   return wrapper
 }

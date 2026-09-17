@@ -267,7 +267,13 @@ async function envoyer(): Promise<void> {
 
   envoiEnCours.value = true
   try {
-    await inscrireAEvenement(evenement.value.publicToken, {
+    // Le jeton vient de l'URL, JAMAIS de la reponse. La fiche publique ne
+    // renvoie pas `publicToken` — seule la liste le fait — si bien que cette
+    // ligne postait vers `/api/secure/events/undefined/register` et que
+    // toute inscription echouait en 404, sur un formulaire par ailleurs
+    // parfaitement affiche. Le jeton est une entree, pas quelque chose a
+    // relire dans une reponse.
+    await inscrireAEvenement(String(route.params.token), {
       fullName: formulaire.fullName,
       email: formulaire.email,
       ...(formulaire.phone ? { phone: formulaire.phone } : {}),
