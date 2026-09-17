@@ -34,10 +34,17 @@ const racine = join(dirname(fileURLToPath(import.meta.url)), '..')
 describe('couleurs de marque', () => {
   it("n'apparaissent en dur dans aucun composant", () => {
     // style.css porte les couleurs de repli ; ce fichier-ci porte la liste a interdire.
-    const EXCLUS = ['style.css', '__tests__/no-hardcoded-brand-colors.spec.ts']
+    const EXCLUS = ['style.css']
 
+    // Les fichiers de test sont hors de portee, et la raison tient a ce que la
+    // garde protege : une couleur en dur dans un composant part dans le bundle
+    // et s'affiche sur le site d'une autre ambassade. Un test n'est jamais
+    // compile dans le bundle et ne rend rien. Certains ont au contraire besoin
+    // des vraies valeurs pour dire quelque chose — verifier que le vert du
+    // drapeau gabonais est accepte par le controle de contraste demande de
+    // nommer ce vert.
     const fichiers = globSync('**/*.{vue,ts,css}', { cwd: racine }).filter(
-      (chemin) => !EXCLUS.includes(chemin),
+      (chemin) => !EXCLUS.includes(chemin) && !chemin.includes('__tests__/'),
     )
 
     const fautifs: string[] = []
