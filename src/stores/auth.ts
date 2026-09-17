@@ -1,17 +1,39 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { apiPost, setAuthToken, ApiError } from '@/api/client'
+import { apiGet, apiPost, setAuthToken, ApiError } from '@/api/client'
 
-/** Administrateur du back-office (spec 4.3). */
+/**
+ * Administrateur du back-office (spec 4.3).
+ *
+ * Le champ du nom s'appelle `name` et non `nom`. La nuance a coute : le front
+ * lisait `nom`, que le back n'a jamais servi — `AuthController::userPayload()`
+ * rend `name` a la connexion comme sur `/auth/me`. Le faux serveur local avait
+ * invente `nom`, les tests l'avaient recopie, et le nom de l'administrateur
+ * connecte ne s'est jamais affiche en production : le gabarit se rabattait
+ * silencieusement sur « Administrateur ». Releve le 2026-09-17, contre le code
+ * du back et non contre le bouchon.
+ */
 export interface Utilisateur {
   id: number
-  nom: string
+  name: string
   email: string
   role: string
+  /** `null` pour un `super_admin`, qui n'est rattache a aucune ambassade. */
+  embassy_id: number | null
 }
 
 interface ReponseConnexion {
   token: string
+  user: Utilisateur
+}
+
+/**
+ * `/auth/me` rend le compte ET l'ambassade a laquelle il est rattache. Le
+ * store ne retient que le compte : la configuration du site vient du
+ * bootstrap, resolu par le DOMAINE, et en retenir une seconde copie resolue
+ * par le COMPTE ouvrirait deux verites sur la meme ambassade.
+ */
+interface ReponseSession {
   user: Utilisateur
 }
 
@@ -72,13 +94,36 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  /** Recharge le jeton persisté au démarrage de l'application. */
+  /**
+   * Recharge la session persistée au démarrage de l'application.
+   *
+   * Le jeton est remis en place de façon synchrone, avant le premier garde de
+   * route : sans cela, un rechargement sur une page du tableau de bord
+   * renverrait vers la connexion alors que la session est valide.
+   *
+   * L'identité, elle, demande un aller-retour. Elle n'était pas rechargée du
+   * tout : après un F5, `estAuthentifie` valait `true` et `utilisateur` valait
+   * `null`. On était donc authentifié sans savoir qui, ce qui vide le menu de
+   * son nom et rend impossible tout affichage conditionné au rôle.
+   *
+   * L'échec est silencieux à dessein : un `/auth/me` en panne ne doit pas
+   * déconnecter un administrateur dont le jeton est bon. Un 401, lui, est déjà
+   * traité par le gestionnaire global posé dans `main.ts`, qui purge la
+   * session.
+   */
   function restaurerSession(): void {
     const persiste = localStorage.getItem(CLEF_JETON)
-    if (persiste) {
-      token.value = persiste
-      setAuthToken(persiste)
-    }
+    if (!persiste) return
+
+    token.value = persiste
+    setAuthToken(persiste)
+    void apiGet<ReponseSession>('/api/auth/me')
+      .then((reponse) => {
+        utilisateur.value = reponse.user
+      })
+      .catch(() => {
+        // Le jeton reste en place : l'identite manquera, pas la session.
+      })
   }
 
   return { token, utilisateur, chargement, erreur, estAuthentifie, login, logout, restaurerSession }

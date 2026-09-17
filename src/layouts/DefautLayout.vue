@@ -119,7 +119,7 @@
                        toutes les ambassades. -->
                   <div class="hidden lg:block text-left">
                     <p class="text-sm font-medium text-gray-800">
-                      {{ auth.utilisateur?.nom || 'Administrateur' }}
+                      {{ auth.utilisateur?.name || 'Administrateur' }}
                     </p>
                     <p v-if="auth.utilisateur?.email" class="text-xs text-gray-500">
                       {{ auth.utilisateur.email }}
