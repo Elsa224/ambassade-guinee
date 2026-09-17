@@ -107,7 +107,12 @@ describe("contenu d'accueil servi par le CMS", () => {
   })
 
   it('affiche les photos de vitrine avec leur texte alternatif', async () => {
-    servir(contenuGabon)
+    // La vitrine n'existe que dans la colonne droite de la banniere simple :
+    // une ambassade qui choisit le diaporama ou le titre centre ne la voit
+    // plus. C'est l'etat du gabarit, pas une decision prise ici — d'ou le
+    // `hero: null` explicite, qui dit sur quelle mise en page ce test porte.
+    const donnees = (contenuGabon as { data: Record<string, unknown> }).data
+    servir({ data: { ...donnees, hero: null } })
 
     const wrapper = await monter()
     const images = wrapper.findAll('img').map((i) => ({

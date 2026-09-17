@@ -104,6 +104,53 @@ describe("banniere d'accueil servie par le CMS", () => {
     expect(banniere.findAll('button[aria-current]')).toHaveLength(2)
   })
 
+  it('centre le titre, l accroche et les boutons quand aucune image ne porte de citation', async () => {
+    // La maquette a deux colonnes suppose une citation par photo. Sans aucune
+    // citation, la moitie droite ne porterait qu'un guillemet orphelin : le
+    // bloc prend alors le centre, et la photo garde toute la largeur.
+    servirBanniere({
+      variant: 'diaporama',
+      title: 'Représenter. Protéger. Rassembler. Coopérer.',
+      intro: 'Au service de la diplomatie gabonaise.',
+      slides: [diapositive(1), diapositive(2)],
+    })
+
+    const wrapper = await monter()
+
+    const banniere = wrapper.find('[aria-label="Bannière d\'accueil"]')
+    expect(banniere.exists()).toBe(true)
+    expect(banniere.find('h1').text()).toBe('Représenter. Protéger. Rassembler. Coopérer.')
+    expect(banniere.text()).toContain('Au service de la diplomatie gabonaise.')
+    expect(banniere.find('.text-center').exists()).toBe(true)
+    // Le guillemet ouvert n'a plus rien a annoncer : il ne doit pas rester.
+    expect(banniere.find('.bxs-quote-left').exists()).toBe(false)
+    // Le reperage des photos, lui, ne depend pas de la citation.
+    expect(banniere.findAll('button[aria-current]')).toHaveLength(2)
+    // Les boutons du slot suivent le bloc au centre.
+    expect(banniere.findAll('a').map((a) => a.text())).toContain('Consulter les actualités')
+  })
+
+  it('garde la maquette en deux colonnes des qu une seule image porte une citation', async () => {
+    // La composition se decide sur l'ENSEMBLE des diapositives : sinon elle
+    // changerait toutes les six secondes au fil du defilement.
+    servirBanniere({
+      variant: 'diaporama',
+      title: null,
+      intro: null,
+      slides: [diapositive(1), diapositive(2, 'Renforcer les liens.', 'SEM Oligui Nguema')],
+    })
+
+    const wrapper = await monter()
+
+    const banniere = wrapper.find('[aria-label="Bannière d\'accueil"]')
+    expect(banniere.find('.lg\\:grid-cols-2').exists()).toBe(true)
+    // La citation est celle de la photo affichee : la premiere n'en porte pas,
+    // et la colonne reste donc vide jusqu'a ce qu'on aille voir la seconde.
+    expect(banniere.text()).not.toContain('SEM Oligui Nguema')
+    await banniere.findAll('button[aria-current]')[1]!.trigger('click')
+    expect(banniere.text()).toContain('SEM Oligui Nguema')
+  })
+
   it("retombe sur la banniere simple quand le diaporama n'a aucune image", async () => {
     // Un diaporama vide n'est pas un diaporama : c'est un aplat sombre ou
     // personne ne trouve le menu. Le back enregistre pourtant la combinaison.

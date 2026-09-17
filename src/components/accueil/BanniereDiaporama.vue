@@ -29,14 +29,65 @@
          Les deux passent le seuil de 4,5, quelle que soit l'image. C'est ce
          qui remplace le fond opaque derriere les blocs de texte : la garantie
          est la meme, et la photographie reste visible. La maquette d'origine
-         descend a 20 %, ou le titre jaune tombe a 1,6 devant une photo claire. -->
+         descend a 20 %, ou le titre jaune tombe a 1,6 devant une photo claire.
+
+         Le degrade va de gauche a droite parce que le texte de la maquette est
+         a gauche : il rend la photo un peu plus visible du cote ou il n'y a
+         que la citation. Sous un bloc centre ce dessin n'a plus d'objet, et le
+         voile devient uniforme — a 70 %, donc au-dessus du plancher. -->
     <div
-      class="absolute inset-0 bg-gradient-to-r from-black/75 via-black/70 to-black/65"
+      class="absolute inset-0"
+      :class="
+        aucuneCitation ? 'bg-black/70' : 'bg-gradient-to-r from-black/75 via-black/70 to-black/65'
+      "
       aria-hidden="true"
     ></div>
 
     <div class="relative max-w-7xl mx-auto px-6 lg:px-8 py-24 w-full">
-      <div class="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+      <!-- Deux compositions, et c'est la citation qui tranche.
+
+           La maquette pose l'identite a gauche et la citation signee a droite.
+           Sans citation, cette moitie droite ne porte plus qu'un guillemet
+           ouvert tout seul et les pastilles : le titre garde alors le centre,
+           comme sur une affiche, et la photographie occupe toute la largeur
+           derriere lui. Le voile et la couleur du titre ne changent pas — le
+           texte reste pose sur la photo dans les deux cas. -->
+      <div v-if="aucuneCitation" class="max-w-3xl mx-auto text-center flex flex-col items-center">
+        <img v-if="logo" :src="logo" :alt="titre" class="w-20 mb-7" />
+
+        <h1 class="text-3xl lg:text-5xl font-bold text-secondary leading-tight mb-5 text-balance">
+          {{ titre }}
+        </h1>
+
+        <p v-if="intro" class="text-white/90 leading-relaxed mb-8">{{ intro }}</p>
+
+        <div class="flex flex-wrap items-center justify-center gap-5">
+          <slot name="boutons" />
+        </div>
+
+        <!-- Les memes pastilles, centrees sous le bloc : elles disent quelle
+             photo on regarde, et ce reperage ne depend pas de la citation. -->
+        <div v-if="diapositives.length > 1" class="flex items-center gap-4 mt-12">
+          <button
+            v-for="(diapositive, rang) in diapositives"
+            :key="diapositive.id"
+            type="button"
+            class="w-12 h-12 rounded-full border-2 font-semibold tabular-nums transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+            :class="
+              rang === rangAffiche
+                ? 'border-secondary bg-secondary/20 text-secondary'
+                : 'border-white/40 text-white/70 hover:border-white hover:text-white'
+            "
+            :aria-label="`Afficher l'image ${rang + 1} sur ${diapositives.length}`"
+            :aria-current="rang === rangAffiche"
+            @click="afficher(rang)"
+          >
+            {{ String(rang + 1).padStart(2, '0') }}
+          </button>
+        </div>
+      </div>
+
+      <div v-else class="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
         <!-- Colonne de gauche : l'identite de l'ambassade. Elle ne change pas
              d'une diapositive a l'autre — c'est ce qui la distingue de la
              citation, et ce qui evite que le titre du site clignote. -->
@@ -57,7 +108,15 @@
         <!-- Colonne de droite : ce qui change. La citation, sa signature, et
              les pastilles numerotees qui disent laquelle on regarde. -->
         <div class="lg:border-l lg:border-white/20 lg:pl-12">
-          <i class="bx bxs-quote-left text-3xl text-secondary/80" aria-hidden="true"></i>
+          <!-- Le guillemet accompagne une citation ; seul, il ne veut rien
+               dire. Une diapositive sans citation au milieu de diapositives
+               qui en portent laisse donc la colonne vide plutot qu'un signe
+               de ponctuation orphelin. -->
+          <i
+            v-if="citation"
+            class="bx bxs-quote-left text-3xl text-secondary/80"
+            aria-hidden="true"
+          ></i>
 
           <!-- `aria-live` parce que ce bloc change tout seul : sans lui, une
                lecture d'ecran ne saurait jamais que le texte a ete remplace. -->
@@ -124,6 +183,21 @@ const INTERVALLE = 6000
 
 const rangAffiche = ref(0)
 let minuterie: ReturnType<typeof setInterval> | null = null
+
+/**
+ * Vrai quand aucune diapositive ne porte de citation.
+ *
+ * La maquette a deux colonnes suppose une citation signee par photo. Toutes
+ * les ambassades n'en ont pas : le Gabon a fourni un titre et une accroche,
+ * et rien a citer. Le diaporama garde alors ses photos et son defilement, et
+ * centre son bloc de texte.
+ *
+ * La regle porte sur l'ENSEMBLE des diapositives, pas sur celle qu'on
+ * regarde : sinon la composition changerait toutes les six secondes.
+ */
+const aucuneCitation = computed(() =>
+  proprietes.diapositives.every((diapositive) => !diapositive.quote),
+)
 
 const citation = computed(() => {
   const courante = proprietes.diapositives[rangAffiche.value]
