@@ -108,15 +108,6 @@
             <span v-if="!isCollapsed">Articles</span>
           </router-link>
 
-          <router-link
-            to="/dashboard/actualites"
-            class="flex items-center gap-3 px-4 py-2 rounded-xl text-white no-underline transition-all duration-300 text-sm font-medium hover:bg-yellow-500/20 hover:text-secondary hover:translate-x-1"
-            :active-class="LIEN_ACTIF"
-          >
-            <i class="bx bxs-megaphone text-xl flex-shrink-0"></i>
-            <span v-if="!isCollapsed">Actualités</span>
-          </router-link>
-
           <!-- Lien Site Internet (pour retourner au site public) -->
           <router-link
             to="/"

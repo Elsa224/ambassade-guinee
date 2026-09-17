@@ -347,7 +347,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { useTenantStore } from '@/stores/tenant'
-import ChampImage from '@/views/dashboard/contenu/ChampImage.vue'
+import ChampImage from '@/components/ui/ChampImage.vue'
 import {
   COULEURS_DU_THEME,
   LONGUEURS_MAX,

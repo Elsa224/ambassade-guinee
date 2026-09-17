@@ -8,7 +8,7 @@ import {
 } from '@/api/evenements-admin'
 import { messageErreur } from '@/api/evenements'
 import { dateLisible, etatDe, remplissage } from './presentation'
-import PastilleEtat from './PastilleEtat.vue'
+import PastilleEtat from '@/components/ui/PastilleEtat.vue'
 import Pagination from '@/components/ui/Pagination.vue'
 
 /**

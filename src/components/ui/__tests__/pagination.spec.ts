@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { readFileSync } from 'node:fs'
+import { readFileSync, readdirSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { bornesAffichees, paginerEnMemoire } from '../pagination'
 
@@ -39,13 +39,23 @@ describe('pagination en memoire', () => {
  */
 describe('une seule barre de pagination', () => {
   it('aucun ecran du tableau de bord ne recalcule ses pages', () => {
-    const racine = resolve(__dirname, '../../../views/dashboard')
-    const fichiers = ['Articles.vue', 'Actualites.vue', 'evenements/ListeEvenements.vue']
-    const fautifs = fichiers.filter((nom) => {
-      const source = readFileSync(resolve(racine, nom), 'utf8')
-      return /Math\.ceil\([^)]*\/\s*items?ParPage/.test(source)
-    })
+    // La liste est balayee depuis le disque, pas enumeree a la main : une
+    // liste ecrite en dur se contente de disparaitre quand un ecran est
+    // renomme ou supprime, et la garde cesse alors de garder quoi que ce soit.
+    const fautifs = ecransDuTableauDeBord().filter((chemin) =>
+      /Math\.ceil\(/.test(readFileSync(chemin, 'utf8')),
+    )
 
     expect(fautifs).toEqual([])
   })
 })
+
+/** Tous les .vue du tableau de bord, sous-dossiers compris. */
+function ecransDuTableauDeBord(racine = resolve(__dirname, '../../../views/dashboard')): string[] {
+  return readdirSync(racine, { withFileTypes: true }).flatMap((entree) => {
+    const chemin = resolve(racine, entree.name)
+    if (entree.isDirectory())
+      return entree.name === '__tests__' ? [] : ecransDuTableauDeBord(chemin)
+    return entree.name.endsWith('.vue') ? [chemin] : []
+  })
+}

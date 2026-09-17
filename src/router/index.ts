@@ -45,7 +45,6 @@ import Articles from '@/views/dashboard/Articles.vue'
 import AccueilContenu from '@/views/dashboard/contenu/AccueilContenu.vue'
 import AnnuaireAdmin from '@/views/dashboard/annuaire/AnnuaireAdmin.vue'
 import JoursFeriesAdmin from '@/views/dashboard/jours-feries/JoursFeriesAdmin.vue'
-import Actualites from '@/views/dashboard/Actualites.vue'
 
 import ListeEvenementsAdmin from '@/views/dashboard/evenements/ListeEvenements.vue'
 import FicheEvenementAdmin from '@/views/dashboard/evenements/FicheEvenement.vue'
@@ -219,7 +218,6 @@ const router = createRouter({
             },
           ],
         },
-        { path: 'actualites', name: 'actualites', component: Actualites },
 
         // Les ecrans herites du fork SecureCheck — utilisateurs, scanner,
         // visiteurs, demandes, presence, cartes, courriers, taches, projets,

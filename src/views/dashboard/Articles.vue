@@ -1,292 +1,666 @@
+<script setup lang="ts">
+import { computed, onMounted, ref } from 'vue'
+import {
+  creerArticle,
+  libelleStatut,
+  listerArticles,
+  modifierArticle,
+  supprimerArticle,
+  type Article,
+  type BrouillonArticle,
+  type StatutArticle,
+} from '@/api/articles'
+import ChampSelect from '@/components/ui/ChampSelect.vue'
+import ChampDate from '@/components/ui/ChampDate.vue'
+import ChampImage from '@/components/ui/ChampImage.vue'
+import Pagination from '@/components/ui/Pagination.vue'
+import PastilleEtat from '@/components/ui/PastilleEtat.vue'
+import { paginerEnMemoire } from '@/components/ui/pagination'
+
+/**
+ * Gestion des articles.
+ *
+ * Cet ecran est le SEUL a ecrire dans /api/articles. Il a longtemps eu un
+ * jumeau, « Actualites », qui appelait exactement les memes routes sur la
+ * meme table en rebaptisant `categorie` en « type » : publier d'un cote
+ * faisait apparaitre la ligne de l'autre, et son champ « mots-cles » n'etait
+ * envoye nulle part. Les deux ecrans ont ete fondus ici.
+ *
+ * Les libelles de statut n'existent qu'a l'affichage. L'etat de l'ecran porte
+ * les valeurs de l'API (`brouillon`, `a_valider`, `publie`) : c'est ce que le
+ * back attend, et une chaine accentuee comparee a la main etait la porte
+ * ouverte au filtre qui ne filtre rien.
+ */
+
+/** Les trois categories servies par le back, source unique des libelles. */
+const CATEGORIES = [
+  { slug: 'actualites-ambassade', libelle: "Actualités de l'ambassade", court: 'Ambassade' },
+  { slug: 'actualites-diplomatique', libelle: 'Actualités diplomatiques', court: 'Diplomatiques' },
+  {
+    slug: 'actualites-gouvernementale',
+    libelle: 'Actualités gouvernementales',
+    court: 'Gouvernementales',
+  },
+] as const
+
+const STATUTS: readonly StatutArticle[] = ['brouillon', 'a_valider', 'publie']
+
+/** Dix lignes tenaient dans la page ; le lecteur peut en demander plus. */
+const LIGNES_PAR_DEFAUT = 10
+
+const OPTIONS_CATEGORIE = CATEGORIES.map((c) => ({ valeur: c.slug, libelle: c.libelle }))
+const OPTIONS_STATUT = STATUTS.map((statut) => ({ valeur: statut, libelle: libelleStatut(statut) }))
+
+const OPTIONS_FILTRE_CATEGORIE = [
+  { valeur: '', libelle: 'Toutes les catégories' },
+  ...OPTIONS_CATEGORIE,
+]
+const OPTIONS_FILTRE_STATUT = [{ valeur: '', libelle: 'Tous les statuts' }, ...OPTIONS_STATUT]
+
+const OPTIONS_TRI = [
+  { valeur: 'recent', libelle: 'Plus récent' },
+  { valeur: 'ancien', libelle: 'Plus ancien' },
+  { valeur: 'titre', libelle: 'Titre A-Z' },
+  { valeur: 'vues', libelle: 'Plus vus' },
+] as const
+
+type Tri = (typeof OPTIONS_TRI)[number]['valeur']
+
+/** L'article tel que l'ecran le manipule : les champs qu'il affiche ou ecrit. */
+interface ArticleEnListe {
+  id: number
+  titre: string
+  resume: string
+  contenu: string
+  image: string
+  categorie: string
+  statut: StatutArticle
+  date: string
+  vues: number
+}
+
+function versEcran(article: Article): ArticleEnListe {
+  return {
+    id: article.id,
+    titre: article.titre,
+    resume: article.resume,
+    contenu: article.contenu,
+    image: article.image,
+    categorie: article.categorie?.slug ?? '',
+    statut: article.statut,
+    date: article.date_publication,
+    vues: article.vues,
+  }
+}
+
+const articles = ref<ArticleEnListe[]>([])
+const chargement = ref(false)
+const erreurApi = ref('')
+
+const recherche = ref('')
+const filtreCategorie = ref('')
+const filtreStatut = ref<'' | StatutArticle>('')
+const tri = ref<Tri>('recent')
+const pageCourante = ref(1)
+const lignesParPage = ref(LIGNES_PAR_DEFAUT)
+
+/**
+ * Repli des accents avant comparaison.
+ *
+ * Personne ne tape « Ceremonie du 2 octobre » avec les accents pour retrouver
+ * un article : la recherche accentuee ne trouvait rien et laissait croire que
+ * l'article n'existait pas.
+ */
+function sansAccent(texte: string): string {
+  return texte
+    .normalize('NFD')
+    .replace(/\p{Diacritic}/gu, '')
+    .toLowerCase()
+}
+
+const articlesFiltres = computed(() => {
+  const terme = sansAccent(recherche.value.trim())
+  const retenus = articles.value.filter((article) => {
+    if (terme && !sansAccent(`${article.titre} ${article.resume}`).includes(terme)) return false
+    if (filtreCategorie.value && article.categorie !== filtreCategorie.value) return false
+    if (filtreStatut.value && article.statut !== filtreStatut.value) return false
+    return true
+  })
+
+  return retenus.sort(COMPARATEURS[tri.value])
+})
+
+const COMPARATEURS: Record<Tri, (a: ArticleEnListe, b: ArticleEnListe) => number> = {
+  recent: (a, b) => horodatage(b.date) - horodatage(a.date),
+  ancien: (a, b) => horodatage(a.date) - horodatage(b.date),
+  titre: (a, b) => a.titre.localeCompare(b.titre, 'fr'),
+  vues: (a, b) => b.vues - a.vues,
+}
+
+/** Une date illisible vaut zero : elle finit en bas du tri, elle ne le casse pas. */
+function horodatage(date: string): number {
+  const valeur = new Date(date).getTime()
+  return Number.isNaN(valeur) ? 0 : valeur
+}
+
+/**
+ * La barre de pagination attend la meme forme que celle servie par le back
+ * pour les evenements. `paginerEnMemoire` la construit ici et garantit au
+ * passage `totalPages >= 1` : l'ancien calcul rendait zero sur une liste
+ * vide, ce qui laissait le bouton « suivant » actif.
+ */
+const pagination = computed(() =>
+  paginerEnMemoire(articlesFiltres.value.length, pageCourante.value, lignesParPage.value),
+)
+
+const articlesPagines = computed(() => {
+  const debut = (pagination.value.page - 1) * pagination.value.limit
+  return articlesFiltres.value.slice(debut, debut + pagination.value.limit)
+})
+
+/**
+ * Les quatre compteurs portent sur TOUT le fonds, pas sur la page ni sur le
+ * filtre courant. Un « total » qui bouge quand on tape dans la recherche ne
+ * dit plus combien d'articles l'ambassade possede.
+ */
+const compteurs = computed(() => ({
+  total: articles.value.length,
+  publies: articles.value.filter((a) => a.statut === 'publie').length,
+  brouillons: articles.value.filter((a) => a.statut === 'brouillon').length,
+  vues: articles.value.reduce((somme, a) => somme + a.vues, 0),
+}))
+
+function libelleCategorie(slug: string): string {
+  return CATEGORIES.find((c) => c.slug === slug)?.libelle ?? slug
+}
+
+/**
+ * Forme courte, pour la colonne du tableau : la colonne s'intitule deja
+ * « Categorie », repeter « Actualites… » sur chaque ligne faisait passer la
+ * pastille sur deux lignes et rendait la hauteur des lignes irreguliere.
+ */
+function categorieCourte(slug: string): string {
+  return CATEGORIES.find((c) => c.slug === slug)?.court ?? slug
+}
+
+/** Le statut porte un etat : c'est la seule chose qui a droit a la couleur. */
+function tonDuStatut(statut: StatutArticle): 'positif' | 'attention' | 'eteint' {
+  if (statut === 'publie') return 'positif'
+  if (statut === 'a_valider') return 'attention'
+  return 'eteint'
+}
+
+function dateLisible(date: string): string {
+  const valeur = new Date(date)
+  if (Number.isNaN(valeur.getTime())) return date
+  return valeur.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
+}
+
+function changerLignesParPage(lignes: number): void {
+  lignesParPage.value = lignes
+  pageCourante.value = 1
+}
+
+/** Toute retouche de filtre ramene en page 1 : sinon la liste parait vide. */
+function filtrer(): void {
+  pageCourante.value = 1
+}
+
+// --- Formulaire -----------------------------------------------------------
+
+interface SaisieArticle {
+  titre: string
+  categorie: string
+  resume: string
+  contenu: string
+  statut: StatutArticle
+  date: string
+  image: string
+}
+
+function saisieVierge(): SaisieArticle {
+  return {
+    titre: '',
+    categorie: CATEGORIES[0].slug,
+    resume: '',
+    contenu: '',
+    statut: 'brouillon',
+    date: new Date().toISOString().slice(0, 10),
+    image: '',
+  }
+}
+
+const formulaireOuvert = ref(false)
+const modeEdition = ref(false)
+const idEnCours = ref<number | null>(null)
+const saisie = ref<SaisieArticle>(saisieVierge())
+const enregistrement = ref(false)
+
+const titreDuFormulaire = computed(() =>
+  modeEdition.value ? "Modifier l'article" : 'Nouvel article',
+)
+
+function ouvrirCreation(): void {
+  modeEdition.value = false
+  idEnCours.value = null
+  saisie.value = saisieVierge()
+  erreurApi.value = ''
+  formulaireOuvert.value = true
+}
+
+function ouvrirEdition(article: ArticleEnListe): void {
+  modeEdition.value = true
+  idEnCours.value = article.id
+  saisie.value = {
+    titre: article.titre,
+    categorie: article.categorie || CATEGORIES[0].slug,
+    resume: article.resume,
+    contenu: article.contenu,
+    statut: article.statut,
+    date: article.date,
+    image: article.image,
+  }
+  erreurApi.value = ''
+  formulaireOuvert.value = true
+}
+
+function fermerFormulaire(): void {
+  formulaireOuvert.value = false
+  saisie.value = saisieVierge()
+  idEnCours.value = null
+}
+
+async function enregistrer(): Promise<void> {
+  if (enregistrement.value) return
+  enregistrement.value = true
+  erreurApi.value = ''
+
+  const brouillon: BrouillonArticle = {
+    titre: saisie.value.titre,
+    resume: saisie.value.resume,
+    contenu: saisie.value.contenu,
+    categorie_slug: saisie.value.categorie,
+    statut: saisie.value.statut,
+    date_publication: saisie.value.date,
+    image: saisie.value.image || undefined,
+  }
+
+  try {
+    if (modeEdition.value && idEnCours.value !== null) {
+      await modifierArticle(idEnCours.value, brouillon)
+    } else {
+      await creerArticle(brouillon)
+    }
+    fermerFormulaire()
+    await charger()
+  } catch {
+    erreurApi.value = 'Enregistrement impossible. Vérifiez les champs et réessayez.'
+  } finally {
+    enregistrement.value = false
+  }
+}
+
+async function supprimer(article: ArticleEnListe): Promise<void> {
+  if (!window.confirm(`Supprimer « ${article.titre} » ? Cette action est définitive.`)) return
+  try {
+    await supprimerArticle(article.id)
+    await charger()
+  } catch {
+    erreurApi.value = 'Suppression impossible.'
+  }
+}
+
+// --- Apercu ---------------------------------------------------------------
+
+const apercu = ref<ArticleEnListe | null>(null)
+
+function ouvrirApercu(article: ArticleEnListe): void {
+  apercu.value = article
+}
+
+function fermerApercu(): void {
+  apercu.value = null
+}
+
+// --- Chargement -----------------------------------------------------------
+
+async function charger(): Promise<void> {
+  chargement.value = true
+  erreurApi.value = ''
+  try {
+    articles.value = (await listerArticles()).map(versEcran)
+  } catch {
+    erreurApi.value = 'Impossible de charger les articles.'
+    articles.value = []
+  } finally {
+    chargement.value = false
+  }
+}
+
+onMounted(charger)
+</script>
+
 <template>
-  <div class="articles-dashboard">
-    <!-- En-tête -->
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+  <div>
+    <header class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
       <div>
         <h2 class="text-2xl font-bold text-gray-800">Gestion des articles</h2>
-        <p class="text-gray-600 mt-1">Gérez tous les articles de votre site</p>
+        <p class="text-gray-600 mt-1">Les articles publiés sur le site de l'ambassade.</p>
       </div>
       <button
-        @click="openModal('add')"
-        class="bg-primary text-white px-5 py-2.5 rounded-lg hover:bg-primary-dark transition-colors flex items-center gap-2 shadow-md"
+        type="button"
+        class="flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 font-medium text-white transition-colors hover:bg-primary-dark"
+        @click="ouvrirCreation"
       >
-        <i class="bx bx-plus-circle text-xl"></i>
+        <i class="bx bx-plus-circle text-xl" aria-hidden="true"></i>
         Nouvel article
       </button>
-    </div>
+    </header>
 
-    <!-- Filtres et recherche -->
-    <div class="bg-white rounded-xl shadow-md p-4 mb-6">
-      <div class="flex flex-col md:flex-row gap-4">
-        <div class="flex-1 relative">
+    <!-- Filtres -->
+    <div class="mb-6 rounded-xl bg-white p-4 shadow-sm">
+      <div class="flex flex-col gap-4 md:flex-row">
+        <div class="relative flex-1">
+          <label class="sr-only" for="recherche-articles">Rechercher un article</label>
           <i
-            class="bx bx-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+            class="bx bx-search pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-gray-400"
+            aria-hidden="true"
           ></i>
           <input
-            v-model="searchQuery"
-            type="text"
-            placeholder="Rechercher un article..."
-            class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary focus:border-secondary"
+            id="recherche-articles"
+            v-model="recherche"
+            type="search"
+            placeholder="Rechercher un article…"
+            class="w-full rounded-lg border border-gray-300 py-2.5 pr-4 pl-10 focus:outline-2 focus:outline-offset-2 focus:outline-primary"
+            @input="filtrer"
           />
         </div>
 
-        <ChampSelect v-model="filtreCategorie" :options="OPTIONS_FILTRECATEGORIE" />
-
-        <ChampSelect v-model="filtreStatut" :options="OPTIONS_FILTRESTATUT" />
-
-        <ChampSelect v-model="tri" :options="OPTIONS_TRI" />
+        <ChampSelect
+          v-model="filtreCategorie"
+          :options="OPTIONS_FILTRE_CATEGORIE"
+          class="md:w-56"
+          @update:model-value="filtrer"
+        />
+        <ChampSelect
+          v-model="filtreStatut"
+          :options="OPTIONS_FILTRE_STATUT"
+          class="md:w-44"
+          @update:model-value="filtrer"
+        />
+        <ChampSelect v-model="tri" :options="OPTIONS_TRI" class="md:w-44" />
       </div>
     </div>
 
-    <!-- Statistiques -->
-    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
-      <div class="bg-white rounded-xl shadow-md p-4 text-center">
-        <p class="text-2xl font-bold text-primary">{{ articlesFiltres.length }}</p>
-        <p class="text-sm text-gray-600">Total articles</p>
+    <!-- Compteurs : tout le fonds, jamais la page ni le filtre -->
+    <div class="mb-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
+      <div class="rounded-xl bg-white p-4 shadow-sm">
+        <p class="text-xs text-gray-500">Articles</p>
+        <p class="mt-1 text-2xl font-bold text-gray-800 tabular-nums">{{ compteurs.total }}</p>
       </div>
-      <div class="bg-white rounded-xl shadow-md p-4 text-center">
-        <p class="text-2xl font-bold text-green-600">{{ articlesPubliés.length }}</p>
-        <p class="text-sm text-gray-600">Publiés</p>
+      <div class="rounded-xl bg-white p-4 shadow-sm">
+        <p class="text-xs text-gray-500">Publiés</p>
+        <p class="mt-1 text-2xl font-bold text-emerald-700 tabular-nums">
+          {{ compteurs.publies }}
+        </p>
       </div>
-      <div class="bg-white rounded-xl shadow-md p-4 text-center">
-        <p class="text-2xl font-bold text-yellow-600">{{ articlesBrouillons.length }}</p>
-        <p class="text-sm text-gray-600">Brouillons</p>
+      <div class="rounded-xl bg-white p-4 shadow-sm">
+        <p class="text-xs text-gray-500">Brouillons</p>
+        <p class="mt-1 text-2xl font-bold text-amber-700 tabular-nums">
+          {{ compteurs.brouillons }}
+        </p>
       </div>
-      <div class="bg-white rounded-xl shadow-md p-4 text-center">
-        <p class="text-2xl font-bold text-primary">{{ totalVues }}</p>
-        <p class="text-sm text-gray-600">Total vues</p>
+      <div class="rounded-xl bg-white p-4 shadow-sm">
+        <p class="text-xs text-gray-500">Vues cumulées</p>
+        <p class="mt-1 text-2xl font-bold text-gray-800 tabular-nums">
+          {{ compteurs.vues.toLocaleString('fr-FR') }}
+        </p>
       </div>
     </div>
 
-    <!-- État de chargement / erreur -->
-    <p v-if="chargement" class="text-gray-500 py-4">Chargement en cours...</p>
-
-    <div
-      v-else-if="erreurApi"
+    <p
+      v-if="erreurApi"
+      class="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-red-800"
       role="alert"
-      class="rounded-lg border border-accent bg-accent/10 px-4 py-3 text-sm text-accent-dark mb-4"
     >
       {{ erreurApi }}
-    </div>
+      <button type="button" class="ml-2 font-medium underline" @click="charger()">Réessayer</button>
+    </p>
 
-    <!-- Liste des articles -->
-    <div class="bg-white rounded-xl shadow-md overflow-hidden">
-      <div class="overflow-x-auto">
-        <table class="w-full">
-          <thead class="bg-gray-50 border-b">
-            <tr>
-              <th
-                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
-                Image
-              </th>
-              <th
-                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
-                Titre
-              </th>
-              <th
-                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
-                Catégorie
-              </th>
-              <th
-                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
-                Statut
-              </th>
-              <th
-                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
-                Date
-              </th>
-              <th
-                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
-                Vues
-              </th>
-              <th
-                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-gray-200">
-            <tr
-              v-for="article in articlesPagines"
-              :key="article.id"
-              class="hover:bg-gray-50 transition-colors"
-            >
-              <td class="px-6 py-4">
-                <img :src="article.image" alt="Image" class="w-12 h-12 rounded-lg object-cover" />
-              </td>
-              <td class="px-6 py-4">
-                <div class="text-sm font-medium text-gray-900">{{ article.titre }}</div>
-                <div class="text-xs text-gray-500 mt-1">{{ article.resume }}</div>
-              </td>
-              <td class="px-6 py-4">
-                <span class="text-xs text-gray-600">{{
-                  getCategorieLabel(article.categorie)
-                }}</span>
-              </td>
-              <td class="px-6 py-4">
-                <span
-                  :class="[
-                    'px-2 py-1 text-xs rounded-full',
-                    article.statut === 'Publié'
-                      ? 'bg-green-100 text-green-600'
-                      : article.statut === 'Brouillon'
-                        ? 'bg-yellow-100 text-yellow-600'
-                        : 'bg-gray-100 text-gray-600',
-                  ]"
+    <!-- Liste -->
+    <div class="overflow-hidden rounded-xl bg-white shadow-sm">
+      <p v-if="chargement" class="px-5 py-8 text-gray-500">Chargement des articles…</p>
+
+      <template v-else>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left">
+            <thead>
+              <tr class="bg-gray-50">
+                <th
+                  v-for="entete in ['Article', 'Catégorie', 'Statut', 'Date', 'Vues', 'Actions']"
+                  :key="entete"
+                  class="border-b border-gray-200 px-5 py-3 text-xs font-semibold tracking-wide text-gray-500 uppercase"
+                  scope="col"
                 >
-                  {{ article.statut }}
-                </span>
-              </td>
-              <td class="px-6 py-4 text-sm text-gray-500">
-                {{ formatDate(article.date) }}
-              </td>
-              <td class="px-6 py-4 text-sm text-gray-500">{{ article.vues }} vues</td>
-              <td class="px-6 py-4">
-                <div class="flex gap-2">
-                  <button
-                    @click="viewArticle(article)"
-                    class="text-primary hover:text-primary-dark"
-                  >
-                    <i class="bx bx-show text-xl"></i>
-                  </button>
-                  <button
-                    @click="editArticle(article)"
-                    class="text-secondary hover:text-secondary-dark"
-                  >
-                    <i class="bx bx-edit-alt text-xl"></i>
-                  </button>
-                  <button
-                    @click="deleteArticle(article.id)"
-                    class="text-red-600 hover:text-red-800"
-                  >
-                    <i class="bx bx-trash text-xl"></i>
-                  </button>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+                  {{ entete }}
+                </th>
+              </tr>
+            </thead>
 
-      <Pagination
-        :pagination="pagination"
-        libelle-vide="Aucun article"
-        @page="pageCourante = $event"
-        @limite="changerLignesParPage"
-      />
+            <tbody v-if="articlesPagines.length === 0">
+              <tr>
+                <td class="px-5 py-16 text-center" colspan="6">
+                  <p class="font-medium text-gray-700">Aucun article ne correspond</p>
+                  <p class="mt-1 text-sm text-gray-500">
+                    Modifiez la recherche ou les filtres, ou créez un article.
+                  </p>
+                </td>
+              </tr>
+            </tbody>
+
+            <tbody v-else>
+              <tr
+                v-for="article in articlesPagines"
+                :key="article.id"
+                class="border-b border-gray-100 transition-colors last:border-0 hover:bg-gray-50/70"
+              >
+                <td class="px-5 py-4">
+                  <div class="flex items-center gap-3">
+                    <img
+                      v-if="article.image"
+                      :src="article.image"
+                      alt=""
+                      class="h-12 w-12 shrink-0 rounded-lg object-cover"
+                    />
+                    <div class="min-w-0">
+                      <p class="truncate font-semibold text-gray-800">{{ article.titre }}</p>
+                      <p class="mt-0.5 truncate text-xs text-gray-500">{{ article.resume }}</p>
+                    </div>
+                  </div>
+                </td>
+
+                <td class="px-5 py-4">
+                  <span
+                    class="inline-block rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium whitespace-nowrap text-gray-700"
+                    :title="libelleCategorie(article.categorie)"
+                  >
+                    {{ categorieCourte(article.categorie) }}
+                  </span>
+                </td>
+
+                <td class="px-5 py-4">
+                  <PastilleEtat
+                    :libelle="libelleStatut(article.statut)"
+                    :ton="tonDuStatut(article.statut)"
+                  />
+                </td>
+
+                <td class="px-5 py-4 whitespace-nowrap text-gray-600 tabular-nums">
+                  {{ dateLisible(article.date) }}
+                </td>
+
+                <td class="px-5 py-4 text-gray-600 tabular-nums">{{ article.vues }}</td>
+
+                <td class="px-5 py-4">
+                  <div class="flex gap-1">
+                    <button
+                      type="button"
+                      class="rounded-md p-1.5 text-gray-500 transition-colors hover:bg-gray-100 hover:text-primary"
+                      :aria-label="`Aperçu de ${article.titre}`"
+                      @click="ouvrirApercu(article)"
+                    >
+                      <i class="bx bx-show text-xl" aria-hidden="true"></i>
+                    </button>
+                    <button
+                      type="button"
+                      class="rounded-md p-1.5 text-gray-500 transition-colors hover:bg-gray-100 hover:text-primary"
+                      :aria-label="`Modifier ${article.titre}`"
+                      @click="ouvrirEdition(article)"
+                    >
+                      <i class="bx bx-edit-alt text-xl" aria-hidden="true"></i>
+                    </button>
+                    <button
+                      type="button"
+                      class="rounded-md p-1.5 text-gray-500 transition-colors hover:bg-red-50 hover:text-red-700"
+                      :aria-label="`Supprimer ${article.titre}`"
+                      @click="supprimer(article)"
+                    >
+                      <i class="bx bx-trash text-xl" aria-hidden="true"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <Pagination
+          :pagination="pagination"
+          libelle-vide="Aucun article"
+          @page="pageCourante = $event"
+          @limite="changerLignesParPage"
+        />
+      </template>
     </div>
 
-    <!-- ========== MODAL AJOUTER/MODIFIER - CENTRÉE ========== -->
+    <!-- Formulaire -->
     <Teleport to="body">
       <div
-        v-if="showModal"
-        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+        v-if="formulaireOuvert"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
       >
-        <div class="bg-white rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-          <div class="flex justify-between items-center p-4 border-b">
-            <h3 class="text-xl font-bold">{{ modalTitle }}</h3>
-            <button @click="closeModal" class="text-gray-400 hover:text-gray-600">
-              <i class="bx bx-x text-2xl"></i>
+        <div
+          class="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-xl bg-white shadow-xl"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="titre-formulaire-article"
+        >
+          <div
+            class="sticky top-0 z-10 flex items-center justify-between border-b border-gray-200 bg-white px-5 py-4"
+          >
+            <h2 id="titre-formulaire-article" class="text-lg font-semibold text-gray-800">
+              {{ titreDuFormulaire }}
+            </h2>
+            <button
+              type="button"
+              class="rounded-md p-1 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600"
+              aria-label="Fermer"
+              @click="fermerFormulaire"
+            >
+              <i class="bx bx-x text-2xl" aria-hidden="true"></i>
             </button>
           </div>
 
-          <form @submit.prevent="saveArticle" class="p-4">
-            <!-- Titre -->
+          <form class="p-5" @submit.prevent="enregistrer">
             <div class="mb-4">
-              <label class="block text-sm font-medium text-gray-700 mb-1"
-                >Titre de l'article *</label
-              >
+              <label class="mb-1 block text-sm font-medium text-gray-700" for="titre-article">
+                Titre de l'article *
+              </label>
               <input
-                v-model="formArticle.titre"
+                id="titre-article"
+                v-model="saisie.titre"
                 type="text"
                 required
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary"
                 placeholder="Entrez le titre de l'article"
+                class="w-full rounded-lg border border-gray-300 px-3 py-2.5 focus:outline-2 focus:outline-offset-2 focus:outline-primary"
               />
             </div>
 
-            <!-- Catégorie -->
             <div class="mb-4">
-              <label class="block text-sm font-medium text-gray-700 mb-1">Catégorie *</label>
+              <label class="mb-1 block text-sm font-medium text-gray-700" for="categorie-article">
+                Catégorie *
+              </label>
               <ChampSelect
-                v-model="formArticle.categorie"
-                :options="OPTIONS_FORMARTICLE_CATEGORIE"
+                id="categorie-article"
+                v-model="saisie.categorie"
+                :options="OPTIONS_CATEGORIE"
               />
             </div>
 
-            <!-- Résumé -->
             <div class="mb-4">
-              <label class="block text-sm font-medium text-gray-700 mb-1">Résumé</label>
+              <label class="mb-1 block text-sm font-medium text-gray-700" for="resume-article">
+                Résumé
+              </label>
               <textarea
-                v-model="formArticle.resume"
+                id="resume-article"
+                v-model="saisie.resume"
                 rows="2"
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary"
-                placeholder="Petite description de l'article..."
+                placeholder="Petite description de l'article…"
+                class="w-full rounded-lg border border-gray-300 px-3 py-2.5 focus:outline-2 focus:outline-offset-2 focus:outline-primary"
               ></textarea>
             </div>
 
-            <!-- Contenu -->
             <div class="mb-4">
-              <label class="block text-sm font-medium text-gray-700 mb-1">Contenu *</label>
+              <label class="mb-1 block text-sm font-medium text-gray-700" for="contenu-article">
+                Contenu *
+              </label>
               <textarea
-                v-model="formArticle.contenu"
+                id="contenu-article"
+                v-model="saisie.contenu"
                 rows="6"
                 required
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary"
-                placeholder="Contenu détaillé de l'article..."
+                placeholder="Contenu détaillé de l'article…"
+                class="w-full rounded-lg border border-gray-300 px-3 py-2.5 focus:outline-2 focus:outline-offset-2 focus:outline-primary"
               ></textarea>
             </div>
 
-            <!-- Image -->
             <div class="mb-4">
-              <label class="block text-sm font-medium text-gray-700 mb-1">Image principale</label>
-              <div class="flex items-center gap-4">
-                <input type="file" @change="handleImageUpload" accept="image/*" class="flex-1" />
-                <div v-if="formArticle.imagePreview" class="w-16 h-16">
-                  <img
-                    :src="formArticle.imagePreview"
-                    alt="Preview"
-                    class="w-full h-full object-cover rounded"
-                  />
-                </div>
+              <ChampImage v-model="saisie.image" libelle="Image principale" />
+            </div>
+
+            <div class="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div>
+                <label class="mb-1 block text-sm font-medium text-gray-700" for="statut-article">
+                  Statut
+                </label>
+                <ChampSelect
+                  id="statut-article"
+                  v-model="saisie.statut"
+                  :options="OPTIONS_STATUT"
+                />
+              </div>
+              <div>
+                <label class="mb-1 block text-sm font-medium text-gray-700" for="date-article">
+                  Date de publication
+                </label>
+                <ChampDate id="date-article" v-model="saisie.date" />
               </div>
             </div>
 
-            <!-- Statut et date -->
-            <div class="grid grid-cols-2 gap-4 mb-4">
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Statut</label>
-                <ChampSelect v-model="formArticle.statut" :options="OPTIONS_FORMARTICLE_STATUT" />
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1"
-                  >Date de publication</label
-                >
-                <ChampDate v-model="formArticle.date" />
-              </div>
-            </div>
-
-            <!-- Boutons -->
-            <div class="flex justify-end gap-3 pt-4 border-t">
+            <div class="flex justify-end gap-3 border-t border-gray-200 pt-4">
               <button
                 type="button"
-                @click="closeModal"
-                class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
+                class="rounded-lg border border-gray-300 px-4 py-2 font-medium text-gray-700 transition-colors hover:bg-gray-50"
+                @click="fermerFormulaire"
               >
                 Annuler
               </button>
               <button
                 type="submit"
-                class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark"
+                :disabled="enregistrement"
+                class="rounded-lg bg-primary px-4 py-2 font-medium text-white transition-colors hover:bg-primary-dark disabled:opacity-60"
               >
-                {{ modalButtonText }}
+                {{ enregistrement ? 'Enregistrement…' : 'Enregistrer' }}
               </button>
             </div>
           </form>
@@ -294,42 +668,63 @@
       </div>
     </Teleport>
 
-    <!-- ========== MODAL VOIR ARTICLE - CENTRÉE ========== -->
+    <!-- Apercu -->
     <Teleport to="body">
       <div
-        v-if="showViewModal"
-        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+        v-if="apercu"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+        @keydown.esc="fermerApercu"
       >
-        <div class="bg-white rounded-lg w-full max-w-3xl max-h-[90vh] overflow-y-auto">
-          <div class="flex justify-between items-center p-4 border-b">
-            <h3 class="text-xl font-bold">Aperçu de l'article</h3>
-            <button @click="closeViewModal" class="text-gray-400 hover:text-gray-600">
-              <i class="bx bx-x text-2xl"></i>
+        <div
+          class="max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-xl bg-white shadow-xl"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="titre-apercu-article"
+        >
+          <div
+            class="sticky top-0 z-10 flex items-center justify-between border-b border-gray-200 bg-white px-5 py-4"
+          >
+            <h2 id="titre-apercu-article" class="text-lg font-semibold text-gray-800">
+              Aperçu de l'article
+            </h2>
+            <button
+              type="button"
+              class="rounded-md p-1 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600"
+              aria-label="Fermer"
+              @click="fermerApercu"
+            >
+              <i class="bx bx-x text-2xl" aria-hidden="true"></i>
             </button>
           </div>
 
-          <div class="p-4">
+          <div class="p-5">
             <img
-              :src="viewArticleData.image"
-              alt="Image"
-              class="w-full h-64 object-cover rounded-lg mb-4"
+              v-if="apercu.image"
+              :src="apercu.image"
+              alt=""
+              class="mb-4 h-64 w-full rounded-lg object-cover"
             />
-            <h2 class="text-2xl font-bold text-gray-800 mb-2">{{ viewArticleData.titre }}</h2>
-            <div class="flex gap-4 text-sm text-gray-500 mb-4">
-              <span>{{ formatDate(viewArticleData.date) }}</span>
-              <span>{{ getCategorieLabel(viewArticleData.categorie) }}</span>
-              <span>{{ viewArticleData.vues }} vues</span>
+            <h3 class="text-xl font-bold text-gray-800">{{ apercu.titre }}</h3>
+            <div class="mt-2 mb-4 flex flex-wrap items-center gap-3 text-sm text-gray-500">
+              <span class="tabular-nums">{{ dateLisible(apercu.date) }}</span>
+              <span>{{ libelleCategorie(apercu.categorie) }}</span>
+              <span class="tabular-nums">{{ apercu.vues }} vues</span>
+              <PastilleEtat
+                :libelle="libelleStatut(apercu.statut)"
+                :ton="tonDuStatut(apercu.statut)"
+              />
             </div>
-            <p class="text-gray-600 italic bg-gray-50 p-3 rounded-lg mb-4">
-              {{ viewArticleData.resume }}
+            <p v-if="apercu.resume" class="mb-4 rounded-lg bg-gray-50 p-3 text-gray-600 italic">
+              {{ apercu.resume }}
             </p>
-            <div class="text-gray-700 whitespace-pre-wrap">{{ viewArticleData.contenu }}</div>
+            <div class="whitespace-pre-wrap text-gray-700">{{ apercu.contenu }}</div>
           </div>
 
-          <div class="flex justify-end p-4 border-t">
+          <div class="flex justify-end border-t border-gray-200 px-5 py-4">
             <button
-              @click="closeViewModal"
-              class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
+              type="button"
+              class="rounded-lg border border-gray-300 px-4 py-2 font-medium text-gray-700 transition-colors hover:bg-gray-50"
+              @click="fermerApercu"
             >
               Fermer
             </button>
@@ -339,317 +734,3 @@
     </Teleport>
   </div>
 </template>
-
-<script setup>
-import { ref, computed, onMounted } from 'vue'
-
-import {
-  listerArticles,
-  creerArticle,
-  modifierArticle,
-  supprimerArticle,
-  libelleStatut,
-  statutDepuisLibelle,
-} from '@/api/articles'
-import ChampSelect from '@/components/ui/ChampSelect.vue'
-import ChampDate from '@/components/ui/ChampDate.vue'
-import Pagination from '@/components/ui/Pagination.vue'
-import { paginerEnMemoire } from '@/components/ui/pagination'
-
-/** Dix lignes tenaient dans la page ; le lecteur peut desormais en demander plus. */
-const LIGNES_PAR_DEFAUT = 10
-const OPTIONS_FILTRECATEGORIE = [
-  { valeur: '', libelle: 'Toutes les catégories' },
-  { valeur: 'actualites-ambassade', libelle: 'Actualités Ambassade' },
-  { valeur: 'actualites-diplomatique', libelle: 'Actualités Diplomatiques' },
-  { valeur: 'actualites-gouvernementale', libelle: 'Actualités Gouvernementales' },
-]
-
-const OPTIONS_FILTRESTATUT = [
-  { valeur: '', libelle: 'Tous les statuts' },
-  { valeur: 'Publié', libelle: 'Publié' },
-  { valeur: 'Brouillon', libelle: 'Brouillon' },
-  { valeur: 'À valider', libelle: 'À valider' },
-]
-
-const OPTIONS_TRI = [
-  { valeur: 'recent', libelle: 'Plus récent' },
-  { valeur: 'ancien', libelle: 'Plus ancien' },
-  { valeur: 'titre', libelle: 'Titre A-Z' },
-  { valeur: 'vues', libelle: 'Plus vus' },
-]
-
-const OPTIONS_FORMARTICLE_CATEGORIE = [
-  { valeur: 'actualites-ambassade', libelle: "Actualités de l'Ambassade" },
-  { valeur: 'actualites-diplomatique', libelle: 'Actualités diplomatiques' },
-  { valeur: 'actualites-gouvernementale', libelle: 'Actualités gouvernementales' },
-]
-
-const OPTIONS_FORMARTICLE_STATUT = [
-  { valeur: 'Brouillon', libelle: 'Brouillon' },
-  { valeur: 'Publié', libelle: 'Publié' },
-  { valeur: 'À valider', libelle: 'À valider' },
-]
-
-// Données des articles
-const articles = ref([])
-const chargement = ref(false)
-const erreurApi = ref(null)
-const searchQuery = ref('')
-const filtreCategorie = ref('')
-const filtreStatut = ref('')
-const tri = ref('recent')
-const pageCourante = ref(1)
-const itemsParPage = ref(LIGNES_PAR_DEFAUT)
-
-// Modal
-const showModal = ref(false)
-const showViewModal = ref(false)
-const modalMode = ref('add')
-const editId = ref(null)
-
-// Formulaire
-const formArticle = ref({
-  titre: '',
-  categorie: 'actualites-ambassade',
-  resume: '',
-  contenu: '',
-  statut: 'Brouillon',
-  date: new Date().toISOString().split('T')[0],
-  image: '',
-  imagePreview: '',
-  imageFile: null,
-})
-
-// Vue article
-const viewArticleData = ref({})
-
-const modalTitle = computed(() =>
-  modalMode.value === 'add' ? 'Ajouter un article' : "Modifier l'article",
-)
-const modalButtonText = computed(() =>
-  modalMode.value === 'add' ? "Publier l'article" : 'Enregistrer les modifications',
-)
-
-const articlesFiltres = computed(() => {
-  let result = [...articles.value]
-
-  if (searchQuery.value) {
-    result = result.filter(
-      (a) =>
-        a.titre.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-        a.resume.toLowerCase().includes(searchQuery.value.toLowerCase()),
-    )
-  }
-
-  if (filtreCategorie.value) {
-    result = result.filter((a) => a.categorie === filtreCategorie.value)
-  }
-
-  if (filtreStatut.value) {
-    result = result.filter((a) => a.statut === filtreStatut.value)
-  }
-
-  switch (tri.value) {
-    case 'recent':
-      result.sort((a, b) => new Date(b.date) - new Date(a.date))
-      break
-    case 'ancien':
-      result.sort((a, b) => new Date(a.date) - new Date(b.date))
-      break
-    case 'titre':
-      result.sort((a, b) => a.titre.localeCompare(b.titre))
-      break
-    case 'vues':
-      result.sort((a, b) => b.vues - a.vues)
-      break
-  }
-
-  return result
-})
-
-const articlesPagines = computed(() => {
-  const start = (pageCourante.value - 1) * itemsParPage.value
-  const end = start + itemsParPage.value
-  return articlesFiltres.value.slice(start, end)
-})
-
-const articlesPubliés = computed(() => articles.value.filter((a) => a.statut === 'Publié'))
-const articlesBrouillons = computed(() => articles.value.filter((a) => a.statut === 'Brouillon'))
-const totalVues = computed(() => articles.value.reduce((sum, a) => sum + a.vues, 0))
-/**
- * La barre de pagination attend la meme forme que celle servie par le back
- * pour les evenements. `paginerEnMemoire` la construit ici, ou articlesFiltres
- * est deja en memoire, et garantit au passage `totalPages >= 1` : l'ancien
- * calcul rendait zero sur une liste vide, ce qui laissait le bouton
- * « suivant » actif et permettait d'avancer dans le neant.
- */
-const pagination = computed(() =>
-  paginerEnMemoire(articlesFiltres.value.length, pageCourante.value, itemsParPage.value),
-)
-
-function changerLignesParPage(lignes) {
-  itemsParPage.value = lignes
-  pageCourante.value = 1
-}
-
-const getCategorieLabel = (categorie) => {
-  const labels = {
-    'actualites-ambassade': 'Actualités Ambassade',
-    'actualites-diplomatique': 'Actualités Diplomatiques',
-    'actualites-gouvernementale': 'Actualités Gouvernementales',
-  }
-  return labels[categorie] || categorie
-}
-
-const formatDate = (date) => {
-  return new Date(date).toLocaleDateString('fr-FR', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  })
-}
-
-const handleImageUpload = (event) => {
-  const file = event.target.files[0]
-  if (file) {
-    formArticle.value.imageFile = file
-    const reader = new FileReader()
-    reader.onload = (e) => {
-      formArticle.value.imagePreview = e.target.result
-    }
-    reader.readAsDataURL(file)
-  }
-}
-
-const openModal = (mode, article = null) => {
-  modalMode.value = mode
-  if (mode === 'add') {
-    formArticle.value = {
-      titre: '',
-      categorie: 'actualites-ambassade',
-      resume: '',
-      contenu: '',
-      statut: 'Brouillon',
-      date: new Date().toISOString().split('T')[0],
-      image: '',
-      imagePreview: '',
-      imageFile: null,
-    }
-    editId.value = null
-  } else if (mode === 'edit' && article) {
-    formArticle.value = {
-      titre: article.titre,
-      categorie: article.categorie,
-      resume: article.resume,
-      contenu: article.contenu,
-      statut: article.statut,
-      date: article.date,
-      image: article.image,
-      imagePreview: article.image,
-      imageFile: null,
-    }
-    editId.value = article.id
-  }
-  showModal.value = true
-}
-
-const closeModal = () => {
-  showModal.value = false
-  formArticle.value = {
-    titre: '',
-    categorie: 'actualites-ambassade',
-    resume: '',
-    contenu: '',
-    statut: 'Brouillon',
-    date: new Date().toISOString().split('T')[0],
-    image: '',
-    imagePreview: '',
-    imageFile: null,
-  }
-}
-
-const saveArticle = async () => {
-  const brouillon = {
-    titre: formArticle.value.titre,
-    resume: formArticle.value.resume,
-    contenu: formArticle.value.contenu,
-    categorie_slug: formArticle.value.categorie,
-    statut: statutDepuisLibelle(formArticle.value.statut),
-    date_publication: formArticle.value.date,
-    image: formArticle.value.imagePreview || undefined,
-  }
-
-  try {
-    if (modalMode.value === 'add') {
-      await creerArticle(brouillon)
-    } else {
-      await modifierArticle(editId.value, brouillon)
-    }
-    closeModal()
-    await chargerArticles()
-  } catch (souleve) {
-    erreurApi.value = 'Enregistrement impossible. Vérifiez les champs et réessayez.'
-    console.error("Échec de l'enregistrement de l'article :", souleve)
-  }
-}
-
-const viewArticle = (article) => {
-  viewArticleData.value = article
-  showViewModal.value = true
-}
-
-const closeViewModal = () => {
-  showViewModal.value = false
-  viewArticleData.value = {}
-}
-
-const editArticle = (article) => {
-  openModal('edit', article)
-}
-
-const deleteArticle = async (id) => {
-  if (!confirm('Êtes-vous sûr de vouloir supprimer cet article ?')) return
-
-  try {
-    await supprimerArticle(id)
-    await chargerArticles()
-  } catch (souleve) {
-    erreurApi.value = 'Suppression impossible.'
-    console.error("Échec de la suppression de l'article :", souleve)
-  }
-}
-
-/**
- * L'API renvoie catégorie sous forme d'objet et statut en valeur technique.
- * Le gabarit existant attend des chaînes plates : on adapte ici plutôt que de
- * réécrire toute la vue.
- */
-const versVue = (article) => ({
-  ...article,
-  categorie: article.categorie?.slug ?? '',
-  statut: libelleStatut(article.statut),
-  date: article.date_publication,
-})
-
-const chargerArticles = async () => {
-  chargement.value = true
-  erreurApi.value = null
-  try {
-    articles.value = (await listerArticles()).map(versVue)
-  } catch (souleve) {
-    erreurApi.value = 'Impossible de charger les articles.'
-    console.error('Échec du chargement des articles :', souleve)
-  } finally {
-    chargement.value = false
-  }
-}
-
-onMounted(chargerArticles)
-</script>
-
-<style scoped>
-.articles-dashboard {
-  max-width: 100%;
-}
-</style>
