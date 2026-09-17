@@ -149,134 +149,70 @@
       </div>
     </section>
 
-    <!-- Section Services : le texte des cartes nomme le pays d'accueil de
-         l'ambassade d'origine (« visa pour les Etats-Unis »). Tant qu'il
-         n'est pas servi par l'API, il suit la rubrique des services. -->
-    <section v-if="servicesOuverts" class="py-20 bg-gray-50">
+    <!-- Section Services : servie par le CMS.
+         Elle portait six cartes ECRITES EN DUR, dont la premiere proposait
+         un « visa pour les Etats-Unis » a tous les tenants, et dont les six
+         liens menaient a /construction. Elle lit desormais les services que
+         l'ambassade a saisis, et disparait quand il n'y en a aucun : le
+         contenu est son propre interrupteur. -->
+    <section v-if="servicesEnAvant.length > 0" class="py-20 bg-gray-50">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-16">
           <h2 class="text-4xl font-bold text-primary mb-4">NOS SERVICES</h2>
           <div class="w-24 h-1 bg-secondary mx-auto mb-4"></div>
           <p class="text-gray-600 text-lg max-w-2xl mx-auto">
-            Découvrez l'ensemble de nos services consulaires pour vous accompagner dans vos
-            démarches
+            Les démarches que l'ambassade accompagne, et ce qu'il faut savoir avant de venir.
           </p>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          <!-- Visa -->
-          <div
-            class="bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-2 transition-all duration-300 border-b-4 border-secondary"
+          <router-link
+            v-for="service in servicesEnAvant"
+            :key="service.id"
+            :to="`/services/${service.slug}`"
+            class="group flex h-full flex-col bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-2 transition-all duration-300 border-b-4 border-secondary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
           >
             <div class="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mb-6">
-              <i class="bx bx-edit text-4xl text-primary"></i>
+              <IconeService :icone="service.icon" class="text-4xl text-primary" />
             </div>
-            <h3 class="text-2xl font-bold text-primary mb-3">Visa</h3>
-            <p class="text-gray-600 mb-4">
-              Demande de visa pour les États-Unis et informations sur les procédures.
-            </p>
-            <router-link
-              to="/construction"
-              class="text-accent font-semibold inline-flex items-center gap-2 hover:gap-3 transition-all"
-            >
-              En savoir plus <i class="bx bx-right-arrow-alt"></i>
-            </router-link>
-          </div>
+            <h3 class="text-2xl font-bold text-primary mb-3">{{ service.title }}</h3>
+            <p v-if="service.summary" class="text-gray-600 mb-4">{{ service.summary }}</p>
 
-          <!-- Carte consulaire -->
-          <div
-            class="bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-2 transition-all duration-300 border-b-4 border-secondary"
-          >
-            <div class="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mb-6">
-              <i class="bx bx-id-card text-4xl text-primary"></i>
-            </div>
-            <h3 class="text-2xl font-bold text-primary mb-3">Carte consulaire</h3>
-            <p class="text-gray-600 mb-4">
-              Inscription et renouvellement de votre carte consulaire.
-            </p>
-            <router-link
-              to="/construction"
-              class="text-accent font-semibold inline-flex items-center gap-2 hover:gap-3 transition-all"
+            <!-- Delai et frais : seulement ce que l'ambassade a renseigne. -->
+            <dl
+              v-if="service.delay || service.fee"
+              class="flex flex-wrap gap-x-6 gap-y-1 text-sm text-gray-500 mb-4"
             >
-              En savoir plus <i class="bx bx-right-arrow-alt"></i>
-            </router-link>
-          </div>
+              <div v-if="service.delay" class="flex gap-2">
+                <dt>Délai</dt>
+                <dd class="font-medium text-gray-700">{{ service.delay }}</dd>
+              </div>
+              <div v-if="service.fee" class="flex gap-2">
+                <dt>Frais</dt>
+                <dd class="font-medium text-gray-700">{{ service.fee }}</dd>
+              </div>
+            </dl>
 
-          <!-- Autres documents -->
-          <div
-            class="bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-2 transition-all duration-300 border-b-4 border-secondary"
-          >
-            <div class="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mb-6">
-              <i class="bx bx-file text-4xl text-primary"></i>
-            </div>
-            <h3 class="text-2xl font-bold text-primary mb-3">Autres documents</h3>
-            <p class="text-gray-600 mb-4">
-              Demande d'actes d'état civil, certificats et autres documents.
-            </p>
-            <router-link
-              to="/construction"
-              class="text-accent font-semibold inline-flex items-center gap-2 hover:gap-3 transition-all"
+            <!-- `mt-auto` colle l'appel en bas de la carte : les resumes
+                 n'ont pas la meme longueur, et sans cela « En savoir plus »
+                 flottait a une hauteur differente sur chaque carte de la
+                 rangee. -->
+            <span
+              class="mt-auto pt-2 text-accent font-semibold inline-flex items-center gap-2 group-hover:gap-3 transition-all"
             >
-              En savoir plus <i class="bx bx-right-arrow-alt"></i>
-            </router-link>
-          </div>
+              En savoir plus <i class="bx bx-right-arrow-alt" aria-hidden="true"></i>
+            </span>
+          </router-link>
+        </div>
 
-          <!-- Documents civils -->
-          <div
-            class="bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-2 transition-all duration-300 border-b-4 border-secondary"
+        <div v-if="services.services.length > servicesEnAvant.length" class="text-center mt-12">
+          <router-link
+            to="/services"
+            class="inline-flex items-center gap-2 font-semibold text-primary hover:gap-3 transition-all"
           >
-            <div class="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mb-6">
-              <i class="bx bx-certification text-4xl text-primary"></i>
-            </div>
-            <h3 class="text-2xl font-bold text-primary mb-3">Documents civils</h3>
-            <p class="text-gray-600 mb-4">
-              Légalisation, certification et authentification de documents.
-            </p>
-            <router-link
-              to="/construction"
-              class="text-accent font-semibold inline-flex items-center gap-2 hover:gap-3 transition-all"
-            >
-              En savoir plus <i class="bx bx-right-arrow-alt"></i>
-            </router-link>
-          </div>
-
-          <!-- Titre de voyage -->
-          <div
-            class="bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-2 transition-all duration-300 border-b-4 border-secondary"
-          >
-            <div class="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mb-6">
-              <i class="bx bx-trip text-4xl text-primary"></i>
-            </div>
-            <h3 class="text-2xl font-bold text-primary mb-3">Titre de voyage</h3>
-            <p class="text-gray-600 mb-4">
-              Demande et renouvellement de passeport et titres de voyage.
-            </p>
-            <router-link
-              to="/construction"
-              class="text-accent font-semibold inline-flex items-center gap-2 hover:gap-3 transition-all"
-            >
-              En savoir plus <i class="bx bx-right-arrow-alt"></i>
-            </router-link>
-          </div>
-
-          <!-- Delivery Express -->
-          <div
-            class="bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-2 transition-all duration-300 border-b-4 border-secondary"
-          >
-            <div class="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mb-6">
-              <i class="bx bx-package text-4xl text-primary"></i>
-            </div>
-            <h3 class="text-2xl font-bold text-primary mb-3">Delivery Express</h3>
-            <p class="text-gray-600 mb-4">
-              Service d'envoi et de réception de documents en express.
-            </p>
-            <router-link
-              to="/construction"
-              class="text-accent font-semibold inline-flex items-center gap-2 hover:gap-3 transition-all"
-            >
-              En savoir plus <i class="bx bx-right-arrow-alt"></i>
-            </router-link>
-          </div>
+            Voir tous les services
+            <i class="bx bx-right-arrow-alt" aria-hidden="true"></i>
+          </router-link>
         </div>
       </div>
     </section>
@@ -284,40 +220,11 @@
     <!-- Section Démarches consulaires et actualités récentes -->
     <section class="py-20 bg-white">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="grid grid-cols-1 gap-12" :class="{ 'lg:grid-cols-2': demarches.length > 0 }">
-          <!-- Demarches consulaires : servies par le CMS, et absentes tant
-               qu'aucun service n'est publie. -->
-          <div v-if="demarches.length > 0">
-            <h2 class="text-3xl font-bold text-primary mb-6 flex items-center gap-3">
-              <span class="w-2 h-8 bg-secondary rounded-full"></span>
-              Démarches consulaires
-            </h2>
-            <div class="space-y-4">
-              <router-link
-                v-for="service in demarches"
-                :key="service.id"
-                :to="`/services/${service.slug}`"
-                class="block bg-gray-50 p-5 rounded-xl hover:bg-primary hover:text-white group transition-all"
-              >
-                <div class="flex items-center justify-between gap-4">
-                  <span class="font-semibold text-lg">{{ service.title }}</span>
-                  <i
-                    class="bx bx-chevron-right text-2xl group-hover:translate-x-2 transition-transform"
-                  ></i>
-                </div>
-              </router-link>
-            </div>
-
-            <router-link
-              v-if="services.services.length > demarches.length"
-              to="/services"
-              class="inline-flex items-center gap-2 mt-6 font-semibold text-accent hover:gap-3 transition-all"
-            >
-              Voir tous les services
-              <i class="bx bx-right-arrow-alt" aria-hidden="true"></i>
-            </router-link>
-          </div>
-
+        <!-- La colonne « Demarches consulaires » vivait ici : elle listait les
+             memes services que la section NOS SERVICES ci-dessus, qui les
+             sert desormais vraiment. Deux listes du meme contenu sur une
+             seule page, c'etait une de trop. -->
+        <div>
           <!-- Actualités récentes -->
           <div>
             <h2 class="text-3xl font-bold text-primary mb-6 flex items-center gap-3">
@@ -441,6 +348,7 @@ import { useIdentite } from '@/tenant/identite'
 import { recupererContenuAccueil, CONTENU_VIDE, type ContenuAccueil } from '@/api/contenu'
 import { recupererServices, SERVICES_VIDES, type ContenuServices } from '@/api/services'
 import BanniereDiaporama from '@/components/accueil/BanniereDiaporama.vue'
+import IconeService from '@/components/services/IconeService.vue'
 import { poserEnteteEnSurimpression } from '@/tenant/banniere'
 
 const tenant = useTenantStore()
@@ -545,11 +453,13 @@ const estAmbassadeur = (dirigeant: { role: string }) =>
 const services = ref<ContenuServices>({ ...SERVICES_VIDES })
 
 /**
- * Quatre entrees au plus : la section est une mise en avant, pas la rubrique.
- * L'ordre est celui choisi par l'ambassade, deja applique par l'API.
+ * Six entrees au plus : la section est une mise en avant, pas la rubrique —
+ * `/services` sert la liste complete, et le lien « Voir tous les services »
+ * n'apparait que s'il y a effectivement plus a voir. L'ordre est celui
+ * choisi par l'ambassade, deja applique par l'API.
  */
-const DEMARCHES_EN_AVANT = 4
-const demarches = computed(() => services.value.services.slice(0, DEMARCHES_EN_AVANT))
+const SERVICES_EN_AVANT = 6
+const servicesEnAvant = computed(() => services.value.services.slice(0, SERVICES_EN_AVANT))
 
 onMounted(async () => {
   try {

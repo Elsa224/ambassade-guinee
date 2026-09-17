@@ -66,18 +66,27 @@ async function monter() {
   return wrapper
 }
 
-/** Toutes les adresses de la section qui porte les demarches. */
+/** Toutes les adresses de la section « NOS SERVICES ». */
 function liensDeLaSection(wrapper: Awaited<ReturnType<typeof monter>>): string[] {
-  const section = wrapper.findAll('section').find((s) => s.text().includes('Démarches consulaires'))
+  const section = wrapper.findAll('section').find((s) => s.text().includes('NOS SERVICES'))
   return section === undefined ? [] : section.findAll('a').map((a) => a.attributes('href') ?? '')
 }
 
-/** Les seules adresses de services : la colonne des demarches. */
-function liensDesDemarches(wrapper: Awaited<ReturnType<typeof monter>>): string[] {
+/** Les seules adresses de services de cette section. */
+function liensDesServices(wrapper: Awaited<ReturnType<typeof monter>>): string[] {
   return liensDeLaSection(wrapper).filter((href) => href.startsWith('/services'))
 }
 
-describe("demarches consulaires de l'accueil", () => {
+/**
+ * La section « NOS SERVICES » de l'accueil.
+ *
+ * Elle portait SIX cartes ecrites en dur, dont la premiere proposait un
+ * « visa pour les Etats-Unis » a tous les tenants, et dont les six liens
+ * menaient a /construction. Elle lit desormais les services saisis par
+ * l'ambassade. La colonne « Demarches consulaires » qui vivait plus bas a
+ * disparu du meme coup : elle listait le meme contenu, sur la meme page.
+ */
+describe("services de l'accueil", () => {
   beforeEach(() => {
     setActivePinia(createPinia())
   })
@@ -91,45 +100,60 @@ describe("demarches consulaires de l'accueil", () => {
 
     const wrapper = await monter()
 
-    expect(liensDesDemarches(wrapper)).toEqual(['/services/visa', '/services/passeport'])
+    expect(liensDesServices(wrapper)).toEqual(['/services/visa', '/services/passeport'])
     expect(wrapper.text()).toContain('Visa')
-    // Les quatre intitules ecrits en dur menaient tous a la page d'attente :
+    // Les six intitules ecrits en dur menaient tous a la page d'attente :
     // plus aucune adresse de cette section n'y renvoie.
     expect(liensDeLaSection(wrapper)).not.toContain('/construction')
   })
 
-  it('fait disparaitre la colonne quand le CMS ne sert aucun service', async () => {
-    // Discipline de retractation : un titre « Demarches consulaires » suspendu
+  it('fait disparaitre la section quand le CMS ne sert aucun service', async () => {
+    // Discipline de retractation : un titre « NOS SERVICES » suspendu
     // au-dessus de rien vaut moins que pas de section du tout.
     servirServices([])
 
     const wrapper = await monter()
 
-    expect(wrapper.text()).not.toContain('Démarches consulaires')
-    expect(liensDesDemarches(wrapper)).toEqual([])
+    expect(wrapper.text()).not.toContain('NOS SERVICES')
+    expect(liensDesServices(wrapper)).toEqual([])
   })
 
-  it('met en avant quatre demarches au plus, et renvoie vers la rubrique complete', async () => {
+  it('ne montre plus de visa pour les Etats-Unis a une ambassade gabonaise', async () => {
+    // Le texte en dur de la premiere carte. C'etait la troisieme fuite
+    // d'identite du gabarit, masquee par un drapeau de rubrique ; elle ne
+    // peut plus revenir, il n'y a plus de texte a masquer.
+    servirServices([service(1, 'visa', 'Visa')])
+
+    const wrapper = await monter()
+
+    expect(wrapper.text()).not.toMatch(/États-Unis|Etats-Unis|Delivery Express/)
+  })
+
+  it('met en avant six services au plus, et renvoie vers la rubrique complete', async () => {
     servirServices([
       service(1, 'visa', 'Visa'),
       service(2, 'passeport', 'Passeport'),
       service(3, 'carte-consulaire', 'Carte consulaire'),
       service(4, 'etat-civil', 'Etat civil'),
-      service(5, 'titre-de-voyage', 'Titre de voyage'),
+      service(5, 'legalisation', 'Legalisation'),
+      service(6, 'procuration', 'Procuration'),
+      service(7, 'titre-de-voyage', 'Titre de voyage'),
     ])
 
     const wrapper = await monter()
 
-    const liens = liensDesDemarches(wrapper)
-    expect(liens).toHaveLength(5)
-    expect(liens.slice(0, 4)).toEqual([
+    const liens = liensDesServices(wrapper)
+    expect(liens).toHaveLength(7)
+    expect(liens.slice(0, 6)).toEqual([
       '/services/visa',
       '/services/passeport',
       '/services/carte-consulaire',
       '/services/etat-civil',
+      '/services/legalisation',
+      '/services/procuration',
     ])
-    // La cinquieme adresse est celle de la rubrique, pas un cinquieme service.
-    expect(liens[4]).toBe('/services')
+    // La septieme adresse est celle de la rubrique, pas un septieme service.
+    expect(liens[6]).toBe('/services')
     expect(wrapper.text()).toContain('Voir tous les services')
     expect(wrapper.text()).not.toContain('Titre de voyage')
   })

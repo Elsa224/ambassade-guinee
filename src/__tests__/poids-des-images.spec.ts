@@ -37,10 +37,16 @@ describe('poids des images livrees', () => {
 
   it('trouve bien des images a verifier', () => {
     // Sans cette assertion, un chemin devenu faux rendrait les deux tests
-    // suivants verts sur un ensemble vide. Le seuil garde contre un chemin
-    // casse, pas contre un inventaire precis : supprimer une image inutilisee
-    // est une bonne chose et ne doit pas faire echouer ce test.
-    expect(images.length).toBeGreaterThan(10)
+    // suivants verts sur un ensemble vide.
+    //
+    // Ce qui est verifie ici est que le CHEMIN resout, pas qu'un inventaire
+    // est respecte. C'etait un seuil chiffre — « plus de dix » — et il a
+    // echoue le jour ou douze images devenues inutiles ont ete supprimees :
+    // un seuil chiffre finit toujours par transformer un bon menage en
+    // panne de CI. La forme ci-dessous ne peut pas passer au vert sur un
+    // ensemble vide et ne dit rien du nombre d'images.
+    expect(images.length).toBeGreaterThan(0)
+    expect(images.some((image) => image.chemin.startsWith('src/assets/images/'))).toBe(true)
   })
 
   it('ne laisse aucune image depasser le plafond unitaire', () => {
