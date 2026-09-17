@@ -138,6 +138,24 @@ function autresAdministrateursActifs(id: number): number {
 }
 
 /** Longueur minimale, celle que le vrai back applique. */
+/**
+ * Un refus de validation dans la forme EXACTE de Laravel.
+ *
+ * Le `message` d'ensemble n'est pas une phrase generique : le framework y
+ * reprend le premier message, puis compte les autres en anglais — « ... (and
+ * 2 more errors) ». Le bouchon le reproduit a la lettre, parce qu'un bouchon
+ * plus lisible que le serveur deplace le defaut jusqu'a la production : c'est
+ * precisement ce resume que le front affichait, et un `message` generique ici
+ * l'aurait cache.
+ */
+function refusValidation(erreurs: Record<string, string[]>) {
+  const messages = Object.values(erreurs).map((liste) => liste[0] ?? '')
+  const restants = messages.length - 1
+  const suffixe =
+    restants > 1 ? ` (and ${restants} more errors)` : restants === 1 ? ' (and 1 more error)' : ''
+  return { message: `${messages[0] ?? ''}${suffixe}`, errors: erreurs }
+}
+
 const LONGUEUR_MOT_DE_PASSE = 8
 const JETON_DEV = 'jeton-de-developpement'
 
@@ -802,10 +820,10 @@ export function mockApi(): Plugin {
         if (corps === null) return repondre(422, { message: 'Corps de requete illisible.' })
         for (const champ of OBLIGATOIRES[listeAnnuaire]) {
           if (typeof corps[champ] !== 'string' || (corps[champ] as string).trim() === '') {
-            return repondre(422, {
-              message: 'Le champ ' + champ + ' est obligatoire.',
-              errors: { [champ]: ['Le champ ' + champ + ' est obligatoire.'] },
-            })
+            return repondre(
+              422,
+              refusValidation({ [champ]: ['Le champ ' + champ + ' est obligatoire.'] }),
+            )
           }
         }
         const elements = annuaire()[listeAnnuaire]
@@ -836,10 +854,10 @@ export function mockApi(): Plugin {
           ids.every((id) => attendus.has(id)) &&
           new Set(ids).size === ids.length
         if (!valide) {
-          return repondre(422, {
-            message: 'La liste des identifiants est incomplete ou invalide.',
-            errors: { ids: ['La liste des identifiants est incomplete ou invalide.'] },
-          })
+          return repondre(
+            422,
+            refusValidation({ ids: ['La liste des identifiants est incomplete ou invalide.'] }),
+          )
         }
         const reordonnes = ids.map((id) => elements.find((e) => e.id === id)!)
         reordonnes.forEach((element, index) => (element.position = index + 1))
@@ -875,10 +893,10 @@ export function mockApi(): Plugin {
               champ in corps &&
               (typeof corps[champ] !== 'string' || (corps[champ] as string).trim() === '')
             ) {
-              return repondre(422, {
-                message: 'Le champ ' + champ + ' ne peut pas etre efface.',
-                errors: { [champ]: ['Le champ ' + champ + ' ne peut pas etre efface.'] },
-              })
+              return repondre(
+                422,
+                refusValidation({ [champ]: ['Le champ ' + champ + ' ne peut pas etre efface.'] }),
+              )
             }
           }
           Object.assign(elements[index]!, corps)
@@ -1423,10 +1441,7 @@ export function mockApi(): Plugin {
           if (!brouillon[champ]) manquants[champ] = ['Ce champ est obligatoire.']
         }
         if (Object.keys(manquants).length > 0) {
-          return repondre(422, {
-            message: 'Les donnees fournies sont invalides.',
-            errors: manquants,
-          })
+          return repondre(422, refusValidation(manquants))
         }
 
         const slug = `${slugifier(nom)}-${creationsAdmin.length + 1}`
@@ -1515,16 +1530,13 @@ export function mockApi(): Plugin {
       return void lireCorps().then((corps) => {
         const mime = corps?.mimeType
         if (mime !== 'image/png' && mime !== 'image/jpeg' && mime !== 'image/webp') {
-          return repondre(422, {
-            message: 'Les donnees fournies sont invalides.',
-            errors: { mimeType: ['Formats acceptes : PNG, JPEG ou WebP.'] },
-          })
+          return repondre(
+            422,
+            refusValidation({ mimeType: ['Formats acceptes : PNG, JPEG ou WebP.'] }),
+          )
         }
         if (typeof corps?.size === 'number' && corps.size > 2 * 1024 * 1024) {
-          return repondre(422, {
-            message: 'Les donnees fournies sont invalides.',
-            errors: { size: ['Le logo ne doit pas depasser 2 Mo.'] },
-          })
+          return repondre(422, refusValidation({ size: ['Le logo ne doit pas depasser 2 Mo.'] }))
         }
         return repondre(200, {
           success: true,
@@ -1574,10 +1586,10 @@ export function mockApi(): Plugin {
       return void lireCorps().then((corps) => {
         const invites = corps?.guests
         if (!Array.isArray(invites) || invites.length === 0 || invites.length > 500) {
-          return repondre(422, {
-            message: 'Les donnees fournies sont invalides.',
-            errors: { guests: ['Le lot doit compter de 1 a 500 invites.'] },
-          })
+          return repondre(
+            422,
+            refusValidation({ guests: ['Le lot doit compter de 1 a 500 invites.'] }),
+          )
         }
         const erreurs: Record<string, string[]> = {}
         invites.forEach((invite: Record<string, unknown>, rang: number) => {
@@ -1591,10 +1603,7 @@ export function mockApi(): Plugin {
           }
         })
         if (Object.keys(erreurs).length > 0) {
-          return repondre(422, {
-            message: 'Les donnees fournies sont invalides.',
-            errors: erreurs,
-          })
+          return repondre(422, refusValidation(erreurs))
         }
         // Un pixel PNG : ce qui compte est la forme (data URL PNG), pas le motif.
         const pixel =
@@ -1744,10 +1753,12 @@ export function mockApi(): Plugin {
         if ('status' in brouillon) {
           const valeur = String(brouillon.status ?? '').toLowerCase()
           if (valeur !== 'cancelled' || Object.keys(brouillon).length > 1) {
-            return repondre(422, {
-              message: 'Les donnees fournies sont invalides.',
-              errors: { status: ["Seule l'annulation est acceptee, et elle s'envoie seule."] },
-            })
+            return repondre(
+              422,
+              refusValidation({
+                status: ["Seule l'annulation est acceptee, et elle s'envoie seule."],
+              }),
+            )
           }
           if (String(trouve.status).toLowerCase() === 'cancelled') {
             return repondre(422, { message: 'Cet evenement est deja annule.' })
