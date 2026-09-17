@@ -38,10 +38,46 @@ export interface Etat {
   ton: Ton
 }
 
+/**
+ * Les trois etats d'Ambassade Secure, et il n'y en a pas d'autres.
+ *
+ * Releves dans le code du service le 2026-09-17 (`EVENT_STATUS`, fige) : le
+ * contrat du 2026-09-14 annoncait `ACTIVE`, `CANCELLED` et `COMPLETED`, et
+ * DEUX de ces trois valeurs n'existent nulle part dans le service. Le vrai
+ * jeu est `scheduled`, `cancelled`, `done`, servi VERBATIM en minuscules,
+ * sans aucune remise en forme. Les cles restent en majuscules ici parce que
+ * `etatDe` normalise avant de chercher.
+ *
+ * `done` n'est produit par aucun chemin de code aujourd'hui — aucune
+ * transition automatique ne le pose — mais il est dans l'enumeration : il
+ * est traite, pour ne pas etre decouvert le jour ou il apparaitra.
+ */
 const ETATS: Record<string, Etat> = {
-  ACTIVE: { libelle: 'En cours', ton: 'positif' },
+  SCHEDULED: { libelle: 'Programmé', ton: 'neutre' },
   CANCELLED: { libelle: 'Annulé', ton: 'attention' },
-  COMPLETED: { libelle: 'Terminé', ton: 'eteint' },
+  DONE: { libelle: 'Terminé', ton: 'eteint' },
+}
+
+/**
+ * Etats terminaux : un evenement qui y est arrive ne s'annule plus.
+ *
+ * La regle est ecrite par la NEGATIVE, et c'est le point important. Elle a
+ * d'abord ete ecrite par la positive — « annulable si ACTIVE » — et le
+ * premier vrai evenement servi par Ambassade Secure est arrive en
+ * `scheduled`, un etat que le front ne connaissait pas : le bouton
+ * « Annuler » avait purement disparu de la fiche. Un etat inconnu ne doit
+ * jamais retirer un geste, seulement ne pas en promettre un.
+ *
+ * `done` est masque ici par DECISION D'INTERFACE, pas par contrainte du
+ * serveur : celui-ci ne refuse l'annulation que sur `cancelled`, et
+ * laisserait donc annuler un evenement deja termine. Ne pas s'appuyer sur un
+ * refus d'amont pour ce cas — il n'en viendra pas.
+ */
+const ETATS_TERMINAUX = ['CANCELLED', 'DONE']
+
+/** Vrai tant que l'evenement n'est pas deja annule ou termine. */
+export function estAnnulable(statut: string): boolean {
+  return !ETATS_TERMINAUX.includes(statut.toUpperCase())
 }
 
 /**

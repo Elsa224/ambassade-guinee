@@ -23,7 +23,6 @@ async function monter(chemin: string) {
         component: { ...Vide, render: () => h('div') },
         children: [
           { path: '', component: Vide },
-          { path: 'actualites', component: Vide },
           { path: 'articles', component: Vide },
           { path: 'cartes/liste', component: Vide },
           { path: 'contenu-accueil', component: Vide },

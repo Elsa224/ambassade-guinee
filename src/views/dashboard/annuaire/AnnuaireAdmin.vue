@@ -295,7 +295,7 @@
 import { ref, reactive, onMounted } from 'vue'
 import ListeOrdonnee from '../contenu/ListeOrdonnee.vue'
 import Boite from '../contenu/Boite.vue'
-import ChampImage from '../contenu/ChampImage.vue'
+import ChampImage from '@/components/ui/ChampImage.vue'
 import { messageErreurContenu } from '@/api/contenu'
 import {
   recupererAnnuaireAdmin,

@@ -9,9 +9,17 @@ import { apiGet, apiPost, ApiError } from './client'
  * une fuite a signaler au back, pas quelque chose a contourner ici.
  */
 
-/** Carte publique d'un evenement : exactement les champs que le back expose. */
+/**
+ * Carte publique d'un evenement : exactement les champs que le back expose.
+ *
+ * `publicToken` n'est servi QUE par la liste. La fiche
+ * `GET /api/secure/events/{token}` ne le renvoie pas — ce qui est logique,
+ * il est deja dans l'URL demandee — et le front ne doit donc jamais compter
+ * dessus pour reconstruire un appel. Il est facultatif ici pour que le
+ * compilateur refuse qu'on le prenne pour acquis.
+ */
 export interface EvenementPublic {
-  publicToken: string
+  publicToken?: string
   name: string
   date: string
   time: string
