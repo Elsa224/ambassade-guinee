@@ -5,6 +5,12 @@
 > libre de la forme interne ; ce document fige **ce que le front appelle, ce
 > qu'il lit, et les refus sur lesquels il compte**. En cas d'ecart, c'est le
 > document du depot back qui tranchera, comme pour le bootstrap.
+>
+> **Amende le meme jour** apres les reponses de la session back : la section
+> « La session » est corrigee (la demande d'aligner `nom` sur `name` etait
+> sans objet, l'erreur venait du front), et la section des questions est
+> remplacee par l'etat reel du back, qui n'a aujourd'hui **ni routes
+> utilisateurs, ni role `editeur`, ni suspension, ni invitation**.
 
 ## Pourquoi
 
@@ -251,25 +257,40 @@ d'elle-meme.
    chez un autre.
 6. **Un role inconnu est refuse en ecriture** (422) plutot que converti.
 
-## La session, qui conditionne le reste
+## La session, qui conditionne le reste — regle le 2026-09-17
 
-Deux demandes, petites et bloquantes.
+Cette section posait deux demandes au back. Les deux ont ete tranchees le jour
+meme, et l'une l'a ete contre moi.
 
-**`GET /api/auth/me`** doit exister en production et rendre le compte
-authentifie. Le faux serveur local le sert deja sous la forme
-`{ "user": … }` — a confirmer, ou a aligner sur `{ "data": … }` comme les
-autres routes d'administration ; le front s'adaptera a celle que le back
-retient. Sans cette route, le role est perdu a chaque rechargement de page et
-aucune garde ne tient.
+**`GET /api/auth/me` existe et est deploye en production.** Son enveloppe n'est
+ni `{ "user": … }` seul ni `{ "data": … }` :
 
-**La forme du compte doit etre la meme partout.** Aujourd'hui `login` rend
-`nom`, alors que tout le reste de l'API est en anglais — `name` dans
-l'annuaire, dans les dirigeants, dans les services. Le CRUD ci-dessus est
-ecrit en `name`. Trois routes serviraient donc deux orthographes du meme
-champ. La bonne correction est d'aligner `login` et `me` sur `name` et la
-meme ressource que la liste ; c'est une rupture, mais elle porte sur **un seul
-champ lu a deux endroits du front**, et elle ne coutera jamais moins cher
-qu'aujourd'hui. Le front acceptera les deux le temps du deploiement.
+```json
+{ "user": { "id": 1, "name": "…", "email": "…", "role": "admin", "embassy_id": 1 },
+  "embassy": null }
+```
+
+C'est la meme forme que `POST /api/auth/login`, au jeton pres. Le front la lit
+desormais au demarrage : `restaurerSession()` ne rehydratait pas l'utilisateur,
+si bien qu'apres un rechargement on etait authentifie sans savoir qui.
+
+**La demande d'aligner `nom` sur `name` etait sans objet, et l'erreur etait de
+mon cote.** Le back n'a jamais servi `nom` : `AuthController::userPayload()`
+rend `name`, a la connexion comme sur `me`. C'est le faux serveur local qui
+avait invente le champ, et le gabarit qui s'y etait aligne — donc **le nom de
+l'administrateur connecte ne s'affichait jamais en production**, le menu se
+rabattant silencieusement sur « Administrateur ». Aucune rupture a planifier
+cote back : un bug front, corrige.
+
+La lecon vaut d'etre ecrite ici, parce qu'elle se repetera : **un bouchon qui
+s'ecarte du contrat ne simplifie pas le developpement, il deplace le bug
+jusqu'au deploiement**, ou plus personne ne le cherche. Verifier contre le code
+du back, jamais contre le faux serveur.
+
+Le store ne retient pas le bloc `embassy` servi a cote du compte : la
+configuration du site vient du bootstrap, resolu par le DOMAINE, et en garder
+une seconde copie resolue par le COMPTE ouvrirait deux verites sur la meme
+ambassade.
 
 ## Regles communes
 
@@ -296,10 +317,34 @@ demande, et le front n'a rien a en lire ; c'est la trace sans laquelle un
 - **Le bandeau « Vous editez le site de … »**, qui devient utile des qu'un
   `super_admin` entre dans l'administration d'un poste. Deja au dossier.
 
-## Ce sur quoi le front attend une reponse
+## Etat cote back au 2026-09-17
 
-1. `GET /api/auth/me` existe-t-il en production, et sous quelle enveloppe ?
-2. L'alignement de `nom` sur `name` est-il accepte, et a quelle date ?
-3. La messagerie est-elle configuree, autrement dit `invitation.sent` peut-il
-   valoir `true` aujourd'hui ?
-4. Suppression d'un compte ayant publie : refus en 422, ou auteur anonymise ?
+La session back a repondu aux quatre questions et releve l'essentiel : **cette
+surface n'existe pas encore**. Son inventaire, verifie dans son depot :
+
+- **Aucune route utilisateurs.** `routes/api.php` n'a que `auth/login`,
+  `auth/me` et `auth/logout`.
+- **Deux roles, pas trois.** `app/Enums/UserRole.php` ne declare que `admin` et
+  `super_admin` : **`editeur` n'existe pas**. La regle « un role inconnu est
+  traite comme `editeur` » reste la bonne prudence cote front, mais elle ne
+  protege rien tant que le role n'existe pas en base.
+- **Aucune notion de suspension** : la table `users` porte `embassy_id` et
+  `role`, sans colonne d'etat.
+- **Aucun mecanisme d'invitation.**
+- **La messagerie n'est pas configuree**, et surtout le depot ne contient aucun
+  Mailable ni aucune Notification : `invitation.sent` ne peut donc pas valoir
+  `true` aujourd'hui, et pas seulement faute de SMTP. Le choix de rendre `sent`
+  dans la reponse et d'afficher le lien quand il vaut `false` tient : c'est
+  meme ce qui rend la surface utilisable des le premier jour.
+- **La question du compte supprime ayant publie est sans objet** : aucune table
+  de contenu ne reference `users`, et `articles` ne porte que `embassy_id` et
+  `categorie_id`. La paternite n'etant stockee nulle part, une suppression ne
+  peut ni emporter du contenu ni laisser un auteur orphelin — mais « auteur
+  anonymise » est tout aussi impossible a afficher. Afficher un auteur serait
+  un ajout de schema, pas un choix de comportement.
+
+Ce document decrit donc un **lot back entier** — schema, role `editeur`,
+invitations, garde du dernier administrateur, refus 403 du `super_admin` depuis
+une route d'ambassade — et non un branchement. C'est une decision d'Elsa, pas
+une suite automatique. La session back a indique vouloir reprendre la garde du
+dernier administrateur telle quelle.
