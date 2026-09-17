@@ -135,7 +135,7 @@ par le compte.
 
 ```
 GET    /api/admin/content/home          -> le bloc `hero` s'ajoute a la reponse
-PUT    /api/admin/content/hero          -> remplace le bloc entier
+PUT    /api/admin/content/hero          -> remplace variant, title et intro
 DELETE /api/admin/content/hero          -> 204, l'ambassade revient au defaut
 
 POST   /api/admin/content/hero/slides         -> cree une diapositive
@@ -144,8 +144,10 @@ DELETE /api/admin/content/hero/slides/{id}    -> 204
 PUT    /api/admin/content/hero/slides/order   -> { "ids": [3, 1, 2] }
 ```
 
-Le corps du `PUT /hero` porte `variant`, `title` et `intro` — pas les
-diapositives, qui ont leurs propres routes, comme `leaders` et `showcase`. Les
+Le corps du `PUT /hero` porte `variant`, `title` et `intro`, et **rien
+d'autre** : les diapositives ont leurs propres routes, comme `leaders` et
+`showcase`. Un `PUT /hero` ne les touche pas. L'effacement franc est reserve au
+`DELETE`, et c'est la toute la difference entre les deux gestes. Les
 images passent par `POST /api/admin/content/media`, deja en place, avec les
 memes bornes (WebP, PNG ou JPEG, 5 Mo) : on televerse, le serveur rend une URL,
 et `image_url` porte cette URL a l'ecriture comme a la lecture. Le front ne
