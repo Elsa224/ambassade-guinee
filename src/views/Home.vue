@@ -6,6 +6,7 @@
       v-if="diaporamaAffiche"
       :titre="titreDeLaBanniere"
       :intro="banniere?.intro ?? null"
+      :logo="logo"
       :diapositives="banniere?.slides ?? []"
     >
       <template #boutons>
