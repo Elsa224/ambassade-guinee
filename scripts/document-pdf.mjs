@@ -133,7 +133,7 @@ function page(corps) {
   @page { size: A4; margin: 18mm 16mm 20mm; }
   * { box-sizing: border-box; }
   body {
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-family: "Trebuchet MS", "Lucida Grande", Verdana, sans-serif;
     color: ${ENCRE}; font-size: 10.5pt; line-height: 1.55; margin: 0;
   }
   h1 {
@@ -190,9 +190,12 @@ await onglet.pdf({
   printBackground: true,
   displayHeaderFooter: true,
   headerTemplate: '<div></div>',
-  footerTemplate: `<div style="width:100%;font-size:8pt;color:#8a9aa1;padding:0 16mm;
-    font-family:Helvetica,Arial,sans-serif;display:flex;justify-content:space-between;">
-    <span>${basename(entree, '.md')}</span><span class="pageNumber"></span></div>`,
+  // Chromium reduit le pied de page a une boite etroite : `flex` n'y repartit
+  // rien. Un tableau a deux colonnes est le seul agencement qui tienne.
+  footerTemplate: `<table style="width:100%;font-size:8pt;color:#8a9aa1;
+    font-family:'Trebuchet MS',Verdana,sans-serif;border:0;padding:0 16mm;">
+    <tr><td style="text-align:left;">${basename(entree, '.md')}</td>
+    <td style="text-align:right;"><span class="pageNumber"></span></td></tr></table>`,
   margin: { top: '18mm', bottom: '20mm', left: '16mm', right: '16mm' },
 })
 await navigateur.close()
