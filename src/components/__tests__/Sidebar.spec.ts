@@ -5,6 +5,7 @@ import { createPinia, setActivePinia } from 'pinia'
 import { defineComponent, h } from 'vue'
 import Sidebar from '../Sidebar.vue'
 import { useTenantStore } from '@/stores/tenant'
+import { useAuthStore } from '@/stores/auth'
 import { GABON } from '@/api/fixtures/tenants'
 
 const Vide = defineComponent({ render: () => h('div') })
@@ -40,6 +41,11 @@ async function monter(chemin: string) {
             ],
           },
           { path: 'galerie', component: Vide },
+          { path: 'annuaire', component: Vide },
+          { path: 'jours-feries', component: Vide },
+          { path: 'parametres', component: Vide },
+          { path: 'profil', component: Vide },
+          { path: 'services', component: Vide },
           { path: 'nouvelles', component: Vide },
           { path: 'presence', component: Vide },
           { path: 'projets/liste', component: Vide },
@@ -153,5 +159,63 @@ describe('barre laterale du tableau de bord', () => {
 
     const liens = wrapper.findAll('a').map((a) => a.attributes('href') ?? '')
     expect(liens).not.toContain('/dashboard/evenements')
+  })
+})
+
+/**
+ * Les deux entrees que le back reserve aux administrateurs.
+ *
+ * La garde est cosmetique — le serveur refuse en 403 — mais son SENS compte :
+ * une entree offerte a un editeur ne mene qu'a un refus, et une entree retiree
+ * a un administrateur lui ferme ses propres parametres.
+ */
+describe('entrees reservees aux administrateurs', () => {
+  beforeEach(() => {
+    setActivePinia(createPinia())
+    useTenantStore().embassy = GABON
+  })
+
+  function adresses(barre: Awaited<ReturnType<typeof monter>>): string[] {
+    return barre.findAll('a').map((lien) => lien.attributes('href') ?? '')
+  }
+
+  it('les propose a un administrateur', async () => {
+    useAuthStore().utilisateur = {
+      id: 1,
+      name: 'X',
+      email: 'x@y.test',
+      role: 'admin',
+      embassy_id: 1,
+    }
+    const barre = await monter('/dashboard')
+
+    expect(adresses(barre)).toContain('/dashboard/parametres')
+    expect(adresses(barre)).toContain('/dashboard/utilisateurs')
+  })
+
+  it('les retire a un editeur', async () => {
+    useAuthStore().utilisateur = {
+      id: 2,
+      name: 'Y',
+      email: 'y@z.test',
+      role: 'editeur',
+      embassy_id: 1,
+    }
+    const barre = await monter('/dashboard')
+
+    expect(adresses(barre)).not.toContain('/dashboard/parametres')
+    expect(adresses(barre)).not.toContain('/dashboard/utilisateurs')
+    // Le contenu, lui, reste ouvert : c'est tout ce qu'un editeur tient.
+    expect(adresses(barre)).toContain('/dashboard/articles')
+  })
+
+  it("les laisse quand l'identite n'est pas encore revenue", async () => {
+    // Ne pas savoir n'est pas un refus. Un editeur voit l'entree le temps d'un
+    // aller-retour ; un administrateur dont `/auth/me` echoue garderait
+    // sinon un tableau de bord amoindri sans raison.
+    useAuthStore().utilisateur = null
+    const barre = await monter('/dashboard')
+
+    expect(adresses(barre)).toContain('/dashboard/parametres')
   })
 })

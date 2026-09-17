@@ -42,6 +42,101 @@ const COMPTE_DEV = {
 /** Le mot de passe courant du compte de developpement, qui peut changer. */
 let motDePasseDev = IDENTIFIANTS_DEV.password
 
+/**
+ * Les comptes de l'ambassade, en memoire.
+ *
+ * Forme EXACTE de `UserResource` : `id`, `name`, `email`, `role`, `status`,
+ * `last_login_at`, `created_at`. `suspended_at` est garde a cote, et JAMAIS
+ * servi — c'est le cas du vrai back, et c'est ce qui rend le refus de renvoi
+ * d'invitation imprevisible pour le front, qui doit donc offrir le geste et
+ * laisser le serveur refuser.
+ */
+interface CompteMock {
+  id: number
+  name: string
+  email: string
+  role: string
+  status: string
+  last_login_at: string | null
+  created_at: string
+  suspended_at: string | null
+}
+
+const STATUT_ACTIF_MOCK = 'actif'
+const STATUT_SUSPENDU_MOCK = 'suspendu'
+
+const comptesMock: CompteMock[] = [
+  {
+    id: COMPTE_DEV.id,
+    name: COMPTE_DEV.name,
+    email: COMPTE_DEV.email,
+    role: COMPTE_DEV.role,
+    status: STATUT_ACTIF_MOCK,
+    last_login_at: COMPTE_DEV.last_login_at,
+    created_at: '2026-06-02T10:00:00.000000Z',
+    suspended_at: null,
+  },
+  {
+    id: 2,
+    name: 'Awa Diallo',
+    email: 'a.diallo@exemple-ambassade.test',
+    role: 'editeur',
+    status: STATUT_SUSPENDU_MOCK,
+    // Jamais connectee, et suspendue par construction depuis sa creation :
+    // `suspended_at` reste nul, donc une invitation peut lui etre renvoyee.
+    last_login_at: null,
+    created_at: '2026-09-15T09:30:00.000000Z',
+    suspended_at: null,
+  },
+  {
+    id: 3,
+    name: 'Ibrahima Camara',
+    email: 'i.camara@exemple-ambassade.test',
+    role: 'editeur',
+    status: STATUT_SUSPENDU_MOCK,
+    // Suspendu par DECISION : le renvoi d'invitation lui est refuse, et le
+    // front ne peut pas le deviner puisque `suspended_at` n'est pas servi.
+    last_login_at: '2026-08-30T14:05:00.000000Z',
+    created_at: '2026-06-20T08:00:00.000000Z',
+    suspended_at: '2026-09-10T11:00:00.000000Z',
+  },
+]
+
+let prochainIdCompte = 4
+
+/** Les invitations en cours : jeton en clair vers l'identifiant du compte. */
+const invitationsMock = new Map<string, { id: number; expire: string }>()
+
+/** Ce que le back sert d'un compte, sans `suspended_at`. */
+function compteServi(compte: CompteMock) {
+  const { suspended_at: _ignore, ...servi } = compte
+  return servi
+}
+
+/**
+ * Emet une invitation, en remplacant celle en cours.
+ *
+ * `sent` vaut toujours `false` en developpement : il n'y a pas de messagerie,
+ * exactement comme sur le vrai back aujourd'hui. C'est le cas ou l'ecran doit
+ * afficher le lien, et donc celui qu'il faut pouvoir eprouver.
+ */
+function emettreInvitationMock(compte: CompteMock) {
+  for (const [jeton, cible] of invitationsMock) {
+    if (cible.id === compte.id) invitationsMock.delete(jeton)
+  }
+  const jeton = `invitation-${compte.id}-${Date.now().toString(36)}`
+  const expire = new Date(Date.now() + 7 * 24 * 3600 * 1000).toISOString()
+  invitationsMock.set(jeton, { id: compte.id, expire })
+  return { url: `http://localhost:5173/invitation/${jeton}`, expires_at: expire, sent: false }
+}
+
+/** « Dernier » se compte sur les administrateurs ACTIFS, comme cote back. */
+function autresAdministrateursActifs(id: number): number {
+  return comptesMock.filter(
+    (autre) => autre.id !== id && autre.role === 'admin' && autre.status === STATUT_ACTIF_MOCK,
+  ).length
+}
+
 /** Longueur minimale, celle que le vrai back applique. */
 const LONGUEUR_MOT_DE_PASSE = 8
 const JETON_DEV = 'jeton-de-developpement'
@@ -899,6 +994,279 @@ export function mockApi(): Plugin {
         COMPTE_DEV.password_changed_at = new Date().toISOString()
         repondre(204, null)
       })
+    }
+
+    // --- Comptes et roles de l'ambassade -----------------------------------
+    //
+    // Refus et messages releves le 2026-09-17 dans le code du back
+    // (`UserController`, `GardesUtilisateur`, `StoreUserRequest`,
+    // `UpdateUserRequest`), mot pour mot. Un bouchon plus permissif que le
+    // serveur ne simplifie rien : il deplace le bug jusqu'au deploiement,
+    // comme l'a fait `nom` contre `name`.
+    if (chemin.startsWith('/admin/users')) {
+      if (requete.headers.authorization !== `Bearer ${JETON_DEV}`) {
+        return repondre(401, { message: 'Non authentifie.' })
+      }
+
+      // `role.admin` garde toute la surface, LECTURE COMPRISE. Passer
+      // `COMPTE_DEV.role` a `editeur` ci-dessus suffit donc a eprouver ce que
+      // voit un editeur : ni cet ecran, ni les parametres.
+      if (COMPTE_DEV.role !== 'admin' && COMPTE_DEV.role !== 'super_admin') {
+        return repondre(403, {
+          message: 'Cette action est reservee aux administrateurs de l ambassade.',
+        })
+      }
+
+      const segments = chemin.split('/').filter(Boolean).slice(2)
+      const idCible = segments.length > 0 ? Number(segments[0]) : null
+      const cible =
+        idCible === null ? null : (comptesMock.find((compte) => compte.id === idCible) ?? null)
+
+      // Un identifiant introuvable rend 404, jamais 403 : un 403 confirmerait
+      // l'existence de la ligne chez une autre ambassade.
+      if (idCible !== null && cible === null) {
+        return repondre(404, { message: 'Compte introuvable.' })
+      }
+
+      if (chemin === '/admin/users' && methode === 'GET') {
+        const parPage = Math.min(Number(url.searchParams.get('per_page') ?? 25) || 25, 100)
+        const pageDemandee = Math.max(Number(url.searchParams.get('page') ?? 1) || 1, 1)
+        const visibles = comptesMock
+          .filter((compte) => compte.role !== 'super_admin')
+          .sort((a, b) => a.name.localeCompare(b.name, 'fr'))
+        const debut = (pageDemandee - 1) * parPage
+        return repondre(200, {
+          data: visibles.slice(debut, debut + parPage).map(compteServi),
+          meta: {
+            current_page: pageDemandee,
+            last_page: Math.max(Math.ceil(visibles.length / parPage), 1),
+            per_page: parPage,
+            total: visibles.length,
+          },
+        })
+      }
+
+      if (chemin === '/admin/users' && methode === 'POST') {
+        return void lireCorps().then((corps) => {
+          if (corps === null) return repondre(422, { message: 'Corps de requete illisible.' })
+          if (corps.role === 'super_admin') {
+            return repondre(403, {
+              message: 'Le role super_admin ne peut pas etre attribue depuis une ambassade.',
+            })
+          }
+          if ('password' in corps) {
+            return repondre(422, {
+              message: 'Le mot de passe est choisi par la personne invitee.',
+            })
+          }
+          const nom = typeof corps.name === 'string' ? corps.name.trim() : ''
+          const adresse = typeof corps.email === 'string' ? corps.email.trim() : ''
+          const role = typeof corps.role === 'string' ? corps.role : ''
+          if (nom === '') return repondre(422, { message: 'Le nom est obligatoire.' })
+          if (adresse === '') return repondre(422, { message: "L'adresse est obligatoire." })
+          if (role !== 'admin' && role !== 'editeur') {
+            return repondre(422, { message: 'Role inconnu.' })
+          }
+          // Le message ne dit JAMAIS « chez une autre ambassade » : cela
+          // apprendrait a un locataire qui travaille ailleurs.
+          if (comptesMock.some((compte) => compte.email === adresse)) {
+            return repondre(422, { message: 'Cette adresse est deja utilisee.' })
+          }
+          const cree: CompteMock = {
+            id: prochainIdCompte++,
+            name: nom,
+            email: adresse,
+            role,
+            status: STATUT_SUSPENDU_MOCK,
+            last_login_at: null,
+            created_at: new Date().toISOString(),
+            suspended_at: null,
+          }
+          comptesMock.push(cree)
+          repondre(201, {
+            data: compteServi(cree),
+            invitation: emettreInvitationMock(cree),
+          })
+        })
+      }
+
+      if (cible !== null && segments[1] === 'invitation' && methode === 'POST') {
+        // Honorer une invitation pose un mot de passe : ca n'a jamais eu
+        // vocation a lever une sanction.
+        if (cible.suspended_at !== null) {
+          return repondre(422, {
+            message: 'Ce compte est suspendu ; aucune invitation ne peut lui etre envoyee.',
+          })
+        }
+        return repondre(200, {
+          data: compteServi(cible),
+          invitation: emettreInvitationMock(cible),
+        })
+      }
+
+      if (cible !== null && segments[1] === 'status' && methode === 'PATCH') {
+        return void lireCorps().then((corps) => {
+          if (corps === null) return repondre(422, { message: 'Corps de requete illisible.' })
+          const statut = corps.status
+          if (statut !== STATUT_ACTIF_MOCK && statut !== STATUT_SUSPENDU_MOCK) {
+            return repondre(422, { message: 'Le statut vaut actif ou suspendu.' })
+          }
+          if (cible.id === COMPTE_DEV.id) {
+            return repondre(422, {
+              message: 'Vous ne pouvez pas modifier votre propre compte ici.',
+            })
+          }
+          if (
+            statut === STATUT_SUSPENDU_MOCK &&
+            cible.role === 'admin' &&
+            cible.status === STATUT_ACTIF_MOCK &&
+            autresAdministrateursActifs(cible.id) === 0
+          ) {
+            return repondre(422, {
+              message: 'Cette ambassade doit garder au moins un administrateur actif.',
+            })
+          }
+          cible.status = statut
+          cible.suspended_at = statut === STATUT_SUSPENDU_MOCK ? new Date().toISOString() : null
+          repondre(200, { data: compteServi(cible) })
+        })
+      }
+
+      if (cible !== null && segments.length === 1 && methode === 'PATCH') {
+        return void lireCorps().then((corps) => {
+          if (corps === null) return repondre(422, { message: 'Corps de requete illisible.' })
+          if (corps.role === 'super_admin') {
+            return repondre(403, {
+              message: 'Le role super_admin ne peut pas etre attribue depuis une ambassade.',
+            })
+          }
+          if ('status' in corps) {
+            return repondre(422, { message: 'Le statut se change par PATCH users/{id}/status.' })
+          }
+          if ('role' in corps) {
+            const role = corps.role
+            if (role !== 'admin' && role !== 'editeur') {
+              return repondre(422, { message: 'Role inconnu.' })
+            }
+            if (cible.id === COMPTE_DEV.id) {
+              return repondre(422, {
+                message: 'Vous ne pouvez pas modifier votre propre compte ici.',
+              })
+            }
+            if (
+              cible.role === 'admin' &&
+              cible.status === STATUT_ACTIF_MOCK &&
+              role !== 'admin' &&
+              autresAdministrateursActifs(cible.id) === 0
+            ) {
+              return repondre(422, {
+                message: 'Cette ambassade doit garder au moins un administrateur actif.',
+              })
+            }
+            cible.role = role
+          }
+          if (typeof corps.name === 'string') {
+            if (corps.name.trim() === '') {
+              return repondre(422, { message: 'Le nom est obligatoire.' })
+            }
+            cible.name = corps.name.trim()
+          }
+          const reponseCompte: Record<string, unknown> = { data: compteServi(cible) }
+          if (typeof corps.email === 'string' && corps.email.trim() !== cible.email) {
+            const adresse = corps.email.trim()
+            if (comptesMock.some((compte) => compte.id !== cible.id && compte.email === adresse)) {
+              return repondre(422, { message: 'Cette adresse est deja utilisee.' })
+            }
+            cible.email = adresse
+            reponseCompte.data = compteServi(cible)
+            // L'ancien lien avait ete envoye a l'ancienne adresse : il ne doit
+            // jamais lui survivre. Un compte suspendu par decision n'en
+            // recoit pas de nouveau, le sien est seulement detruit.
+            if (cible.suspended_at !== null) {
+              for (const [jeton, vise] of invitationsMock) {
+                if (vise.id === cible.id) invitationsMock.delete(jeton)
+              }
+            } else {
+              reponseCompte.invitation = emettreInvitationMock(cible)
+            }
+          }
+          repondre(200, reponseCompte)
+        })
+      }
+
+      if (cible !== null && segments.length === 1 && methode === 'DELETE') {
+        if (cible.id === COMPTE_DEV.id) {
+          return repondre(422, {
+            message: 'Vous ne pouvez pas modifier votre propre compte ici.',
+          })
+        }
+        if (
+          cible.role === 'admin' &&
+          cible.status === STATUT_ACTIF_MOCK &&
+          autresAdministrateursActifs(cible.id) === 0
+        ) {
+          return repondre(422, {
+            message: 'Cette ambassade doit garder au moins un administrateur actif.',
+          })
+        }
+        comptesMock.splice(comptesMock.indexOf(cible), 1)
+        return repondre(204, null)
+      }
+    }
+
+    // --- Invitation : les deux routes publiques ----------------------------
+    //
+    // Le MEME 404 pour un jeton inconnu, deja consomme ou expire : distinguer
+    // les cas transformerait la route en oracle permettant de tester des
+    // jetons.
+    if (chemin.startsWith('/auth/invitation/')) {
+      const jeton = decodeURIComponent(chemin.slice('/auth/invitation/'.length))
+      const visee = invitationsMock.get(jeton)
+      const compte = visee ? comptesMock.find((autre) => autre.id === visee.id) : undefined
+      const expiree = visee ? new Date(visee.expire).getTime() < Date.now() : true
+
+      if (!visee || !compte || expiree) {
+        return repondre(404, { message: 'Invitation introuvable.' })
+      }
+
+      if (methode === 'GET') {
+        // Le nom et l'adresse, et rien d'autre : ni role, ni identifiant, ni
+        // ambassade.
+        return repondre(200, { data: { name: compte.name, email: compte.email } })
+      }
+
+      if (methode === 'POST') {
+        return void lireCorps().then((corps) => {
+          if (corps === null) return repondre(422, { message: 'Corps de requete illisible.' })
+          const nouveau = typeof corps.password === 'string' ? corps.password : ''
+          const confirmation =
+            typeof corps.password_confirmation === 'string' ? corps.password_confirmation : ''
+          if (nouveau !== confirmation) {
+            return repondre(422, { message: 'Les deux mots de passe ne correspondent pas.' })
+          }
+          if (nouveau.length < LONGUEUR_MOT_DE_PASSE) {
+            return repondre(422, {
+              message: `Le mot de passe fait au moins ${LONGUEUR_MOT_DE_PASSE} caracteres.`,
+            })
+          }
+          invitationsMock.delete(jeton)
+          compte.last_login_at = new Date().toISOString()
+          // Un compte suspendu par DECISION ne redevient pas actif parce qu'il
+          // pose un mot de passe : la sanction ne se leve que par la route de
+          // statut.
+          if (compte.suspended_at === null) compte.status = STATUT_ACTIF_MOCK
+          repondre(200, {
+            token: JETON_DEV,
+            user: {
+              id: compte.id,
+              name: compte.name,
+              email: compte.email,
+              role: compte.role,
+              embassy_id: 1,
+            },
+          })
+        })
+      }
     }
 
     if (chemin === '/auth/logout' && methode === 'POST') {
