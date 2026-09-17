@@ -169,11 +169,22 @@ premier qui l'est en plus par confort.
 
 ## Ce que le front livrera
 
-Un ecran `/dashboard/profil`, accessible a **tous les roles** — chacun peut
-lire et changer son propre compte, y compris un `lecteur`. C'est la seule
-surface du back-office qui ne depend pas du role, et c'est voulu : un compte
-qui ne peut pas changer son mot de passe est un compte qu'on ne peut pas
-securiser.
+Un ecran `/dashboard/profil`, accessible a **tous les roles** — `super_admin`,
+`admin` et `editeur`, les trois que porte `docs/contrat-utilisateurs-roles.md`
+et que l'enumeration du back applique. C'est la seule surface du back-office
+qui ne depend pas du role, et c'est voulu : un compte qui ne peut pas changer
+son mot de passe est un compte qu'on ne peut pas securiser.
+
+> **Correction du 2026-09-17.** Cette phrase citait un role `lecteur` qui
+> N'EXISTE PAS : le contrat des roles le refuse explicitement — « un
+> observateur est le role qu'on ajoute quand on n'ose pas trancher » — et
+> l'enumeration du back ne le porte pas. Releve par la session du CMS back,
+> qui a verifie contre le code. C'est la meme erreur que
+> `ACTIVE`/`COMPLETED` sur les etats d'evenement, prise un tour plus tot :
+> un role invente dans un contrat devient une condition morte dans un ecran.
+>
+> Les etats de compte, pour la meme raison, sont **`actif`** et
+> **`suspendu`** : en francais, en minuscules, tels que le back les applique.
 
 Deux sections : l'identite (nom, telephone, fonction, et le courriel affiche
 en lecture seule avec la raison), puis le mot de passe. La date du dernier
