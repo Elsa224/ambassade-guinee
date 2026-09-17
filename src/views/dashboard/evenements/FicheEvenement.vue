@@ -194,13 +194,19 @@ function donneesDeLAffiche(): DonneesAffiche | null {
   if (!donnees || !actuel) return null
   return {
     nomEvenement: actuel.name,
+    description: actuel.description ?? '',
+    typeLabel: actuel.typeLabel ?? '',
     dateLisible: dateLisible(actuel.date),
     heure: actuel.time,
     lieu: actuel.location,
     nomAmbassade: nomDeLAmbassade.value,
     urlInscription: donnees.registrationUrl,
     qr: donnees.qr,
-    logo: logoAmbassade.value === '' ? undefined : logoAmbassade.value,
+    // Le logo de l'ambassade quand le CMS en sert un ; celui de
+    // l'evenement sinon. `logoObjet` est une URL d'objet issue des octets
+    // deja recuperes avec le jeton porteur : la poser dans un canevas ne le
+    // souille pas, contrairement a une URL distante.
+    logo: logoAmbassade.value !== '' ? logoAmbassade.value : (logoObjet.value ?? undefined),
     couleurs: couleursDuTenant(),
   }
 }
@@ -230,10 +236,12 @@ async function imprimerQr(): Promise<void> {
     const style = doc.createElement('style')
     // L'affiche est deja au format A4 : elle occupe la page entiere, sans
     // marge du navigateur qui ajouterait un liseré blanc a l'impression.
+    // Le billet est CENTRE sur la feuille, pas etire dessus : c'est un
+    // billet, il doit avoir de l'air autour de lui et se decouper.
     style.textContent =
-      '@page{size:A4 portrait;margin:0}' +
-      'html,body{margin:0;padding:0}' +
-      'img{display:block;width:100%;height:auto}'
+      '@page{size:A4 portrait;margin:14mm}' +
+      'html,body{margin:0;padding:0;display:flex;justify-content:center}' +
+      'img{display:block;width:118mm;height:auto;align-self:flex-start}'
     doc.head.appendChild(style)
     const image = doc.createElement('img')
     image.alt = "Affiche d'inscription"

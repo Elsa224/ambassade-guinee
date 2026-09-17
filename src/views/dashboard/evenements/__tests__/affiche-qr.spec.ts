@@ -2,10 +2,10 @@ import { describe, it, expect } from 'vitest'
 import { couleursDuTenant, nomDeFichier } from '../affiche-qr'
 
 /**
- * L'affiche est dessinee sur un canevas, que jsdom ne sait pas rasteriser :
+ * Le billet est dessine sur un canevas, que jsdom ne sait pas rasteriser :
  * les tests portent donc sur ce qui se verifie sans contexte de dessin — la
- * provenance des couleurs et le nom du fichier partage. Le rendu lui-meme a
- * ete verifie en navigateur.
+ * provenance des couleurs et le nom du fichier partage. La composition
+ * elle-meme a ete verifiee en navigateur.
  */
 describe("couleurs de l'affiche", () => {
   it('prend les couleurs appliquees par le theme du tenant', () => {
