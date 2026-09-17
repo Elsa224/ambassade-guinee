@@ -198,6 +198,34 @@ back ; ils sont notes ici parce qu'ils conditionnent la reprise.
   main aussitot. Il s'arrete sous `prefers-reduced-motion`, et la premiere
   diapositive reste alors affichee : une banniere qui bouge toute seule n'est
   pas negociable pour qui a demande qu'elle ne bouge pas.
+- **Le texte du diaporama est pose sur un voile, pas sur la photo.** C'est la
+  seule regle de cette liste qui ne se rattrape pas apres coup, et elle merite
+  d'etre lue avant d'ecrire le gabarit.
+
+  Le controle de contraste de l'ecran des parametres juge une couleur contre
+  une autre couleur. Ici, le titre, l'accroche, la citation et la signature ne
+  sont pas poses sur une couleur : ils sont poses sur une **photographie
+  televersee par l'ambassade**. Aucune valeur n'est mesurable a l'avance, le
+  rapport varie d'un point a l'autre de la meme image, et ni le formulaire ni
+  l'API ne savent ce que contient le fichier. Une editrice qui choisit une
+  photo de ciel clair rend son propre titre illisible, et rien ne l'en
+  avertit.
+
+  La reponse est donc structurelle et non mesurable. Deux dispositifs, et les
+  deux, pas l'un ou l'autre :
+
+  1. un voile assombrissant **systematique** entre l'image et le texte, avec
+     un plancher qui ne descend pas au milieu de la banniere — la maquette
+     d'origine y passe a `black/20`, ce qui suffit devant ses trois portraits
+     sombres et ne suffira pas devant la premiere photo claire ;
+  2. derriere le seul bloc de texte, un fond plus dense encore, pour que la
+     lisibilite ne depende pas de ce que l'image contient a cet endroit-la.
+
+  Cote API, la contrainte est nulle : le back ne sert que l'URL de l'image, le
+  gabarit pose ce qu'il veut par-dessus. Point souleve par la session back le
+  2026-09-17, pendant l'implementation, et note ici plutot que decouvert par
+  une ambassade.
+
 - **Le bouton flottant « calendrier » n'est pas repris.** Il est declare
   `fixed` a l'interieur de la section : il suit donc le visiteur sur toute la
   page, alors qu'il est ecrit comme un element de la banniere. Le gabarit a
