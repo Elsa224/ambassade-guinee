@@ -1,11 +1,8 @@
 # Informations nécessaires à la mise en ligne du site
 
 **Ambassade de la République du Gabon en Guinée**
-Document préparé le 17 septembre 2026 — à retourner complété.
 
-> Ce document est rédigé avec les accents, contrairement au reste du dépôt :
-> il est destiné à être imprimé et remis à l'ambassade, pas lu par un
-> développeur.
+Document préparé le 17 septembre 2026, à retourner complété.
 
 ---
 
