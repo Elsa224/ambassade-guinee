@@ -1,6 +1,33 @@
 {
   "data": {
-    "hero": null,
+    "hero": {
+      "variant": "diaporama",
+      "title": "Représenter. Protéger. Rassembler. Coopérer.",
+      "intro": "Au service de la diplomatie gabonaise, de l’amitié entre les peuples et d’un partenariat d’avenir entre le Gabon et la Guinée. L’Ambassade porte la voix de la République Gabonaise, défend ses intérêts et œuvre au renforcement des relations d’amitié, de fraternité et de coopération avec la République de Guinée.",
+      "slides": [
+        {
+          "id": 61,
+          "image_url": "/fixtures/banniere-1.webp",
+          "quote": null,
+          "author": null,
+          "position": 1
+        },
+        {
+          "id": 62,
+          "image_url": "/fixtures/banniere-2.webp",
+          "quote": null,
+          "author": null,
+          "position": 2
+        },
+        {
+          "id": 63,
+          "image_url": "/fixtures/banniere-3.webp",
+          "quote": null,
+          "author": null,
+          "position": 3
+        }
+      ]
+    },
     "welcome": {
       "title": "Mot de bienvenue",
       "body_html": "<p>Chers compatriotes,<br />Chers amis et partenaires de la République Gabonaise,</p><p>C'est avec un réel plaisir que nous vous ouvrons les portes de l'Ambassade du Gabon en Guinée via ce site.</p>"
