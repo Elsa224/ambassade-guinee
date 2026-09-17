@@ -17,17 +17,21 @@
       aria-hidden="true"
     ></div>
 
-    <!-- Voile systematique. Le texte n'est pas pose sur une couleur mais sur
-         une photographie televersee par l'ambassade : aucun rapport de
-         contraste n'est mesurable a l'avance, et il varie d'un point a
-         l'autre de la meme image. Le degrade s'eclaircit vers la droite pour
-         laisser voir la photo, mais son plancher ne descend pas sous 55 % :
-         la maquette d'origine passait a 20 % au milieu de la banniere, ce qui
-         tient devant trois portraits sombres et pas devant la premiere photo
-         claire. Le plancher est plus haut que pour une colonne unique, parce
-         que du texte est desormais pose des deux cotes. -->
+    <!-- Voile systematique, et seul dispositif : le texte est pose dessus
+         sans cadre. Le texte n'est pas pose sur une couleur mais sur une
+         photographie televersee par l'ambassade, dont rien n'est mesurable a
+         l'avance. Le plancher est donc calcule contre le PIRE cas possible,
+         une photographie entierement blanche :
+
+           voile a 65 %  ->  texte blanc              : 6,98
+                             titre en couleur secondaire : 4,74 (jaune gabonais)
+
+         Les deux passent le seuil de 4,5, quelle que soit l'image. C'est ce
+         qui remplace le fond opaque derriere les blocs de texte : la garantie
+         est la meme, et la photographie reste visible. La maquette d'origine
+         descend a 20 %, ou le titre jaune tombe a 1,6 devant une photo claire. -->
     <div
-      class="absolute inset-0 bg-gradient-to-r from-black/75 via-black/60 to-black/55"
+      class="absolute inset-0 bg-gradient-to-r from-black/75 via-black/70 to-black/65"
       aria-hidden="true"
     ></div>
 
@@ -36,7 +40,7 @@
         <!-- Colonne de gauche : l'identite de l'ambassade. Elle ne change pas
              d'une diapositive a l'autre — c'est ce qui la distingue de la
              citation, et ce qui evite que le titre du site clignote. -->
-        <div class="bg-black/45 backdrop-blur-sm rounded-2xl px-8 py-10">
+        <div>
           <img v-if="logo" :src="logo" :alt="titre" class="w-16 mb-6" />
 
           <h1 class="text-3xl lg:text-5xl font-bold text-secondary leading-tight mb-5 text-balance">
@@ -52,7 +56,7 @@
 
         <!-- Colonne de droite : ce qui change. La citation, sa signature, et
              les pastilles numerotees qui disent laquelle on regarde. -->
-        <div class="bg-black/45 backdrop-blur-sm rounded-2xl px-8 py-10">
+        <div class="lg:border-l lg:border-white/20 lg:pl-12">
           <i class="bx bxs-quote-left text-3xl text-secondary/80" aria-hidden="true"></i>
 
           <!-- `aria-live` parce que ce bloc change tout seul : sans lui, une

@@ -211,15 +211,30 @@ back ; ils sont notes ici parce qu'ils conditionnent la reprise.
   photo de ciel clair rend son propre titre illisible, et rien ne l'en
   avertit.
 
-  La reponse est donc structurelle et non mesurable. Deux dispositifs, et les
-  deux, pas l'un ou l'autre :
+  La reponse est donc structurelle. Un voile assombrissant **systematique**
+  entre l'image et le texte, dont le plancher est calcule contre le pire cas
+  possible : une photographie entierement blanche.
 
-  1. un voile assombrissant **systematique** entre l'image et le texte, avec
-     un plancher qui ne descend pas au milieu de la banniere — la maquette
-     d'origine y passe a `black/20`, ce qui suffit devant ses trois portraits
-     sombres et ne suffira pas devant la premiere photo claire ;
-  2. derriere le seul bloc de texte, un fond plus dense encore, pour que la
-     lisibilite ne depende pas de ce que l'image contient a cet endroit-la.
+  | Voile | Texte blanc | Titre en `#FCD116` |
+  | --- | --- | --- |
+  | 45 % | 3,35 | 2,28 |
+  | 55 % | 4,76 | 3,23 |
+  | **65 %** | **6,98** | **4,74** |
+
+  A 65 %, les deux passent 4,5 quelle que soit l'image televersee. C'est ce
+  qui permet de poser le texte a nu sur la photographie, sans cadre opaque
+  derriere les blocs : la garantie est la meme, et la photographie reste
+  visible. Un fond derriere le seul bloc de texte est l'autre maniere d'y
+  arriver, avec un voile general plus leger ; les deux se valent, le plancher
+  chiffre est ce qui compte.
+
+  La maquette d'origine passe a `black/20` au milieu de la banniere, ou le
+  titre jaune tombe a 1,6 devant une photo claire. Elle ne tient que parce que
+  ses trois images sont des portraits sombres.
+
+  Amende le 2026-09-17 apres reprise de la mise en page en deux colonnes : la
+  redaction precedente exigeait les deux dispositifs a la fois, ce qui alourdit
+  la banniere sans rien garantir de plus qu'un plancher mesure.
 
   Cote API, la contrainte est nulle : le back ne sert que l'URL de l'image, le
   gabarit pose ce qu'il veut par-dessus. Point souleve par la session back le
