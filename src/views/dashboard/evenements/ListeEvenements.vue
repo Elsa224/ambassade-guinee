@@ -9,7 +9,7 @@ import {
 import { messageErreur } from '@/api/evenements'
 import { dateLisible, etatDe, remplissage } from './presentation'
 import PastilleEtat from './PastilleEtat.vue'
-import Pagination from './Pagination.vue'
+import Pagination from '@/components/ui/Pagination.vue'
 
 /**
  * Liste d'administration des evenements.
@@ -228,6 +228,7 @@ onMounted(() => charger(1))
       <Pagination
         :pagination="pagination"
         :desactive="chargement"
+        libelle-vide="Aucun évènement"
         @page="(numero) => charger(numero)"
         @limite="(lignes) => charger(1, lignes)"
       />

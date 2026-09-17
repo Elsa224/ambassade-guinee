@@ -13,7 +13,7 @@ import {
   type Pagination as PaginationServie,
 } from '@/api/evenements-admin'
 import { messageErreur } from '@/api/evenements'
-import Pagination from './Pagination.vue'
+import Pagination from '@/components/ui/Pagination.vue'
 import ChampSelect from '@/components/ui/ChampSelect.vue'
 
 /** Les trois etats du filtre de pointage, dans l'ordre d'usage. */
@@ -335,6 +335,7 @@ onMounted(() => {
         v-if="pagination && pagination.total > 0"
         :pagination="pagination"
         :desactive="chargement"
+        libelle-vide="Aucune inscription"
         @page="allerPage"
         @limite="changerLimite"
       />
