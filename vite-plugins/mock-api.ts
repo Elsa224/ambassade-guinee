@@ -237,6 +237,23 @@ export function mockApi(): Plugin {
   let prochainIdentifiant = 100
 
   /**
+   * Demandes de rendez-vous par tenant. Vides au depart : ce sont des
+   * demandes de visiteurs, rien ne doit en etre preserve d'un tenant a
+   * l'autre ni prete a une ambassade neuve.
+   */
+  type DemandeRdvMock = Record<string, unknown> & {
+    id: number
+    status: string
+    staff_note: string | null
+    updated_at: string
+  }
+  const rendezVousParTenant: Record<string, DemandeRdvMock[]> = { gabon: [], guinee: [] }
+  let dernierIdRdv = 0
+
+  /** Liste fermee au contrat. */
+  const STATUTS_RDV_MOCK = ['nouveau', 'confirme', 'refuse', 'honore', 'annule']
+
+  /**
    * Annuaire par tenant : personnel et consuls honoraires. Vide au depart,
    * comme le vrai back pour une ambassade neuve ; tout se saisit par
    * l'ecran d'administration.
@@ -471,6 +488,7 @@ export function mockApi(): Plugin {
 
     // --- Services consulaires ---------------------------------------------
     const servicesDuTenant = () => servicesParTenant[estGabon ? 'gabon' : 'guinee']!
+    const rendezVousDuTenant = () => rendezVousParTenant[estGabon ? 'gabon' : 'guinee']!
     const listeServices = () => servicesDuTenant().services as Record<string, unknown>[]
 
     if (chemin === '/content/services' || chemin === '/admin/content/services') {
@@ -612,6 +630,103 @@ export function mockApi(): Plugin {
     if (chemin === '/admin/content/ambassador' && methode === 'DELETE') {
       contenu().ambassador = null
       return repondre(204, null)
+    }
+
+    // --- Rendez-vous -------------------------------------------------------
+    //
+    // Le faux serveur applique les refus du contrat plutot que d'accepter
+    // tout : la maquette qu'il remplace confirmait sans rien envoyer, et un
+    // bouchon permissif reproduirait ce defaut un cran plus loin.
+    if (chemin === '/content/appointments' && methode === 'POST') {
+      return void lireCorps().then((corps) => {
+        if (corps === null) return repondre(400, { message: 'Corps de requete illisible.' })
+
+        const erreurs: Record<string, string[]> = {}
+        const texte = (cle: string) => (typeof corps[cle] === 'string' ? String(corps[cle]) : '')
+        const exige = (cle: string, message: string) => {
+          if (texte(cle).trim() === '') erreurs[cle] = [message]
+        }
+        exige('service', 'Le service est obligatoire.')
+        exige('last_name', 'Le nom est obligatoire.')
+        exige('first_name', 'Le prenom est obligatoire.')
+        exige('email', "L'adresse de courriel est obligatoire.")
+        exige('phone', 'Le telephone est obligatoire.')
+        exige('preferred_date', 'La date souhaitee est obligatoire.')
+        exige('preferred_time', "L'heure souhaitee est obligatoire.")
+
+        if (texte('email') !== '' && !texte('email').includes('@')) {
+          erreurs.email = ["L'adresse de courriel n'est pas valide."]
+        }
+
+        // La borne des deux jours est tenue par le serveur, pas seulement par
+        // le formulaire : un front n'est pas une garantie.
+        const plusTot = new Date()
+        plusTot.setDate(plusTot.getDate() + 2)
+        const bornee = plusTot.toISOString().slice(0, 10)
+        if (texte('preferred_date') !== '' && texte('preferred_date') < bornee) {
+          erreurs.preferred_date = [
+            "La date doit etre posterieure d'au moins deux jours a aujourd'hui.",
+          ]
+        }
+
+        if (Object.keys(erreurs).length > 0) return repondre(422, refusValidation(erreurs))
+
+        const demande = {
+          ...corps,
+          id: ++dernierIdRdv,
+          reference: `RDV-${new Date().getFullYear()}-${String(dernierIdRdv).padStart(6, '0')}`,
+          status: 'nouveau',
+          staff_note: null,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        }
+        rendezVousDuTenant().unshift(demande)
+        repondre(201, {
+          data: {
+            reference: demande.reference,
+            status: demande.status,
+            created_at: demande.created_at,
+          },
+        })
+      })
+    }
+
+    if (chemin === '/admin/appointments' && methode === 'GET') {
+      const statut = url.searchParams.get('status')
+      const demandes = rendezVousDuTenant().filter((d) => !statut || d.status === statut)
+      return repondre(200, {
+        data: demandes,
+        meta: { current_page: 1, last_page: 1 },
+      })
+    }
+
+    if (chemin.startsWith('/admin/appointments/')) {
+      const id = Number(chemin.split('/')[3])
+      const demande = rendezVousDuTenant().find((d) => d.id === id)
+      if (!demande) return repondre(404, { message: 'Demande introuvable.' })
+
+      if (methode === 'DELETE') {
+        const liste = rendezVousDuTenant()
+        liste.splice(liste.indexOf(demande), 1)
+        return repondre(204, null)
+      }
+
+      if (methode === 'PATCH') {
+        return void lireCorps().then((corps) => {
+          if (corps === null) return repondre(400, { message: 'Corps de requete illisible.' })
+          if (typeof corps.status === 'string') {
+            if (!STATUTS_RDV_MOCK.includes(corps.status)) {
+              return repondre(422, refusValidation({ status: ['Le statut est inconnu.'] }))
+            }
+            demande.status = corps.status
+          }
+          if ('staff_note' in corps) {
+            demande.staff_note = typeof corps.staff_note === 'string' ? corps.staff_note : null
+          }
+          demande.updated_at = new Date().toISOString()
+          repondre(200, { data: demande })
+        })
+      }
     }
 
     // --- Banniere d'accueil ------------------------------------------------
