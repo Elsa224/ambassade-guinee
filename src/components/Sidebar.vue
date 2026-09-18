@@ -104,6 +104,18 @@
             <span v-if="!isCollapsed">Utilisateurs</span>
           </router-link>
 
+          <!-- L'entree suit le module : sans lui, aucune demande ne peut
+               arriver, et l'ecran n'afficherait qu'une liste vide. -->
+          <router-link
+            v-if="rendezVousOuverts"
+            to="/dashboard/rendez-vous"
+            class="flex items-center gap-3 px-4 py-2 rounded-xl text-white no-underline transition-all duration-300 text-sm font-medium hover:bg-yellow-500/20 hover:text-secondary hover:translate-x-1"
+            :active-class="LIEN_ACTIF"
+          >
+            <i class="bx bxs-calendar-check text-xl flex-shrink-0"></i>
+            <span v-if="!isCollapsed">Rendez-vous</span>
+          </router-link>
+
           <router-link
             to="/dashboard/jours-feries"
             class="flex items-center gap-3 px-4 py-2 rounded-xl text-white no-underline transition-all duration-300 text-sm font-medium hover:bg-yellow-500/20 hover:text-secondary hover:translate-x-1"
@@ -203,6 +215,8 @@ const tenant = useTenantStore()
  * `tenant/module-administration.ts`.
  */
 const evenementsOuverts = computed(() => etatDuModule('secure_events', tenant) === 'ouvert')
+
+const rendezVousOuverts = computed(() => etatDuModule('rendez_vous', tenant) === 'ouvert')
 
 /**
  * Les surfaces qui engagent l'ambassade, reservees aux administrateurs.

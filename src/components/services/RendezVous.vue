@@ -5,8 +5,16 @@
       <div class="absolute inset-0 bg-black/20"></div>
       <div class="relative max-w-7xl mx-auto px-4 py-16 md:py-20">
         <div class="text-center">
-          <div class="inline-block bg-white/20 backdrop-blur px-4 py-1 rounded-full text-sm mb-4">
-            🇬🇳 Service aux citoyens
+          <div
+            class="inline-flex items-center gap-2 bg-white/20 backdrop-blur px-4 py-1 rounded-full text-sm mb-4"
+          >
+            <img
+              v-if="identite.drapeau.value"
+              :src="identite.drapeau.value"
+              alt=""
+              class="h-4 w-6 object-cover rounded-sm"
+            />
+            Service aux citoyens
           </div>
           <h1 class="text-4xl md:text-5xl font-bold mb-4">Prise de rendez-vous</h1>
           <p class="text-xl md:text-2xl max-w-3xl mx-auto opacity-90">
@@ -43,13 +51,16 @@
               Formulaire de rendez-vous
             </h2>
 
-            <form @submit.prevent="submitRendezVous" class="space-y-6">
+            <form @submit.prevent="envoyerDemande" class="space-y-6">
               <!-- Type de service -->
               <div>
                 <label class="block text-sm font-semibold text-gray-700 mb-2">
                   Type de service *
                 </label>
-                <ChampSelect v-model="formData.service" :options="OPTIONS_FORMDATA_SERVICE" />
+                <ChampSelect v-model="formulaire.service" :options="optionsService" />
+                <p v-if="erreurs.service" class="mt-2 text-sm text-red-600" role="alert">
+                  {{ erreurs.service }}
+                </p>
               </div>
 
               <!-- Informations personnelles -->
@@ -58,10 +69,13 @@
                   <label class="block text-sm font-semibold text-gray-700 mb-2"> Nom * </label>
                   <input
                     type="text"
-                    v-model="formData.nom"
+                    v-model="formulaire.last_name"
                     class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
                     required
                   />
+                  <p v-if="erreurs.last_name" class="mt-2 text-sm text-red-600" role="alert">
+                    {{ erreurs.last_name }}
+                  </p>
                 </div>
                 <div>
                   <label class="block text-sm font-semibold text-gray-700 mb-2">
@@ -69,10 +83,13 @@
                   </label>
                   <input
                     type="text"
-                    v-model="formData.prenom"
+                    v-model="formulaire.first_name"
                     class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
                     required
                   />
+                  <p v-if="erreurs.first_name" class="mt-2 text-sm text-red-600" role="alert">
+                    {{ erreurs.first_name }}
+                  </p>
                 </div>
               </div>
 
@@ -81,10 +98,13 @@
                   <label class="block text-sm font-semibold text-gray-700 mb-2"> Email * </label>
                   <input
                     type="email"
-                    v-model="formData.email"
+                    v-model="formulaire.email"
                     class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
                     required
                   />
+                  <p v-if="erreurs.email" class="mt-2 text-sm text-red-600" role="alert">
+                    {{ erreurs.email }}
+                  </p>
                 </div>
                 <div>
                   <label class="block text-sm font-semibold text-gray-700 mb-2">
@@ -92,10 +112,13 @@
                   </label>
                   <input
                     type="tel"
-                    v-model="formData.telephone"
+                    v-model="formulaire.phone"
                     class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
                     required
                   />
+                  <p v-if="erreurs.phone" class="mt-2 text-sm text-red-600" role="alert">
+                    {{ erreurs.phone }}
+                  </p>
                 </div>
               </div>
 
@@ -105,13 +128,19 @@
                   <label class="block text-sm font-semibold text-gray-700 mb-2">
                     Date souhaitée *
                   </label>
-                  <ChampDate v-model="formData.date" :min="dateMin" requis />
+                  <ChampDate v-model="formulaire.preferred_date" :min="dateMin" requis />
+                  <p v-if="erreurs.preferred_date" class="mt-2 text-sm text-red-600" role="alert">
+                    {{ erreurs.preferred_date }}
+                  </p>
                 </div>
                 <div>
                   <label class="block text-sm font-semibold text-gray-700 mb-2">
                     Heure souhaitée *
                   </label>
-                  <ChampSelect v-model="formData.heure" :options="OPTIONS_FORMDATA_HEURE" />
+                  <ChampSelect v-model="formulaire.preferred_time" :options="OPTIONS_HEURE" />
+                  <p v-if="erreurs.preferred_time" class="mt-2 text-sm text-red-600" role="alert">
+                    {{ erreurs.preferred_time }}
+                  </p>
                 </div>
               </div>
 
@@ -121,7 +150,7 @@
                   Documents à apporter *
                 </label>
                 <textarea
-                  v-model="formData.documents"
+                  v-model="formulaire.documents"
                   rows="3"
                   class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
                   placeholder="Listez les documents que vous apporterez (passeport, formulaire, etc.)"
@@ -135,26 +164,29 @@
                   Message (optionnel)
                 </label>
                 <textarea
-                  v-model="formData.message"
+                  v-model="formulaire.message"
                   rows="3"
                   class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
                   placeholder="Informations complémentaires..."
                 ></textarea>
               </div>
 
+              <p
+                v-if="echec"
+                class="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+                role="alert"
+              >
+                {{ echec }}
+              </p>
+
               <!-- Bouton soumission - CENTRÉ -->
               <div class="flex justify-center pt-4">
                 <button
                   type="submit"
-                  :disabled="isSubmitting"
+                  :disabled="envoi"
                   class="bg-accent text-white px-10 py-4 rounded-lg font-semibold hover:bg-accent-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-3 text-lg shadow-lg hover:shadow-xl"
                 >
-                  <svg
-                    v-if="isSubmitting"
-                    class="animate-spin h-5 w-5"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                  >
+                  <svg v-if="envoi" class="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
                     <circle
                       class="opacity-25"
                       cx="12"
@@ -196,20 +228,10 @@
               </svg>
               Horaires d'ouverture
             </h3>
-            <div class="space-y-2">
-              <div class="flex justify-between py-2 border-b border-gray-100">
-                <span class="text-gray-600">Lundi - Jeudi</span>
-                <span class="font-semibold">09:00 - 16:00</span>
-              </div>
-              <div class="flex justify-between py-2 border-b border-gray-100">
-                <span class="text-gray-600">Vendredi</span>
-                <span class="font-semibold">09:00 - 13:00</span>
-              </div>
-              <div class="flex justify-between py-2">
-                <span class="text-gray-600">Samedi - Dimanche</span>
-                <span class="font-semibold text-accent">Fermé</span>
-              </div>
-            </div>
+            <p v-if="identite.horaires.value" class="text-gray-600">
+              {{ identite.horaires.value }}
+            </p>
+            <p v-else class="text-gray-500">Les horaires d’ouverture ne sont pas encore publiés.</p>
           </div>
 
           <!-- Coordonnées -->
@@ -253,7 +275,7 @@
                 </svg>
                 <div>
                   <p class="font-semibold">Téléphone</p>
-                  <p class="text-gray-600">+1 (202) 986-4300</p>
+                  <p class="text-gray-600">{{ identite.telephone.value || 'Non communiqué' }}</p>
                 </div>
               </div>
               <div class="flex items-start gap-3">
@@ -272,10 +294,10 @@
                 </svg>
                 <div>
                   <p class="font-semibold">Email</p>
-                  <p class="text-gray-600">consulat@ambaguinee-usa.org</p>
+                  <p class="text-gray-600">{{ identite.courriel.value }}</p>
                 </div>
               </div>
-              <div class="flex items-start gap-3">
+              <div v-if="identite.adresse.value" class="flex items-start gap-3">
                 <svg
                   class="w-5 h-5 text-accent mt-1"
                   fill="none"
@@ -297,7 +319,7 @@
                 </svg>
                 <div>
                   <p class="font-semibold">Adresse</p>
-                  <p class="text-gray-600">2112 Leroy Place, NW<br />Washington, D.C. 20008</p>
+                  <p class="text-gray-600 whitespace-pre-line">{{ identite.adresse.value }}</p>
                 </div>
               </div>
             </div>
@@ -331,7 +353,7 @@
               </li>
               <li class="flex items-start gap-2">
                 <span class="text-secondary">✓</span>
-                <span>Preuve de résidence aux États-Unis</span>
+                <span>Justificatif de domicile dans le pays de résidence</span>
               </li>
             </ul>
           </div>
@@ -340,8 +362,10 @@
 
       <!-- Modal de confirmation -->
       <div
-        v-if="showModal"
+        v-if="accuse"
         class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+        role="dialog"
+        aria-modal="true"
       >
         <div class="bg-white rounded-2xl max-w-md w-full p-8 text-center">
           <div
@@ -361,13 +385,17 @@
               ></path>
             </svg>
           </div>
-          <h3 class="text-2xl font-bold text-gray-800 mb-2">Demande envoyée !</h3>
-          <p class="text-gray-600 mb-6">
-            Votre demande de rendez-vous a été enregistrée avec succès.<br />
-            Nous vous contacterons sous 48h pour confirmer votre rendez-vous.
+          <h3 class="text-2xl font-bold text-gray-800 mb-2">Demande enregistrée</h3>
+          <p class="text-gray-600 mb-4">
+            Le service consulaire vous recontactera pour confirmer la date et l’heure de votre
+            rendez-vous.
+          </p>
+          <p class="mb-6 text-gray-600">
+            Conservez votre référence :
+            <span class="font-semibold text-gray-800">{{ accuse.reference }}</span>
           </p>
           <button
-            @click="closeModal"
+            @click="fermerConfirmation"
             class="bg-accent text-white px-6 py-3 rounded-lg font-semibold hover:bg-accent-dark transition-colors"
           >
             Fermer
@@ -378,25 +406,51 @@
   </div>
 </template>
 
-<script setup>
-import { ref, reactive } from 'vue'
+<script setup lang="ts">
+import { ref, reactive, computed, onMounted } from 'vue'
 import ChampSelect from '@/components/ui/ChampSelect.vue'
 import ChampDate from '@/components/ui/ChampDate.vue'
 import { aujourdHui, decaler, versIso } from '@/components/ui/dates'
+import { useIdentite } from '@/tenant/identite'
+import { recupererServices, type Service } from '@/api/services'
+import {
+  envoyerDemandeRendezVous,
+  estTropDeDemandes,
+  DELAI_MINIMAL_EN_JOURS,
+  SERVICE_AUTRE,
+  type AccuseRendezVous,
+} from '@/api/rendez-vous'
+import { erreursDeChamp } from '@/api/evenements-admin'
+import { ApiError, messageDeLEchec } from '@/api/client'
 
-const OPTIONS_FORMDATA_SERVICE = [
+const identite = useIdentite()
+
+/**
+ * Les services proposes sont ceux que l'ambassade a publies.
+ *
+ * La liste etait ecrite en dur et venait du gabarit guineen : elle offrait un
+ * rendez-vous pour des services qu'une autre ambassade n'assure pas. Quand le
+ * poste n'a rien publie, il ne reste que « Autre service », ce qui est
+ * honnete : le champ libre porte alors la demande.
+ */
+const services = ref<Service[]>([])
+
+const optionsService = computed(() => [
   { valeur: '', libelle: 'Sélectionnez un service' },
-  { valeur: 'consulat', libelle: 'Services consulaires' },
-  { valeur: 'passeport', libelle: 'Demande de passeport' },
-  { valeur: 'carte-consulaire', libelle: 'Carte consulaire' },
-  { valeur: 'etat-civil', libelle: "Actes d'état civil" },
-  { valeur: 'legalisation', libelle: 'Légalisation de documents' },
-  { valeur: 'visa', libelle: 'Information visa' },
-  { valeur: 'ambassadeur', libelle: "Audience avec l'Ambassadeur" },
-  { valeur: 'autre', libelle: 'Autre service' },
-]
+  ...services.value.map((service) => ({ valeur: service.slug, libelle: service.title })),
+  { valeur: SERVICE_AUTRE, libelle: 'Autre service' },
+])
 
-const OPTIONS_FORMDATA_HEURE = [
+onMounted(async () => {
+  try {
+    services.value = (await recupererServices()).services
+  } catch {
+    // Le formulaire reste utilisable : « Autre service » suffit a envoyer.
+    services.value = []
+  }
+})
+
+const OPTIONS_HEURE = [
   { valeur: '', libelle: 'Sélectionnez une heure' },
   { valeur: '09:00', libelle: '09:00' },
   { valeur: '09:30', libelle: '09:30' },
@@ -411,55 +465,76 @@ const OPTIONS_FORMDATA_HEURE = [
   { valeur: '16:00', libelle: '16:00' },
 ]
 
-// État du formulaire
-const formData = reactive({
+/**
+ * Les champs portent les noms du contrat, et ce n'est pas une paresse : le
+ * serveur range ses refus de validation par nom de champ, et c'est ce qui
+ * permet de poser chaque message sous le champ qu'il concerne.
+ */
+const formulaire = reactive({
   service: '',
-  nom: '',
-  prenom: '',
+  last_name: '',
+  first_name: '',
   email: '',
-  telephone: '',
-  date: '',
-  heure: '',
+  phone: '',
+  preferred_date: '',
+  preferred_time: '',
   documents: '',
   message: '',
 })
 
-// État de soumission
-const isSubmitting = ref(false)
-const showModal = ref(false)
+const envoi = ref(false)
+const erreurs = ref<Record<string, string>>({})
+const echec = ref<string | null>(null)
+
+/** L'accuse du serveur. Tant qu'il est nul, rien n'a ete enregistre. */
+const accuse = ref<AccuseRendezVous | null>(null)
 
 // Date minimale : aujourd'hui plus deux jours. Le calcul reste en heure
 // locale — `toISOString()` rend une date UTC, qui recule d'un jour a l'ouest
-// de Greenwich et proposerait un creneau trop tot.
-const dateMin = ref(versIso(decaler(aujourdHui(), 2)))
+// de Greenwich et proposerait un creneau trop tot. Le serveur applique la
+// meme borne : un front n'est pas une garantie.
+const dateMin = ref(versIso(decaler(aujourdHui(), DELAI_MINIMAL_EN_JOURS)))
 
-// Soumission du formulaire
-const submitRendezVous = async () => {
-  isSubmitting.value = true
-
-  // Simuler l'envoi au serveur (à remplacer par votre API)
+/**
+ * Envoie la demande, et n'affiche la confirmation qu'apres la reponse.
+ *
+ * Ce composant simulait l'envoi : un `setTimeout`, un `console.log`, puis la
+ * fenetre « enregistree avec succes ». La demande du citoyen etait jetee et
+ * il repartait en croyant avoir un rendez-vous consulaire.
+ */
+async function envoyerDemande() {
+  envoi.value = true
+  erreurs.value = {}
+  echec.value = null
   try {
-    await new Promise((resolve) => setTimeout(resolve, 1500))
-    console.log('Rendez-vous demandé:', formData)
-
-    // Réinitialiser le formulaire
-    Object.keys(formData).forEach((key) => {
-      formData[key] = ''
-    })
-
-    // Afficher le modal de confirmation
-    showModal.value = true
-  } catch (error) {
-    console.error("Erreur lors de l'envoi:", error)
-    alert('Une erreur est survenue. Veuillez réessayer.')
+    accuse.value = await envoyerDemandeRendezVous({ ...formulaire })
+    for (const cle of Object.keys(formulaire) as (keyof typeof formulaire)[]) {
+      formulaire[cle] = ''
+    }
+  } catch (souleve) {
+    erreurs.value = erreursDeChamp(souleve)
+    echec.value = messageDuRefus(souleve)
   } finally {
-    isSubmitting.value = false
+    envoi.value = false
   }
 }
 
-// Fermer le modal
-const closeModal = () => {
-  showModal.value = false
+/** Le texte du bandeau d'echec, selon ce que le serveur a refuse. */
+function messageDuRefus(souleve: unknown): string {
+  if (estTropDeDemandes(souleve)) {
+    return 'Trop de demandes ont été envoyées depuis cet appareil. Réessayez dans quelques minutes.'
+  }
+  if (Object.keys(erreurs.value).length > 0) {
+    return 'Certains champs doivent être corrigés avant l’envoi.'
+  }
+  if (souleve instanceof ApiError && souleve.corpsPorteUnMessage) {
+    return messageDeLEchec(souleve.corps, souleve.statut)
+  }
+  return "Votre demande n'a pas pu être envoyée. Vérifiez votre connexion et réessayez."
+}
+
+function fermerConfirmation() {
+  accuse.value = null
 }
 </script>
 

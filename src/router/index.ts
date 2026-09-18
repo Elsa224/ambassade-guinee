@@ -209,6 +209,11 @@ const router = createRouter({
         },
         { path: 'jours-feries', name: 'jours-feries-admin', component: JoursFeriesAdmin },
         {
+          path: 'rendez-vous',
+          name: 'rendez-vous-admin',
+          component: () => import('@/views/dashboard/rendez-vous/RendezVousAdmin.vue'),
+        },
+        {
           path: 'evenements',
           component: RacineEvenementsAdmin,
           children: [
