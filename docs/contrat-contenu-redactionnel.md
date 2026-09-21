@@ -93,7 +93,8 @@ Les regles, dans l'ordre d'importance :
    discipline de retractation que les jours feries et le contenu d'accueil :
    le front n'affiche alors rien, et surtout ne retombe jamais sur le gabarit.
 2. **`slug` est pris dans une liste fermee**, celle des pages que le gabarit
-   sait dessiner : `presentation`, `chancellerie`, `relations-bilaterales`.
+   sait dessiner : `presentation`, `chancellerie`, `relations-bilaterales`,
+   `ambition-numerique`.
    Ce n'est pas un identifiant libre : chaque slug correspond a une route du
    site. **La liste se ferme cote serveur** : un `PUT` sur un slug inconnu rend
    422, il ne cree pas une ligne que personne ne lira jamais. Le front ignore
@@ -222,6 +223,38 @@ ailleurs :
   fuites d'identite du gabarit, voir `docs/` et la PR #78.
 - Un ecran d'administration `/dashboard/contenu/pages` recoit les trois pages,
   la juridiction et les chiffres ; un second recoit les relations bilaterales.
+
+## Decisions d'Elsa, 2026-09-21
+
+Quatre decisions prises apres presentation d'une maquette des trois pages
+composee avec le texte reel de la fiche. Elles ne se rediscutent pas ici.
+
+1. **Une quatrieme page, `ambition-numerique`.** Le texte de la fiche sur la
+   digitalisation annonce des services qui n'existent pas encore — rendez-vous
+   en ligne, pre-demandes, suivi de dossier. Il est publie tel quel, sans etre
+   reecrit, mais sur une page qui se presente explicitement comme une vision et
+   non comme une offre de services. D'ou le quatrieme slug de la liste fermee.
+2. **La Chancellerie presente l'annuaire groupe par service**, et non un
+   organigramme dessine. Un organigramme est un developpement a part qui devra
+   etre tenu a la main a chaque mouvement de personnel ; obsolete, il est pire
+   qu'une liste exacte.
+   **Consequence pour le back, et c'est la seule demande nouvelle de cette
+   revision :** `MembrePersonnel` n'a aujourd'hui ni service ni departement
+   (`id, name, role, email, phone, image_url, position`). Sans ce champ, il n'y
+   a pas de regroupement possible, seulement une liste a plat dont l'ordre
+   suggere la structure sans la nommer. Le front demande donc **un champ
+   facultatif `department`** sur le personnel de l'annuaire : chaine de 120
+   caracteres au plus, `null` par defaut. Les membres sans departement se
+   rangent en fin de liste, sans titre de groupe. Rien d'autre de l'annuaire ne
+   bouge.
+3. **Les chiffres marquants s'affichent a trois valeurs** : annee d'ouverture,
+   nombre de domaines de cooperation, nombre de pays sous juridiction. Le
+   chiffre de la communaute gabonaise en Guinee n'a pas ete fourni et le bloc ne
+   l'attend pas. Cela confirme que `figures` doit accepter une liste de
+   longueur libre, et non quatre cases imposees.
+4. **Le lot « pages » passe avant le lot « relations bilaterales »**, et les
+   deux avant le relais des rendez-vous vers Ambassade Secure. C'est l'ordre de
+   priorite que la session back avait demande a Elsa de trancher.
 
 ## Ce qui reste a trancher par le back
 
