@@ -10,6 +10,8 @@ import Ambassadeur from '@/components/ambassade/Ambassadeur.vue'
 import Chancellerie from '@/components/ambassade/Chancellerie.vue'
 import ConsulsHonoraires from '@/components/ambassade/ConsulsHonoraires.vue'
 import Calendrier from '@/components/ambassade/Calendrier.vue'
+import Presentation from '@/components/ambassade/Presentation.vue'
+import RelationsBilaterales from '@/views/RelationsBilaterales.vue'
 import { useTenantStore } from '@/stores/tenant'
 import type { Embassy } from '@/api/bootstrap'
 import { GUINEE, GABON, GABON_AVANT_COLONNES } from '@/api/fixtures/tenants'
@@ -53,6 +55,9 @@ let annuaireServi: unknown
 /** Ce que le CMS sert pour les jours feries pendant un test donne. */
 let feriesServies: unknown
 
+/** Ce que le CMS sert pour les pages redactionnelles pendant un test donne. */
+let pagesServies: unknown
+
 function reponse(corps: unknown) {
   return new Response(JSON.stringify(corps), {
     status: 200,
@@ -66,7 +71,9 @@ function routeur(chemin: string) {
     routes: [
       { path: '/', component: Home },
       { path: '/actualite', component: Actualite },
-      { path: '/presentation', component: Vide },
+      { path: '/presentation', component: Presentation },
+      { path: '/relations-bilaterales', component: RelationsBilaterales },
+      { path: '/ambition-numerique', component: Vide },
       { path: '/ambassadeur', component: Ambassadeur },
       { path: '/chancellerie', component: Chancellerie },
       { path: '/consuls-honoraires', component: ConsulsHonoraires },
@@ -106,11 +113,13 @@ describe("etancheite de l'identite entre ambassades", () => {
         if (chemin.includes('/api/content/directory'))
           return Promise.resolve(reponse(annuaireServi))
         if (chemin.includes('/api/content/holidays')) return Promise.resolve(reponse(feriesServies))
+        if (chemin.includes('/api/content/pages')) return Promise.resolve(reponse(pagesServies))
         return Promise.resolve(reponse({ data: articlesGabon.data }))
       }),
     )
     contenuServi = { data: { welcome: null, leaders: [], showcase: [] } }
     annuaireServi = { data: { staff: [], consuls: [] } }
+    pagesServies = { data: { pages: [], jurisdiction: [], figures: [] } }
     feriesServies = {
       data: {
         year: 2026,
@@ -153,6 +162,40 @@ describe("etancheite de l'identite entre ambassades", () => {
     }
     const remplie = await rendre('/ambassadeur', GABON)
     expect(remplie.text()).toContain('Persis Lionel Essono Ondo')
+    expect(remplie.text().match(IDENTITE_ETRANGERE)).toBeNull()
+  })
+
+  it('ne laisse aucune trace guineenne sur les pages redactionnelles', async () => {
+    // Ces pages portaient pres de 3 000 lignes ecrites en dur : juridiction
+    // americaine, « 186 ambassades a Washington DC », les relations de la
+    // Guinee avec quatre pays. Vides comme remplies du texte officiel
+    // gabonais, rien de guineen ne doit rester.
+    for (const chemin of ['/presentation', '/relations-bilaterales']) {
+      const vide = await rendre(chemin, GABON)
+      expect(vide.text().match(IDENTITE_ETRANGERE)).toBeNull()
+    }
+
+    pagesServies = {
+      data: {
+        pages: [
+          {
+            id: 1,
+            slug: 'presentation',
+            title: 'Une representation au service de l Etat',
+            subtitle: null,
+            hero_image_url: null,
+            body_html: '<p>L Ambassade de la Republique Gabonaise en Republique de Guinee.</p>',
+            position: 1,
+            published: true,
+          },
+        ],
+        jurisdiction: ['Republique de Guinee'],
+        figures: [{ value: '2026', label: 'Annee d ouverture de la mission' }],
+      },
+    }
+    const remplie = await rendre('/presentation', GABON)
+    expect(remplie.text()).toContain('Une representation au service de l Etat')
+    expect(remplie.text()).toContain('2026')
     expect(remplie.text().match(IDENTITE_ETRANGERE)).toBeNull()
   })
 

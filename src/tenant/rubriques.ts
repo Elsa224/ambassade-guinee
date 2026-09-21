@@ -11,6 +11,13 @@ export const RUBRIQUE_PAR_CHEMIN: Readonly<Record<string, string>> = {
   // plus : les trois pages sont servies par le CMS et se retractent
   // d'elles-memes quand il ne sert rien, comme `/ambassadeur`. Leur garde
   // n'existait que parce que leur contenu etait ecrit en dur.
+  //
+  // `/presentation`, `/relations-bilaterales` et `/ambition-numerique` les
+  // ont rejointes le 21/09/2026, avec le contrat du contenu redactionnel :
+  // leur texte vient du CMS, et une page non publiee affiche « Rubrique en
+  // preparation » sans que la configuration ait a le dire. Les cinq pages
+  // pays qui dependaient de `bilateral` ont ete supprimees avec leurs
+  // routes.
   '/services-ambassadeur': 'services',
   // Le formulaire porte les pieces exigees par un seul pays d'accueil
   // (« preuve de residence aux USA ») : il suit la rubrique des services et
@@ -18,16 +25,9 @@ export const RUBRIQUE_PAR_CHEMIN: Readonly<Record<string, string>> = {
   '/demarche-ligne': 'services',
   '/consulat': 'consulat',
   '/rendez-vous': 'rendez_vous',
-  '/presentation': 'presentation',
   // `/ambassadeur` ne figure plus ici : la page est servie par le bloc
   // `ambassador` du CMS et se retracte d'elle-meme quand il est vide. La
   // garde n'existait que parce que la biographie etait ecrite en dur.
-  '/relations-bilaterales': 'bilateral',
-  '/usa': 'bilateral',
-  '/costa-rica': 'bilateral',
-  '/haiti': 'bilateral',
-  '/bahamas': 'bilateral',
-  '/fond-monetaire': 'bilateral',
 }
 
 /** Nom de la rubrique dont depend un chemin, ou `null` s'il est toujours ouvert. */

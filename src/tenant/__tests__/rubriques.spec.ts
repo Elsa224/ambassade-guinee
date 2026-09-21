@@ -45,19 +45,28 @@ describe('ouverture des rubriques selon l ambassade', () => {
 
     expect(ouvert('/')).toBe(true)
     expect(ouvert('/actualite')).toBe(true)
+    // Les pages servies par le CMS se retractent d'elles-memes : elles ne
+    // dependent plus d'aucune rubrique. `/presentation`,
+    // `/relations-bilaterales` et `/ambition-numerique` les ont rejointes avec
+    // le contrat du contenu redactionnel.
     expect(ouvert('/presentation')).toBe(true)
-    // Les trois pages servies par le CMS se retractent d'elles-memes : elles
-    // ne dependent plus d'aucune rubrique.
+    expect(ouvert('/relations-bilaterales')).toBe(true)
+    expect(ouvert('/ambition-numerique')).toBe(true)
     expect(ouvert('/ambassadeur')).toBe(true)
     expect(ouvert('/chancellerie')).toBe(true)
     expect(ouvert('/consuls-honoraires')).toBe(true)
     expect(ouvert('/calendrier')).toBe(true)
   })
 
-  it('ferme les six pages de relations bilaterales d un seul drapeau', () => {
+  it('n a plus de drapeau bilateral a fermer', () => {
+    // Les cinq pages pays ont ete supprimees avec leurs routes : elles
+    // decrivaient les relations de la Guinee avec quatre pays qui ne
+    // concernent aucune autre ambassade. `/relations-bilaterales` est servie
+    // par le CMS et se retracte d'elle-meme. Une ambassade qui declarerait
+    // encore `bilateral: false` ne doit donc plus rien voir se fermer.
     useTenantStore().embassy = { modules: { bilateral: false } } as unknown as Embassy
 
-    const bilaterales = [
+    const anciennes = [
       '/relations-bilaterales',
       '/usa',
       '/costa-rica',
@@ -66,7 +75,9 @@ describe('ouverture des rubriques selon l ambassade', () => {
       '/fond-monetaire',
     ]
 
-    expect(bilaterales.filter((chemin) => ouvert(chemin))).toEqual([])
+    expect(anciennes.filter((chemin) => !ouvert(chemin))).toEqual([])
+    expect(Object.values(RUBRIQUE_PAR_CHEMIN)).not.toContain('bilateral')
+    expect(Object.values(RUBRIQUE_PAR_CHEMIN)).not.toContain('presentation')
   })
 
   describe('sur les deux ambassades reellement configurees', () => {
@@ -84,19 +95,7 @@ describe('ouverture des rubriques selon l ambassade', () => {
       const fermes = Object.keys(RUBRIQUE_PAR_CHEMIN).filter((chemin) => !ouvert(chemin))
 
       expect(fermes.sort()).toEqual(
-        [
-          '/bahamas',
-          '/consulat',
-          '/costa-rica',
-          '/fond-monetaire',
-          '/haiti',
-          '/presentation',
-          '/relations-bilaterales',
-          '/rendez-vous',
-          '/services-ambassadeur',
-          '/demarche-ligne',
-          '/usa',
-        ].sort(),
+        ['/consulat', '/rendez-vous', '/services-ambassadeur', '/demarche-ligne'].sort(),
       )
     })
 
