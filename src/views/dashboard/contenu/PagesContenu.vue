@@ -328,7 +328,7 @@ const libelleDe = (slug: SlugDePage) =>
  */
 function estVisible(slug: SlugDePage): boolean {
   const page = pageDe(slug)
-  return page !== null && page.published && (page.body_html ?? '') !== ''
+  return page !== null && page.published === true && (page.body_html ?? '') !== ''
 }
 
 function ouvrir(slug: SlugDePage): void {

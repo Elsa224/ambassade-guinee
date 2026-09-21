@@ -42,7 +42,15 @@ export interface PageRedactionnelle {
   /** Assaini cote serveur : le front l'insere avec `v-html`. */
   body_html: string | null
   position: number
-  published: boolean
+  /**
+   * Absent de la surface VISITEUR, present sur celle d'administration.
+   *
+   * Ce n'est pas une negligence du serveur : la surface visiteur ne sert que
+   * ce qui est publie, donc le champ n'y porterait aucune information. Il est
+   * donc facultatif ici, et l'ecran d'administration le lit avec un repli.
+   * Le declarer obligatoire ferait mentir le type sur la moitie des reponses.
+   */
+  published?: boolean
 }
 
 /**
@@ -150,8 +158,11 @@ export async function recupererPagesAdmin(): Promise<ContenuDesPages> {
 /** Ce qu'un ecran d'administration envoie pour une page. */
 export type PageSaisie = Pick<
   PageRedactionnelle,
-  'title' | 'subtitle' | 'hero_image_url' | 'body_html' | 'published'
->
+  'title' | 'subtitle' | 'hero_image_url' | 'body_html'
+> & {
+  /** Obligatoire a l'ecriture, meme si la lecture visiteur ne le porte pas. */
+  published: boolean
+}
 
 /**
  * Enregistre une page : creation ou remplacement, sans distinction.

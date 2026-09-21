@@ -61,6 +61,28 @@ describe('pages redactionnelles servies par le CMS', () => {
     expect(pageParSlug(contenu, 'chancellerie')).toBeNull()
   })
 
+  it('accepte une page servie sans le champ de publication', () => {
+    // La surface VISITEUR ne sert que ce qui est publie, donc elle omet
+    // `published` : le champ n'y porterait aucune information. Le front ne
+    // doit pas s'attendre a le trouver — ni le traiter comme « non publie ».
+    const contenu = normaliserPages({
+      pages: [
+        {
+          id: 1,
+          slug: 'presentation',
+          title: 'Titre',
+          subtitle: null,
+          hero_image_url: null,
+          body_html: '<p>Corps</p>',
+          position: 1,
+        },
+      ],
+    })
+
+    expect(contenu.pages).toHaveLength(1)
+    expect(contenu.pages[0]?.published).toBeUndefined()
+  })
+
   it('sert la juridiction et les chiffres tels quels', () => {
     const contenu = normaliserPages({
       pages: [],

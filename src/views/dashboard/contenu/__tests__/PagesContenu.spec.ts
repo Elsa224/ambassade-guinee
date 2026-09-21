@@ -102,6 +102,23 @@ describe("ecran de saisie des pages de l'ambassade", () => {
     expect(wrapper.text()).not.toContain('Visible sur le site')
   })
 
+  it('traite comme masquee une page servie sans champ de publication', async () => {
+    // Defensif : si l'administration servait un jour la forme visiteur, qui
+    // omet `published`, mieux vaut annoncer « masquee » que promettre a tort
+    // qu'une page est en ligne.
+    servir({
+      data: {
+        pages: [{ ...page('presentation'), published: undefined }],
+        jurisdiction: [],
+        figures: [],
+      },
+    })
+
+    const wrapper = await monter()
+
+    expect(wrapper.text()).not.toContain('Visible sur le site')
+  })
+
   it("envoie tous les champs a l'adresse du contrat, effacements compris", async () => {
     // Le remplacement est COMPLET : un sous-titre efface doit partir a `null`
     // et non rester absent du corps, sinon l'ancienne valeur survit.
