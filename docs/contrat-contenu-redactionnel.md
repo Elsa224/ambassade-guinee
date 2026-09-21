@@ -8,6 +8,13 @@
 > interne ; ce document fige **ce que le front appelle et ce qu'il lit**. En
 > cas d'ecart, c'est le document du depot back qui tranchera, comme pour le
 > bootstrap, le contenu d'accueil et les services consulaires.
+>
+> **Amende le 2026-09-21 par la session back**, qui prend le contrat sur le
+> fond. Ses corrections sont integrees ici : la liste de slugs se ferme cote
+> serveur et non cote front, `body_html` exige une colonne `mediumtext`, la
+> route de televersement de documents existe deja, et l'incident 500 sur le
+> mot de bienvenue n'avait pas la cause que ce document lui pretait — il est
+> corrige depuis le 2026-09-17.
 
 ## Pourquoi
 
@@ -88,16 +95,23 @@ Les regles, dans l'ordre d'importance :
 2. **`slug` est pris dans une liste fermee**, celle des pages que le gabarit
    sait dessiner : `presentation`, `chancellerie`, `relations-bilaterales`.
    Ce n'est pas un identifiant libre : chaque slug correspond a une route du
-   site. Une page dont le slug est inconnu du front est ignoree, sans erreur.
-   Ouvrir des pages libres est un sujet distinct, voir « Ce qui reste a
-   trancher ».
+   site. **La liste se ferme cote serveur** : un `PUT` sur un slug inconnu rend
+   422, il ne cree pas une ligne que personne ne lira jamais. Le front ignore
+   sans erreur un slug qu'il ne sait pas dessiner, mais c'est une ceinture, pas
+   la fermeture. Amendement de la session back, 2026-09-21 : la liste est
+   fermee ou elle ne l'est pas. Ouvrir des pages libres est un sujet distinct,
+   voir « Ce qui reste a trancher ».
 3. **`published` a `false` retire la page du payload visiteur.** Le front ne
    filtre pas : ce qui est servi est publie. Le champ n'apparait que sur la
    surface d'administration.
 4. **`body_html` est assaini par le serveur**, profil « riche » (titres,
    listes, liens, gras, italique, tableaux), comme le corps des services
    consulaires. Le front le rend sans le retoucher ; il ne peut donc pas etre
-   le maillon de confiance.
+   le maillon de confiance. Rappel de la session back : le profil riche
+   n'admet ni `img`, ni `style`, ni `class`, et les liens ressortent en
+   `target="_blank" rel="noreferrer noopener"`. Un texte officiel colle depuis
+   un traitement de texte perdra donc ses images en ligne et sa mise en forme
+   d'origine — a verifier avant la saisie, pas apres.
 5. **`subtitle` et `hero_image_url` sont facultatifs** et valent `null`. Le
    bandeau se rabat alors sur le nom de l'ambassade servi par le bootstrap,
    comme le fait deja `/chancellerie`.
@@ -166,13 +180,17 @@ Deux precisions que le front demande noir sur blanc, pour avoir ete mordu
 ailleurs :
 
 - **`PUT /api/admin/pages/{slug}` cree ou remplace.** Les pages ne se creent
-  pas : leur liste est fermee. Un `PUT` sur un slug qui n'a pas encore de ligne
-  doit la creer, et non rendre 404 — c'est exactement le chemin qui a produit
-  l'incident 500 sur `PUT /api/admin/content/welcome` en production.
+  pas : leur liste est fermee, et un `PUT` sur un slug de la liste qui n'a pas
+  encore de ligne doit la creer plutot que rendre 404. Le precedent est le mot
+  de bienvenue, dont le controleur fait un `updateOrCreate` sur l'ambassade
+  depuis son premier commit et rend 200 dans les deux cas : les pages suivent
+  le meme patron. **Accorde par la session back le 2026-09-21.**
 - **Le remplacement est complet.** Un champ absent du corps est mis a `null`,
-  il n'est pas conserve. Si le back prefere la fusion, qu'il le dise : le front
-  enverra tous les champs dans les deux cas, mais l'ecran d'administration
-  n'affichera pas la meme promesse.
+  il n'est pas conserve. **Accorde par la session back le 2026-09-21**, qui
+  signale le piege : un `updateOrCreate` nourri de `validated()` ne pose que
+  les cles presentes, si bien qu'un champ absent declare `nullable` verrait son
+  ancienne valeur survivre — une fusion silencieuse la ou le contrat promet
+  `null`. Les champs absents sont donc normalises a `null` avant l'ecriture.
 
 ## Bornes des champs
 
@@ -183,7 +201,7 @@ ailleurs :
 | `subtitle` | chaine ou null | 200 caracteres |
 | `country_name` | chaine | 2 a 120 caracteres, obligatoire |
 | `summary` | chaine ou null | 400 caracteres |
-| `body_html` | chaine ou null | 200 000 caracteres avant assainissement |
+| `body_html` | chaine ou null | 200 000 caracteres avant assainissement — **exige une colonne `mediumtext`** |
 | `hero_image_url`, `flag_image_url` | URL ou null | image televersee par le CMS |
 | `position` | entier | 0 a 9 999 |
 | `published` | booleen | defaut `false` |
@@ -213,10 +231,16 @@ ailleurs :
    prevoir des maintenant des pages libres avec leur entree de menu, ou
    attendre qu'une ambassade le demande ? Le front recommande d'attendre : une
    page libre demande un editeur de menu, qui est un chantier a part.
-2. **Documents a telecharger.** Le CMS televerse des IMAGES. La fiche gabonaise
-   annonce des formulaires consulaires a telecharger, et ils n'ont aucun endroit
-   ou se poser. Le nombre et le format ont ete demandes a l'ambassade ; si la
-   reponse est « une dizaine de PDF », c'est un contrat de plus, pas un champ.
+2. **Documents a telecharger.** ~~Le CMS televerse des IMAGES.~~ **Corrige par
+   la session back le 2026-09-21 : c'est faux.**
+   `POST /api/admin/content/document` existe depuis le lot des services
+   consulaires — champ `file`, type verifie sur le contenu reel et non sur
+   l'extension annoncee, borne a 5 Mo, rend `{"data": {"url": "…"}}` en 201.
+   C'est la jumelle deliberee de la route d'images, separee precisement pour
+   qu'un PDF ne puisse pas se glisser dans l'`image_url` d'un dirigeant. Le
+   stockage n'est donc pas un chantier : il ne manque que l'endroit ou
+   **attacher et lister** un document sur une page, soit quelques champs. Le
+   nombre et le format ont ete demandes a l'ambassade.
 3. **`og:description`.** La demande de contrat du 2026-09-15 laissait ce champ
    sans porteur. Le `subtitle` de la page `presentation` pourrait le porter, ou
    un champ dedie dans les parametres de l'ambassade. A trancher avec le point
