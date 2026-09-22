@@ -55,7 +55,7 @@
               "
               :style="
                 categorieActive === categorie.slug
-                  ? { backgroundColor: categorie.couleur }
+                  ? { backgroundColor: couleurDeCategorie(categorie) }
                   : undefined
               "
             >
@@ -109,7 +109,7 @@
                 <div class="flex items-center gap-3 mb-4">
                   <span
                     class="px-3 py-1 rounded-full text-sm font-semibold text-white"
-                    :style="{ backgroundColor: actualiteUne.categorie?.couleur }"
+                    :style="{ backgroundColor: couleurDeCategorie(actualiteUne.categorie) }"
                   >
                     {{ actualiteUne.categorie?.nom }}
                   </span>
@@ -162,7 +162,7 @@
               <div class="absolute top-4 left-4 flex gap-2">
                 <span
                   class="px-3 py-1 rounded-full text-xs font-semibold text-white"
-                  :style="{ backgroundColor: actualite.categorie?.couleur }"
+                  :style="{ backgroundColor: couleurDeCategorie(actualite.categorie) }"
                 >
                   {{ actualite.categorie?.nom }}
                 </span>
@@ -299,6 +299,7 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import { useActualites, formaterDate } from '@/composables/useActualites'
+import { couleurDeCategorie } from '@/api/articles'
 
 const { articles, categories, chargement, erreur, recharger } = useActualites()
 

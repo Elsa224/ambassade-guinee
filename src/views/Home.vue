@@ -246,7 +246,7 @@
                 <div class="flex items-start gap-4">
                   <div
                     class="w-16 h-16 rounded-xl flex items-center justify-center text-white font-bold text-center leading-tight shrink-0"
-                    :style="{ backgroundColor: actu.categorie?.couleur }"
+                    :style="{ backgroundColor: couleurDeCategorie(actu.categorie) }"
                   >
                     {{ formaterDateCourte(actu.date_publication) }}
                   </div>
@@ -298,7 +298,7 @@
             <div class="h-48 overflow-hidden relative">
               <div
                 class="absolute top-4 left-4 text-white px-3 py-1 rounded-full text-sm font-semibold z-10"
-                :style="{ backgroundColor: actu.categorie?.couleur }"
+                :style="{ backgroundColor: couleurDeCategorie(actu.categorie) }"
               >
                 {{ actu.categorie?.nom }}
               </div>
@@ -344,6 +344,7 @@
 import { computed, onMounted, onBeforeUnmount, watch, ref } from 'vue'
 import { useActualites, formaterDate, formaterDateCourte } from '@/composables/useActualites'
 import { useTenantStore } from '@/stores/tenant'
+import { couleurDeCategorie } from '@/api/articles'
 import { useIdentite } from '@/tenant/identite'
 import { recupererContenuAccueil, CONTENU_VIDE, type ContenuAccueil } from '@/api/contenu'
 import { recupererServices, SERVICES_VIDES, type ContenuServices } from '@/api/services'

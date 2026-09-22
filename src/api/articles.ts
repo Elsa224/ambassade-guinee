@@ -8,7 +8,19 @@ export interface Categorie {
   id: number
   nom: string
   slug: string
-  couleur: string
+  /** Facultative cote serveur, et aucune vue ne s'en sert aujourd'hui. */
+  couleur: string | null
+}
+
+/**
+ * Couleur de fond d'une pastille de categorie.
+ *
+ * `couleur` est facultative cote serveur : une categorie creee sans elle
+ * ressort a `null`. Les pastilles posent du texte blanc sur ce fond — sans
+ * repli, le libelle deviendrait invisible sur la photographie.
+ */
+export function couleurDeCategorie(categorie: Categorie | null | undefined): string {
+  return categorie?.couleur || 'var(--color-primary-dark)'
 }
 
 export interface Article {
@@ -115,6 +127,18 @@ export function statutDepuisLibelle(libelle: string): StatutArticle {
  */
 export async function listerCategories(): Promise<Categorie[]> {
   const reponse = await apiGet<Enveloppe<Categorie[]>>('/api/admin/categories')
+  return reponse.data
+}
+
+/**
+ * Cree une categorie pour l'ambassade courante.
+ *
+ * Le slug n'est pas envoye : le serveur le derive du nom et le rend unique
+ * par ambassade. Deux ambassades peuvent donc porter le meme intitule sans
+ * se marcher dessus.
+ */
+export async function creerCategorie(nom: string): Promise<Categorie> {
+  const reponse = await apiPost<Enveloppe<Categorie>>('/api/admin/categories', { nom })
   return reponse.data
 }
 

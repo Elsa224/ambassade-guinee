@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
 import {
   listerArticles,
   listerArticlesAdmin,
+  creerCategorie,
   listerCategories,
   listerArticlesPublies,
   recupererArticleParSlug,
@@ -173,6 +174,27 @@ describe('service Articles', () => {
 
     expect(vi.mocked(fetch).mock.calls[0]![0]).toBe('/api/admin/categories')
     expect(categories[0]!.nom).toBe('Actualités')
+  })
+
+  it("cree une categorie en n'envoyant que son nom", async () => {
+    // Le slug n'est pas envoye : le serveur le derive du nom et le rend
+    // unique par ambassade.
+    vi.mocked(fetch).mockResolvedValue(
+      reponse(
+        { data: { id: 7, nom: "Actualités de l'ambassade", slug: 'actualites', couleur: null } },
+        201,
+      ),
+    )
+
+    const categorie = await creerCategorie("Actualités de l'ambassade")
+
+    const [url, options] = vi.mocked(fetch).mock.calls[0]!
+    expect(url).toBe('/api/admin/categories')
+    expect((options as RequestInit).method).toBe('POST')
+    expect(JSON.parse((options as RequestInit).body as string)).toEqual({
+      nom: "Actualités de l'ambassade",
+    })
+    expect(categorie.id).toBe(7)
   })
 
   it('cree un article par POST', async () => {
