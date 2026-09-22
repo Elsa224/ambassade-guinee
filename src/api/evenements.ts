@@ -1,4 +1,9 @@
-import { apiGet, apiPost, ApiError } from './client'
+import { apiGet, apiPost, ApiError, genreErreur, type GenreErreur } from './client'
+
+// Reexportes : les deux etaient nes ici, et la page d'inscription les importe
+// depuis ce module. Ils vivent desormais dans `client.ts`, ou le relais des
+// rendez-vous les prend aussi — ce sont des statuts HTTP, pas des evenements.
+export { genreErreur, type GenreErreur }
 
 /**
  * Surface visiteur du module Evenements.
@@ -51,33 +56,6 @@ export interface DemandeInscription {
 
 interface Enveloppe<T> {
   data: T
-}
-
-/** Nature d'un echec, pour que l'interface le presente au bon endroit. */
-export type GenreErreur = 'introuvable' | 'impossible' | 'saisie' | 'trop_de_requetes' | 'panne'
-
-/**
- * Traduit le statut HTTP en nature d'erreur.
- *
- * Le back normalise tout ce qui vient d'Ambassade Secure : il ne reste que
- * cinq cas. Un 502 est une panne de service et ne doit jamais etre presente
- * comme une faute de saisie du visiteur.
- */
-export function genreErreur(souleve: unknown): GenreErreur {
-  if (!(souleve instanceof ApiError)) return 'panne'
-  switch (souleve.statut) {
-    case 404:
-      return 'introuvable'
-    case 409:
-      return 'impossible'
-    case 422:
-      return 'saisie'
-    case 429:
-      return 'trop_de_requetes'
-    default:
-      // 502, et toute panne reseau, que le client rapporte avec le statut 0.
-      return 'panne'
-  }
 }
 
 const MESSAGES_DE_REPLI: Record<GenreErreur, string> = {
