@@ -30,9 +30,12 @@
               />
               {{ nomDeLAmbassade }}
             </div>
-            <h1 class="text-4xl md:text-5xl font-bold mb-4">La Chancellerie Diplomatique</h1>
-            <p class="text-xl md:text-2xl max-w-3xl mx-auto opacity-90">
-              Au service de la représentation diplomatique et des relations bilatérales
+            <h1 class="text-4xl md:text-5xl font-bold mb-4">{{ titreDeLaPage }}</h1>
+            <p
+              v-if="sousTitreDeLaPage !== ''"
+              class="text-xl md:text-2xl max-w-3xl mx-auto opacity-90"
+            >
+              {{ sousTitreDeLaPage }}
             </p>
             <div class="flex justify-center gap-4 mt-8">
               <div class="w-16 h-1 bg-accent"></div>
@@ -51,6 +54,17 @@
             ></path>
           </svg>
         </div>
+      </div>
+
+      <!-- La presentation de la chancellerie, servie par le CMS, avant les
+           personnes. Elle reste en texte suivi : c'est un preambule a
+           l'annuaire, pas un mandat a embrasser du regard comme sur les
+           pages que `PageRedaction` dessine. -->
+      <div v-if="corpsDeLaPage !== ''" class="max-w-7xl mx-auto px-4 pt-12">
+        <div
+          class="bg-white rounded-2xl shadow-sm p-6 md:p-8 contenu-cms text-gray-700 max-w-3xl"
+          v-html="corpsDeLaPage"
+        ></div>
       </div>
 
       <div class="max-w-7xl mx-auto px-4 py-12">
@@ -154,6 +168,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { recupererAnnuaire, grouperParService, ANNUAIRE_VIDE, type Annuaire } from '@/api/annuaire'
 import { recupererContenuAccueil, CONTENU_VIDE, type ContenuAccueil } from '@/api/contenu'
+import { recupererPages, pageParSlug, PAGES_VIDES, type ContenuDesPages } from '@/api/pages'
 import { useIdentite, articleDuPays } from '@/tenant/identite'
 
 /**
@@ -173,6 +188,7 @@ import { useIdentite, articleDuPays } from '@/tenant/identite'
  */
 const annuaire = ref<Annuaire>({ ...ANNUAIRE_VIDE })
 const contenu = ref<ContenuAccueil>({ ...CONTENU_VIDE })
+const pages = ref<ContenuDesPages>({ ...PAGES_VIDES })
 const chargement = ref(true)
 
 const { nomOfficiel, nomDeLAmbassade, drapeau } = useIdentite()
@@ -191,7 +207,37 @@ const personnel = computed(() => annuaire.value.staff)
  */
 const groupes = computed(() => grouperParService(personnel.value))
 const ambassadeur = computed(() => contenu.value.ambassador)
-const aDuContenu = computed(() => personnel.value.length > 0 || ambassadeur.value !== null)
+
+/**
+ * La page `chancellerie` du contenu redactionnel.
+ *
+ * Son texte etait saisissable dans l'administration depuis le lot « pages »
+ * mais n'etait affiche nulle part : cette route rend l'annuaire, pas
+ * `PageRedaction`. Elsa a tranche le 22/09/2026 — il se place AU-DESSUS de
+ * l'equipe, en preambule.
+ */
+const pageDeLaChancellerie = computed(() => pageParSlug(pages.value, 'chancellerie'))
+const corpsDeLaPage = computed(() => pageDeLaChancellerie.value?.body_html ?? '')
+
+/**
+ * Le titre et le sous-titre saisis passent avant ceux du gabarit.
+ *
+ * Les ignorer ferait mentir l'ecran d'administration, qui les presente comme
+ * les deux premiers champs de la page. Le repli reste le texte du gabarit,
+ * qui ne nomme aucune ambassade en particulier.
+ */
+const titreDeLaPage = computed(
+  () => pageDeLaChancellerie.value?.title ?? 'La Chancellerie Diplomatique',
+)
+const sousTitreDeLaPage = computed(() =>
+  pageDeLaChancellerie.value === null
+    ? 'Au service de la représentation diplomatique et des relations bilatérales'
+    : (pageDeLaChancellerie.value.subtitle ?? ''),
+)
+
+const aDuContenu = computed(
+  () => personnel.value.length > 0 || ambassadeur.value !== null || corpsDeLaPage.value !== '',
+)
 
 /** Les fiches alternent les couleurs de l'ambassade, dans l'ordre servi. */
 const BORDURES = ['border-accent', 'border-secondary', 'border-primary-light'] as const
@@ -200,12 +246,14 @@ const bordureDuRang = (rang: number) => BORDURES[rang % BORDURES.length]
 onMounted(async () => {
   // Les deux lectures sont independantes : l'echec de l'une ne doit pas
   // priver la page de l'autre.
-  const [listes, accueil] = await Promise.allSettled([
+  const [listes, accueil, redactionnel] = await Promise.allSettled([
     recupererAnnuaire(),
     recupererContenuAccueil(),
+    recupererPages(),
   ])
   if (listes.status === 'fulfilled') annuaire.value = listes.value
   if (accueil.status === 'fulfilled') contenu.value = accueil.value
+  if (redactionnel.status === 'fulfilled') pages.value = redactionnel.value
   chargement.value = false
 })
 </script>
