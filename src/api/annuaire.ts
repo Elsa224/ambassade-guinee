@@ -22,7 +22,91 @@ export interface MembrePersonnel {
   email: string | null
   phone: string | null
   image_url: string | null
+  /**
+   * Le service auquel l'agent appartient, quand l'ambassade le renseigne.
+   *
+   * Ajoute le 21/09/2026 : la page de la chancellerie presente l'annuaire
+   * GROUPE PAR SERVICE plutot qu'un organigramme dessine, qu'il faudrait tenir
+   * a la main a chaque mouvement de personnel. Sans ce champ il n'y a pas de
+   * regroupement possible, seulement une liste a plat dont l'ordre suggere la
+   * structure sans jamais la nommer.
+   *
+   * Facultatif et `null` par defaut : tant qu'il vaut `null` partout, la page
+   * se comporte exactement comme avant.
+   */
+  department: string | null
   position: number
+}
+
+/**
+ * Un service et les agents qui le composent, dans l'ordre servi.
+ *
+ * `nom` vaut `null` pour les membres sans service : ils se rangent en fin de
+ * liste, sans titre de groupe.
+ */
+export interface GroupeDePersonnel {
+  nom: string | null
+  membres: MembrePersonnel[]
+}
+
+/**
+ * Regroupe le personnel par service, sans jamais retrier les membres.
+ *
+ * Deux regles, et la seconde est la seule subtile :
+ *
+ * - les membres gardent l'ordre servi a l'interieur de leur groupe, comme
+ *   partout ailleurs dans l'annuaire ;
+ * - **l'ordre des groupes se derive de la position MINIMALE de leurs
+ *   membres**, et non de leur premiere apparition dans le tableau servi. La
+ *   difference ne se voit qu'a l'usage : un agent ajoute en fin de liste
+ *   porte la position la plus haute, et si l'ordre des groupes suivait les
+ *   apparitions, son service entier sauterait en fin de page. Ce serait lu
+ *   comme un bug et n'en serait pas un.
+ *
+ * Le groupe sans nom passe toujours en dernier, quelle que soit la position
+ * de ses membres : il n'a pas de titre pour s'annoncer.
+ */
+export function grouperParService(membres: readonly MembrePersonnel[]): GroupeDePersonnel[] {
+  const groupes = new Map<string | null, MembrePersonnel[]>()
+  for (const membre of membres) {
+    const cle = membre.department === null || membre.department === '' ? null : membre.department
+    const groupe = groupes.get(cle)
+    if (groupe === undefined) groupes.set(cle, [membre])
+    else groupe.push(membre)
+  }
+
+  const rang = (groupe: readonly MembrePersonnel[]) =>
+    groupe.reduce((minimum, membre) => Math.min(minimum, membre.position), Number.POSITIVE_INFINITY)
+
+  return [...groupes.entries()]
+    .map(([nom, membres]) => ({ nom, membres }))
+    .sort((a, b) => {
+      if (a.nom === null) return 1
+      if (b.nom === null) return -1
+      return rang(a.membres) - rang(b.membres)
+    })
+}
+
+/**
+ * Les services deja saisis dans cette ambassade, tries et sans doublon.
+ *
+ * Ils nourrissent la liste de suggestions du champ de saisie. Une chaine
+ * libre diverge — « Service consulaire », « service consulaire » et
+ * « Consulaire » feraient trois groupes, et personne ne le verrait avant que
+ * la page ne montre trois titres pour un seul service. Le serveur ne
+ * normalise pas a l'ecriture, et c'est voulu : cela imposerait une casse a
+ * toutes les ambassades et rendrait « Service Consulaire » impossible a
+ * ecrire volontairement. La parade est ici, a la saisie.
+ *
+ * Le serveur sert la meme liste dans `GET /api/admin/directory` ; celle-ci
+ * n'est qu'un repli, exact tant que tout l'annuaire tient dans la reponse.
+ */
+export function servicesSaisis(membres: readonly MembrePersonnel[]): string[] {
+  const vus = new Set<string>()
+  for (const membre of membres) {
+    if (membre.department !== null && membre.department !== '') vus.add(membre.department)
+  }
+  return [...vus].sort((a, b) => a.localeCompare(b, 'fr'))
 }
 
 export interface ConsulHonoraire {
@@ -51,6 +135,8 @@ export const ANNUAIRE_VIDE: Annuaire = { staff: [], consuls: [] }
 
 /** Bornes du contrat, reprises pour les poser sur les champs de saisie. */
 export const LONGUEUR_TEXTE_MAX = 191
+/** Borne du service, plus courte que les autres textes : c'est un intitule. */
+export const LONGUEUR_SERVICE_MAX = 120
 export const LONGUEUR_TELEPHONE_MAX = 40
 export const LONGUEUR_ADRESSE_MAX = 2000
 
@@ -62,7 +148,13 @@ export const LONGUEUR_ADRESSE_MAX = 2000
  */
 export function normaliserAnnuaire(servi: Partial<Annuaire> | null | undefined): Annuaire {
   return {
-    staff: [...(servi?.staff ?? [])],
+    // `department` peut manquer : le champ a ete ajoute apres la mise en
+    // service de l'annuaire, et un serveur qui ne l'a pas encore livre sert
+    // des membres sans lui. `null` vaut « aucun service », pas « inconnu ».
+    staff: (servi?.staff ?? []).map((membre) => ({
+      ...membre,
+      department: membre.department ?? null,
+    })),
     consuls: [...(servi?.consuls ?? [])],
   }
 }
@@ -93,6 +185,8 @@ export type MembreSaisi = {
   email: string | null
   phone: string | null
   image_url: string | null
+  /** `null` retire l'agent de tout groupe : il se range en fin de liste. */
+  department: string | null
 }
 
 export async function ajouterMembre(saisi: MembreSaisi): Promise<MembrePersonnel> {

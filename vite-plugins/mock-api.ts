@@ -234,6 +234,27 @@ export function mockApi(): Plugin {
     guinee: structuredClone((fixture('services-vides') as { data: Record<string, unknown> }).data),
   }
 
+  /**
+   * Pages redactionnelles par ambassade, en memoire.
+   *
+   * Le Gabon part rempli avec le texte officiel de la fiche de renseignements
+   * du 17/09/2026, pour que la premiere vague soit visible sans saisie
+   * prealable. La Guinee part vide : ses pages portent encore leur contenu en
+   * dur dans le gabarit, et rien ne doit lui etre prete ici.
+   */
+  const pagesParTenant: Record<string, Record<string, unknown>> = {
+    gabon: structuredClone((fixture('pages-gabon') as { data: Record<string, unknown> }).data),
+    guinee: structuredClone((fixture('pages-vides') as { data: Record<string, unknown> }).data),
+  }
+
+  /** Les slugs que le gabarit sait dessiner. La liste se ferme ICI, pas au front. */
+  const SLUGS_DE_PAGE = [
+    'presentation',
+    'chancellerie',
+    'relations-bilaterales',
+    'ambition-numerique',
+  ]
+
   let prochainIdentifiant = 100
 
   /**
@@ -467,6 +488,79 @@ export function mockApi(): Plugin {
 
     if (chemin === '/content/home' || chemin === '/admin/content/home') {
       return repondre(200, { data: contenu() })
+    }
+
+    // --- Pages redactionnelles --------------------------------------------
+    const pagesDuTenant = () => pagesParTenant[estGabon ? 'gabon' : 'guinee']!
+    const listePages = () => pagesDuTenant().pages as Record<string, unknown>[]
+
+    if (chemin === '/content/pages' && methode === 'GET') {
+      // La surface visiteur ne sert que le publie : le front ne filtre pas.
+      return repondre(200, {
+        data: { ...pagesDuTenant(), pages: listePages().filter((page) => page.published === true) },
+      })
+    }
+
+    if (chemin === '/admin/pages' && methode === 'GET') {
+      return repondre(200, { data: pagesDuTenant() })
+    }
+
+    if (chemin.startsWith('/admin/pages/') && methode === 'PUT') {
+      const slug = chemin.slice('/admin/pages/'.length)
+      return void lireCorps().then((corps) => {
+        if (corps === null) return repondre(422, { message: 'Corps de requete illisible.' })
+        // La liste se ferme cote serveur : un slug inconnu ne cree pas une
+        // ligne que personne ne lira jamais.
+        if (!SLUGS_DE_PAGE.includes(slug)) {
+          return repondre(422, {
+            message: 'Cette page n existe pas.',
+            errors: { slug: ['Cette page n existe pas.'] },
+          })
+        }
+        if (typeof corps.title !== 'string' || corps.title.trim() === '') {
+          return repondre(422, {
+            message: 'Le titre est obligatoire.',
+            errors: { title: ['Le titre est obligatoire.'] },
+          })
+        }
+        const texte = (valeur: unknown) =>
+          typeof valeur === 'string' && valeur.trim() !== '' ? valeur : null
+        const existante = listePages().find((page) => page.slug === slug)
+        // Remplacement COMPLET : un champ absent du corps part a null, il
+        // n'est pas conserve.
+        const page = {
+          id: existante?.id ?? (prochainIdentifiant += 1),
+          slug,
+          title: corps.title,
+          subtitle: texte(corps.subtitle),
+          hero_image_url: texte(corps.hero_image_url),
+          body_html: texte(corps.body_html),
+          position: existante?.position ?? listePages().length + 1,
+          published: corps.published === true,
+        }
+        if (existante === undefined) listePages().push(page)
+        else Object.assign(existante, page)
+        // Creation comme remplacement rendent 200, jamais 201 : le contrat
+        // veut une seule forme de reponse.
+        repondre(200, { data: page })
+      })
+    }
+
+    if (chemin === '/admin/pages-settings' && methode === 'PUT') {
+      return void lireCorps().then((corps) => {
+        if (corps === null) return repondre(422, { message: 'Corps de requete illisible.' })
+        const juridiction = Array.isArray(corps.jurisdiction) ? corps.jurisdiction : []
+        const chiffres = Array.isArray(corps.figures) ? corps.figures : []
+        if (chiffres.some((c) => typeof (c as { value?: unknown }).value !== 'string')) {
+          return repondre(422, {
+            message: 'Chaque chiffre doit porter une valeur.',
+            errors: { figures: ['Chaque chiffre doit porter une valeur.'] },
+          })
+        }
+        pagesDuTenant().jurisdiction = juridiction
+        pagesDuTenant().figures = chiffres
+        repondre(200, { data: { jurisdiction: juridiction, figures: chiffres } })
+      })
     }
 
     // --- Services consulaires ---------------------------------------------
@@ -810,7 +904,10 @@ export function mockApi(): Plugin {
     }
 
     const FACULTATIFS: Record<'staff' | 'consuls', string[]> = {
-      staff: ['email', 'phone', 'image_url'],
+      // `department` porte le service de l'agent. Oublie ici, il etait accepte
+      // par la route puis perdu en silence : l'annuaire groupe par service ne
+      // pouvait pas etre eprouve en local, alors que le back le sert.
+      staff: ['email', 'phone', 'image_url', 'department'],
       consuls: ['address', 'email', 'phone'],
     }
 

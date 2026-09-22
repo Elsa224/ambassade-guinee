@@ -5,8 +5,16 @@
       <div class="absolute inset-0 bg-black/20"></div>
       <div class="relative max-w-7xl mx-auto px-4 py-16 md:py-20">
         <div class="text-center">
-          <div class="inline-block bg-white/20 backdrop-blur px-4 py-1 rounded-full text-sm mb-4">
-            🇬🇳 Service aux citoyens
+          <div
+            class="inline-flex items-center gap-2 bg-white/20 backdrop-blur px-4 py-1 rounded-full text-sm mb-4"
+          >
+            <img
+              v-if="identite.drapeau.value"
+              :src="identite.drapeau.value"
+              alt=""
+              class="h-4 w-6 object-cover rounded-sm"
+            />
+            Service aux citoyens
           </div>
           <h1 class="text-4xl md:text-5xl font-bold mb-4">Prise de rendez-vous</h1>
           <p class="text-xl md:text-2xl max-w-3xl mx-auto opacity-90">
@@ -196,20 +204,10 @@
               </svg>
               Horaires d'ouverture
             </h3>
-            <div class="space-y-2">
-              <div class="flex justify-between py-2 border-b border-gray-100">
-                <span class="text-gray-600">Lundi - Jeudi</span>
-                <span class="font-semibold">09:00 - 16:00</span>
-              </div>
-              <div class="flex justify-between py-2 border-b border-gray-100">
-                <span class="text-gray-600">Vendredi</span>
-                <span class="font-semibold">09:00 - 13:00</span>
-              </div>
-              <div class="flex justify-between py-2">
-                <span class="text-gray-600">Samedi - Dimanche</span>
-                <span class="font-semibold text-accent">Fermé</span>
-              </div>
-            </div>
+            <p v-if="identite.horaires.value" class="text-gray-600">
+              {{ identite.horaires.value }}
+            </p>
+            <p v-else class="text-gray-500">Les horaires d’ouverture ne sont pas encore publiés.</p>
           </div>
 
           <!-- Coordonnées -->
@@ -253,7 +251,7 @@
                 </svg>
                 <div>
                   <p class="font-semibold">Téléphone</p>
-                  <p class="text-gray-600">+1 (202) 986-4300</p>
+                  <p class="text-gray-600">{{ identite.telephone.value || 'Non communiqué' }}</p>
                 </div>
               </div>
               <div class="flex items-start gap-3">
@@ -272,10 +270,10 @@
                 </svg>
                 <div>
                   <p class="font-semibold">Email</p>
-                  <p class="text-gray-600">consulat@ambaguinee-usa.org</p>
+                  <p class="text-gray-600">{{ identite.courriel.value }}</p>
                 </div>
               </div>
-              <div class="flex items-start gap-3">
+              <div v-if="identite.adresse.value" class="flex items-start gap-3">
                 <svg
                   class="w-5 h-5 text-accent mt-1"
                   fill="none"
@@ -297,7 +295,7 @@
                 </svg>
                 <div>
                   <p class="font-semibold">Adresse</p>
-                  <p class="text-gray-600">2112 Leroy Place, NW<br />Washington, D.C. 20008</p>
+                  <p class="text-gray-600 whitespace-pre-line">{{ identite.adresse.value }}</p>
                 </div>
               </div>
             </div>
@@ -331,7 +329,7 @@
               </li>
               <li class="flex items-start gap-2">
                 <span class="text-secondary">✓</span>
-                <span>Preuve de résidence aux États-Unis</span>
+                <span>Justificatif de domicile dans le pays de résidence</span>
               </li>
             </ul>
           </div>
@@ -383,6 +381,17 @@ import { ref, reactive } from 'vue'
 import ChampSelect from '@/components/ui/ChampSelect.vue'
 import ChampDate from '@/components/ui/ChampDate.vue'
 import { aujourdHui, decaler, versIso } from '@/components/ui/dates'
+import { useIdentite } from '@/tenant/identite'
+
+/**
+ * Coordonnees de l'ambassade qui sert le domaine.
+ *
+ * La barre laterale portait celles du gabarit : un numero de Washington, une
+ * adresse de Washington et le courriel de l'ambassade de Guinee aux
+ * Etats-Unis. La rubrique est fermee partout, mais l'ouvrir aurait expose ces
+ * coordonnees a tout autre poste.
+ */
+const identite = useIdentite()
 
 const OPTIONS_FORMDATA_SERVICE = [
   { valeur: '', libelle: 'Sélectionnez un service' },

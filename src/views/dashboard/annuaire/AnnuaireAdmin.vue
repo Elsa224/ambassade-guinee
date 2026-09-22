@@ -117,6 +117,32 @@
           />
         </div>
 
+        <div>
+          <label for="service-membre" class="block text-sm font-medium text-gray-700 mb-1.5">
+            Service <span class="text-gray-400 font-normal">(facultatif)</span>
+          </label>
+          <!-- Liste de suggestions et non liste fermee : une ambassade doit
+               pouvoir nommer un service que personne n'a encore saisi. Elle
+               evite en revanche que « Service consulaire » et « service
+               consulaire » fassent deux groupes sur la page publique. -->
+          <input
+            id="service-membre"
+            v-model.trim="saisieMembre.department"
+            type="text"
+            list="services-annuaire"
+            :maxlength="LONGUEUR_SERVICE_MAX"
+            placeholder="Service Visa et Actes consulaires"
+            class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary"
+          />
+          <datalist id="services-annuaire">
+            <option v-for="service in servicesProposes" :key="service" :value="service"></option>
+          </datalist>
+          <p class="text-xs text-gray-500 mt-1.5">
+            Les agents sont regroupés par service sur la page de la chancellerie. Sans service, ils
+            apparaissent en fin de liste.
+          </p>
+        </div>
+
         <div class="grid md:grid-cols-2 gap-5">
           <div>
             <label for="email-membre" class="block text-sm font-medium text-gray-700 mb-1.5">
@@ -292,7 +318,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted } from 'vue'
 import ListeOrdonnee from '../contenu/ListeOrdonnee.vue'
 import Boite from '../contenu/Boite.vue'
 import ChampImage from '@/components/ui/ChampImage.vue'
@@ -309,6 +335,8 @@ import {
   ordonnerConsuls,
   ANNUAIRE_VIDE,
   LONGUEUR_TEXTE_MAX,
+  LONGUEUR_SERVICE_MAX,
+  servicesSaisis,
   LONGUEUR_TELEPHONE_MAX,
   LONGUEUR_ADRESSE_MAX,
   type Annuaire,
@@ -325,7 +353,22 @@ const message = ref('')
 
 const membreOuvert = ref(false)
 const membreEdite = ref<MembrePersonnel | null>(null)
-const saisieMembre = reactive({ name: '', role: '', email: '', phone: '', image_url: '' })
+const saisieMembre = reactive({
+  name: '',
+  role: '',
+  email: '',
+  phone: '',
+  image_url: '',
+  department: '',
+})
+
+/**
+ * Les services deja saisis, proposes en suggestion.
+ *
+ * Le serveur les sert dans la reponse d'administration ; on retombe sur ceux
+ * qu'on lit dans l'annuaire tant qu'il ne le fait pas.
+ */
+const servicesProposes = computed(() => servicesSaisis(annuaire.value.staff))
 
 const consulOuvert = ref(false)
 const consulEdite = ref<ConsulHonoraire | null>(null)
@@ -380,6 +423,7 @@ function ouvrirMembre(id: number | null): void {
   saisieMembre.email = existant?.email ?? ''
   saisieMembre.phone = existant?.phone ?? ''
   saisieMembre.image_url = existant?.image_url ?? ''
+  saisieMembre.department = existant?.department ?? ''
   membreOuvert.value = true
 }
 
@@ -396,6 +440,7 @@ async function enregistrerMembre(): Promise<void> {
     email: saisieMembre.email === '' ? null : saisieMembre.email,
     phone: saisieMembre.phone === '' ? null : saisieMembre.phone,
     image_url: saisieMembre.image_url === '' ? null : saisieMembre.image_url,
+    department: saisieMembre.department === '' ? null : saisieMembre.department,
   }
   const edite = membreEdite.value
   const fait = await agir(

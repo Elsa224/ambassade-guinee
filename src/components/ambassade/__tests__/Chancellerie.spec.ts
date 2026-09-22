@@ -18,27 +18,61 @@ function membre(partiel: Partial<MembrePersonnel> = {}): MembrePersonnel {
     email: null,
     phone: null,
     image_url: null,
+    department: null,
     position: 1,
     ...partiel,
   }
 }
 
 /**
- * La page lit deux surfaces : l'annuaire et le contenu d'accueil. On repond
- * selon le chemin, sinon l'une recevrait la reponse de l'autre.
+ * La page lit trois surfaces : l'annuaire, le contenu d'accueil et les pages
+ * redactionnelles. On repond selon le chemin, sinon l'une recevrait la
+ * reponse de l'autre.
  */
-function servir(annuaire: unknown, accueil: unknown = { data: { ambassador: null } }) {
+function servir(
+  annuaire: unknown,
+  accueil: unknown = { data: { ambassador: null } },
+  pages: unknown = { data: { pages: [], jurisdiction: [], figures: [] } },
+) {
   vi.stubGlobal(
     'fetch',
-    vi.fn((url: string) =>
-      Promise.resolve(
-        new Response(JSON.stringify(String(url).includes('/directory') ? annuaire : accueil), {
+    vi.fn((url: string) => {
+      const chemin = String(url)
+      const corps = chemin.includes('/directory')
+        ? annuaire
+        : chemin.includes('/content/pages')
+          ? pages
+          : accueil
+      return Promise.resolve(
+        new Response(JSON.stringify(corps), {
           status: 200,
           headers: { 'Content-Type': 'application/json' },
         }),
-      ),
-    ),
+      )
+    }),
   )
+}
+
+/** Une page `chancellerie` telle que le CMS la sert. */
+function pageChancellerie(reste: Record<string, unknown> = {}) {
+  return {
+    data: {
+      pages: [
+        {
+          id: 1,
+          slug: 'chancellerie',
+          title: 'La Chancellerie diplomatique',
+          subtitle: 'La structure de la mission, et celles et ceux qui la servent.',
+          hero_image_url: null,
+          body_html: '<p>La Chancellerie est le siège de la mission.</p>',
+          position: 1,
+          ...reste,
+        },
+      ],
+      jurisdiction: [],
+      figures: [],
+    },
+  }
 }
 
 async function monter() {
@@ -164,5 +198,52 @@ describe('page de la chancellerie', () => {
     const wrapper = await monter()
 
     expect(wrapper.text()).toContain('Awa Ndong')
+  })
+
+  it('affiche le texte de la chancellerie au-dessus de l equipe', async () => {
+    // Ce texte etait saisissable dans l'administration depuis le lot
+    // « pages » et n'etait affiche nulle part : cette route rend l'annuaire,
+    // pas `PageRedaction`.
+    servir({ data: { staff: [membre()], consuls: [] } }, undefined, pageChancellerie())
+
+    const wrapper = await monter()
+    const texte = wrapper.text()
+
+    expect(texte).toContain('La Chancellerie est le siège de la mission.')
+    // Au-dessus, et non a la suite : le preambule precede les personnes.
+    expect(texte.indexOf('siège de la mission')).toBeLessThan(texte.indexOf('Awa Ndong'))
+  })
+
+  it('prend le titre et le sous-titre saisis plutot que ceux du gabarit', async () => {
+    // Les ignorer ferait mentir l'ecran d'administration, qui les presente
+    // comme les deux premiers champs de la page.
+    servir({ data: { staff: [membre()], consuls: [] } }, undefined, pageChancellerie())
+
+    const wrapper = await monter()
+
+    expect(wrapper.text()).toContain(
+      'La structure de la mission, et celles et ceux qui la servent.',
+    )
+    expect(wrapper.text()).not.toContain('Au service de la représentation diplomatique')
+  })
+
+  it('garde le titre du gabarit quand le CMS ne sert pas cette page', async () => {
+    servir({ data: { staff: [membre()], consuls: [] } })
+
+    const wrapper = await monter()
+
+    expect(wrapper.text()).toContain('La Chancellerie Diplomatique')
+    expect(wrapper.text()).toContain('Au service de la représentation diplomatique')
+  })
+
+  it('montre la page quand seul le texte est publie, sans aucun agent', async () => {
+    // Un texte sans equipe reste du contenu : se retracter le ferait
+    // disparaitre alors que l'ambassade l'a bien publie.
+    servir({ data: { staff: [], consuls: [] } }, undefined, pageChancellerie())
+
+    const wrapper = await monter()
+
+    expect(wrapper.text()).not.toContain('Rubrique en préparation')
+    expect(wrapper.text()).toContain('La Chancellerie est le siège de la mission.')
   })
 })

@@ -30,9 +30,12 @@
               />
               {{ nomDeLAmbassade }}
             </div>
-            <h1 class="text-4xl md:text-5xl font-bold mb-4">La Chancellerie Diplomatique</h1>
-            <p class="text-xl md:text-2xl max-w-3xl mx-auto opacity-90">
-              Au service de la représentation diplomatique et des relations bilatérales
+            <h1 class="text-4xl md:text-5xl font-bold mb-4">{{ titreDeLaPage }}</h1>
+            <p
+              v-if="sousTitreDeLaPage !== ''"
+              class="text-xl md:text-2xl max-w-3xl mx-auto opacity-90"
+            >
+              {{ sousTitreDeLaPage }}
             </p>
             <div class="flex justify-center gap-4 mt-8">
               <div class="w-16 h-1 bg-accent"></div>
@@ -51,6 +54,17 @@
             ></path>
           </svg>
         </div>
+      </div>
+
+      <!-- La presentation de la chancellerie, servie par le CMS, avant les
+           personnes. Elle reste en texte suivi : c'est un preambule a
+           l'annuaire, pas un mandat a embrasser du regard comme sur les
+           pages que `PageRedaction` dessine. -->
+      <div v-if="corpsDeLaPage !== ''" class="max-w-7xl mx-auto px-4 pt-12">
+        <div
+          class="bg-white rounded-2xl shadow-sm p-6 md:p-8 contenu-cms text-gray-700 max-w-3xl"
+          v-html="corpsDeLaPage"
+        ></div>
       </div>
 
       <div class="max-w-7xl mx-auto px-4 py-12">
@@ -86,52 +100,60 @@
           </div>
         </div>
 
-        <!-- Personnel de la chancellerie, dans l'ordre servi par le CMS -->
-        <div
-          v-if="personnel.length > 0"
-          class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-        >
-          <div
-            v-for="(membre, rang) in personnel"
-            :key="membre.id"
-            class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow border-l-4"
-            :class="bordureDuRang(rang)"
+        <!-- Personnel de la chancellerie, groupe par service et dans l'ordre
+             servi par le CMS. Le titre de service n'apparait que si l'agent en
+             porte un : une ambassade qui ne renseigne pas le champ retrouve la
+             liste a plat qu'elle avait avant. -->
+        <div v-for="groupe in groupes" :key="groupe.nom ?? 'sans-service'" class="mb-10 last:mb-0">
+          <h3
+            v-if="groupe.nom !== null"
+            class="text-sm font-bold tracking-wider uppercase text-accent mb-4 pb-2 border-b border-gray-200"
           >
-            <div class="flex items-start gap-4">
-              <div
-                v-if="membre.image_url !== null"
-                class="w-14 h-14 rounded-full overflow-hidden bg-gray-100 shrink-0"
-              >
-                <img
-                  :src="membre.image_url"
-                  :alt="membre.name"
-                  class="w-full h-full object-cover"
-                />
-              </div>
-              <div v-else class="bg-accent/10 p-3 rounded-full shrink-0">
-                <i class="bx bx-user text-2xl text-accent" aria-hidden="true"></i>
-              </div>
+            {{ groupe.nom }}
+          </h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div
+              v-for="(membre, rang) in groupe.membres"
+              :key="membre.id"
+              class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow border-l-4"
+              :class="bordureDuRang(rang)"
+            >
+              <div class="flex items-start gap-4">
+                <div
+                  v-if="membre.image_url !== null"
+                  class="w-14 h-14 rounded-full overflow-hidden bg-gray-100 shrink-0"
+                >
+                  <img
+                    :src="membre.image_url"
+                    :alt="membre.name"
+                    class="w-full h-full object-cover"
+                  />
+                </div>
+                <div v-else class="bg-accent/10 p-3 rounded-full shrink-0">
+                  <i class="bx bx-user text-2xl text-accent" aria-hidden="true"></i>
+                </div>
 
-              <div class="min-w-0">
-                <h3 class="font-bold text-gray-800 break-words">{{ membre.name }}</h3>
-                <p class="text-accent font-medium break-words">{{ membre.role }}</p>
+                <div class="min-w-0">
+                  <h3 class="font-bold text-gray-800 break-words">{{ membre.name }}</h3>
+                  <p class="text-accent font-medium break-words">{{ membre.role }}</p>
 
-                <div class="mt-3 space-y-1 text-sm">
-                  <p v-if="membre.email !== null" class="flex items-center gap-2">
-                    <i class="bx bx-envelope text-gray-400" aria-hidden="true"></i>
-                    <a
-                      :href="`mailto:${membre.email}`"
-                      class="text-primary-light hover:underline break-all"
-                    >
-                      {{ membre.email }}
-                    </a>
-                  </p>
-                  <p v-if="membre.phone !== null" class="flex items-center gap-2">
-                    <i class="bx bx-phone text-gray-400" aria-hidden="true"></i>
-                    <a :href="`tel:${membre.phone}`" class="text-primary-light hover:underline">
-                      {{ membre.phone }}
-                    </a>
-                  </p>
+                  <div class="mt-3 space-y-1 text-sm">
+                    <p v-if="membre.email !== null" class="flex items-center gap-2">
+                      <i class="bx bx-envelope text-gray-400" aria-hidden="true"></i>
+                      <a
+                        :href="`mailto:${membre.email}`"
+                        class="text-primary-light hover:underline break-all"
+                      >
+                        {{ membre.email }}
+                      </a>
+                    </p>
+                    <p v-if="membre.phone !== null" class="flex items-center gap-2">
+                      <i class="bx bx-phone text-gray-400" aria-hidden="true"></i>
+                      <a :href="`tel:${membre.phone}`" class="text-primary-light hover:underline">
+                        {{ membre.phone }}
+                      </a>
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -144,8 +166,9 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import { recupererAnnuaire, ANNUAIRE_VIDE, type Annuaire } from '@/api/annuaire'
+import { recupererAnnuaire, grouperParService, ANNUAIRE_VIDE, type Annuaire } from '@/api/annuaire'
 import { recupererContenuAccueil, CONTENU_VIDE, type ContenuAccueil } from '@/api/contenu'
+import { recupererPages, pageParSlug, PAGES_VIDES, type ContenuDesPages } from '@/api/pages'
 import { useIdentite, articleDuPays } from '@/tenant/identite'
 
 /**
@@ -165,14 +188,56 @@ import { useIdentite, articleDuPays } from '@/tenant/identite'
  */
 const annuaire = ref<Annuaire>({ ...ANNUAIRE_VIDE })
 const contenu = ref<ContenuAccueil>({ ...CONTENU_VIDE })
+const pages = ref<ContenuDesPages>({ ...PAGES_VIDES })
 const chargement = ref(true)
 
 const { nomOfficiel, nomDeLAmbassade, drapeau } = useIdentite()
 
 /** L'ordre servi fait foi : `position` peut porter des trous. */
 const personnel = computed(() => annuaire.value.staff)
+
+/**
+ * Le personnel range par service, dans l'ordre decide par l'ambassade.
+ *
+ * Elsa a tranche le 21/09/2026 contre un organigramme dessine : l'annuaire
+ * groupe par service ne demande aucun developpement de schema, et surtout il
+ * reste exact quand quelqu'un change de poste, la ou un arbre devient faux en
+ * silence. L'ordre des groupes suit la position minimale de leurs membres —
+ * voir `grouperParService`, qui explique pourquoi.
+ */
+const groupes = computed(() => grouperParService(personnel.value))
 const ambassadeur = computed(() => contenu.value.ambassador)
-const aDuContenu = computed(() => personnel.value.length > 0 || ambassadeur.value !== null)
+
+/**
+ * La page `chancellerie` du contenu redactionnel.
+ *
+ * Son texte etait saisissable dans l'administration depuis le lot « pages »
+ * mais n'etait affiche nulle part : cette route rend l'annuaire, pas
+ * `PageRedaction`. Elsa a tranche le 22/09/2026 — il se place AU-DESSUS de
+ * l'equipe, en preambule.
+ */
+const pageDeLaChancellerie = computed(() => pageParSlug(pages.value, 'chancellerie'))
+const corpsDeLaPage = computed(() => pageDeLaChancellerie.value?.body_html ?? '')
+
+/**
+ * Le titre et le sous-titre saisis passent avant ceux du gabarit.
+ *
+ * Les ignorer ferait mentir l'ecran d'administration, qui les presente comme
+ * les deux premiers champs de la page. Le repli reste le texte du gabarit,
+ * qui ne nomme aucune ambassade en particulier.
+ */
+const titreDeLaPage = computed(
+  () => pageDeLaChancellerie.value?.title ?? 'La Chancellerie Diplomatique',
+)
+const sousTitreDeLaPage = computed(() =>
+  pageDeLaChancellerie.value === null
+    ? 'Au service de la représentation diplomatique et des relations bilatérales'
+    : (pageDeLaChancellerie.value.subtitle ?? ''),
+)
+
+const aDuContenu = computed(
+  () => personnel.value.length > 0 || ambassadeur.value !== null || corpsDeLaPage.value !== '',
+)
 
 /** Les fiches alternent les couleurs de l'ambassade, dans l'ordre servi. */
 const BORDURES = ['border-accent', 'border-secondary', 'border-primary-light'] as const
@@ -181,12 +246,14 @@ const bordureDuRang = (rang: number) => BORDURES[rang % BORDURES.length]
 onMounted(async () => {
   // Les deux lectures sont independantes : l'echec de l'une ne doit pas
   // priver la page de l'autre.
-  const [listes, accueil] = await Promise.allSettled([
+  const [listes, accueil, redactionnel] = await Promise.allSettled([
     recupererAnnuaire(),
     recupererContenuAccueil(),
+    recupererPages(),
   ])
   if (listes.status === 'fulfilled') annuaire.value = listes.value
   if (accueil.status === 'fulfilled') contenu.value = accueil.value
+  if (redactionnel.status === 'fulfilled') pages.value = redactionnel.value
   chargement.value = false
 })
 </script>

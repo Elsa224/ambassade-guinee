@@ -24,11 +24,6 @@ import Calendrier from '@/components/ambassade/Calendrier.vue'
 
 // Relations bilatérales
 import RelationsBilaterales from '@/views/RelationsBilaterales.vue'
-import Usa from '@/components/relations/Usa.vue'
-import CostaRica from '@/components/relations/CostaRica.vue'
-import Haiti from '@/components/relations/Haiti.vue'
-import Bahamas from '@/components/relations/Bahamas.vue'
-import FondMonetaire from '@/components/relations/FondMonetaire.vue'
 
 // Services
 import Consulat from '@/components/services/Consulat.vue'
@@ -137,11 +132,16 @@ const router = createRouter({
           name: 'relations-bilaterales',
           component: RelationsBilaterales,
         },
-        { path: 'usa', name: 'usa', component: Usa },
-        { path: 'costa-rica', name: 'costa-rica', component: CostaRica },
-        { path: 'haiti', name: 'haiti', component: Haiti },
-        { path: 'bahamas', name: 'bahamas', component: Bahamas },
-        { path: 'fond-monetaire', name: 'fond-monetaire', component: FondMonetaire },
+        // Les cinq pages pays (`/usa`, `/costa-rica`, `/haiti`, `/bahamas`,
+        // `/fond-monetaire`) ont ete supprimees : elles decrivaient les
+        // relations de la Guinee avec quatre pays qui ne concernent aucune
+        // autre ambassade. Le contrat prevoit a leur place une collection
+        // `bilateral-relations`, une page par partenaire, servie par le CMS.
+        {
+          path: 'ambition-numerique',
+          name: 'ambition-numerique',
+          component: () => import('@/components/ambassade/AmbitionNumerique.vue'),
+        },
 
         // La rubrique des services servie par le CMS. Elle ne remplace pas
         // `services-ambassadeur`, qui porte encore le texte en dur de
@@ -175,6 +175,11 @@ const router = createRouter({
         { path: '', name: 'dashboard', component: Dashboard },
         { path: 'articles', name: 'articles', component: Articles },
         { path: 'contenu-accueil', name: 'contenu-accueil', component: AccueilContenu },
+        {
+          path: 'pages',
+          name: 'contenu-pages',
+          component: () => import('@/views/dashboard/contenu/PagesContenu.vue'),
+        },
         {
           path: 'services',
           name: 'services-admin',

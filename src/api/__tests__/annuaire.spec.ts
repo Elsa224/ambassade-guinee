@@ -23,6 +23,7 @@ function membre(partiel: Partial<MembrePersonnel> = {}): MembrePersonnel {
     email: null,
     phone: null,
     image_url: null,
+    department: null,
     position: 1,
     ...partiel,
   }
