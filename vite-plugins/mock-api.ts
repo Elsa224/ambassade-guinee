@@ -67,10 +67,15 @@ interface CompteMock {
  * les rend. Ce sont ceux d'Ambassade Secure, pas les services consulaires du
  * CMS : on ne prend pas rendez-vous ici pour un passeport.
  */
+// Les slugs sont volontairement illisibles : Ambassade Secure les derive
+// lui-meme, et ceux de dev ressemblent a `z58sgf8a51kp07q`. Un bouchon qui
+// rendrait `protocole` laisserait croire qu'un slug se devine, se cite ou
+// s'ecrit en dur. Leur NOMBRE n'est pas un contrat non plus : trois ici,
+// quatre sur dev, zero sur une ambassade qui n'a rien configure.
 const DEPARTEMENTS_RDV = [
-  { slug: 'cabinet', name: "Cabinet de l'Ambassadeur" },
-  { slug: 'protocole', name: 'Protocole' },
-  { slug: 'cooperation', name: 'Coopération' },
+  { slug: 'q4k2m9xv0bt7ra1', name: "Cabinet de l'Ambassadeur" },
+  { slug: 'h8we3zpn6cdy5sf', name: 'Protocole' },
+  { slug: 'j1ub7og4nlik20c', name: 'Coopération' },
 ]
 
 let prochaineReferenceRdv = 1

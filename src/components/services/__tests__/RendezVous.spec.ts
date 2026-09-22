@@ -7,12 +7,15 @@ import ChampDate from '@/components/ui/ChampDate.vue'
 import { useTenantStore } from '@/stores/tenant'
 import { GABON } from '@/api/fixtures/tenants'
 
+// Slugs illisibles a dessein : Ambassade Secure les derive, et ceux de dev
+// ressemblent a `z58sgf8a51kp07q`. Les tests doivent echouer si l'ecran
+// suppose un slug lisible, le cite quelque part, ou le montre au visiteur.
 const SERVICE = {
   data: {
     name: 'Ambassade du Gabon',
     departments: [
-      { slug: 'cabinet', name: "Cabinet de l'Ambassadeur" },
-      { slug: 'protocole', name: 'Protocole' },
+      { slug: 'q4k2m9xv0bt7ra1', name: "Cabinet de l'Ambassadeur" },
+      { slug: 'h8we3zpn6cdy5sf', name: 'Protocole' },
     ],
   },
 }
@@ -24,7 +27,7 @@ const CREEE = {
     // Une heure UTC volontairement decalee de celle qui sera saisie : si
     // l'ecran reformatait `scheduledAt`, le recapitulatif montrerait 08:30.
     scheduledAt: '2026-10-01T08:30:00.000Z',
-    department: { slug: 'protocole', name: 'Protocole' },
+    department: { slug: 'h8we3zpn6cdy5sf', name: 'Protocole' },
     purpose: 'Remise de documents',
     host: null,
   },
@@ -90,8 +93,8 @@ describe('prise de rendez-vous de chancellerie', () => {
 
     const premier = wrapper.getComponent(ChampSelect)
     expect(premier.props('options')).toEqual([
-      { valeur: 'cabinet', libelle: "Cabinet de l'Ambassadeur" },
-      { valeur: 'protocole', libelle: 'Protocole' },
+      { valeur: 'q4k2m9xv0bt7ra1', libelle: "Cabinet de l'Ambassadeur" },
+      { valeur: 'h8we3zpn6cdy5sf', libelle: 'Protocole' },
     ])
   })
 
@@ -137,6 +140,30 @@ describe('prise de rendez-vous de chancellerie', () => {
     expect(texte).not.toContain('08:30')
     // Une fausse confirmation coute un deplacement a quelqu'un.
     expect(texte).not.toContain('rendez-vous est confirmé')
+  })
+
+  it('rend le recapitulatif d une demande sans service, sans ligne vide', async () => {
+    // `department: null` est la valeur NORMALE quand le visiteur n'a choisi
+    // aucun service — et il ne peut pas en choisir sur une ambassade dont la
+    // liste est vide. L'amont laisse le champ a `null` par defaut, le CMS le
+    // relaie tel quel : le recapitulatif doit se taire, pas afficher un
+    // intitule sans valeur ni le mot « undefined ».
+    const wrapper = monter()
+    await flushPromises()
+
+    await remplirLIdentite(wrapper)
+    await choisirDateEtHeure(wrapper, '2026-10-01', '10:30')
+    vi.mocked(fetch).mockResolvedValue(reponse({ data: { ...CREEE.data, department: null } }, 201))
+    await wrapper.get('form').trigger('submit')
+    await flushPromises()
+
+    // Le formulaire reste monte derriere la modale et porte lui aussi le mot
+    // « Service » : on lit le recapitulatif seul, sinon la garde ne garde rien.
+    const recapitulatif = wrapper.get('dl').text()
+    expect(recapitulatif).toContain('RDV-2026-000123')
+    expect(recapitulatif).not.toContain('Service')
+    expect(recapitulatif).not.toContain('undefined')
+    expect(recapitulatif).not.toContain('null')
   })
 
   it('retire les heures deja passees quand la date choisie est aujourd hui', async () => {
