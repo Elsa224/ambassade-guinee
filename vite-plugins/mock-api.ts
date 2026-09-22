@@ -904,7 +904,10 @@ export function mockApi(): Plugin {
     }
 
     const FACULTATIFS: Record<'staff' | 'consuls', string[]> = {
-      staff: ['email', 'phone', 'image_url'],
+      // `department` porte le service de l'agent. Oublie ici, il etait accepte
+      // par la route puis perdu en silence : l'annuaire groupe par service ne
+      // pouvait pas etre eprouve en local, alors que le back le sert.
+      staff: ['email', 'phone', 'image_url', 'department'],
       consuls: ['address', 'email', 'phone'],
     }
 
