@@ -141,4 +141,43 @@ describe('ecran de gestion des articles', () => {
     // de la taxonomie servie : le serveur ne regarde pas les slugs.
     expect(corps.categorie_id).toBe(1)
   })
+
+  it("permet de creer une categorie quand l'ambassade n'en a aucune", async () => {
+    // Le menu ne peut proposer que ce qui existe en base, et aucun autre
+    // ecran ne cree de categorie : sans ce controle, une ambassade neuve
+    // n'a aucune facon d'en obtenir une, et tous ses articles partent sans
+    // categorie, en silence.
+    vi.stubGlobal('fetch', servir(articlesFixture, { data: [] }))
+    const ecran = await monter()
+    await ecran
+      .findAll('button')
+      .find((b) => b.text().includes('Nouvel article'))!
+      .trigger('click')
+
+    const ouvrir = ecran.findAll('button').find((b) => b.text().includes('Nouvelle catégorie'))
+    expect(ouvrir).toBeDefined()
+    await ouvrir!.trigger('click')
+
+    vi.mocked(fetch).mockResolvedValue(
+      reponse(
+        { data: { id: 7, nom: "Actualités de l'ambassade", slug: 'actualites', couleur: null } },
+        201,
+      ),
+    )
+    await ecran.find('#nom-nouvelle-categorie').setValue("Actualités de l'ambassade")
+    await ecran
+      .findAll('button')
+      .find((b) => b.text() === 'Créer')!
+      .trigger('click')
+    await flushPromises()
+
+    const appels = vi.mocked(fetch).mock.calls
+    const envoi = appels.find((appel) => (appel[1] as RequestInit | undefined)?.method === 'POST')!
+    expect(envoi[0]).toBe('/api/admin/categories')
+    expect(JSON.parse((envoi[1] as RequestInit).body as string).nom).toBe(
+      "Actualités de l'ambassade",
+    )
+    // Et elle est choisie d'office : on vient de la creer pour cet article.
+    expect((ecran.vm as unknown as { saisie: { categorie: string } }).saisie.categorie).toBe('7')
+  })
 })

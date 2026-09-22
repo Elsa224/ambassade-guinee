@@ -168,7 +168,8 @@ interface Categorie {
   id: number
   nom: string
   slug: string
-  couleur: string
+  /** Facultative cote serveur, comme dans `CategoryResource`. */
+  couleur: string | null
 }
 
 /**
@@ -1007,6 +1008,36 @@ export function mockApi(): Plugin {
       // offrir une adresse que l'API refuse.
       const taxonomie = [...categories.values()].sort((a, b) => a.nom.localeCompare(b.nom))
       return repondre(200, { data: taxonomie })
+    }
+
+    if (chemin === '/admin/categories' && methode === 'POST') {
+      // Seul `nom` est envoye : le serveur derive le slug et le rend unique
+      // par ambassade. Un intitule deja pris vaut 422, pas un doublon.
+      return void lireCorps().then((corps) => {
+        if (corps === null) return repondre(422, { message: 'Corps de requete illisible.' })
+        const nom = typeof corps.nom === 'string' ? corps.nom.trim() : ''
+        if (nom === '') {
+          return repondre(422, {
+            message: 'Les données envoyées sont invalides.',
+            errors: { nom: ['Le nom est obligatoire.'] },
+          })
+        }
+        const slug = slugifier(nom)
+        if (categories.has(slug)) {
+          return repondre(422, {
+            message: 'Les données envoyées sont invalides.',
+            errors: { nom: ['Cette categorie existe deja.'] },
+          })
+        }
+        const creee: Categorie = {
+          id: prochainId++,
+          nom,
+          slug,
+          couleur: typeof corps.couleur === 'string' ? corps.couleur : null,
+        }
+        categories.set(slug, creee)
+        return repondre(201, { data: creee })
+      })
     }
 
     if (chemin === '/admin/media' && methode === 'POST') {

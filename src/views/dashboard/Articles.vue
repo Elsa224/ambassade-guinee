@@ -2,6 +2,7 @@
 import { computed, onMounted, ref } from 'vue'
 import {
   creerArticle,
+  creerCategorie,
   libelleStatut,
   listerArticlesAdmin,
   listerCategories,
@@ -293,6 +294,7 @@ function ouvrirEdition(article: ArticleEnListe): void {
 
 function fermerFormulaire(): void {
   formulaireOuvert.value = false
+  annulerCreationCategorie()
   saisie.value = saisieVierge()
   idEnCours.value = null
 }
@@ -326,6 +328,50 @@ async function enregistrer(): Promise<void> {
     erreurApi.value = 'Enregistrement impossible. Vérifiez les champs et réessayez.'
   } finally {
     enregistrement.value = false
+  }
+}
+
+// --- Creation de categorie ------------------------------------------------
+
+/**
+ * Le menu ne peut proposer que ce qui existe en base, et aucun autre ecran
+ * ne cree de categorie. Sans ce controle, une ambassade neuve n'a aucune
+ * facon d'en obtenir une : tous ses articles partent sans categorie, en
+ * silence, puisque le serveur accepte `categorie_id: null`.
+ */
+const creationCategorie = ref(false)
+const nomNouvelleCategorie = ref('')
+const erreurCategorie = ref('')
+const ajoutEnCours = ref(false)
+
+function ouvrirCreationCategorie(): void {
+  creationCategorie.value = true
+  nomNouvelleCategorie.value = ''
+  erreurCategorie.value = ''
+}
+
+function annulerCreationCategorie(): void {
+  creationCategorie.value = false
+  nomNouvelleCategorie.value = ''
+  erreurCategorie.value = ''
+}
+
+async function ajouterCategorie(): Promise<void> {
+  const nom = nomNouvelleCategorie.value.trim()
+  if (nom === '' || ajoutEnCours.value) return
+  ajoutEnCours.value = true
+  erreurCategorie.value = ''
+  try {
+    const creee = await creerCategorie(nom)
+    categories.value = [...categories.value, creee].sort((a, b) => a.nom.localeCompare(b.nom, 'fr'))
+    // Choisie d'office : on vient de la creer pour l'article en cours.
+    saisie.value.categorie = String(creee.id)
+    creationCategorie.value = false
+    nomNouvelleCategorie.value = ''
+  } catch {
+    erreurCategorie.value = 'Création impossible. Ce nom est peut-être déjà pris.'
+  } finally {
+    ajoutEnCours.value = false
   }
 }
 
@@ -638,7 +684,7 @@ onMounted(charger)
 
             <div class="mb-4">
               <label class="mb-1 block text-sm font-medium text-gray-700" for="categorie-article">
-                Catégorie *
+                Catégorie
               </label>
               <ChampSelect
                 v-if="categories.length > 0"
@@ -648,8 +694,44 @@ onMounted(charger)
               />
               <p v-else class="text-sm text-amber-700">
                 Aucune catégorie n'existe encore pour cette ambassade. L'article s'enregistrera sans
-                catégorie.
+                catégorie tant que vous n'en aurez pas créé une.
               </p>
+
+              <div v-if="creationCategorie" class="mt-2 flex items-center gap-2">
+                <input
+                  id="nom-nouvelle-categorie"
+                  v-model="nomNouvelleCategorie"
+                  type="text"
+                  class="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:outline-none"
+                  placeholder="Nom de la catégorie"
+                  aria-label="Nom de la nouvelle catégorie"
+                  @keydown.enter.prevent="ajouterCategorie"
+                />
+                <button
+                  type="button"
+                  class="rounded-lg bg-primary px-3 py-2 text-sm font-medium text-white disabled:opacity-50"
+                  :disabled="ajoutEnCours || nomNouvelleCategorie.trim() === ''"
+                  @click="ajouterCategorie"
+                >
+                  {{ ajoutEnCours ? 'Création…' : 'Créer' }}
+                </button>
+                <button
+                  type="button"
+                  class="rounded-lg px-3 py-2 text-sm text-gray-600 hover:text-gray-900"
+                  @click="annulerCreationCategorie"
+                >
+                  Annuler
+                </button>
+              </div>
+              <button
+                v-else
+                type="button"
+                class="mt-2 text-sm font-medium text-gray-700 underline hover:text-gray-900"
+                @click="ouvrirCreationCategorie"
+              >
+                + Nouvelle catégorie
+              </button>
+              <p v-if="erreurCategorie" class="mt-1 text-sm text-red-600">{{ erreurCategorie }}</p>
             </div>
 
             <div class="mb-4">
