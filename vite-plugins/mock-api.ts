@@ -398,9 +398,12 @@ export function mockApi(): Plugin {
     const chemin = url.pathname
     const methode = requete.method ?? 'GET'
 
-    const repondre = (statut: number, corps: unknown) => {
+    const repondre = (statut: number, corps: unknown, entetes: Record<string, string> = {}) => {
       reponse.statusCode = statut
       reponse.setHeader('Content-Type', 'application/json')
+      // `Allow` accompagne un 405 : c'est cet en-tete qui a permis de voir que
+      // `/articles` ne repondait qu'en lecture.
+      for (const [nom, valeur] of Object.entries(entetes)) reponse.setHeader(nom, valeur)
       reponse.end(corps === null ? '' : JSON.stringify(corps))
     }
 
@@ -1920,12 +1923,29 @@ export function mockApi(): Plugin {
       })
     }
 
-    if (chemin === '/articles' && methode === 'GET') {
+    // Les articles ont deux surfaces, comme les pages : `/articles` pour le
+    // visiteur, `/admin/articles` pour le back-office. Le bouchon servait tout
+    // sur la premiere, si bien qu'une ecriture adressee a la mauvaise route
+    // marchait en local et rendait 405 en ligne. Il reproduit desormais le
+    // refus du serveur reel, en-tete `Allow` compris.
+    if (chemin === '/articles' && methode !== 'GET' && methode !== 'HEAD') {
+      return repondre(405, { message: 'Methode non autorisee.' }, { Allow: 'GET, HEAD' })
+    }
+    if (chemin.startsWith('/articles/') && methode !== 'GET' && methode !== 'HEAD') {
+      return repondre(405, { message: 'Methode non autorisee.' }, { Allow: 'GET, HEAD' })
+    }
+
+    const cheminArticles = chemin.startsWith('/admin/articles')
+      ? chemin.slice('/admin'.length)
+      : chemin
+    const administration = chemin.startsWith('/admin/articles')
+
+    if (cheminArticles === '/articles' && methode === 'GET') {
       // Le site public demande statut=publie ; le back-office ne filtre pas.
       // Le simulateur doit honorer les deux, sinon un brouillon apparaitrait
       // en developpement sur des pages publiques et personne ne le verrait
       // avant la mise en ligne.
-      const statutDemande = url.searchParams.get('statut')
+      const statutDemande = administration ? url.searchParams.get('statut') : 'publie'
       const categorieDemandee = url.searchParams.get('categorie')
 
       const corpus = estGabon ? articlesGabon : articles
@@ -1944,7 +1964,7 @@ export function mockApi(): Plugin {
       })
     }
 
-    if (chemin === '/articles' && methode === 'POST') {
+    if (cheminArticles === '/articles' && methode === 'POST') {
       return void lireCorps().then((corps) => {
         if (corps === null) return repondre(422, { message: 'Corps de requete illisible.' })
         const { categorie_slug: categorieSlug, ...reste } = corps
@@ -1971,7 +1991,7 @@ export function mockApi(): Plugin {
         : articles.find((a) => a.slug === identifiant)
     }
 
-    const correspondance = chemin.match(/^\/articles\/([^/]+)$/)
+    const correspondance = cheminArticles.match(/^\/articles\/([^/]+)$/)
     if (correspondance) {
       const segment = correspondance[1]!
 

@@ -243,3 +243,145 @@ République de Guinée
 
 La valeur est un texte libre et non un nombre : « 1 200+ » est accepté aussi
 bien que « 11 ».
+
+---
+
+## Etat de la saisie au 22/09/2026
+
+Releve sur l'API. Ce document garde ce qui est fait, marque comme tel, plutot
+que de le supprimer : le chemin parcouru reste lisible.
+
+| Bloc | Dev | Production |
+|---|---|---|
+| Bandeau, mot de bienvenue, Ambassadeur, dirigeants | saisi | saisi |
+| Adresse postale | saisie | saisie |
+| Les quatre pages redactionnelles | **saisies et publiees** | a reporter |
+| Juridiction et chiffres marquants | **saisis** | a reporter |
+| Annuaire, cinq agents | a saisir | a saisir |
+| Actualites, cinq articles | a saisir | a saisir |
+| Nouvelles photographies (President, Ministre, Ambassadeur) | a poser | a poser |
+| Numeros de telephone | **attendus du poste** | attendus |
+
+Un guide de remplissage avec boutons de copie reprend les deux blocs a saisir :
+https://claude.ai/code/artifact/019381df-a62d-48a1-af36-8a9f6e23baa6
+
+---
+
+## Annuaire — l'equipe de la chancellerie
+
+Six portraits transmis par le poste le 22/09, avec les noms et les fonctions.
+Les photographies optimisees sont dans
+`~/VueJS/medias-gabon/a-televerser/equipe-chancellerie/`.
+
+**L'Ambassadeur n'entre PAS dans cette liste.** La page de la chancellerie le
+tire du bloc « L'Ambassadeur » du contenu d'accueil ; l'inscrire aussi dans le
+personnel l'afficherait deux fois. Sa nouvelle photographie se pose dans
+Contenu de l'accueil.
+
+L'ordre ci-dessous est celui du poste, et le conserver a un effet visible : la
+page derive l'ordre des services de la position de leurs membres.
+
+| # | Nom | Fonction | Service | Photographie |
+|---|---|---|---|---|
+| 1 | Barry Diawadou | Premier conseiller, chargé des affaires consulaires | Service Visa et Actes consulaires | `premier-conseiller.webp` |
+| 2 | Syron Amiss NDONG MINSTA | Conseiller économique, chargé de la Chancellerie | Service économique et commercial | `conseiller-economique.webp` |
+| 3 | Guy-Roger ROMBONOT MOUSSAVOU | Conseiller académique et culturel | *(vide)* | `conseiller-academique.webp` |
+| 4 | Oswald Kevin DOUKAGHA | Conseiller communication, chargé des médias | Unité de communication et de digitalisation | `conseiller-communication.webp` |
+| 5 | Pyssame Gael IVALA | Chef du Protocole | *(vide)* | `chef-du-protocole.webp` |
+
+**Reserves a lever :**
+
+- **L'Ambassadeur n'entre PAS dans l'annuaire.** La page de la chancellerie le tire du bloc « L'Ambassadeur » du contenu d'accueil. L'inscrire aussi dans le personnel l'afficherait deux fois. Sa nouvelle photographie se pose dans Contenu de l'accueil, pas ici.
+- **Deux agents ne relèvent d'aucun des quatre services.** Le Conseiller académique et culturel et le Chef du Protocole : les quatre services que l'ambassade nomme dans son propre texte ne les couvrent pas. Laisser leur service vide les range en fin de liste sans titre de groupe, ce qui est correct. À faire trancher par le poste.
+- **Un service reste sans agent.** « Responsabilité administrative et financière » est nommée dans le texte de la chancellerie mais aucun des six noms transmis ne s'y rattache.
+- **Deux orthographes à confirmer.** « Pyssame Gael IVALA » — « Gaël » prend peut-être un tréma. Et le document écrit « Conseiller accademique et culturelle » : corrigé en « académique et culturel », accordé au masculin comme le mot « Conseiller ».
+- **Deux personnes viendront plus tard.** La secrétaire particulière de l'Ambassadeur et la secrétaire du pool des conseillers, annoncées par le poste. Elles s'ajouteront à la suite, sans rien changer à ce qui précède.
+
+---
+
+## Articles — la revue de presse du 4 juin au 11 septembre
+
+Cinq articles tires du document de revue de presse envoye par le poste. Les
+corps sont dans le dossier `actualites/` voisin, un fichier par article. Les
+images sont dans `~/VueJS/medias-gabon/a-televerser/actualites/`.
+
+Les cinq portent la categorie **Actualites de l'ambassade** et prennent la date
+de l'EVENEMENT, non celle de la saisie. Le statut doit passer a **Publie** :
+laisse en brouillon, l'article n'apparait pas sur le site.
+
+### 1. Présentation des copies figurées des lettres de créance de l'Ambassadeur du Gabon en République de Guinée
+
+**Date de publication** : 4 juin 2026 &nbsp;·&nbsp; **Image** : `01-lettres-de-creance-copies-figurees.webp`
+
+**Resume**
+
+```
+Le 4 juin 2026, l'Ambassadeur Persis Lionel Essono Ondo a présenté les copies figurées de ses lettres de créance au ministre guinéen des Affaires étrangères, étape protocolaire préalable à leur remise officielle au Chef de l'État.
+```
+
+**Contenu** : coller `actualites/2026-06-04-copies-figurees.html` (1848 caracteres).
+
+### 2. AFG Bank Guinée se lance officiellement à Conakry en présence de l'Ambassadeur du Gabon
+
+**Date de publication** : 28 juin 2026 &nbsp;·&nbsp; **Image** : `02-afg-bank-guinee-lancement.webp`
+
+**Resume**
+
+```
+Le groupe bancaire panafricain Atlantic Financial Group a lancé ses activités en Guinée le 28 juin 2026. L'Ambassadeur du Gabon a pris part à la cérémonie, marquant la dimension régionale de ce déploiement.
+```
+
+**Contenu** : coller `actualites/2026-06-28-afg-bank.html` (1529 caracteres).
+
+### 3. Mission d'inspection à Kindia : l'Ambassadeur du Gabon visite les installations industrielles du groupe SONOCO
+
+**Date de publication** : 3 juillet 2026 &nbsp;·&nbsp; **Image** : `03-sonoco-kindia-inspection.webp`
+
+**Resume**
+
+```
+Le 3 juillet 2026, l'Ambassadeur du Gabon a inspecté les installations de la société SONOCO à Kindia, afin d'évaluer sa capacité à accompagner un projet envisagé au Gabon et d'identifier des partenariats industriels entre les deux pays.
+```
+
+**Contenu** : coller `actualites/2026-07-03-sonoco.html` (2129 caracteres).
+
+### 4. L'Ambassadeur du Gabon en Guinée à la finale de la Coupe de l'Unité africaine à Conakry
+
+**Date de publication** : 23 juillet 2026 &nbsp;·&nbsp; **Image** : `04-coupe-unite-africaine-finale.webp`
+
+**Resume**
+
+```
+L'Ambassadeur du Gabon a pris part le 23 juillet 2026 à la finale de la Coupe de l'Unité africaine à Conakry, une rencontre placée sous le signe de la fraternité et du rapprochement entre les peuples du continent.
+```
+
+**Contenu** : coller `actualites/2026-07-23-coupe-unite.html` (2213 caracteres).
+
+### 5. Présentation des lettres de créance de l'Ambassadeur du Gabon au Président de la République de Guinée
+
+**Date de publication** : 11 septembre 2026 &nbsp;·&nbsp; **Image** : `05-lettres-de-creance-president.webp`
+
+**Resume**
+
+```
+Le 11 septembre 2026, au Palais Mohammed V, l'Ambassadeur Persis Lionel Essono Ondo a remis ses lettres de créance au Général Mamadi Doumbouya, Président de la République de Guinée, aux côtés de neuf autres ambassadeurs nouvellement accrédités.
+```
+
+**Contenu** : coller `actualites/2026-09-11-lettres-de-creance.html` (2609 caracteres).
+
+**La photographie du 11 septembre est trop petite** : 472 px de large, la ou
+la page d'article en affiche environ 900. Elle sera visiblement floue, et c'est
+l'article le plus important des cinq. A redemander au poste.
+
+### Ce qui a ete corrige dans le texte du poste
+
+Le fond n'a pas ete reecrit. Seules des fautes materielles ont ete reprises :
+
+| Ou | Quoi |
+|---|---|
+| Titre de l'article du 4 juin | « … lettres de créance l'Ambassadeur du Gabon » — il manquait « de ». |
+| Article du 4 juin | « Conackry » corrigé en « Conakry ». |
+| Titre de l'article du 11 septembre | « à son Excellence General Mamadi DOUMBOUYA, Président de la République Chef de l'Etat » : capitales, accent sur « État », virgule manquante. Le titre a été raccourci, la formule complète restant dans le premier paragraphe. |
+| Article du 11 septembre | « DOUMBAOUYA » corrigé en « DOUMBOUYA » — le document écrit le nom de deux façons dans le même article. |
+| Partout | « COMMUNICATION DE L'AMBASSADE » devient une signature en italique en fin d'article, au lieu d'une ligne en capitales. |
+| Partout | dates en toutes lettres homogénéisées (« 04 juin » → « 4 juin »), doubles espaces supprimés, « coopération sud-sud » → « Sud-Sud ». |
