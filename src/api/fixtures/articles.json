@@ -6,7 +6,6 @@
       "titre": "Cérémonie du 2 octobre à la chancellerie",
       "resume": "La communauté guinéenne s'est réunie pour l'anniversaire de l'indépendance.",
       "contenu": "<p>La chancellerie a accueilli plusieurs centaines de membres de la communauté guinéenne à l'occasion de l'anniversaire de l'indépendance. La cérémonie s'est ouverte par une allocution de l'ambassadeur.</p>",
-      "image": "/fixtures/article-4.jpg",
       "categorie": {
         "id": 1,
         "nom": "Actualités Ambassade",
@@ -19,7 +18,8 @@
       "likes": 28,
       "locale": "fr",
       "source": "manuel",
-      "temps_lecture": 3
+      "temps_lecture": 3,
+      "image_url": "/fixtures/article-4.jpg"
     },
     {
       "id": 6,
@@ -27,7 +27,6 @@
       "titre": "Visite du ministre des Affaires étrangères",
       "resume": "Le ministre a été reçu à l'ambassade lors de sa tournée nord-américaine.",
       "contenu": "<p>Le ministre des Affaires étrangères a été reçu à l'ambassade dans le cadre de sa tournée nord-américaine. Un point sur les dossiers consulaires a été présenté.</p>",
-      "image": "/fixtures/article-6.jpg",
       "categorie": {
         "id": 2,
         "nom": "Actualités Diplomatiques",
@@ -40,7 +39,8 @@
       "likes": 63,
       "locale": "fr",
       "source": "manuel",
-      "temps_lecture": 3
+      "temps_lecture": 3,
+      "image_url": "/fixtures/article-6.jpg"
     },
     {
       "id": 5,
@@ -48,7 +48,6 @@
       "titre": "Nouveaux horaires du service consulaire",
       "resume": "Le service consulaire ouvre désormais le samedi matin.",
       "contenu": "<p>Afin de mieux répondre à l'affluence, le service consulaire ouvre ses portes le samedi de 9h à 13h, sur rendez-vous uniquement.</p>",
-      "image": "/fixtures/article-5.jpg",
       "categorie": {
         "id": 1,
         "nom": "Actualités Ambassade",
@@ -61,7 +60,8 @@
       "likes": 41,
       "locale": "fr",
       "source": "manuel",
-      "temps_lecture": 2
+      "temps_lecture": 2,
+      "image_url": "/fixtures/article-5.jpg"
     },
     {
       "id": 9,
@@ -69,7 +69,6 @@
       "titre": "Mise à jour des procédures de visa",
       "resume": "Les nouvelles modalités entrent en vigueur le 1er novembre.",
       "contenu": "<p>À compter du 1er novembre, les demandes de visa se déposent exclusivement en ligne. Les dossiers incomplets ne seront plus examinés.</p>",
-      "image": "/fixtures/article-9.jpg",
       "categorie": {
         "id": 3,
         "nom": "Actualités Gouvernementales",
@@ -82,7 +81,8 @@
       "likes": 74,
       "locale": "fr",
       "source": "manuel",
-      "temps_lecture": 2
+      "temps_lecture": 2,
+      "image_url": "/fixtures/article-9.jpg"
     },
     {
       "id": 3,
@@ -90,7 +90,6 @@
       "titre": "Préparation de la fête nationale",
       "resume": "Les préparatifs de la cérémonie sont engagés.",
       "contenu": "<p>La cérémonie se tiendra à la chancellerie en présence de la communauté guinéenne.</p>",
-      "image": "/fixtures/article-3.jpg",
       "categorie": {
         "id": 3,
         "nom": "Actualités Gouvernementales",
@@ -103,7 +102,8 @@
       "likes": 0,
       "locale": "fr",
       "source": "manuel",
-      "temps_lecture": 1
+      "temps_lecture": 1,
+      "image_url": "/fixtures/article-3.jpg"
     },
     {
       "id": 7,
@@ -111,7 +111,6 @@
       "titre": "Forum économique Guinée–États-Unis",
       "resume": "Deux cents investisseurs ont participé aux rencontres d'affaires.",
       "contenu": "<p>Le forum a réuni près de deux cents investisseurs autour des secteurs minier, agricole et énergétique. Plusieurs protocoles d'intention ont été signés.</p>",
-      "image": "/fixtures/article-7.jpg",
       "categorie": {
         "id": 2,
         "nom": "Actualités Diplomatiques",
@@ -124,7 +123,8 @@
       "likes": 187,
       "locale": "fr",
       "source": "manuel",
-      "temps_lecture": 4
+      "temps_lecture": 4,
+      "image_url": "/fixtures/article-7.jpg"
     },
     {
       "id": 10,
@@ -132,7 +132,6 @@
       "titre": "Programme de bourses 2027",
       "resume": "Les candidatures sont ouvertes jusqu'au 31 décembre.",
       "contenu": "<p>Le programme de bourses destiné aux étudiants guinéens est ouvert. Les dossiers sont à déposer avant le 31 décembre.</p>",
-      "image": "/fixtures/article-1.jpg",
       "categorie": {
         "id": 3,
         "nom": "Actualités Gouvernementales",
@@ -145,7 +144,8 @@
       "likes": 96,
       "locale": "fr",
       "source": "manuel",
-      "temps_lecture": 3
+      "temps_lecture": 3,
+      "image_url": "/fixtures/article-1.jpg"
     },
     {
       "id": 1,
@@ -153,7 +153,6 @@
       "titre": "Rencontre bilatérale à Washington",
       "resume": "L'ambassadeur a rencontré les représentants du Département d'État.",
       "contenu": "<p>Une rencontre de travail s'est tenue à Washington entre l'ambassadeur et les représentants du Département d'État. Les échanges ont porté sur le renforcement de la coopération bilatérale.</p>",
-      "image": "/fixtures/article-1.jpg",
       "categorie": {
         "id": 1,
         "nom": "Actualités Ambassade",
@@ -166,7 +165,8 @@
       "likes": 12,
       "locale": "fr",
       "source": "manuel",
-      "temps_lecture": 2
+      "temps_lecture": 2,
+      "image_url": "/fixtures/article-1.jpg"
     },
     {
       "id": 8,
@@ -174,7 +174,6 @@
       "titre": "Coopération universitaire renforcée",
       "resume": "Un partenariat facilite les échanges d'étudiants.",
       "contenu": "<p>Un partenariat a été conclu avec plusieurs universités afin de faciliter les échanges d'étudiants et la reconnaissance des diplômes.</p>",
-      "image": "/fixtures/article-8.jpg",
       "categorie": {
         "id": 2,
         "nom": "Actualités Diplomatiques",
@@ -187,7 +186,8 @@
       "likes": 52,
       "locale": "fr",
       "source": "manuel",
-      "temps_lecture": 3
+      "temps_lecture": 3,
+      "image_url": "/fixtures/article-8.jpg"
     },
     {
       "id": 11,
@@ -195,7 +195,6 @@
       "titre": "Recensement de la communauté guinéenne",
       "resume": "Une campagne d'inscription au registre consulaire est lancée.",
       "contenu": "<p>Une campagne d'inscription au registre consulaire est lancée. L'inscription facilite la délivrance des documents et la protection consulaire.</p>",
-      "image": "/fixtures/article-2.jpg",
       "categorie": {
         "id": 3,
         "nom": "Actualités Gouvernementales",
@@ -208,7 +207,8 @@
       "likes": 19,
       "locale": "fr",
       "source": "manuel",
-      "temps_lecture": 2
+      "temps_lecture": 2,
+      "image_url": "/fixtures/article-2.jpg"
     },
     {
       "id": 2,
@@ -216,7 +216,6 @@
       "titre": "Accord de coopération avec le Costa Rica",
       "resume": "Signature d'un accord de coopération économique.",
       "contenu": "<p>Les deux pays ont signé un accord de coopération économique portant sur les échanges commerciaux et la formation professionnelle.</p>",
-      "image": "/fixtures/article-2.jpg",
       "categorie": {
         "id": 2,
         "nom": "Actualités Diplomatiques",
@@ -229,7 +228,8 @@
       "likes": 3,
       "locale": "fr",
       "source": "facebook",
-      "temps_lecture": 1
+      "temps_lecture": 1,
+      "image_url": "/fixtures/article-2.jpg"
     }
   ],
   "meta": {

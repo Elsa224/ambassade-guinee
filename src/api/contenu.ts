@@ -335,12 +335,14 @@ export async function televerserImage(fichier: File): Promise<string> {
 }
 
 /** Message d'un refus previsible, ou `null` si le fichier est acceptable. */
-export function refusDuFichier(fichier: File): string | null {
+export function refusDuFichier(fichier: File, borne = TAILLE_IMAGE_MAX): string | null {
   if (!TYPES_IMAGE_ACCEPTES.includes(fichier.type as (typeof TYPES_IMAGE_ACCEPTES)[number])) {
     return 'Formats acceptés : WebP, PNG ou JPEG.'
   }
-  if (fichier.size > TAILLE_IMAGE_MAX) {
-    return "L'image ne doit pas dépasser 5 Mo."
+  if (fichier.size > borne) {
+    // La borne differe selon la route : 5 Mo pour le contenu, 10 pour les
+    // medias d'article. Le message doit dire celle qui s'applique.
+    return `L'image ne doit pas dépasser ${Math.round(borne / (1024 * 1024))} Mo.`
   }
   return null
 }

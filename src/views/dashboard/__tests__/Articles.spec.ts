@@ -25,9 +25,28 @@ async function monter() {
   return ecran
 }
 
+/** La taxonomie de l'ambassade, servie par sa propre route. */
+const CATEGORIES = {
+  data: [
+    { id: 1, nom: "Actualités de l'ambassade", slug: 'actualites-ambassade', couleur: '#006633' },
+    { id: 2, nom: 'Actualités diplomatiques', slug: 'actualites-diplomatique', couleur: '#0A7B3E' },
+  ],
+}
+
+/**
+ * L'ecran charge deux routes : les articles et la taxonomie. Un bouchon qui
+ * rendrait la meme reponse aux deux ferait passer une liste d'articles pour
+ * une liste de categories.
+ */
+function servir(articles: unknown = articlesFixture, categories: unknown = CATEGORIES) {
+  return vi.fn((url: string) =>
+    Promise.resolve(reponse(String(url).includes('/api/admin/categories') ? categories : articles)),
+  )
+}
+
 describe('ecran de gestion des articles', () => {
   beforeEach(() => {
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(reponse(articlesFixture)))
+    vi.stubGlobal('fetch', servir())
   })
 
   afterEach(() => {
@@ -40,7 +59,7 @@ describe('ecran de gestion des articles', () => {
     // de la liste ou il vient d'etre cree.
     await monter()
 
-    expect(vi.mocked(fetch).mock.calls[0]![0]).toBe('/api/admin/articles')
+    expect(vi.mocked(fetch).mock.calls.map((appel) => appel[0])).toContain('/api/admin/articles')
   })
 
   it('compte tout le fonds, pas la page affichee', async () => {
@@ -118,6 +137,8 @@ describe('ecran de gestion des articles', () => {
     const envoi = appels.find((appel) => (appel[1] as RequestInit | undefined)?.method === 'POST')!
     const corps = JSON.parse((envoi[1] as RequestInit).body as string)
     expect(corps.statut).toBe('publie')
-    expect(corps.categorie_slug).toBe('actualites-ambassade')
+    // Et la categorie part sous son IDENTIFIANT, celui de la premiere entree
+    // de la taxonomie servie : le serveur ne regarde pas les slugs.
+    expect(corps.categorie_id).toBe(1)
   })
 })
