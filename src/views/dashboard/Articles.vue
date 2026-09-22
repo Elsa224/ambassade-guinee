@@ -3,7 +3,7 @@ import { computed, onMounted, ref } from 'vue'
 import {
   creerArticle,
   libelleStatut,
-  listerArticles,
+  listerArticlesAdmin,
   modifierArticle,
   supprimerArticle,
   type Article,
@@ -328,7 +328,7 @@ async function charger(): Promise<void> {
   chargement.value = true
   erreurApi.value = ''
   try {
-    articles.value = (await listerArticles()).map(versEcran)
+    articles.value = (await listerArticlesAdmin()).map(versEcran)
   } catch {
     erreurApi.value = 'Impossible de charger les articles.'
     articles.value = []

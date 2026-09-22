@@ -88,6 +88,30 @@ export async function listerArticles(filtres: FiltresArticles = {}): Promise<Art
 }
 
 /**
+ * La surface d'ADMINISTRATION des articles.
+ *
+ * `/api/articles` est la surface visiteur : elle ne repond qu'en lecture, et
+ * le serveur le dit lui-meme — un `POST` y rend 405 avec `Allow: GET, HEAD`.
+ * Les ecritures passent par `/api/admin/articles`, comme les pages passent
+ * par `/api/admin/pages`. Le gabarit tenait l'ancienne adresse depuis le plan
+ * de la phase 1, ecrit avant que le back ne separe les deux surfaces ; le
+ * defaut n'est apparu que le jour ou quelqu'un a voulu creer un article.
+ */
+const ADMIN = '/api/admin/articles'
+
+/**
+ * Liste vue par l'administration, brouillons compris.
+ *
+ * La surface visiteur ne sert que le publie ; l'ecran d'administration doit
+ * voir aussi ce qui ne l'est pas, sans quoi un brouillon enregistre
+ * disparaitrait de la liste ou il a ete cree.
+ */
+export async function listerArticlesAdmin(filtres: FiltresArticles = {}): Promise<Article[]> {
+  const reponse = await apiGet<Enveloppe<Article[]>>(`${ADMIN}${versChaineDeRequete(filtres)}`)
+  return reponse.data
+}
+
+/**
  * Liste destinee au site public.
  *
  * Le filtre `statut=publie` est demande au serveur, puis reapplique ici. Cette
@@ -107,15 +131,15 @@ export async function recupererArticleParSlug(slug: string): Promise<Article> {
 }
 
 export async function creerArticle(brouillon: BrouillonArticle): Promise<Article> {
-  const reponse = await apiPost<Enveloppe<Article>>('/api/articles', brouillon)
+  const reponse = await apiPost<Enveloppe<Article>>(ADMIN, brouillon)
   return reponse.data
 }
 
 export async function modifierArticle(id: number, brouillon: BrouillonArticle): Promise<Article> {
-  const reponse = await apiPut<Enveloppe<Article>>(`/api/articles/${id}`, brouillon)
+  const reponse = await apiPut<Enveloppe<Article>>(`${ADMIN}/${id}`, brouillon)
   return reponse.data
 }
 
 export function supprimerArticle(id: number): Promise<void> {
-  return apiDelete(`/api/articles/${id}`)
+  return apiDelete(`${ADMIN}/${id}`)
 }

@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
 import {
   listerArticles,
+  listerArticlesAdmin,
   listerArticlesPublies,
   recupererArticleParSlug,
   creerArticle,
@@ -105,6 +106,16 @@ describe('service Articles', () => {
     expect(article.titre).toBe('Rencontre bilatérale à Washington')
   })
 
+  it("ecrit sur la surface d'administration, jamais sur celle du visiteur", async () => {
+    // `/api/articles` ne repond qu'en lecture : un POST y rend 405 avec
+    // `Allow: GET, HEAD`. Les trois ecritures passent par `/api/admin/articles`.
+    vi.mocked(fetch).mockResolvedValue(reponse({ data: articlesFixture.data[0]! }))
+
+    await listerArticlesAdmin({ statut: 'brouillon' })
+
+    expect(vi.mocked(fetch).mock.calls[0]![0]).toBe('/api/admin/articles?statut=brouillon')
+  })
+
   it('cree un article par POST', async () => {
     vi.mocked(fetch).mockResolvedValue(
       reponse({ data: { ...articlesFixture.data[0]!, id: 42 } }, 201),
@@ -113,7 +124,7 @@ describe('service Articles', () => {
     const article = await creerArticle(BROUILLON)
 
     const [url, options] = vi.mocked(fetch).mock.calls[0]!
-    expect(url).toBe('/api/articles')
+    expect(url).toBe('/api/admin/articles')
     expect((options as RequestInit).method).toBe('POST')
     expect(JSON.parse((options as RequestInit).body as string).titre).toBe('Nouvel article')
     expect(article.id).toBe(42)
@@ -125,7 +136,7 @@ describe('service Articles', () => {
     await modifierArticle(1, BROUILLON)
 
     const [url, options] = vi.mocked(fetch).mock.calls[0]!
-    expect(url).toBe('/api/articles/1')
+    expect(url).toBe('/api/admin/articles/1')
     expect((options as RequestInit).method).toBe('PUT')
   })
 
@@ -135,7 +146,7 @@ describe('service Articles', () => {
     await supprimerArticle(7)
 
     const [url, options] = vi.mocked(fetch).mock.calls[0]!
-    expect(url).toBe('/api/articles/7')
+    expect(url).toBe('/api/admin/articles/7')
     expect((options as RequestInit).method).toBe('DELETE')
   })
 

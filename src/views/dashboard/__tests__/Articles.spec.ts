@@ -34,10 +34,13 @@ describe('ecran de gestion des articles', () => {
     vi.unstubAllGlobals()
   })
 
-  it('charge la liste depuis /api/articles', async () => {
+  it("charge la liste depuis la surface d'administration", async () => {
+    // Et non depuis `/api/articles`, qui est la surface VISITEUR : elle ne
+    // sert que le publie, si bien qu'un brouillon enregistre disparaitrait
+    // de la liste ou il vient d'etre cree.
     await monter()
 
-    expect(vi.mocked(fetch).mock.calls[0]![0]).toBe('/api/articles')
+    expect(vi.mocked(fetch).mock.calls[0]![0]).toBe('/api/admin/articles')
   })
 
   it('compte tout le fonds, pas la page affichee', async () => {
