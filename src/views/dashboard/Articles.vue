@@ -4,12 +4,15 @@ import {
   creerArticle,
   libelleStatut,
   listerArticlesAdmin,
+  listerCategories,
   modifierArticle,
   supprimerArticle,
   type Article,
   type BrouillonArticle,
+  type Categorie,
   type StatutArticle,
 } from '@/api/articles'
+import { televerserMedia, TAILLE_MEDIA_MAX } from '@/api/medias'
 import ChampSelect from '@/components/ui/ChampSelect.vue'
 import ChampDate from '@/components/ui/ChampDate.vue'
 import ChampImage from '@/components/ui/ChampImage.vue'
@@ -32,29 +35,31 @@ import { paginerEnMemoire } from '@/components/ui/pagination'
  * ouverte au filtre qui ne filtre rien.
  */
 
-/** Les trois categories servies par le back, source unique des libelles. */
-const CATEGORIES = [
-  { slug: 'actualites-ambassade', libelle: "Actualités de l'ambassade", court: 'Ambassade' },
-  { slug: 'actualites-diplomatique', libelle: 'Actualités diplomatiques', court: 'Diplomatiques' },
-  {
-    slug: 'actualites-gouvernementale',
-    libelle: 'Actualités gouvernementales',
-    court: 'Gouvernementales',
-  },
-] as const
+/**
+ * Les categories viennent du serveur, jamais d'une liste ecrite ici.
+ *
+ * Le gabarit en portait trois en dur — `actualites-ambassade`,
+ * `actualites-diplomatique`, `actualites-gouvernementale` — qui ne
+ * correspondaient a rien : les categories sont des lignes propres a chaque
+ * ambassade, creees a la demande. Un article enregistre avec l'un de ces
+ * slugs ressortait sans categorie, en silence.
+ */
+const categories = ref<Categorie[]>([])
 
 const STATUTS: readonly StatutArticle[] = ['brouillon', 'a_valider', 'publie']
 
 /** Dix lignes tenaient dans la page ; le lecteur peut en demander plus. */
 const LIGNES_PAR_DEFAUT = 10
 
-const OPTIONS_CATEGORIE = CATEGORIES.map((c) => ({ valeur: c.slug, libelle: c.libelle }))
+const OPTIONS_CATEGORIE = computed(() =>
+  categories.value.map((c) => ({ valeur: String(c.id), libelle: c.nom })),
+)
 const OPTIONS_STATUT = STATUTS.map((statut) => ({ valeur: statut, libelle: libelleStatut(statut) }))
 
-const OPTIONS_FILTRE_CATEGORIE = [
+const OPTIONS_FILTRE_CATEGORIE = computed(() => [
   { valeur: '', libelle: 'Toutes les catégories' },
-  ...OPTIONS_CATEGORIE,
-]
+  ...categories.value.map((c) => ({ valeur: c.slug, libelle: c.nom })),
+])
 const OPTIONS_FILTRE_STATUT = [{ valeur: '', libelle: 'Tous les statuts' }, ...OPTIONS_STATUT]
 
 const OPTIONS_TRI = [
@@ -73,7 +78,10 @@ interface ArticleEnListe {
   resume: string
   contenu: string
   image: string
+  /** Le slug, pour le filtre et la pastille. */
   categorie: string
+  /** L'identifiant, pour reouvrir le formulaire sur la bonne valeur. */
+  categorieId: number | null
   statut: StatutArticle
   date: string
   vues: number
@@ -87,6 +95,7 @@ function versEcran(article: Article): ArticleEnListe {
     contenu: article.contenu,
     image: article.image,
     categorie: article.categorie?.slug ?? '',
+    categorieId: article.categorie?.id ?? null,
     statut: article.statut,
     date: article.date_publication,
     vues: article.vues,
@@ -171,7 +180,8 @@ const compteurs = computed(() => ({
 }))
 
 function libelleCategorie(slug: string): string {
-  return CATEGORIES.find((c) => c.slug === slug)?.libelle ?? slug
+  if (slug === '') return 'Sans catégorie'
+  return categories.value.find((c) => c.slug === slug)?.nom ?? slug
 }
 
 /**
@@ -180,7 +190,11 @@ function libelleCategorie(slug: string): string {
  * pastille sur deux lignes et rendait la hauteur des lignes irreguliere.
  */
 function categorieCourte(slug: string): string {
-  return CATEGORIES.find((c) => c.slug === slug)?.court ?? slug
+  const nom = libelleCategorie(slug)
+  // « Actualites de l'ambassade » -> « Ambassade ». Le prefixe est retire
+  // quand il existe, jamais impose : les noms appartiennent a l'ambassade.
+  const abrege = nom.replace(/^actualit[ée]s?\s+(?:de\s+l['’])?/i, '')
+  return abrege === '' ? nom : abrege.charAt(0).toUpperCase() + abrege.slice(1)
 }
 
 /** Le statut porte un etat : c'est la seule chose qui a droit a la couleur. */
@@ -210,23 +224,34 @@ function filtrer(): void {
 
 interface SaisieArticle {
   titre: string
+  /** L'identifiant de la categorie, sous forme de chaine pour le `select`. */
   categorie: string
   resume: string
   contenu: string
   statut: StatutArticle
   date: string
+  /**
+   * La CLE du media, renseignee seulement par un nouveau televersement.
+   *
+   * Vide, elle signifie « ne touche pas a l'image » : le champ est alors
+   * absent du corps envoye. La lecture ne rend que l'adresse d'affichage, et
+   * la cle ne s'en deduit pas.
+   */
   image: string
+  /** L'adresse montree dans la vignette, qui n'est jamais enregistree. */
+  apercuImage: string
 }
 
 function saisieVierge(): SaisieArticle {
   return {
     titre: '',
-    categorie: CATEGORIES[0].slug,
+    categorie: '',
     resume: '',
     contenu: '',
     statut: 'brouillon',
     date: new Date().toISOString().slice(0, 10),
     image: '',
+    apercuImage: '',
   }
 }
 
@@ -244,6 +269,7 @@ function ouvrirCreation(): void {
   modeEdition.value = false
   idEnCours.value = null
   saisie.value = saisieVierge()
+  saisie.value.categorie = categories.value[0] ? String(categories.value[0].id) : ''
   erreurApi.value = ''
   formulaireOuvert.value = true
 }
@@ -253,12 +279,13 @@ function ouvrirEdition(article: ArticleEnListe): void {
   idEnCours.value = article.id
   saisie.value = {
     titre: article.titre,
-    categorie: article.categorie || CATEGORIES[0].slug,
+    categorie: article.categorieId === null ? '' : String(article.categorieId),
     resume: article.resume,
     contenu: article.contenu,
     statut: article.statut,
     date: article.date,
-    image: article.image,
+    image: '',
+    apercuImage: article.image,
   }
   erreurApi.value = ''
   formulaireOuvert.value = true
@@ -279,9 +306,11 @@ async function enregistrer(): Promise<void> {
     titre: saisie.value.titre,
     resume: saisie.value.resume,
     contenu: saisie.value.contenu,
-    categorie_slug: saisie.value.categorie,
+    categorie_id: saisie.value.categorie === '' ? null : Number(saisie.value.categorie),
     statut: saisie.value.statut,
     date_publication: saisie.value.date,
+    // Absent quand aucune image neuve n'a ete choisie : le serveur laisse
+    // alors celle qui est deja posee.
     image: saisie.value.image || undefined,
   }
 
@@ -312,6 +341,8 @@ async function supprimer(article: ArticleEnListe): Promise<void> {
 
 // --- Apercu ---------------------------------------------------------------
 
+const poidsMaximalDuMedia = Math.round(TAILLE_MEDIA_MAX / (1024 * 1024))
+
 const apercu = ref<ArticleEnListe | null>(null)
 
 function ouvrirApercu(article: ArticleEnListe): void {
@@ -328,13 +359,28 @@ async function charger(): Promise<void> {
   chargement.value = true
   erreurApi.value = ''
   try {
-    articles.value = (await listerArticlesAdmin()).map(versEcran)
+    // Les deux vont ensemble : sans la taxonomie, la colonne « Categorie »
+    // n'aurait que des slugs a montrer et le formulaire un menu vide.
+    const [liste, taxonomie] = await Promise.all([listerArticlesAdmin(), listerCategories()])
+    articles.value = liste.map(versEcran)
+    categories.value = taxonomie
   } catch {
     erreurApi.value = 'Impossible de charger les articles.'
     articles.value = []
   } finally {
     chargement.value = false
   }
+}
+
+/**
+ * Televerse et garde la CLE du media, l'adresse ne servant qu'a l'apercu.
+ *
+ * C'est ce que la route d'article attend : elle rebatit l'adresse a la
+ * lecture. Lui rendre l'URL absolue la faisait prefixer deux fois.
+ */
+async function televerserPourArticle(fichier: File) {
+  const media = await televerserMedia(fichier)
+  return { valeur: media.cle, apercu: media.url }
 }
 
 onMounted(charger)
@@ -481,10 +527,14 @@ onMounted(charger)
 
                 <td class="px-5 py-4">
                   <span
+                    v-if="article.categorie !== ''"
                     class="inline-block rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium whitespace-nowrap text-gray-700"
                     :title="libelleCategorie(article.categorie)"
                   >
                     {{ categorieCourte(article.categorie) }}
+                  </span>
+                  <span v-else class="text-xs whitespace-nowrap text-amber-700">
+                    Sans catégorie
                   </span>
                 </td>
 
@@ -591,10 +641,15 @@ onMounted(charger)
                 Catégorie *
               </label>
               <ChampSelect
+                v-if="categories.length > 0"
                 id="categorie-article"
                 v-model="saisie.categorie"
                 :options="OPTIONS_CATEGORIE"
               />
+              <p v-else class="text-sm text-amber-700">
+                Aucune catégorie n'existe encore pour cette ambassade. L'article s'enregistrera sans
+                catégorie.
+              </p>
             </div>
 
             <div class="mb-4">
@@ -625,7 +680,13 @@ onMounted(charger)
             </div>
 
             <div class="mb-4">
-              <ChampImage v-model="saisie.image" libelle="Image principale" />
+              <ChampImage
+                v-model="saisie.image"
+                v-model:apercu="saisie.apercuImage"
+                libelle="Image principale"
+                :televerseur="televerserPourArticle"
+                :poids-maximal="poidsMaximalDuMedia"
+              />
             </div>
 
             <div class="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
