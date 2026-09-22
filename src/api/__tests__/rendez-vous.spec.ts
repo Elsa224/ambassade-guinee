@@ -17,7 +17,7 @@ const CREEE = {
   reference: 'RDV-2026-000123',
   status: 'pending',
   scheduledAt: '2026-10-01T10:30:00.000Z',
-  department: { slug: 'protocole', name: 'Protocole' },
+  department: { slug: 'h8we3zpn6cdy5sf', name: 'Protocole' },
   purpose: 'Remise de documents',
   host: null,
 }
