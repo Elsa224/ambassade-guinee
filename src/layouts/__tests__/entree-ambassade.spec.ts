@@ -39,11 +39,14 @@ describe('entree « Ambassade » du menu', () => {
     setActivePinia(createPinia())
   })
 
-  it("ne mene pas a /presentation quand la rubrique n'est pas servie", async () => {
+  it('mene a /presentation meme quand aucune rubrique ne la declare', async () => {
+    // La page est servie par le CMS depuis le 21/09/2026 et se retracte
+    // d'elle-meme quand il ne sert rien : la garder fermee empecherait
+    // l'ambassade de voir ce qu'elle vient de saisir. C'est l'inverse de ce
+    // que ce test verifiait quand son texte etait ecrit en dur.
     const wrapper = await monter(GABON)
 
-    expect(liens(wrapper)).not.toContain('/presentation')
-    // L'intitule reste present : il deplie le sous-menu au lieu de naviguer.
+    expect(liens(wrapper)).toContain('/presentation')
     expect(wrapper.text()).toContain('Ambassade')
   })
 
@@ -58,14 +61,9 @@ describe('entree « Ambassade » du menu', () => {
     expect(adresses).toContain('/consuls-honoraires')
   })
 
-  it('mene bien a /presentation la ou la rubrique est ouverte', async () => {
-    const ouvert = {
-      ...GABON,
-      modules: { ...GABON.modules, presentation: true },
-    } as unknown as Embassy
+  it("offre la page d'ambition numerique dans le meme sous-menu", async () => {
+    const wrapper = await monter(GABON)
 
-    const wrapper = await monter(ouvert)
-
-    expect(liens(wrapper)).toContain('/presentation')
+    expect(liens(wrapper)).toContain('/ambition-numerique')
   })
 })

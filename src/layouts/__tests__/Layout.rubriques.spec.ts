@@ -23,7 +23,9 @@ function routeur() {
       { path: '/chancellerie', component: Chancellerie },
       { path: '/consuls-honoraires', component: Chancellerie },
       { path: '/calendrier', component: Chancellerie },
-      { path: '/usa', component: Chancellerie },
+      { path: '/presentation', component: Chancellerie },
+      { path: '/relations-bilaterales', component: Chancellerie },
+      { path: '/ambition-numerique', component: Chancellerie },
       { path: '/demarche-ligne', component: Chancellerie },
       { path: '/actualites-ambassade', component: Chancellerie },
     ],
@@ -54,8 +56,12 @@ describe('rubriques fermees dans le gabarit public', () => {
     expect(wrapper.text()).toContain('Rubrique en préparation')
   })
 
-  it('ferme aussi les pages bilaterales par URL directe', async () => {
-    const wrapper = await visiter('/usa', GABON)
+  it('ferme aussi le formulaire de demarches par URL directe', async () => {
+    // `/demarche-ligne` porte les pieces exigees par un seul pays d'accueil.
+    // Les cinq pages pays qui servaient autrefois ce test (`/usa` et les
+    // autres) n'existent plus du tout : elles ont ete supprimees avec leurs
+    // routes le 21/09/2026, et une route absente ne peut plus rien fuir.
+    const wrapper = await visiter('/demarche-ligne', GABON)
 
     expect(wrapper.text()).not.toContain(TEMOIN)
     expect(wrapper.text()).toContain('Rubrique en préparation')
@@ -79,7 +85,14 @@ describe('rubriques fermees dans le gabarit public', () => {
     // rubrique : leur contenu vient de l'annuaire et elles se retractent
     // d'elles-memes quand il est vide. Les fermer d'avance empecherait
     // l'ambassade de voir ce qu'elle vient de saisir.
-    for (const chemin of ['/chancellerie', '/consuls-honoraires', '/calendrier']) {
+    for (const chemin of [
+      '/chancellerie',
+      '/consuls-honoraires',
+      '/calendrier',
+      '/presentation',
+      '/relations-bilaterales',
+      '/ambition-numerique',
+    ]) {
       const wrapper = await visiter(chemin, GABON)
       expect(wrapper.text()).toContain(TEMOIN)
     }
@@ -91,7 +104,7 @@ describe('rubriques fermees dans le gabarit public', () => {
       .findAllComponents({ name: 'RouterLink' })
       .map((l) => String(l.props('to')))
 
-    const fermes = ['/usa']
+    const fermes = ['/demarche-ligne', '/consulat', '/rendez-vous']
 
     expect(fermes.filter((chemin) => liens.includes(chemin))).toEqual([])
   })
@@ -140,7 +153,12 @@ describe('rubriques fermees dans le gabarit public', () => {
       .findAllComponents({ name: 'RouterLink' })
       .map((l) => String(l.props('to')))
 
-    const attendus = ['/chancellerie', '/consuls-honoraires', '/calendrier', '/usa']
+    const attendus = [
+      '/chancellerie',
+      '/consuls-honoraires',
+      '/calendrier',
+      '/relations-bilaterales',
+    ]
 
     expect(attendus.filter((chemin) => !liens.includes(chemin))).toEqual([])
   })

@@ -177,74 +177,30 @@
                 >
                 <router-link
                   to="/calendrier"
-                  class="block px-4 py-2 text-sm text-gray-800 hover:bg-secondary hover:text-ink-dark transition-all"
+                  class="block px-4 py-2 text-sm text-gray-800 hover:bg-secondary hover:text-ink-dark transition-all border-b border-gray-100"
                   >Calendrier des fêtes légales</router-link
+                >
+                <router-link
+                  to="/ambition-numerique"
+                  class="block px-4 py-2 text-sm text-gray-800 hover:bg-secondary hover:text-ink-dark transition-all"
+                  >Notre ambition numérique</router-link
                 >
               </div>
             </div>
 
-            <!-- Relations - Menu cliquable avec chevron -->
-            <div v-if="rubriqueOuverte('/relations-bilaterales')" class="relative group">
-              <div class="flex items-center">
-                <router-link
-                  to="/relations-bilaterales"
-                  class="nav-item px-3 py-2 rounded-l hover:bg-secondary hover:text-ink-dark transition text-primary"
-                  active-class="hover-active"
-                >
-                  Relations
-                </router-link>
-                <button
-                  @click.stop="toggleDropdown('relations')"
-                  class="nav-item px-2 py-2 rounded-r hover:bg-secondary hover:text-ink-dark transition border-l border-primary/20"
-                  :class="{ 'bg-secondary text-ink-dark': openDropdowns.relations }"
-                >
-                  <svg
-                    class="w-4 h-4 transition-transform duration-200"
-                    :class="{ 'rotate-180': openDropdowns.relations }"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M19 9l-7 7-7-7"
-                    />
-                  </svg>
-                </button>
-              </div>
-              <div
-                v-show="openDropdowns.relations"
-                class="absolute top-full left-0 min-w-[250px] bg-white rounded-lg shadow-lg z-50 py-1 mt-1"
-              >
-                <router-link
-                  to="/usa"
-                  class="block px-4 py-2 text-sm text-gray-800 hover:bg-secondary hover:text-ink-dark transition-all border-b border-gray-100"
-                  >Les Etats-Unis d'Amérique</router-link
-                >
-                <router-link
-                  to="/costa-rica"
-                  class="block px-4 py-2 text-sm text-gray-800 hover:bg-secondary hover:text-ink-dark transition-all border-b border-gray-100"
-                  >La République du Costa Rica</router-link
-                >
-                <router-link
-                  to="/haiti"
-                  class="block px-4 py-2 text-sm text-gray-800 hover:bg-secondary hover:text-ink-dark transition-all border-b border-gray-100"
-                  >La République d'Haïti</router-link
-                >
-                <router-link
-                  to="/bahamas"
-                  class="block px-4 py-2 text-sm text-gray-800 hover:bg-secondary hover:text-ink-dark transition-all border-b border-gray-100"
-                  >Le Commonwealth des Bahamas</router-link
-                >
-                <router-link
-                  to="/fond-monetaire"
-                  class="block px-4 py-2 text-sm text-gray-800 hover:bg-secondary hover:text-ink-dark transition-all"
-                  >Le FMI et la Banque mondiale</router-link
-                >
-              </div>
-            </div>
+            <!-- Relations : un lien simple depuis le 21/09/2026. Les cinq
+                 pages pays qui peuplaient ce menu decrivaient les relations de
+                 la Guinee avec les Etats-Unis, le Costa Rica, Haiti et les
+                 Bahamas ; elles ont ete supprimees avec leurs routes. Le
+                 contrat prevoit a leur place une collection servie par le CMS,
+                 une page par partenaire, qui repeuplera ce menu. -->
+            <router-link
+              to="/relations-bilaterales"
+              class="nav-item px-3 py-2 rounded hover:bg-secondary hover:text-ink-dark transition text-primary"
+              active-class="hover-active"
+            >
+              Relations
+            </router-link>
 
             <!-- Services - Menu cliquable avec chevron -->
             <!-- L'intitule menait autrefois a `/demarche-ligne` quand le
@@ -814,19 +770,14 @@ const mobileMenus = ref([
       { label: 'Les Services', path: '/services-ambassadeur' },
       { label: 'Les consuls Honoraires', path: '/consuls-honoraires' },
       { label: 'Calendrier des fêtes légales', path: '/calendrier' },
+      { label: 'Notre ambition numérique', path: '/ambition-numerique' },
     ],
   },
   {
     key: 'relations',
     label: 'Relations',
     path: '/relations-bilaterales',
-    items: [
-      { label: "Les Etats-Unis d'Amérique", path: '/usa' },
-      { label: 'La République du Costa Rica', path: '/costa-rica' },
-      { label: "La République d'Haïti", path: '/haiti' },
-      { label: 'Le Commonwealth des Bahamas', path: '/bahamas' },
-      { label: 'Le FMI et la Banque mondiale', path: '/fond-monetaire' },
-    ],
+    items: [],
   },
   {
     key: 'services',
