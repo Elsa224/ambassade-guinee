@@ -24,7 +24,6 @@ export const RUBRIQUE_PAR_CHEMIN: Readonly<Record<string, string>> = {
   // n'est pas un chemin neutre, contrairement a ce qu'on avait suppose.
   '/demarche-ligne': 'services',
   '/consulat': 'consulat',
-  '/rendez-vous': 'rendez_vous',
   // `/ambassadeur` ne figure plus ici : la page est servie par le bloc
   // `ambassador` du CMS et se retracte d'elle-meme quand il est vide. La
   // garde n'existait que parce que la biographie etait ecrite en dur.
@@ -54,6 +53,14 @@ export function rubriqueDuChemin(chemin: string): string | null {
  */
 export const MODULE_PAR_CHEMIN: Readonly<Record<string, string>> = {
   '/evenements': 'secure_events',
+  // `/rendez-vous` etait garde par la rubrique `rendez_vous`, dont le defaut
+  // est OUVERT sur le site d'origine et quand aucun tenant n'est charge. La
+  // page etait donc atteignable des qu'une panne de bootstrap survenait, et
+  // son formulaire de maquette jetait la demande du visiteur en affichant
+  // « enregistree avec succes ». Le drapeau que le back tient est de toute
+  // facon `secure_rdv`, comme `secure_events` : meme relais, meme amont, et
+  // le meme defaut ferme.
+  '/rendez-vous': 'secure_rdv',
   // La rubrique des services servie par le CMS porte une cle distincte de
   // `services`, qui garde la page ecrite en dur de l'ambassade de Guinee aux
   // Etats-Unis. Les deux coexistent : une ambassade qui a saisi ses services
