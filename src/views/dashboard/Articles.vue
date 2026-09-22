@@ -547,7 +547,7 @@ onMounted(charger)
     <Teleport to="body">
       <div
         v-if="formulaireOuvert"
-        class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+        class="fixed inset-0 z-[1100] flex items-center justify-center bg-black/50 p-4"
       >
         <div
           class="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-xl bg-white shadow-xl"
@@ -672,7 +672,7 @@ onMounted(charger)
     <Teleport to="body">
       <div
         v-if="apercu"
-        class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+        class="fixed inset-0 z-[1100] flex items-center justify-center bg-black/50 p-4"
         @keydown.esc="fermerApercu"
       >
         <div
