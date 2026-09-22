@@ -340,7 +340,6 @@ export function mockApi(): Plugin {
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/^-|-$/g, '')
   let prochainId = 100
-  let prochainIdCategorie = 100
 
   // Taxonomie connue : reprise des categories deja presentes dans la fixture,
   // pour que le simulateur reponde avec la meme forme que l'API reelle
@@ -352,18 +351,15 @@ export function mockApi(): Plugin {
       .map((c) => [c.slug, c]),
   )
 
-  /** Retrouve la categorie d un slug connu, ou en fabrique une coherente. */
-  function categorieDepuisSlug(slug: string): Categorie {
-    const existante = categories.get(slug)
-    if (existante) return existante
-    const creee: Categorie = {
-      id: prochainIdCategorie++,
-      nom: slug.charAt(0).toUpperCase() + slug.slice(1).replace(/-/g, ' '),
-      slug,
-      couleur: '#64748b',
-    }
-    categories.set(slug, creee)
-    return creee
+  /**
+   * Retrouve une categorie par son IDENTIFIANT, comme le fait le serveur.
+   *
+   * Les categories sont des lignes propres a chaque ambassade : le contrat
+   * d'ecriture porte `categorie_id`, et un identifiant inconnu vaut refus.
+   */
+  function categorieDepuisId(identifiant: unknown): Categorie | null {
+    if (typeof identifiant !== 'number') return null
+    return [...categories.values()].find((c) => c.id === identifiant) ?? null
   }
 
   /**
@@ -1003,6 +999,25 @@ export function mockApi(): Plugin {
           repondre(200, { data: elements[index] })
         })
       }
+    }
+
+    if (chemin === '/admin/categories' && methode === 'GET') {
+      // `/admin/articles/categories` rend 404 cote serveur : le liant de route
+      // y cherche un article nomme « categories ». Le bouchon ne doit pas
+      // offrir une adresse que l'API refuse.
+      const taxonomie = [...categories.values()].sort((a, b) => a.nom.localeCompare(b.nom))
+      return repondre(200, { data: taxonomie })
+    }
+
+    if (chemin === '/admin/media' && methode === 'POST') {
+      // Cette route rend la CLE en plus de l'adresse, la ou
+      // `/admin/content/media` ne rend que l'adresse. Le champ `image` d'un
+      // article attend cette cle : lui donner l'URL absolue la faisait
+      // prefixer une seconde fois, et l'image ne s'affichait pas.
+      return repondre(201, {
+        key: 'medias/gabon-guinee/2026/09/vitrine-cascade.webp',
+        url: '/fixtures/vitrine-cascade.webp',
+      })
     }
 
     if (chemin === '/admin/content/media' && methode === 'POST') {
@@ -1967,11 +1982,17 @@ export function mockApi(): Plugin {
     if (cheminArticles === '/articles' && methode === 'POST') {
       return void lireCorps().then((corps) => {
         if (corps === null) return repondre(422, { message: 'Corps de requete illisible.' })
-        const { categorie_slug: categorieSlug, ...reste } = corps
+        const { categorie_id: categorieId, image, ...reste } = corps
+        if (categorieId != null && categorieDepuisId(categorieId) === null) {
+          return repondre(422, {
+            message: 'Les données envoyées sont invalides.',
+            errors: { categorie_id: ["Cette categorie n'existe pas."] },
+          })
+        }
         const article = {
           ...reste,
-          categorie:
-            typeof categorieSlug === 'string' ? categorieDepuisSlug(categorieSlug) : undefined,
+          categorie: categorieDepuisId(categorieId),
+          image_url: typeof image === 'string' ? `/api/medias/${image}` : null,
           id: prochainId++,
           vues: 0,
           likes: 0,
@@ -2009,14 +2030,21 @@ export function mockApi(): Plugin {
           // a pu etre localise par slug ou par id, la mutation doit viser
           // exactement l'entree resolue plus haut.
           const index = articles.indexOf(existant)
-          const { categorie_slug: categorieSlug, ...reste } = corps
+          const { categorie_id: categorieId, image, ...reste } = corps
+          if (categorieId != null && categorieDepuisId(categorieId) === null) {
+            return repondre(422, {
+              message: 'Les données envoyées sont invalides.',
+              errors: { categorie_id: ["Cette categorie n'existe pas."] },
+            })
+          }
           articles[index] = {
             ...existant,
             ...reste,
             categorie:
-              typeof categorieSlug === 'string'
-                ? categorieDepuisSlug(categorieSlug)
-                : existant.categorie,
+              categorieId === undefined ? existant.categorie : categorieDepuisId(categorieId),
+            // Champ absent : l'image reste celle deja posee. C'est ainsi que
+            // l'ecran modifie un article sans retoucher sa photographie.
+            image_url: typeof image === 'string' ? `/api/medias/${image}` : existant.image_url,
             id: existant.id,
           }
           return repondre(200, { data: articles[index] })

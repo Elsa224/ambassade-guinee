@@ -34,14 +34,53 @@ export interface BrouillonArticle {
   titre: string
   resume: string
   contenu: string
-  categorie_slug: string
+  /**
+   * L'IDENTIFIANT de la categorie, pas son slug.
+   *
+   * Le gabarit envoyait `categorie_slug`, tire d'une liste de trois slugs
+   * ecrite en dur depuis le plan de la phase 1. Les regles de validation du
+   * serveur ne portent pas ce nom : le champ n'etait donc pas refuse, il
+   * n'etait jamais regarde. L'article partait en 201 et ressortait sans
+   * categorie, sans qu'aucun message n'avertisse le redacteur.
+   *
+   * Les categories sont des lignes propres a chaque ambassade, creees a la
+   * demande : il n'existe aucune liste fixe qu'un gabarit pourrait porter.
+   * Elles se lisent par `listerCategories`.
+   */
+  categorie_id: number | null
   statut: StatutArticle
   date_publication: string
+  /**
+   * La CLE du media, rendue par `televerserMedia`, jamais une URL.
+   *
+   * Absent du corps, le champ laisse l'image en place : c'est ainsi qu'on
+   * modifie un article sans retoucher sa photographie, faute de pouvoir
+   * reconstruire la cle depuis l'adresse servie en lecture.
+   */
   image?: string
 }
 
 interface Enveloppe<T> {
   data: T
+}
+
+/**
+ * La forme SERVIE d'un article, qui n'est pas tout a fait celle qu'on affiche.
+ *
+ * Le serveur nomme le champ `image_url` en lecture et accepte `image` en
+ * ecriture. Le gabarit portait `image` des deux cotes depuis le plan de la
+ * phase 1 : la vignette d'un article enregistre restait donc vide, l'attribut
+ * `src` valant `undefined`. `image` reste conserve en repli, au cas ou une
+ * route servirait encore l'ancien nom.
+ */
+interface ArticleServi extends Omit<Article, 'image'> {
+  image_url?: string | null
+  image?: string | null
+}
+
+function normaliserArticle(servi: ArticleServi): Article {
+  const { image_url: adresse, image, ...reste } = servi
+  return { ...reste, image: adresse ?? image ?? '' }
 }
 
 const LIBELLES: Record<StatutArticle, string> = {
@@ -67,6 +106,18 @@ export function statutDepuisLibelle(libelle: string): StatutArticle {
   return trouve ?? 'brouillon'
 }
 
+/**
+ * Les categories de l'ambassade courante.
+ *
+ * `GET /api/admin/categories` — et non `/api/admin/articles/categories`, qui
+ * rend 404 parce que le liant de route y cherche un article nomme
+ * « categories ».
+ */
+export async function listerCategories(): Promise<Categorie[]> {
+  const reponse = await apiGet<Enveloppe<Categorie[]>>('/api/admin/categories')
+  return reponse.data
+}
+
 /** Filtres acceptes par la liste d'articles. */
 export interface FiltresArticles {
   statut?: StatutArticle
@@ -83,8 +134,10 @@ function versChaineDeRequete(filtres: FiltresArticles): string {
 }
 
 export async function listerArticles(filtres: FiltresArticles = {}): Promise<Article[]> {
-  const reponse = await apiGet<Enveloppe<Article[]>>(`/api/articles${versChaineDeRequete(filtres)}`)
-  return reponse.data
+  const reponse = await apiGet<Enveloppe<ArticleServi[]>>(
+    `/api/articles${versChaineDeRequete(filtres)}`,
+  )
+  return reponse.data.map(normaliserArticle)
 }
 
 /**
@@ -107,8 +160,8 @@ const ADMIN = '/api/admin/articles'
  * disparaitrait de la liste ou il a ete cree.
  */
 export async function listerArticlesAdmin(filtres: FiltresArticles = {}): Promise<Article[]> {
-  const reponse = await apiGet<Enveloppe<Article[]>>(`${ADMIN}${versChaineDeRequete(filtres)}`)
-  return reponse.data
+  const reponse = await apiGet<Enveloppe<ArticleServi[]>>(`${ADMIN}${versChaineDeRequete(filtres)}`)
+  return reponse.data.map(normaliserArticle)
 }
 
 /**
@@ -126,18 +179,18 @@ export async function listerArticlesPublies(categorie?: string): Promise<Article
 }
 
 export async function recupererArticleParSlug(slug: string): Promise<Article> {
-  const reponse = await apiGet<Enveloppe<Article>>(`/api/articles/${encodeURIComponent(slug)}`)
-  return reponse.data
+  const reponse = await apiGet<Enveloppe<ArticleServi>>(`/api/articles/${encodeURIComponent(slug)}`)
+  return normaliserArticle(reponse.data)
 }
 
 export async function creerArticle(brouillon: BrouillonArticle): Promise<Article> {
-  const reponse = await apiPost<Enveloppe<Article>>(ADMIN, brouillon)
-  return reponse.data
+  const reponse = await apiPost<Enveloppe<ArticleServi>>(ADMIN, brouillon)
+  return normaliserArticle(reponse.data)
 }
 
 export async function modifierArticle(id: number, brouillon: BrouillonArticle): Promise<Article> {
-  const reponse = await apiPut<Enveloppe<Article>>(`${ADMIN}/${id}`, brouillon)
-  return reponse.data
+  const reponse = await apiPut<Enveloppe<ArticleServi>>(`${ADMIN}/${id}`, brouillon)
+  return normaliserArticle(reponse.data)
 }
 
 export function supprimerArticle(id: number): Promise<void> {
