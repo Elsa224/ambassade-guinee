@@ -68,8 +68,125 @@ describe('page redactionnelle servie par le CMS', () => {
     const wrapper = await monter({})
 
     expect(wrapper.text()).toContain('Une représentation au service de l’État')
-    // Le corps est assaini cote serveur : le front l'insere tel quel.
-    expect(wrapper.html()).toContain('<h2>Mission diplomatique</h2>')
+    // Le corps est assaini cote serveur : le front en dispose les morceaux
+    // sans en retrancher un mot.
+    expect(wrapper.text()).toContain('Mission diplomatique')
+    expect(wrapper.html()).toContain('<p>Corps officiel.</p>')
+  })
+
+  it('dispose quatre sections et plus en grille', async () => {
+    // Les missions d'une ambassade sont paralleles, pas sequentielles : une
+    // grille dit cela, un rouleau dit le contraire.
+    servir({
+      data: {
+        pages: [
+          page('presentation', {
+            body_html: [1, 2, 3, 4]
+              .map((n) => `<h2>${n}. Mission ${n}</h2><p>Corps ${n}.</p>`)
+              .join(''),
+          }),
+        ],
+        jurisdiction: [],
+        figures: [],
+      },
+    })
+
+    const wrapper = await monter({})
+    const cartes = wrapper.findAll('article')
+
+    expect(cartes).toHaveLength(4)
+    // Le numero est celui que l'ambassade a ecrit : le gabarit n'en invente
+    // aucun, il le met simplement en evidence.
+    expect(cartes[0]?.text()).toContain('01')
+    expect(cartes[0]?.text()).toContain('Mission 1')
+    expect(cartes[0]?.text()).not.toContain('1. Mission 1')
+  })
+
+  it('etale la derniere carte quand elle serait seule sur sa ligne', async () => {
+    // Sept sections sur trois colonnes laissent une carte isolee devant deux
+    // cases vides, ce qui se lit comme une section manquante.
+    servir({
+      data: {
+        pages: [
+          page('ambition-numerique', {
+            body_html: [1, 2, 3, 4, 5, 6, 7].map((n) => `<h2>Axe ${n}</h2><p>C${n}.</p>`).join(''),
+          }),
+        ],
+        jurisdiction: [],
+        figures: [],
+      },
+    })
+
+    const wrapper = await monter({ slug: 'ambition-numerique' })
+    const cartes = wrapper.findAll('article')
+
+    expect(cartes).toHaveLength(7)
+    expect(cartes[6]?.classes()).toContain('lg:col-span-3')
+    expect(cartes[6]?.classes()).toContain('md:col-span-2')
+    // Les autres restent dans leur case.
+    expect(cartes[0]?.classes()).not.toContain('lg:col-span-3')
+  })
+
+  it('laisse moins de quatre sections en texte suivi', async () => {
+    servir({
+      data: {
+        pages: [
+          page('presentation', {
+            body_html: '<h2>Une</h2><p>A.</p><h2>Deux</h2><p>B.</p>',
+          }),
+        ],
+        jurisdiction: [],
+        figures: [],
+      },
+    })
+
+    const wrapper = await monter({})
+
+    expect(wrapper.findAll('article')).toHaveLength(0)
+    expect(wrapper.text()).toContain('Une')
+    expect(wrapper.text()).toContain('Deux')
+  })
+
+  it('detache la section d un autre registre et y range le flanc', async () => {
+    // « Le Gabon » ferme la presentation : l'adresse et la juridiction s'y
+    // rangent plutot que de border le chapeau, ou elles depassaient sous lui.
+    servir({
+      data: {
+        pages: [
+          page('presentation', {
+            body_html:
+              [1, 2, 3, 4].map((n) => `<h2>${n}. Mission ${n}</h2><p>C${n}.</p>`).join('') +
+              '<h2>Le Gabon</h2><p>Sur la côte atlantique.</p>',
+          }),
+        ],
+        jurisdiction: ['République de Guinée'],
+        figures: [],
+      },
+    })
+
+    const wrapper = await monter({ flanc: true })
+    const bande = wrapper.find('section')
+
+    expect(wrapper.findAll('article')).toHaveLength(4)
+    expect(bande.text()).toContain('Le Gabon')
+    expect(bande.text()).toContain('Sur la côte atlantique.')
+    expect(bande.text()).toContain('République de Guinée')
+  })
+
+  it('montre les chiffres meme quand le corps s ouvre sur un titre', async () => {
+    // Sans chapeau a border, ils passent en bande : les loger dans le chapeau
+    // les aurait fait disparaitre avec lui.
+    servir({
+      data: {
+        pages: [page('presentation', { body_html: '<h2>Une</h2><p>A.</p>' })],
+        jurisdiction: [],
+        figures: [{ value: '2026', label: "Année d'ouverture" }],
+      },
+    })
+
+    const wrapper = await monter({ chiffresVisibles: true })
+
+    expect(wrapper.findAll('.tabular-nums').map((c) => c.text())).toEqual(['2026'])
   })
 
   it('se retracte quand l ambassade n a pas publie la page', async () => {

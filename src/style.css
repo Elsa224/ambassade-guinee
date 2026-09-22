@@ -213,3 +213,91 @@ body {
   background-color: #f9fafb;
   font-weight: 700;
 }
+
+/*
+ * Trois registres de lecture pour le meme HTML servi.
+ *
+ * Le corps d'une page redactionnelle est decoupe a l'affichage (voir
+ * `src/contenu/decoupage.ts`) : le chapeau, les cartes de la grille et la
+ * bande de fin recoivent le meme HTML assaini, mais pas la meme echelle.
+ * Aucune de ces classes ne change le texte : elles changent sa mise en page.
+ */
+
+/* Le chapeau porte la these de la page : il se lit plus grand. */
+.contenu-chapeau > p:first-child {
+  font-size: 1.1875rem;
+  line-height: 1.6;
+  color: #374151;
+}
+
+/*
+ * Une carte de la grille. Le texte y est plus serre que dans une colonne de
+ * lecture : neuf cartes cote a cote doivent se parcourir du regard, pas se
+ * lire l'une apres l'autre.
+ */
+.contenu-carte p {
+  margin-block: 0.75rem;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+}
+
+.contenu-carte ul,
+.contenu-carte ol {
+  margin-block: 0.6875rem;
+  font-size: 0.90625rem;
+  line-height: 1.55;
+}
+
+.contenu-carte ul {
+  /* Le tiret cadratin tient moins de place que la puce et ne concurrence pas
+     le filet colore qui coiffe la carte. */
+  list-style: none;
+  padding-inline-start: 1.0625rem;
+}
+
+.contenu-carte ul > li::before {
+  content: '';
+  position: absolute;
+  inset-inline-start: 0;
+  inset-block-start: 0.65em;
+  width: 0.375rem;
+  height: 1.5px;
+  background-color: var(--color-secondary-dark);
+}
+
+.contenu-carte ul > li {
+  position: relative;
+  margin-block: 0.3125rem;
+}
+
+.contenu-carte ol {
+  padding-inline-start: 1.25rem;
+}
+
+/*
+ * La bande de fin est posee sur la couleur principale assombrie : le texte y
+ * est clair, et les liens ne peuvent pas garder la couleur d'accent, qui n'a
+ * aucun contraste garanti sur ce fond. Ils heritent et se soulignent.
+ */
+.contenu-bande {
+  color: #e5e7eb;
+  max-width: 68ch;
+}
+
+.contenu-bande a {
+  color: inherit;
+  text-decoration: underline;
+}
+
+.contenu-bande h3 {
+  color: #ffffff;
+}
+
+/*
+ * Une carte peut occuper toute la largeur quand elle serait seule sur sa
+ * ligne : la mesure de lecture reste bornee, sinon son texte s'etirerait sur
+ * plus de cent caracteres la ou ses voisines en tiennent quarante.
+ */
+.contenu-carte {
+  max-width: 72ch;
+}
