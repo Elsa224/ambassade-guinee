@@ -202,7 +202,12 @@
               Relations
             </router-link>
 
-            <!-- Services - Menu cliquable avec chevron -->
+            <!-- Demarches - Menu cliquable avec chevron -->
+            <!-- Le menu s'appelait « Services », comme la page `/services`
+                 saisie au CMS qui le suit dans la barre : deux entrees
+                 portaient le meme mot cote a cote, et rien ne disait laquelle
+                 menait ou. Le menu prend le verbe (les demarches qu'on
+                 accomplit), la page garde le nom (les services rendus). -->
             <!-- L'intitule menait autrefois a `/demarche-ligne` quand le
                  consulat etait ferme. Ce repli n'en est plus un : ce
                  formulaire nomme le pays d'accueil de l'ambassade d'origine et
@@ -216,7 +221,7 @@
                   class="nav-item px-3 py-2 rounded-l hover:bg-secondary hover:text-ink-dark transition text-primary"
                   active-class="hover-active"
                 >
-                  Services
+                  Démarches
                 </router-link>
                 <button
                   @click.stop="toggleDropdown('services')"
@@ -272,7 +277,7 @@
               to="/services"
               class="nav-item px-3 py-2 rounded hover:bg-secondary hover:text-ink-dark transition text-primary"
               active-class="hover-active"
-              >Services</router-link
+              >Nos services</router-link
             >
 
             <!-- Le module Evenements n'est pas provisionne pour toutes les
@@ -357,7 +362,7 @@
               v-if="rubriqueOuverte('/services')"
               to="/services"
               class="block px-3 py-2 rounded hover:bg-secondary hover:text-ink-dark text-primary"
-              >Services</router-link
+              >Nos services</router-link
             >
             <router-link
               v-if="rubriqueOuverte('/evenements')"
@@ -685,7 +690,8 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed } from 'vue'
+import { ref, reactive, computed, watch, onMounted, onBeforeUnmount } from 'vue'
+import { useRoute } from 'vue-router'
 import BientotDisponible from '@/components/BientotDisponible.vue'
 import { useTenantStore } from '@/stores/tenant'
 import { cheminOuvert } from '@/tenant/rubriques'
@@ -781,7 +787,7 @@ const mobileMenus = ref([
   },
   {
     key: 'services',
-    label: 'Services',
+    label: 'Démarches',
     path: '/consulat',
     items: [
       { label: 'Le consulat', path: '/consulat' },
@@ -844,9 +850,51 @@ const toggleMobileMenu = () => {
   isMobileMenuOpen.value = !isMobileMenuOpen.value
 }
 
-const toggleDropdown = (menu) => {
-  openDropdowns[menu] = !openDropdowns[menu]
+/**
+ * Ferme tous les menus deroulants du format bureau.
+ *
+ * Trois gestes doivent les fermer, et aucun ne le faisait : ouvrir un autre
+ * menu, cliquer ailleurs dans la page, changer de page. Les panneaux
+ * s'empilaient donc les uns sur les autres et survivaient a la navigation,
+ * posés sur la page d'arrivee.
+ */
+function fermerLesMenus() {
+  for (const cle of Object.keys(openDropdowns)) openDropdowns[cle] = false
 }
+
+const toggleDropdown = (menu) => {
+  const aOuvrir = !openDropdowns[menu]
+  fermerLesMenus()
+  openDropdowns[menu] = aOuvrir
+}
+
+// Le lien du sous-menu navigue mais ne ferme rien de lui-meme : c'est
+// l'arrivee sur la nouvelle route qui replie l'en-tete, au format bureau
+// comme au format mobile.
+const route = useRoute()
+watch(
+  () => route.fullPath,
+  () => {
+    fermerLesMenus()
+    isMobileMenuOpen.value = false
+  },
+)
+
+function surToucheClavier(evenement) {
+  if (evenement.key === 'Escape') fermerLesMenus()
+}
+
+// Les boutons d'ouverture portent `@click.stop` : l'ecouteur pose sur le
+// document ne referme donc pas le menu que l'on vient d'ouvrir.
+onMounted(() => {
+  document.addEventListener('click', fermerLesMenus)
+  document.addEventListener('keydown', surToucheClavier)
+})
+
+onBeforeUnmount(() => {
+  document.removeEventListener('click', fermerLesMenus)
+  document.removeEventListener('keydown', surToucheClavier)
+})
 
 const toggleSubmenu = (key) => {
   openSubmenus[key] = !openSubmenus[key]

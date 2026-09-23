@@ -120,7 +120,7 @@ describe('rubriques fermees dans le gabarit public', () => {
     expect(ouverts.filter((chemin) => !liens.includes(chemin))).toEqual([])
   })
 
-  it('retire le menu « Services » quand aucune de ses pages n est ouverte', async () => {
+  it('retire le menu « Démarches » quand aucune de ses pages n est ouverte', async () => {
     // L'intitule se rabattait sur `/demarche-ligne`. Ce n'est plus un repli :
     // ce formulaire exige des pieces propres a un seul pays d'accueil, et il
     // s'affichait tel quel sur le domaine gabonais.
@@ -137,10 +137,13 @@ describe('rubriques fermees dans le gabarit public', () => {
     expect(liens).not.toContain('/rendez-vous')
   })
 
-  it('garde le menu « Services » sur le site guineen', async () => {
+  it('garde le menu « Démarches » sur le site guineen', async () => {
     const wrapper = await visiter('/', GUINEE)
 
-    expect(wrapper.text()).toContain('Services')
+    // « Services » seul ne gardait rien : le pied de page porte « Services
+    // consulaires » sur tous les domaines, l'assertion passait donc meme
+    // menu retire. L'intitule du menu lui est propre.
+    expect(wrapper.text()).toContain('Démarches')
     const liens = wrapper
       .findAllComponents({ name: 'RouterLink' })
       .map((l) => String(l.props('to')))
