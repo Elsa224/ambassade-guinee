@@ -17,7 +17,7 @@
       <!-- Bandeau -->
       <div class="relative bg-gradient-to-r from-accent to-primary-light text-white">
         <div class="absolute inset-0 bg-black/20"></div>
-        <div class="relative max-w-7xl mx-auto px-4 py-16 md:py-20">
+        <div class="relative max-w-7xl mx-auto px-4 pt-16 pb-28 md:pt-20 md:pb-32">
           <div class="text-center">
             <div
               class="inline-flex items-center gap-2 bg-white/20 backdrop-blur px-4 py-1 rounded-full text-sm mb-4"
@@ -45,12 +45,16 @@
           </div>
         </div>
 
+        <!-- La vague qui rejoint le fond de la page. Meme courbe que la
+             banniere des actualites, cadree sur sa crete : le SVG d'origine
+             reserve ses 96 premieres unites au vide, et les afficher
+             ferait descendre l'aplat sous le titre. -->
         <div class="absolute bottom-0 left-0 right-0">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 120" class="w-full h-auto">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 96 1440 120" class="w-full h-auto">
             <path
               fill="#f9fafb"
               fill-opacity="1"
-              d="M0,64L80,69.3C160,75,320,85,480,80C640,75,800,53,960,48C1120,43,1280,53,1360,58.7L1440,64L1440,120L1360,120C1280,120,1120,120,960,120C800,120,640,120,480,120C320,120,160,120,80,120L0,120Z"
+              d="M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,122.7C672,117,768,139,864,154.7C960,171,1056,181,1152,170.7C1248,160,1344,128,1392,112L1440,96L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"
             ></path>
           </svg>
         </div>
