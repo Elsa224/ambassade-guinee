@@ -244,12 +244,12 @@ describe('fiche d un evenement', () => {
     // l'ecran ne permet de revenir en arriere d'un clic. Le contrat exige
     // que `status` parte SEUL : tout autre champ a ses cotes vaut 422.
     servir(evenement())
-    vi.stubGlobal(
-      'confirm',
-      vi.fn(() => true),
-    )
     const wrapper = await rendre()
     await bouton(wrapper, "Annuler l'évènement")!.trigger('click')
+    await flushPromises()
+    // La boite du cadre a remplace celle du navigateur : sans ce second
+    // geste, rien ne part.
+    await wrapper.get('[data-confirmation="valider"]').trigger('click')
     await flushPromises()
 
     expect(envois[envois.length - 1]!.methode).toBe('PATCH')
@@ -258,12 +258,10 @@ describe('fiche d un evenement', () => {
 
   it("n'envoie rien si la confirmation est refusee", async () => {
     servir(evenement())
-    vi.stubGlobal(
-      'confirm',
-      vi.fn(() => false),
-    )
     const wrapper = await rendre()
     await bouton(wrapper, "Annuler l'évènement")!.trigger('click')
+    await flushPromises()
+    await wrapper.get('[data-confirmation="renoncer"]').trigger('click')
     await flushPromises()
 
     expect(envois).toHaveLength(0)

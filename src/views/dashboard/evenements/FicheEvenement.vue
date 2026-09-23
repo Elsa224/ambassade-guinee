@@ -23,6 +23,7 @@ import {
 } from './affiche-qr'
 import { useIdentite } from '@/tenant/identite'
 import PastilleEtat from '@/components/ui/PastilleEtat.vue'
+import Confirmation from '@/components/ui/Confirmation.vue'
 
 /**
  * Fiche d'un evenement.
@@ -122,11 +123,16 @@ async function agir(operation: () => Promise<EvenementAdmin>) {
  * Confirmation demandee : l'annulation est visible des inscrits et du site
  * public, et rien dans l'ecran ne permet de revenir en arriere d'un clic.
  */
-function annuler() {
+const annulationDemandee = ref(false)
+
+function demanderLAnnulation() {
   if (!evenement.value) return
-  const nom = evenement.value.name
-  if (!window.confirm(`Annuler « ${nom} » ? Les inscrits pourront en être informés.`)) return
-  void agir(() => annulerEvenement(slug.value))
+  annulationDemandee.value = true
+}
+
+async function annuler() {
+  annulationDemandee.value = false
+  await agir(() => annulerEvenement(slug.value))
 }
 
 function basculerSurLeSite() {
@@ -434,7 +440,7 @@ onMounted(charger)
             type="button"
             :disabled="action"
             class="border border-red-200 text-red-700 font-medium px-4 py-2 rounded-lg disabled:opacity-60"
-            @click="annuler"
+            @click="demanderLAnnulation"
           >
             Annuler l'évènement
           </button>
@@ -750,5 +756,18 @@ onMounted(charger)
         </section>
       </div>
     </template>
+
+    <Confirmation
+      v-if="annulationDemandee && evenement"
+      titre="Annuler cet évènement"
+      :question="`Annuler « ${evenement.name} » ?`"
+      consequence="Les inscrits pourront en être informés, et l'évènement est retiré du site public. Rien ne permet de revenir en arrière."
+      libelle-confirmer="Annuler l'évènement"
+      libelle-renoncer="Le conserver"
+      dangereux
+      :en-cours="action"
+      @confirmer="annuler"
+      @fermer="annulationDemandee = false"
+    />
   </div>
 </template>

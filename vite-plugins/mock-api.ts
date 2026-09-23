@@ -62,6 +62,24 @@ interface CompteMock {
   suspended_at: string | null
 }
 
+/**
+ * Services que le poste propose a la visite, tels que `GET /api/secure/rdv`
+ * les rend. Ce sont ceux d'Ambassade Secure, pas les services consulaires du
+ * CMS : on ne prend pas rendez-vous ici pour un passeport.
+ */
+// Les slugs sont volontairement illisibles : Ambassade Secure les derive
+// lui-meme, et ceux de dev ressemblent a `z58sgf8a51kp07q`. Un bouchon qui
+// rendrait `protocole` laisserait croire qu'un slug se devine, se cite ou
+// s'ecrit en dur. Leur NOMBRE n'est pas un contrat non plus : trois ici,
+// quatre sur dev, zero sur une ambassade qui n'a rien configure.
+const DEPARTEMENTS_RDV = [
+  { slug: 'q4k2m9xv0bt7ra1', name: "Cabinet de l'Ambassadeur" },
+  { slug: 'h8we3zpn6cdy5sf', name: 'Protocole' },
+  { slug: 'j1ub7og4nlik20c', name: 'Coopération' },
+]
+
+let prochaineReferenceRdv = 1
+
 const STATUT_ACTIF_MOCK = 'actif'
 const STATUT_SUSPENDU_MOCK = 'suspendu'
 
@@ -420,6 +438,44 @@ export function mockApi(): Plugin {
           }
         })
       })
+
+    /**
+     * Lit un corps `multipart/form-data` aussi bien que du JSON.
+     *
+     * Le relais des rendez-vous envoie toujours du multipart, parce qu'il
+     * porte deux faces facultatives de piece d'identite. Seules les valeurs
+     * textuelles sont retenues : le bouchon ne stocke aucun fichier, il a
+     * seulement besoin de savoir qu'une piece etait jointe.
+     */
+    const lireChamps = (): Promise<Record<string, unknown> | null> => {
+      const type = requete.headers['content-type'] ?? ''
+      if (!type.includes('multipart/form-data')) return lireCorps()
+
+      const frontiere = /boundary=(?:"([^"]+)"|([^;]+))/.exec(type)
+      const marque = frontiere?.[1] ?? frontiere?.[2]
+      if (marque === undefined) return Promise.resolve(null)
+
+      return new Promise((resoudre) => {
+        const morceaux: Buffer[] = []
+        requete.on('data', (morceau: Buffer) => morceaux.push(morceau))
+        requete.on('end', () => {
+          const brut = Buffer.concat(morceaux).toString('binary')
+          const champs: Record<string, unknown> = {}
+          for (const partie of brut.split(`--${marque}`)) {
+            const nom = /name="([^"]+)"/.exec(partie)?.[1]
+            if (nom === undefined) continue
+            const separation = partie.indexOf('\r\n\r\n')
+            if (separation === -1) continue
+            const valeur = partie.slice(separation + 4).replace(/\r\n$/, '')
+            // Un fichier : on retient son nom, pas son contenu.
+            const fichier = /filename="([^"]*)"/.exec(partie)?.[1]
+            champs[nom] =
+              fichier === undefined ? Buffer.from(valeur, 'binary').toString('utf8') : fichier
+          }
+          resoudre(champs)
+        })
+      })
+    }
 
     const ambassade = () => ambassades[estGabon ? 'gabon' : 'guinee']!
 
@@ -1935,6 +1991,98 @@ export function mockApi(): Plugin {
       const trouve = evenementsAdmin().find((evenement) => evenement.slug === slug)
       if (!trouve) return repondre(404, { message: "Cet evenement n'existe pas." })
       return repondre(200, { data: trouve })
+    }
+
+    // --- Rendez-vous de chancellerie, relais vers Ambassade Secure -----
+    // Le CMS ne stocke rien : il n'y a pas de surface d'administration, et
+    // une demande creee n'est plus jamais relisible. Le bouchon ne garde donc
+    // aucune collection, il valide et rend.
+
+    if (chemin === '/secure/rdv' && methode === 'GET') {
+      return repondre(200, {
+        data: { name: ambassade().display_name, departments: DEPARTEMENTS_RDV },
+      })
+    }
+
+    if (chemin === '/secure/rdv' && methode === 'POST') {
+      return void lireChamps().then((champs) => {
+        if (champs === null) return repondre(422, { message: 'Corps de requete illisible.' })
+
+        // Validation du CMS : elle porte le sac `errors` de Laravel, avec un
+        // message par champ. C'est ce qui la distingue du refus relaye
+        // ci-dessous, et l'ecran s'appuie sur cette distinction.
+        const erreurs: Record<string, string[]> = {}
+        for (const requis of [
+          'firstName',
+          'lastName',
+          'phone',
+          'email',
+          'date',
+          'time',
+          'purpose',
+        ]) {
+          const valeur = champs[requis]
+          if (typeof valeur !== 'string' || valeur.trim() === '') {
+            erreurs[requis] = ['Ce champ est obligatoire.']
+          }
+        }
+
+        const date = typeof champs.date === 'string' ? champs.date : ''
+        if (date !== '' && erreurs.date === undefined) {
+          const jour = new Date().toISOString().slice(0, 10)
+          const limite = new Date(Date.now() + 90 * 86400000).toISOString().slice(0, 10)
+          if (date < jour) {
+            erreurs.date = ['La date demandee ne peut pas etre dans le passe.']
+          } else if (date > limite) {
+            erreurs.date = ['La date doit etre comprise dans les 90 prochains jours.']
+          }
+        }
+
+        if (Object.keys(erreurs).length > 0) {
+          return repondre(422, { message: 'Les donnees envoyees sont invalides.', errors: erreurs })
+        }
+
+        // Le departement est resolu par l'AMONT, scope sur l'entreprise : un
+        // slug inconnu ou venu d'une autre ambassade rend 404, indistinguable
+        // du 404 d'un module ferme. Le front n'a donc pas a le deviner — il
+        // n'envoie que les slugs rendus par le GET.
+        const slug = typeof champs.departmentSlug === 'string' ? champs.departmentSlug : ''
+        const departement = DEPARTEMENTS_RDV.find((d) => d.slug === slug) ?? null
+        if (slug !== '' && departement === null) {
+          return repondre(404, { message: 'Ressource introuvable.' })
+        }
+
+        // Les deux bornes de date ne coincident pas : le CMS valide le JOUR,
+        // l'amont refuse tout horodatage deja passe. Ce refus-la arrive en 422
+        // SANS `errors`, avec une phrase generique — le corps amont est jete
+        // parce qu'il renverrait les champs soumis. Un bouchon qui l'oublierait
+        // cacherait justement le cas que l'ecran doit savoir presenter.
+        const heure = typeof champs.time === 'string' ? champs.time : ''
+        const maintenant = new Date()
+        const jourCourant = new Date().toISOString().slice(0, 10)
+        const heureCourante = `${String(maintenant.getHours()).padStart(2, '0')}:${String(
+          maintenant.getMinutes(),
+        ).padStart(2, '0')}`
+        if (date === jourCourant && heure !== '' && heure <= heureCourante) {
+          return repondre(422, { message: 'Donnees refusees par le service Ambassade Secure.' })
+        }
+
+        // `hostSlug` et `companySlug` ne sont pas acceptes : le premier est
+        // ignore, le second vient du domaine. Les deux disparaissent ici comme
+        // cote serveur, sans erreur.
+        return repondre(201, {
+          data: {
+            reference: `RDV-${new Date().getFullYear()}-${String(prochaineReferenceRdv++).padStart(6, '0')}`,
+            status: 'pending',
+            // ISO 8601 en UTC, avec millisecondes : c'est ce que Mongoose
+            // serialise en amont. Le front ne doit PAS le reformater.
+            scheduledAt: new Date(`${date}T${heure}`).toISOString(),
+            department: departement,
+            purpose: champs.purpose,
+            host: typeof champs.host === 'string' && champs.host !== '' ? champs.host : null,
+          },
+        })
+      })
     }
 
     // --- Module Evenements, surface visiteur ---------------------------

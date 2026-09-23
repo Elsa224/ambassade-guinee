@@ -94,8 +94,10 @@ describe('ouverture des rubriques selon l ambassade', () => {
 
       const fermes = Object.keys(RUBRIQUE_PAR_CHEMIN).filter((chemin) => !ouvert(chemin))
 
+      // `/rendez-vous` n'y figure plus : il est passe sous le module
+      // `secure_rdv`, dont le defaut est ferme pour toutes les ambassades.
       expect(fermes.sort()).toEqual(
-        ['/consulat', '/rendez-vous', '/services-ambassadeur', '/demarche-ligne'].sort(),
+        ['/consulat', '/services-ambassadeur', '/demarche-ligne'].sort(),
       )
     })
 
@@ -173,11 +175,37 @@ describe('chemins dependant d un module a provisionner', () => {
     expect(cheminOuvert('/', { modules: {} })).toBe(true)
   })
 
-  it('ferme le module sur les deux ambassades reellement configurees', () => {
+  it('ferme la prise de rendez-vous quand aucun tenant n est charge', () => {
+    // C'est le cas qui motive le deplacement. Garde comme rubrique de
+    // contenu, `/rendez-vous` etait OUVERT des que le bootstrap echouait ou
+    // que le site d'origine etait servi, et son formulaire de maquette
+    // jetait la demande du visiteur en affichant « enregistree avec
+    // succes ». Sous un module, l'absence de configuration ferme la page.
+    expect(cheminOuvert('/rendez-vous', null)).toBe(false)
+    // Trois formes d'absence, et le CMS les traite toutes pareil : sa lecture
+    // de `modules['secure_rdv']` se termine par `?? false`. Une table
+    // ABSENTE n'est pas une table vide — sur un bootstrap en echec, il n'y a
+    // pas d'objet `modules` du tout.
+    expect(cheminOuvert('/rendez-vous', {})).toBe(false)
+    expect(cheminOuvert('/rendez-vous', { slug: 'guinee-usa' })).toBe(false)
+    expect(cheminOuvert('/rendez-vous', { slug: 'guinee-usa', modules: {} })).toBe(false)
+    expect(cheminOuvert('/rendez-vous', { modules: { secure_rdv: false } })).toBe(false)
+    expect(cheminOuvert('/rendez-vous', { modules: { secure_rdv: true } })).toBe(true)
+  })
+
+  it('ne confond pas le drapeau du relais avec l ancienne rubrique', () => {
+    // Le back tient `secure_rdv` ; `rendez_vous` traine encore dans les
+    // fixtures de bootstrap. Le declarer a true ne doit rien ouvrir.
+    expect(cheminOuvert('/rendez-vous', { modules: { rendez_vous: true } })).toBe(false)
+    expect(Object.values(RUBRIQUE_PAR_CHEMIN)).not.toContain('rendez_vous')
+  })
+
+  it('ferme les deux modules sur les ambassades reellement configurees', () => {
     // Ni la Guinee ni le Gabon n'ont provisionne Ambassade Secure : aucune
     // entree « Évènements » ne doit apparaitre aujourd'hui en production.
     const tenants: TenantConsulte[] = [GUINEE, GABON]
 
     expect(tenants.filter((t) => cheminOuvert('/evenements', t))).toEqual([])
+    expect(tenants.filter((t) => cheminOuvert('/rendez-vous', t))).toEqual([])
   })
 })

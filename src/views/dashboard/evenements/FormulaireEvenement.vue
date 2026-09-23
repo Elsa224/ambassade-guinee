@@ -14,6 +14,7 @@ import { messageErreur } from '@/api/evenements'
 import ChampDate from '@/components/ui/ChampDate.vue'
 import ChampHeure from '@/components/ui/ChampHeure.vue'
 import ChampSelect from '@/components/ui/ChampSelect.vue'
+import Confirmation from '@/components/ui/Confirmation.vue'
 
 /**
  * Creation et modification d'un evenement.
@@ -176,10 +177,27 @@ async function enregistrer() {
   }
 }
 
+/**
+ * Garde de sortie, posee sur une boite du cadre plutot que sur celle du
+ * navigateur. Le routeur accepte une promesse : la navigation reste
+ * suspendue tant que la question n'a pas de reponse.
+ */
+const sortieDemandee = ref(false)
+let repondreALaSortie: ((partir: boolean) => void) | null = null
+
 onBeforeRouteLeave(() => {
   if (!modifie.value) return true
-  return window.confirm('Les modifications non enregistrées seront perdues. Quitter quand même ?')
+  sortieDemandee.value = true
+  return new Promise<boolean>((resoudre) => {
+    repondreALaSortie = resoudre
+  })
 })
+
+function repondreSortie(partir: boolean): void {
+  sortieDemandee.value = false
+  repondreALaSortie?.(partir)
+  repondreALaSortie = null
+}
 
 onMounted(async () => {
   // Les types d'abord : la correspondance du type de l'evenement charge en
@@ -368,5 +386,17 @@ onMounted(async () => {
         </RouterLink>
       </div>
     </form>
+
+    <Confirmation
+      v-if="sortieDemandee"
+      titre="Quitter sans enregistrer"
+      question="Les modifications non enregistrées seront perdues."
+      consequence="Rien de ce qui a été saisi depuis le dernier enregistrement ne sera conservé."
+      libelle-confirmer="Quitter sans enregistrer"
+      libelle-renoncer="Rester sur la page"
+      dangereux
+      @confirmer="repondreSortie(true)"
+      @fermer="repondreSortie(false)"
+    />
   </div>
 </template>

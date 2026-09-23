@@ -259,40 +259,13 @@
       </div>
     </section>
 
-    <!-- Section newsletter -->
-    <section class="py-20 bg-gradient-to-r from-primary to-primary-dark">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <h2 class="text-3xl lg:text-4xl font-bold text-white mb-4">Restez informé</h2>
-        <p class="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
-          Abonnez-vous à notre newsletter pour recevoir les dernières actualités de l'Ambassade
-        </p>
-
-        <form
-          @submit.prevent="abonnerNewsletter"
-          class="flex flex-col sm:flex-row gap-4 max-w-lg mx-auto"
-        >
-          <input
-            type="email"
-            v-model="email"
-            placeholder="Votre adresse email"
-            class="flex-1 px-6 py-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary text-gray-800"
-            required
-          />
-          <button
-            type="submit"
-            class="bg-secondary text-ink-dark px-8 py-4 rounded-lg font-semibold hover:bg-white transition-all whitespace-nowrap flex items-center justify-center gap-2"
-          >
-            S'abonner
-            <i class="bx bx-send"></i>
-          </button>
-        </form>
-
-        <p class="text-white/70 text-sm mt-4">
-          En vous abonnant, vous acceptez de recevoir nos actualités. Vous pourrez vous désabonner à
-          tout moment.
-        </p>
-      </div>
-    </section>
+    <!-- Le bloc « Restez informé » a ete retire le 23/09/2026 sur decision
+         d'Elsa. Il remerciait le visiteur — « Merci pour votre abonnement » —
+         sans appeler la moindre route : l'adresse saisie etait simplement
+         effacee. Personne n'a jamais ete abonne. Meme faute que le formulaire
+         de rendez-vous de la maquette, qui annoncait « enregistree avec
+         succes » en jetant la demande. A rebrancher le jour ou une liste de
+         diffusion existe vraiment, pas avant. -->
   </div>
 </template>
 
@@ -307,7 +280,6 @@ const categorieActive = ref('tous')
 const recherche = ref('')
 const pageCourante = ref(1)
 const ARTICLES_PAR_PAGE = 6
-const email = ref('')
 
 /**
  * Une seule source de verite pour le filtrage : la pagination et le compteur
@@ -351,9 +323,4 @@ watch([categorieActive, recherche], () => {
 
 /** Article mis en avant : le plus recent, l'API renvoyant la liste triee. */
 const actualiteUne = computed(() => articles.value[0])
-
-function abonnerNewsletter() {
-  alert(`Merci pour votre abonnement avec l'adresse : ${email.value}`)
-  email.value = ''
-}
 </script>

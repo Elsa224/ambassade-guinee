@@ -280,28 +280,45 @@ describe('formulaire d un evenement', () => {
 
   it('previent avant d abandonner une saisie non enregistree', async () => {
     servir()
-    const confirmation = vi.fn(() => false)
-    vi.stubGlobal('confirm', confirmation)
     const { wrapper, routeur } = await rendre()
     await wrapper.find('#champ-nom').setValue('Brouillon en cours')
 
-    await routeur.push('/dashboard/evenements')
+    // La navigation reste SUSPENDUE tant que la boite n'a pas de reponse :
+    // attendre `push` avant d'y repondre bloquerait le test jusqu'au delai.
+    const navigation = routeur.push('/dashboard/evenements')
+    await flushPromises()
+    expect(wrapper.find('[data-confirmation="valider"]').exists()).toBe(true)
+
+    await wrapper.get('[data-confirmation="renoncer"]').trigger('click')
+    await navigation
     await flushPromises()
 
-    expect(confirmation).toHaveBeenCalled()
     expect(routeur.currentRoute.value.path).toBe('/dashboard/evenements/nouveau')
+  })
+
+  it('laisse partir quand on confirme l abandon', async () => {
+    servir()
+    const { wrapper, routeur } = await rendre()
+    await wrapper.find('#champ-nom').setValue('Brouillon en cours')
+
+    const navigation = routeur.push('/dashboard/evenements')
+    await flushPromises()
+    await wrapper.get('[data-confirmation="valider"]').trigger('click')
+    await navigation
+    await flushPromises()
+
+    expect(routeur.currentRoute.value.path).toBe('/dashboard/evenements')
   })
 
   it('laisse partir un formulaire auquel on n a pas touche', async () => {
     servir()
-    const confirmation = vi.fn(() => false)
-    vi.stubGlobal('confirm', confirmation)
-    const { routeur } = await rendre()
+    const { wrapper, routeur } = await rendre()
 
     await routeur.push('/dashboard/evenements')
     await flushPromises()
 
-    expect(confirmation).not.toHaveBeenCalled()
+    // Aucune question posee : la boite n'est jamais apparue.
+    expect(wrapper.find('[data-confirmation="valider"]').exists()).toBe(false)
     expect(routeur.currentRoute.value.path).toBe('/dashboard/evenements')
   })
 })
