@@ -238,9 +238,10 @@ describe('colonne des actions', () => {
   it("demande confirmation avant d'annuler, et n'appelle rien si on refuse", async () => {
     servir([evenement()])
     const ecran = await rendre()
-    vi.spyOn(window, 'confirm').mockReturnValue(false)
-
     await ecran.find('button[aria-label^="Annuler"]').trigger('click')
+    await flushPromises()
+    // Renoncer dans la boite du cadre, qui a remplace celle du navigateur.
+    await ecran.get('[data-confirmation="renoncer"]').trigger('click')
     await flushPromises()
 
     expect(demandes.filter((url) => url.includes('fete-nationale'))).toEqual([])
@@ -249,9 +250,9 @@ describe('colonne des actions', () => {
   it('annule puis recharge la liste quand on confirme', async () => {
     servir([evenement()])
     const ecran = await rendre()
-    vi.spyOn(window, 'confirm').mockReturnValue(true)
-
     await ecran.find('button[aria-label^="Annuler"]').trigger('click')
+    await flushPromises()
+    await ecran.get('[data-confirmation="valider"]').trigger('click')
     await flushPromises()
 
     // L'annulation est un PATCH `{status: 'cancelled'}`, pas un DELETE :

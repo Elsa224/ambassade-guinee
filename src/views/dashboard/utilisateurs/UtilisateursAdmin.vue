@@ -184,7 +184,7 @@
                           ? `Réactiver ${compte.name}`
                           : `Suspendre ${compte.name}`
                       "
-                      @click="basculerStatut(compte)"
+                      @click="demander(compte, 'statut')"
                     >
                       <i
                         :class="
@@ -199,7 +199,7 @@
                       :disabled="enCours"
                       class="rounded-lg p-2 text-gray-500 hover:bg-gray-100 hover:text-red-700 disabled:opacity-50"
                       :aria-label="`Supprimer ${compte.name}`"
-                      @click="supprimer(compte)"
+                      @click="demander(compte, 'suppression')"
                     >
                       <i class="bx bx-trash text-lg" aria-hidden="true"></i>
                     </button>
@@ -302,6 +302,18 @@
         </div>
       </form>
     </Boite>
+
+    <Confirmation
+      v-if="aConfirmer"
+      :titre="questionDeConfirmation.titre"
+      :question="questionDeConfirmation.question"
+      :consequence="questionDeConfirmation.consequence"
+      :libelle-confirmer="questionDeConfirmation.libelle"
+      :dangereux="aConfirmer.geste === 'suppression'"
+      :en-cours="enCours"
+      @confirmer="confirmer"
+      @fermer="aConfirmer = null"
+    />
   </div>
 </template>
 
@@ -311,6 +323,7 @@ import { useAuthStore } from '@/stores/auth'
 import Boite from '@/views/dashboard/contenu/Boite.vue'
 import ChampSelect from '@/components/ui/ChampSelect.vue'
 import PastilleEtat from '@/components/ui/PastilleEtat.vue'
+import Confirmation from '@/components/ui/Confirmation.vue'
 import Pagination from '@/components/ui/Pagination.vue'
 import type { Pagination as FormePagination } from '@/components/ui/pagination'
 import { dateLisible, libelleRole, messageErreurCompte } from '@/api/compte'
@@ -518,15 +531,66 @@ async function renvoyer(compte: CompteAdmin): Promise<void> {
     erreurAction.value = messageErreurCompte(souleve)
   } finally {
     enCours.value = false
+    aConfirmer.value = null
   }
+}
+
+/**
+ * Le geste soumis a confirmation, et sur quel compte.
+ *
+ * Un seul porteur pour les deux gestes : ils ne peuvent pas etre demandes en
+ * meme temps, et deux drapeaux separes finiraient par se contredire.
+ */
+const aConfirmer = ref<{ compte: CompteAdmin; geste: 'statut' | 'suppression' } | null>(null)
+
+/** La question posee, qui depend du geste ET de l'etat du compte. */
+const questionDeConfirmation = computed(() => {
+  const demande = aConfirmer.value
+  if (!demande) return { titre: '', question: '', consequence: '', libelle: '' }
+  const { compte, geste } = demande
+
+  if (geste === 'suppression') {
+    return {
+      titre: 'Supprimer ce compte',
+      question: `Supprimer définitivement le compte de ${compte.name} ?`,
+      consequence:
+        "Pour un agent qui s'absente, la suspension est réversible ; la suppression ne l'est pas.",
+      libelle: 'Supprimer',
+    }
+  }
+
+  return compte.status !== STATUT_SUSPENDU
+    ? {
+        titre: 'Suspendre ce compte',
+        question: `Suspendre ${compte.name} ?`,
+        consequence:
+          'Ses sessions ouvertes sont fermées sur-le-champ, et son invitation en attente cesse de valoir.',
+        libelle: 'Suspendre',
+      }
+    : {
+        titre: 'Réactiver ce compte',
+        question: `Réactiver ${compte.name} ?`,
+        consequence:
+          "Un compte qui n'a jamais posé de mot de passe aura besoin d'une nouvelle invitation.",
+        libelle: 'Réactiver',
+      }
+})
+
+function demander(compte: CompteAdmin, geste: 'statut' | 'suppression'): void {
+  if (enCours.value) return
+  aConfirmer.value = { compte, geste }
+}
+
+function confirmer(): void {
+  const demande = aConfirmer.value
+  if (!demande) return
+  void (demande.geste === 'suppression'
+    ? supprimer(demande.compte)
+    : basculerStatut(demande.compte))
 }
 
 async function basculerStatut(compte: CompteAdmin): Promise<void> {
   const suspendre = compte.status !== STATUT_SUSPENDU
-  const question = suspendre
-    ? `Suspendre ${compte.name} ? Ses sessions ouvertes sont fermées sur-le-champ, et son invitation en attente cesse de valoir.`
-    : `Réactiver ${compte.name} ? Un compte qui n'a jamais posé de mot de passe aura besoin d'une nouvelle invitation.`
-  if (!window.confirm(question)) return
 
   enCours.value = true
   erreurAction.value = null
@@ -537,18 +601,11 @@ async function basculerStatut(compte: CompteAdmin): Promise<void> {
     erreurAction.value = messageErreurCompte(souleve)
   } finally {
     enCours.value = false
+    aConfirmer.value = null
   }
 }
 
 async function supprimer(compte: CompteAdmin): Promise<void> {
-  if (
-    !window.confirm(
-      `Supprimer définitivement le compte de ${compte.name} ? Pour un agent qui s'absente, la suspension est réversible.`,
-    )
-  ) {
-    return
-  }
-
   enCours.value = true
   erreurAction.value = null
   try {
@@ -558,6 +615,7 @@ async function supprimer(compte: CompteAdmin): Promise<void> {
     erreurAction.value = messageErreurCompte(souleve)
   } finally {
     enCours.value = false
+    aConfirmer.value = null
   }
 }
 

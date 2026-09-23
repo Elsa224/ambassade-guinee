@@ -19,6 +19,7 @@ import ChampDate from '@/components/ui/ChampDate.vue'
 import ChampImage from '@/components/ui/ChampImage.vue'
 import Pagination from '@/components/ui/Pagination.vue'
 import PastilleEtat from '@/components/ui/PastilleEtat.vue'
+import Confirmation from '@/components/ui/Confirmation.vue'
 import { paginerEnMemoire } from '@/components/ui/pagination'
 
 /**
@@ -375,13 +376,27 @@ async function ajouterCategorie(): Promise<void> {
   }
 }
 
-async function supprimer(article: ArticleEnListe): Promise<void> {
-  if (!window.confirm(`Supprimer « ${article.titre} » ? Cette action est définitive.`)) return
+/** L'article dont la suppression est soumise a confirmation. */
+const aSupprimer = ref<ArticleEnListe | null>(null)
+const suppressionEnCours = ref(false)
+
+function demanderLaSuppression(article: ArticleEnListe): void {
+  aSupprimer.value = article
+}
+
+async function supprimer(): Promise<void> {
+  const article = aSupprimer.value
+  if (!article) return
+  suppressionEnCours.value = true
   try {
     await supprimerArticle(article.id)
+    aSupprimer.value = null
     await charger()
   } catch {
+    aSupprimer.value = null
     erreurApi.value = 'Suppression impossible.'
+  } finally {
+    suppressionEnCours.value = false
   }
 }
 
@@ -619,7 +634,7 @@ onMounted(charger)
                       type="button"
                       class="rounded-md p-1.5 text-gray-500 transition-colors hover:bg-red-50 hover:text-red-700"
                       :aria-label="`Supprimer ${article.titre}`"
-                      @click="supprimer(article)"
+                      @click="demanderLaSuppression(article)"
                     >
                       <i class="bx bx-trash text-xl" aria-hidden="true"></i>
                     </button>
@@ -875,5 +890,17 @@ onMounted(charger)
         </div>
       </div>
     </Teleport>
+
+    <Confirmation
+      v-if="aSupprimer"
+      titre="Supprimer cet article"
+      :question="`Supprimer « ${aSupprimer.titre} » ?`"
+      consequence="Cette action est définitive : l'article et sa mise en avant disparaissent du site."
+      libelle-confirmer="Supprimer"
+      dangereux
+      :en-cours="suppressionEnCours"
+      @confirmer="supprimer"
+      @fermer="aSupprimer = null"
+    />
   </div>
 </template>

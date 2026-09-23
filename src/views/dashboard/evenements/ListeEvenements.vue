@@ -11,6 +11,7 @@ import { messageErreur } from '@/api/evenements'
 import { dateLisible, estAnnulable, etatDe, remplissage } from './presentation'
 import PastilleEtat from '@/components/ui/PastilleEtat.vue'
 import Pagination from '@/components/ui/Pagination.vue'
+import Confirmation from '@/components/ui/Confirmation.vue'
 
 /**
  * Liste d'administration des evenements.
@@ -64,11 +65,17 @@ async function charger(page = pagination.value.page, limite = pagination.value.l
  */
 const annulationEnCours = ref('')
 
-async function annuler(evenement: EvenementAdmin) {
+/** L'evenement dont l'annulation est soumise a confirmation. */
+const aAnnuler = ref<EvenementAdmin | null>(null)
+
+function demanderLAnnulation(evenement: EvenementAdmin): void {
   if (annulationEnCours.value !== '') return
-  if (!window.confirm(`Annuler « ${evenement.name} » ? Les inscrits pourront en être informés.`)) {
-    return
-  }
+  aAnnuler.value = evenement
+}
+
+async function annuler() {
+  const evenement = aAnnuler.value
+  if (!evenement || annulationEnCours.value !== '') return
 
   annulationEnCours.value = evenement.slug
   erreur.value = ''
@@ -79,6 +86,7 @@ async function annuler(evenement: EvenementAdmin) {
     erreur.value = messageErreur(souleve)
   } finally {
     annulationEnCours.value = ''
+    aAnnuler.value = null
   }
 }
 
@@ -281,7 +289,7 @@ onMounted(() => charger(1))
                     :disabled="annulationEnCours !== ''"
                     class="rounded-md p-1.5 text-gray-500 transition-colors hover:bg-red-50 hover:text-red-700 disabled:opacity-50"
                     :aria-label="`Annuler ${evenement.name}`"
-                    @click="annuler(evenement)"
+                    @click="demanderLAnnulation(evenement)"
                   >
                     <i
                       class="bx text-xl"
@@ -308,5 +316,18 @@ onMounted(() => charger(1))
         @limite="(lignes) => charger(1, lignes)"
       />
     </div>
+
+    <Confirmation
+      v-if="aAnnuler"
+      titre="Annuler cet évènement"
+      :question="`Annuler « ${aAnnuler.name} » ?`"
+      consequence="Les inscrits pourront en être informés, et l'évènement est retiré du site public. Rien ne permet de revenir en arrière."
+      libelle-confirmer="Annuler l'évènement"
+      libelle-renoncer="Le conserver"
+      dangereux
+      :en-cours="annulationEnCours !== ''"
+      @confirmer="annuler"
+      @fermer="aAnnuler = null"
+    />
   </div>
 </template>

@@ -71,6 +71,16 @@ function appelsPar(methode: string) {
   return appels.filter((appel) => (appel[1] as RequestInit | undefined)?.method === methode)
 }
 
+/**
+ * Repond a la boite de confirmation. Les gestes irreversibles passaient par
+ * `window.confirm` ; ils passent desormais par une boite du cadre, qu'il
+ * faut donc actionner pour que l'appel parte.
+ */
+async function repondre(ecran: VueWrapper, reponse: 'valider' | 'renoncer'): Promise<void> {
+  await ecran.get(`[data-confirmation="${reponse}"]`).trigger('click')
+  await flushPromises()
+}
+
 describe('ecran des utilisateurs', () => {
   beforeEach(() => {
     setActivePinia(createPinia())
@@ -120,13 +130,12 @@ describe('ecran des utilisateurs', () => {
 
   it('affiche le refus du serveur sans masquer la liste', async () => {
     const ecran = await monter([MOI, AUTRE_ACTIF])
-    vi.spyOn(window, 'confirm').mockReturnValue(true)
     vi.mocked(fetch).mockResolvedValueOnce(
       reponse({ message: 'Cette ambassade doit garder au moins un administrateur actif.' }, 422),
     )
 
     await actions(ecran, 'Suspendre Awa')[0]!.trigger('click')
-    await flushPromises()
+    await repondre(ecran, 'valider')
 
     expect(ecran.text()).toContain('au moins un administrateur actif')
     // La liste reste lue : un echec d'action n'est pas un echec de lecture.
@@ -135,20 +144,16 @@ describe('ecran des utilisateurs', () => {
 
   it('demande confirmation avant de suspendre, et n appelle rien si on refuse', async () => {
     const ecran = await monter([MOI, AUTRE_ACTIF])
-    vi.spyOn(window, 'confirm').mockReturnValue(false)
-
     await actions(ecran, 'Suspendre Awa')[0]!.trigger('click')
-    await flushPromises()
+    await repondre(ecran, 'renoncer')
 
     expect(appelsPar('PATCH')).toHaveLength(0)
   })
 
   it('suspend par la route de statut, jamais par le formulaire', async () => {
     const ecran = await monter([MOI, AUTRE_ACTIF])
-    vi.spyOn(window, 'confirm').mockReturnValue(true)
-
     await actions(ecran, 'Suspendre Awa')[0]!.trigger('click')
-    await flushPromises()
+    await repondre(ecran, 'valider')
 
     const [appel] = appelsPar('PATCH')
     expect(String(appel![0])).toBe('/api/admin/users/2/status')
