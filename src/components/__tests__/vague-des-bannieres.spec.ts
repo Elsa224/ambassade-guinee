@@ -11,9 +11,11 @@ import path from 'node:path'
  *
  * La garde ne vise que cette vague-la, reconnaissable a son cadre : les
  * autres aplats du gabarit rejoignent d'autres fonds, et le blanc de la
- * banniere des actualites est correct.
+ * banniere des actualites est correct. Ce cadre commence a 96 unites : les
+ * huit bannieres reprennent la courbe des actualites, dont le SVG reserve
+ * ses premieres unites au vide.
  */
-const VAGUE_DU_GABARIT = 'viewBox="0 0 1440 120"'
+const VAGUE_DU_GABARIT = 'viewBox="0 96 1440 120"'
 const FOND_DE_PAGE = '#f9fafb'
 
 function vues(depart: string): string[] {
