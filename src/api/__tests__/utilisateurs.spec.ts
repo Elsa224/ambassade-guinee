@@ -166,10 +166,12 @@ describe('surface des comptes', () => {
     expect((dernierAppel()[1] as RequestInit).method).toBe('DELETE')
   })
 
-  it("n'offre que les deux roles attribuables depuis une ambassade", () => {
+  it("n'offre que les roles attribuables depuis une ambassade", () => {
     // `super_admin` est refuse en 403 a la creation comme a la modification :
-    // le proposer ne produirait qu'un refus.
-    expect(ROLES_ATTRIBUABLES.map((role) => role.valeur)).toEqual(['editeur', 'admin'])
+    // le proposer ne produirait qu'un refus. `agent_rdv` a rejoint la liste
+    // le 2026-09-24, quand le back l'a livre dans `UserRole::attribuables()`.
+    expect(ROLES_ATTRIBUABLES.map((role) => role.valeur)).toEqual(['editeur', 'agent_rdv', 'admin'])
+    expect(ROLES_ATTRIBUABLES.map((role) => role.valeur)).not.toContain('super_admin')
   })
 })
 
