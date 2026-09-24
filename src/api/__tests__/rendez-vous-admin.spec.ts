@@ -111,8 +111,12 @@ describe('consultation des rendez-vous', () => {
     await refuserRendezVous('rdv .*', 'Dossier incomplet')
     expect(dernierChemin()).toBe(`${CHEMIN_RDV_ADMIN}/rdv%20.*/reject`)
 
+    // Un corps de chaine plutot qu'un Blob : le Blob de jsdom n'expose pas
+    // `stream()` sur toutes les versions de Node, et `Response.blob()` s'en
+    // sert. Le test echouait alors sur la CI et pas en local, pour une raison
+    // etrangere a ce qu'il verifie.
     vi.mocked(fetch).mockImplementation(
-      async () => new Response(new Blob(['x'], { type: 'image/png' })),
+      async () => new Response('octets', { headers: { 'Content-Type': 'image/png' } }),
     )
     await recupererPiece('rdv .*', 'recto')
     expect(dernierChemin()).toBe(`${CHEMIN_RDV_ADMIN}/rdv%20.*/piece/recto`)
