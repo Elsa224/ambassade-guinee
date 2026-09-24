@@ -88,15 +88,25 @@ export interface ModificationCompte {
 }
 
 /**
- * Les deux roles attribuables depuis une ambassade.
+ * Les trois roles attribuables depuis une ambassade.
  *
  * `super_admin` est absent a dessein : le back le refuse en **403**, avec un
  * message explicite, a la creation comme a la modification. Un champ hors de
  * portee se refuse, il ne s'escamote pas — meme precedent que `slug`,
  * `domain` et `modules` dans les parametres.
+ *
+ * `agent_rdv` a rejoint la liste le 2026-09-24, quand le back l'a livre dans
+ * `UserRole::attribuables()`. Il n'y figurait pas avant, et c'etait voulu :
+ * un role propose ici que le back ignore se refuse a l'enregistrement, sans
+ * que l'ecran sache dire pourquoi.
  */
 export const ROLES_ATTRIBUABLES = [
   { valeur: 'editeur', libelle: 'Éditeur', resume: 'Publie le contenu du site.' },
+  {
+    valeur: 'agent_rdv',
+    libelle: 'Agent rendez-vous',
+    resume: "Les demandes de rendez-vous, et rien d'autre.",
+  },
   {
     valeur: 'admin',
     libelle: 'Administrateur',

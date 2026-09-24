@@ -60,10 +60,11 @@ export interface ChangementMotDePasse {
 export const LONGUEUR_MOT_DE_PASSE = 8
 
 /**
- * Les trois roles que le back sert, et il n'y en a pas d'autres.
+ * Les quatre roles que le back sert, et il n'y en a pas d'autres.
  *
  * Releves dans son enumeration le 2026-09-17 : `admin`, `super_admin`,
- * `editeur`. Il n'existe AUCUN role en lecture seule — le contrat des roles
+ * `editeur` ; `agent_rdv` s'y est ajoute le 2026-09-24 avec la consultation
+ * des rendez-vous. Il n'existe AUCUN role en lecture seule — le contrat des roles
  * le refuse explicitement, et une premiere version de ce gabarit en citait
  * un, ce qui aurait donne une condition morte dans un ecran.
  *
@@ -76,6 +77,7 @@ const LIBELLES_ROLE: Record<string, string> = {
   admin: 'Administrateur',
   editeur: 'Éditeur',
   super_admin: 'Super administrateur',
+  agent_rdv: 'Agent rendez-vous',
 }
 
 export function libelleRole(role: string): string {

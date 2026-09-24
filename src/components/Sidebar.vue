@@ -35,7 +35,9 @@
         >
           <div class="flex items-center gap-3">
             <i class="bx bx-user-circle text-xl flex-shrink-0"></i>
-            <span v-if="!isCollapsed" class="font-medium text-sm">Admin</span>
+            <span v-if="!isCollapsed" class="font-medium text-sm">{{
+              agentRdv ? 'Mon poste' : 'Admin'
+            }}</span>
           </div>
           <i
             v-if="!isCollapsed"
@@ -46,6 +48,7 @@
 
         <div v-show="isAdminOpen" class="ml-2 flex flex-col gap-1">
           <router-link
+            v-if="!agentRdv"
             to="/dashboard"
             class="flex items-center gap-3 px-4 py-2 rounded-xl text-white no-underline transition-all duration-300 text-sm font-medium hover:bg-yellow-500/20 hover:text-secondary hover:translate-x-1"
             :exact-active-class="LIEN_ACTIF"
@@ -55,6 +58,7 @@
           </router-link>
 
           <router-link
+            v-if="!agentRdv"
             to="/dashboard/contenu-accueil"
             class="flex items-center gap-3 px-4 py-2 rounded-xl text-white no-underline transition-all duration-300 text-sm font-medium hover:bg-yellow-500/20 hover:text-secondary hover:translate-x-1"
             :active-class="LIEN_ACTIF"
@@ -64,6 +68,7 @@
           </router-link>
 
           <router-link
+            v-if="!agentRdv"
             to="/dashboard/pages"
             class="flex items-center gap-3 px-4 py-2 rounded-xl text-white no-underline transition-all duration-300 text-sm font-medium hover:bg-yellow-500/20 hover:text-secondary hover:translate-x-1"
             :active-class="LIEN_ACTIF"
@@ -73,6 +78,7 @@
           </router-link>
 
           <router-link
+            v-if="!agentRdv"
             to="/dashboard/services"
             class="flex items-center gap-3 px-4 py-2 rounded-xl text-white no-underline transition-all duration-300 text-sm font-medium hover:bg-yellow-500/20 hover:text-secondary hover:translate-x-1"
             :active-class="LIEN_ACTIF"
@@ -82,6 +88,7 @@
           </router-link>
 
           <router-link
+            v-if="!agentRdv"
             to="/dashboard/annuaire"
             class="flex items-center gap-3 px-4 py-2 rounded-xl text-white no-underline transition-all duration-300 text-sm font-medium hover:bg-yellow-500/20 hover:text-secondary hover:translate-x-1"
             :active-class="LIEN_ACTIF"
@@ -114,6 +121,7 @@
           </router-link>
 
           <router-link
+            v-if="!agentRdv"
             to="/dashboard/jours-feries"
             class="flex items-center gap-3 px-4 py-2 rounded-xl text-white no-underline transition-all duration-300 text-sm font-medium hover:bg-yellow-500/20 hover:text-secondary hover:translate-x-1"
             :active-class="LIEN_ACTIF"
@@ -123,6 +131,7 @@
           </router-link>
 
           <router-link
+            v-if="!agentRdv"
             to="/dashboard/articles"
             class="flex items-center gap-3 px-4 py-2 rounded-xl text-white no-underline transition-all duration-300 text-sm font-medium hover:bg-yellow-500/20 hover:text-secondary hover:translate-x-1"
             :active-class="LIEN_ACTIF"
@@ -149,7 +158,7 @@
         Evenements, et un intitule qu'on deplie sur rien est une impasse. La
         garde porte donc sur l'en-tete, pas seulement sur le lien.
       -->
-      <div v-if="evenementsOuverts">
+      <div v-if="evenementsOuverts || rendezVousOuverts">
         <div
           @click="toggleAmbassade"
           class="flex items-center justify-between px-4 py-3 rounded-xl cursor-pointer transition-all duration-300 text-white hover:bg-yellow-500/20 hover:text-secondary"
@@ -167,12 +176,23 @@
 
         <div v-show="isAmbassadeOpen" class="ml-2 flex flex-col gap-1">
           <router-link
+            v-if="evenementsOuverts"
             to="/dashboard/evenements"
             class="flex items-center gap-3 px-4 py-2 rounded-xl text-white no-underline transition-all duration-300 text-sm font-medium hover:bg-yellow-500/20 hover:text-secondary hover:translate-x-1"
             :active-class="LIEN_ACTIF"
           >
             <i class="bx bx-calendar-event text-xl flex-shrink-0"></i>
             <span v-if="!isCollapsed">Evènements</span>
+          </router-link>
+
+          <router-link
+            v-if="rendezVousOuverts"
+            to="/dashboard/rendez-vous"
+            class="flex items-center gap-3 px-4 py-2 rounded-xl text-white no-underline transition-all duration-300 text-sm font-medium hover:bg-yellow-500/20 hover:text-secondary hover:translate-x-1"
+            :active-class="LIEN_ACTIF"
+          >
+            <i class="bx bx-calendar-check text-xl flex-shrink-0"></i>
+            <span v-if="!isCollapsed">Rendez-vous</span>
           </router-link>
         </div>
       </div>
@@ -198,7 +218,7 @@ import { useAuthStore } from '@/stores/auth'
 import { useTenantStore } from '@/stores/tenant'
 import { useIdentite } from '@/tenant/identite'
 import { etatDuModule } from '@/tenant/module-administration'
-import { peutAdministrer } from '@/acces/roles'
+import { peutAdministrer, peutConsulterLesRendezVous, estAgentRdv } from '@/acces/roles'
 
 const router = useRouter()
 const auth = useAuthStore()
@@ -212,6 +232,24 @@ const tenant = useTenantStore()
  * `tenant/module-administration.ts`.
  */
 const evenementsOuverts = computed(() => etatDuModule('secure_events', tenant) === 'ouvert')
+
+/**
+ * La consultation des rendez-vous tient a deux conditions, et non une : le
+ * module souscrit par l'ambassade, et un role que le back accepte sur cette
+ * surface. Un editeur voit le module ouvert et n'y recevrait que des 403.
+ */
+const rendezVousOuverts = computed(
+  () =>
+    etatDuModule('secure_rdv', tenant) === 'ouvert' &&
+    peutConsulterLesRendezVous(auth.utilisateur?.role),
+)
+
+/**
+ * Un agent rendez-vous n'administre rien : le groupe du contenu ne lui
+ * proposerait que des ecrans qui repondent 403. On les retire plutot que de
+ * les lui laisser essayer un a un.
+ */
+const agentRdv = computed(() => estAgentRdv(auth.utilisateur?.role))
 
 /**
  * Les surfaces qui engagent l'ambassade, reservees aux administrateurs.

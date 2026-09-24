@@ -38,3 +38,41 @@ export function peutAdministrer(role: string | null | undefined): boolean {
   if (role === null || role === undefined || role === '') return true
   return ROLES_ADMINISTRATEURS.includes(role)
 }
+
+/**
+ * Le role metier livre avec la consultation des rendez-vous.
+ *
+ * C'est la seule surface qu'il ouvre : tout le reste de `/api/admin` lui
+ * repond 403. Le reconnaitre permet de ne pas lui proposer un menu dont
+ * chaque entree serait un refus.
+ */
+export const ROLE_AGENT_RDV = 'agent_rdv'
+
+/**
+ * Vrai si ce compte n'est QU'un agent rendez-vous.
+ *
+ * Ici pas de defaut ouvert : la question posee est « faut-il retirer des
+ * entrees de menu ? », et un role inconnu ne doit pas se voir amputer le
+ * sien. Seul le role exact retire.
+ */
+export function estAgentRdv(role: string | null | undefined): boolean {
+  return role === ROLE_AGENT_RDV
+}
+
+/**
+ * Les roles que le back accepte sur `/api/admin/secure/rdv`, releves dans
+ * `role:admin,agent_rdv` — `super_admin` traverse sans etre nomme.
+ *
+ * Meme raisonnement que pour l'administration, et donc les memes deux
+ * defauts : la liste est ecrite par la POSITIVE — un role que le back ne
+ * connaitrait pas encore n'obtiendrait ici qu'une suite de 403 — mais une
+ * identite pas encore chargee OUVRE, parce que ne pas savoir n'est pas un
+ * refus.
+ */
+const ROLES_RENDEZ_VOUS = ['admin', 'super_admin', ROLE_AGENT_RDV]
+
+/** Vrai si ce role ouvre la consultation des rendez-vous. */
+export function peutConsulterLesRendezVous(role: string | null | undefined): boolean {
+  if (role === null || role === undefined || role === '') return true
+  return ROLES_RENDEZ_VOUS.includes(role)
+}
