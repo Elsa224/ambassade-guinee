@@ -215,6 +215,7 @@ const RUBRIQUES = {
   '/dashboard/jours-feries': { titre: 'Jours fériés', icone: 'bx bxs-calendar-star' },
   '/dashboard/articles': { titre: 'Articles', icone: 'bx bxs-news' },
   '/dashboard/profil': { titre: 'Mon profil', icone: 'bx bxs-user-circle' },
+  '/dashboard/rendez-vous': { titre: 'Rendez-vous', icone: 'bx bx-calendar-check' },
 }
 
 /**

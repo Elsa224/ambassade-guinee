@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
-import { peutAdministrer } from '@/acces/roles'
+import { peutAdministrer, peutConsulterLesRendezVous, estAgentRdv } from '@/acces/roles'
 
 // Layouts
 import Layout from '@/layouts/Layout.vue'
@@ -214,6 +214,15 @@ const router = createRouter({
         },
         { path: 'jours-feries', name: 'jours-feries-admin', component: JoursFeriesAdmin },
         {
+          // La seule surface que le role `agent_rdv` ouvre. Le back la garde
+          // par `role:admin,agent_rdv` ; l'editeur y recoit 403, et une
+          // ambassade sans le module `secure_rdv` un 404.
+          path: 'rendez-vous',
+          name: 'rendez-vous-admin',
+          meta: { rendezVous: true },
+          component: () => import('@/views/dashboard/rendez-vous/ListeRendezVous.vue'),
+        },
+        {
           path: 'evenements',
           component: RacineEvenementsAdmin,
           children: [
@@ -319,6 +328,30 @@ router.beforeEach(async (destination) => {
     await auth.pretPourLesGardes()
     if (!peutAdministrer(auth.utilisateur?.role)) {
       return { path: '/dashboard' }
+    }
+  }
+
+  // Meme garde cosmetique pour la consultation des rendez-vous, avec sa
+  // propre liste : `agent_rdv` l'ouvre alors qu'il n'administre rien.
+  if (versDashboard && destination.meta.rendezVous === true) {
+    await auth.pretPourLesGardes()
+    if (!peutConsulterLesRendezVous(auth.utilisateur?.role)) {
+      return { path: '/dashboard' }
+    }
+  }
+
+  /**
+   * Un agent rendez-vous n'a rien a faire sur le tableau de bord.
+   *
+   * Celui-ci resume le contenu du site, dont aucune route ne lui repond
+   * autrement qu'en 403 : le laisser y atterrir apres sa connexion lui
+   * montrerait un ecran vide ou en erreur avant qu'il trouve la seule page
+   * qui le concerne.
+   */
+  if (destination.path === '/dashboard') {
+    await auth.pretPourLesGardes()
+    if (estAgentRdv(auth.utilisateur?.role)) {
+      return { path: '/dashboard/rendez-vous' }
     }
   }
 
